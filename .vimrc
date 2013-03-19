@@ -1,0 +1,163 @@
+" Link to this file from your $HOME
+" ln -s $SRC_ROOT/dotfiles/.vimrc .vimrc
+"
+
+"set runtimepath^=~/.vim/bundle/vim-gitgutter
+set runtimepath^=~/.vim/bundle/ctrlp.vim
+let g:ctrlp_use_caching = 1
+let g:ctrlp_clear_cache_on_exit = 1
+let g:ctrlp_show_hidden = 1
+let g:ctrlp_extensions = ['tag']
+
+filetype off
+
+set rtp^=/usr/local/Cellar/go/1.0.3/misc/vim
+
+set rtp^=~/.vim/bundle/vundle/
+call vundle#rc()
+
+Bundle 'Lokaltog/vim-powerline'
+Bundle 'natw/keyboard_cat.vim'
+if has("gui_running")
+	let g:Powerline_symbols = 'fancy'
+else
+	let g:Powerline_symbols = 'compatible'
+endif
+
+set grepprg=ack\ -a
+
+" When started as "evim", evim.vim will already have done these settings.
+if v:progname =~? "evim"
+  finish
+endif
+
+" Use Vim settings, rather then Vi settings (much better!).
+" This must be first, because it changes other options as a side effect.
+set nocompatible
+set laststatus=2
+set encoding=utf-8
+set ttyfast
+
+" allow backspacing over everything in insert mode
+set backspace=indent,eol,start
+
+set history=50		" keep 50 lines of command line history
+set ruler		" show the cursor position all the time
+set showcmd		" display incomplete commands
+set incsearch		" do incremental searching
+
+" For Win32 GUI: remove 't' flag from 'guioptions': no tearoff menu entries
+" let &guioptions = substitute(&guioptions, "t", "", "g")
+
+" Don't use Ex mode, use Q for formatting
+map Q gq
+
+" map home row to exit Insert mode
+imap jj <Esc>
+imap hh <Esc>
+imap kk <Esc>
+imap lll <Esc>
+
+nmap <F3> :noautocmd execute "vimgrep /" . expand("<cword>") . "/j **/*.cpp **/*.h **/*.cc **/*.c **/*.java **/*.rb **/*.py **/*.pl" <Bar> cw<CR> :cc<CR>
+
+vmap <Tab> =
+
+:if $VIM_CRONTAB == "true"
+:set nobackup
+:set nowritebackup
+:endif
+
+nmap <F9> :w<CR>:cp<CR>
+nmap <F10> :w<CR>:cn<CR>
+nmap C i/*  */<CR><Esc>klllli
+nmap <F11> :w<CR>
+imap <F11> <Esc>:w<CR>
+
+" F4 - swap header and cpp files
+nmap <F4> :wa<CR> :e %:p:s,.h$,.X123X,:s,.cpp$,.h,:s,.X123X$,.cpp,<CR>
+imap <F4> <Esc> <F4>
+vmap <F4> <Esc> <F4>
+
+" F7 - incremental build
+nmap <F7> :wa<CR> :!clear <CR><CR> :make<CR><CR>
+imap <F7> <Esc> <F7>
+vmap <F7> <Esc> <F7>
+
+" C-F7 - clean build
+nmap <C-F7> :!make clean <CR><CR> <F7>
+imap <C-F7> <Esc> <C-F7>
+vmap <C-F7> <Esc> <C-F7>
+
+vmap <silent> ,y "xy<CR>:wviminfo! ~/.viminfo
+nmap <silent> ,p :rviminfo! ~/.viminfo<CR>"xp
+
+vmap <C-c> y:call system("pbcopy", getreg("\""))<CR>
+" nmap <C-v> :call setreg("\"",system("pbpaste"))<CR>p
+
+set tags=/usr/include/tags,./tags
+
+nnoremap s :exec "normal i".nr2char(getchar())."\el"<CR>
+nnoremap S :exec "normal a".nr2char(getchar())."\el"<CR>
+
+" CTRL-U in insert mode deletes a lot.  Use CTRL-G u to first break undo,
+" so that you can undo CTRL-U after inserting a line break.
+inoremap <C-U> <C-G>u<C-U>
+
+" In many terminal emulators the mouse works just fine, thus enable it.
+if has('mouse')
+  set mouse=a
+endif
+
+" Switch syntax highlighting on, when the terminal has colors
+" Also switch on highlighting the last used search pattern.
+if &t_Co > 2 || has("gui_running")
+  syntax on
+  set hlsearch
+endif
+
+" Only do this part when compiled with support for autocommands.
+if has("autocmd")
+
+  " Enable file type detection.
+  " Use the default filetype settings, so that mail gets 'tw' set to 72,
+  " 'cindent' is on in C files, etc.
+  " Also load indent files, to automatically do language-dependent indenting.
+  filetype plugin indent on
+
+  " Put these in an autocmd group, so that we can delete them easily.
+  augroup vimrcEx
+  au!
+
+  " For all text files set 'textwidth' to 78 characters.
+  autocmd FileType text setlocal textwidth=78
+
+  " When editing a file, always jump to the last known cursor position.
+  " Don't do it when the position is invalid or when inside an event handler
+  " (happens when dropping a file on gvim).
+  " Also don't do it when the mark is in the first line, that is the default
+  " position when opening a file.
+  autocmd BufReadPost *
+    \ if line("'\"") > 1 && line("'\"") <= line("$") |
+    \   exe "normal! g`\"" |
+    \ endif
+
+  augroup END
+
+else
+
+  set autoindent		" always set autoindenting on
+
+endif " has("autocmd")
+
+set cino=:0g0
+set sw=4
+set ts=4
+
+" Convenient command to see the difference between the current buffer and the
+" file it was loaded from, thus the changes you made.
+" Only define it when not defined already.
+if !exists(":DiffOrig")
+  command DiffOrig vert new | set bt=nofile | r # | 0d_ | diffthis
+		  \ | wincmd p | diffthis
+endif
+
