@@ -3,6 +3,8 @@ bind "set completion-ignore-case on"
 
 shopt -s cdspell
 
+alias ssh-dev='ssh will.thefundersclub.com'
+
 export SRC_ROOT=$HOME/src
 
 mymake()
@@ -14,11 +16,21 @@ alias make=mymake
 
 export PATH=$PATH:$HOME/bin
 
-if [ -d "/c/Windows" ]; then
+platform='unknown'
+unamestr=`uname`
+if [[ "$unamestr" == 'Linux' ]]; then
+	platform='linux'
+elif [[ "$unamestr" == 'FreeBSD' ]]; then
+	platform='freebsd'
+elif [ -d "/c/Windows" ]; then
+	platform='windows'
+fi
+
+if [[ $platform == 'windows' ]]; then
 	alias ls='ls -G -a -l -tr --color'
 fi
 
-if [ -d "/etc/defaults" ]; then
+if [[ $platform == 'freebsd' ]]; then
 	# Mac OS
 	# set prompt = "%{\033[31m%}[%~] %{\033[0m%}%#"
 	alias ls='ls -G -a -l -tr'
@@ -31,22 +43,14 @@ if [ -d "/etc/defaults" ]; then
 	fi
 fi
 
-if [ -f "/etc/debian_version" ]; then
+if [[ $platform == 'linux' ]]; then
 	alias ls='ls -G -a -l -tr --color'
 	# Debian
 	#set prompt = "%{\033[32m%}[%~] %{\033[0m%}%#"
 	#setenv LS_COLORS 'no=00:fi=00:di=01;33:ln=01;36:pi=40;33:so=40;33:bd=40;33:cd=40;33:ex=01;32:*.sh=01;32:*.pl=01;32:'
 	#set color = (ls-F)
-	alias ls='"ls-F" -l --color -tr'
 	#set term=xterm
 	# limit coredumpsize 16000
-fi
-
-if [ -d "/home/ubuntu" ]; then
-	alias ls='ls -G -a -l -tr --color'
-	# Ubuntu
-	#set prompt = "%{\033[35m%}[%~] %{\033[0m%}%#"
-	#limit coredumpsize 16000
 fi
 
 DULL=0
