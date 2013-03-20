@@ -3,7 +3,6 @@
 "
 
 "set runtimepath^=~/.vim/bundle/vim-gitgutter
-set runtimepath^=~/.vim/bundle/ctrlp.vim
 let g:ctrlp_use_caching = 1
 let g:ctrlp_clear_cache_on_exit = 1
 let g:ctrlp_show_hidden = 1
@@ -11,13 +10,16 @@ let g:ctrlp_extensions = ['tag']
 
 filetype off
 
-set rtp^=/usr/local/Cellar/go/1.0.3/misc/vim
+call pathogen#infect()
 
 set rtp^=~/.vim/bundle/vundle/
 call vundle#rc()
 
+Bundle 'kien/ctrlp.vim'
 Bundle 'Lokaltog/vim-powerline'
-Bundle 'natw/keyboard_cat.vim'
+"Bundle 'natw/keyboard_cat.vim'
+"Bundle 'scrooloose/syntastic'
+
 if has("gui_running")
 	let g:Powerline_symbols = 'fancy'
 else
@@ -94,7 +96,7 @@ nmap <silent> ,p :rviminfo! ~/.viminfo<CR>"xp
 vmap <C-c> y:call system("pbcopy", getreg("\""))<CR>
 " nmap <C-v> :call setreg("\"",system("pbpaste"))<CR>p
 
-set tags=/usr/include/tags,./tags
+set tags=~/tags
 
 nnoremap s :exec "normal i".nr2char(getchar())."\el"<CR>
 nnoremap S :exec "normal a".nr2char(getchar())."\el"<CR>
@@ -152,6 +154,7 @@ endif " has("autocmd")
 set cino=:0g0
 set sw=4
 set ts=4
+autocmd FileType python setlocal sw=4 sts=4 ts=4 expandtab
 
 " Convenient command to see the difference between the current buffer and the
 " file it was loaded from, thus the changes you made.
