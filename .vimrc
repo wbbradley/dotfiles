@@ -19,6 +19,7 @@ Bundle 'kien/ctrlp.vim'
 Bundle 'Lokaltog/vim-powerline'
 "Bundle 'natw/keyboard_cat.vim'
 "Bundle 'scrooloose/syntastic'
+Bundle 'davidhalter/jedi-vim'
 
 if has("gui_running")
 	let g:Powerline_symbols = 'fancy'
@@ -84,6 +85,14 @@ vmap <F4> <Esc> <F4>
 nmap <F7> :wa<CR> :!clear <CR><CR> :make<CR><CR>
 imap <F7> <Esc> <F7>
 vmap <F7> <Esc> <F7>
+
+" map Shift Tab to outdent
+nmap <S-Tab> V<
+vmap <S-Tab> <
+
+" map Tab to indent
+nmap <Tab> V>
+vmap <Tab> >
 
 " C-F7 - clean build
 nmap <C-F7> :!make clean <CR><CR> <F7>

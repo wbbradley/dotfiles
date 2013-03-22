@@ -22,6 +22,8 @@ if [[ "$unamestr" == 'Linux' ]]; then
 	platform='linux'
 elif [[ "$unamestr" == 'FreeBSD' ]]; then
 	platform='freebsd'
+elif [[ "$unamestr" == 'Darwin' ]]; then
+	platform='freebsd'
 elif [ -d "/c/Windows" ]; then
 	platform='windows'
 fi
@@ -38,6 +40,8 @@ if [[ $platform == 'freebsd' ]]; then
 	defaults write com.apple.Xcode PBXPageGuideLocation "79"
 	alias crontab='env VIM_CRONTAB=true crontab -e'
 	alias kgs='javaws http://files.gokgs.com/javaBin/cgoban.jnlp'
+	alias venv='source env/bin/activate'
+
 	if [ -d "/Library/Java/Home" ]; then
 		export JAVA_HOME=/Library/Java/Home
 	fi
