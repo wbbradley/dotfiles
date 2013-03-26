@@ -14,7 +14,7 @@ mymake()
 
 alias make=mymake
 
-export PATH=$PATH:$HOME/bin
+export PATH=/usr/local/bin:$PATH:$HOME/bin
 
 platform='unknown'
 unamestr=`uname`
@@ -41,7 +41,7 @@ if [[ $platform == 'freebsd' ]]; then
 	alias crontab='env VIM_CRONTAB=true crontab -e'
 	alias kgs='javaws http://files.gokgs.com/javaBin/cgoban.jnlp'
 	alias venv='source env/bin/activate'
-
+	export PGDATA=/usr/local/var/postgres
 	if [ -d "/Library/Java/Home" ]; then
 		export JAVA_HOME=/Library/Java/Home
 	fi
