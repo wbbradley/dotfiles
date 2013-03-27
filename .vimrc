@@ -4,10 +4,10 @@
 
 "set runtimepath^=~/.vim/bundle/vim-gitgutter
 let g:ctrlp_use_caching = 1
-let g:ctrlp_clear_cache_on_exit = 1
+let g:ctrlp_clear_cache_on_exit = 0
 let g:ctrlp_show_hidden = 1
 let g:ctrlp_extensions = ['tag']
-let g:ctrlp_cusom_ignore = { 'file': '\v\.(pyc)$' }
+let g:ctrlp_custom_ignore = { 'file': '\v\.(pyc)$' }
 set wildignore+=*.pyc
 
 filetype off
