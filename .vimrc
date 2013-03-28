@@ -72,8 +72,8 @@ vmap <Tab> =
 :set nowritebackup
 :endif
 
-nmap <F9> :w<CR>:cp<CR>
-nmap <F10> :w<CR>:cn<CR>
+nmap <F9> :set autowrite<CR>:cp<CR>:set noautowrite<CR>
+nmap <F10> :set autowrite<CR>:cn<CR>:set noautowrite<CR>
 nmap C i/*  */<CR><Esc>klllli
 nmap <F11> :w<CR>
 imap <F11> <Esc>:w<CR>
