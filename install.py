@@ -14,8 +14,8 @@ def get_dest_path(file):
 
 
 def system(cmd):
-    print(basename(__file__) + ' running: ' + cmd)
-    #os.system(cmd)
+    #print(basename(__file__) + ' running: ' + cmd)
+    os.system(cmd)
 
 
 for file_tuple in files:
