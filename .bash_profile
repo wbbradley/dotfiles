@@ -14,7 +14,7 @@ mymake()
 
 alias make=mymake
 
-export PATH=/usr/local/bin:$PATH:$HOME/bin
+export PATH=/usr/local/bin:$PATH:/usr/local/share/python:$HOME/bin
 
 platform='unknown'
 unamestr=`uname`
