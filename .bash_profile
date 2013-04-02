@@ -38,7 +38,6 @@ if [[ $platform == 'freebsd' ]]; then
 	alias ls='ls -G -a -l -tr'
 	defaults write com.apple.Xcode XCCodeSenseFormattingOptions -dict BlockSeparator "\n" CaseStatementSpacing ""
 	defaults write com.apple.Xcode PBXPageGuideLocation "79"
-	alias crontab='env VIM_CRONTAB=true crontab -e'
 	alias kgs='javaws http://files.gokgs.com/javaBin/cgoban.jnlp'
 	alias venv='source env/bin/activate'
 	export PGDATA=/usr/local/var/postgres
@@ -122,3 +121,6 @@ PROMPT_COMMAND='export ERR=$?'
 
 PS1="${BRIGHT_RED}[\w]${NORMAL}\$ ${RESET}"
 
+
+### Added by the Heroku Toolbelt
+export PATH="/usr/local/heroku/bin:$PATH"

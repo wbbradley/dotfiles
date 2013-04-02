@@ -7,7 +7,7 @@ let g:ctrlp_use_caching = 1
 let g:ctrlp_clear_cache_on_exit = 0
 let g:ctrlp_show_hidden = 1
 let g:ctrlp_extensions = ['tag']
-let g:ctrlp_custom_ignore = { 'file': '\v\.(pyc)$' }
+let g:ctrlp_custom_ignore = { 'dir': '/env$', 'file': '\v\.(pyc)$' }
 set wildignore+=*.pyc
 
 filetype off
@@ -28,8 +28,6 @@ if has("gui_running")
 else
 	let g:Powerline_symbols = 'compatible'
 endif
-
-set grepprg=ack\ -a
 
 " When started as "evim", evim.vim will already have done these settings.
 if v:progname =~? "evim"
@@ -63,7 +61,9 @@ imap hh <Esc>
 imap kk <Esc>
 imap lll <Esc>
 
-nmap <F3> :noautocmd execute "vimgrep /" . expand("<cword>") . "/j **/*.cpp **/*.h **/*.cc **/*.c **/*.java **/*.rb **/*.py **/*.pl" <Bar> cw<CR> :cc<CR>
+" nmap <F3> :noautocmd execute "vimgrep /" . expand("<cword>") . "/j **/*.cpp **/*.h **/*.cc **/*.c **/*.java **/*.rb **/*.py **/*.pl" <Bar> cw<CR> :cc<CR>
+"nmap <F3> :noautocmd execute "vimgrep /" . expand("<cword>") . "/j **/*.py **/*.htm* **/*.txt" <Bar> cw<CR> :cc<CR>
+map <F3> :execute " grep -srnw --binary-files=without-match --exclude-dir=.git --exclude-dir=env . -e " . expand("<cword>") . " " <bar> cwindow<CR><CR><CR>
 
 vmap <Tab> =
 
