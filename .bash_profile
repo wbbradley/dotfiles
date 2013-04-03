@@ -16,6 +16,10 @@ alias make=mymake
 
 export PATH=/usr/local/bin:$PATH:/usr/local/share/python:$HOME/bin
 
+if [[ -d "/usr/local/heroku/bin" ]]; then
+	export PATH="/usr/local/heroku/bin:$PATH"
+fi
+
 platform='unknown'
 unamestr=`uname`
 if [[ "$unamestr" == 'Linux' ]]; then
@@ -38,7 +42,6 @@ if [[ $platform == 'freebsd' ]]; then
 	alias ls='ls -G -a -l -tr'
 	defaults write com.apple.Xcode XCCodeSenseFormattingOptions -dict BlockSeparator "\n" CaseStatementSpacing ""
 	defaults write com.apple.Xcode PBXPageGuideLocation "79"
-	alias crontab='env VIM_CRONTAB=true crontab -e'
 	alias kgs='javaws http://files.gokgs.com/javaBin/cgoban.jnlp'
 	alias venv='source env/bin/activate'
 	export PGDATA=/usr/local/var/postgres
