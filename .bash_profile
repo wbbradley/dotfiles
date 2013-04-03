@@ -122,3 +122,7 @@ PROMPT_COMMAND='export ERR=$?'
 
 PS1="${BRIGHT_RED}[\w]${NORMAL}\$ ${RESET}"
 
+if [[ -f "local.bashrc" ]]; then
+	source local.bashrc
+fi
+
