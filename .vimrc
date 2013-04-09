@@ -22,6 +22,7 @@ Bundle 'Lokaltog/vim-powerline'
 "Bundle 'natw/keyboard_cat.vim'
 "Bundle 'scrooloose/syntastic'
 Bundle 'davidhalter/jedi-vim'
+Bundle 'vim-scripts/grep.vim.git'
 
 if has("gui_running")
 	let g:Powerline_symbols = 'fancy'
@@ -61,9 +62,22 @@ imap hh <Esc>
 imap kk <Esc>
 imap lll <Esc>
 
+function! FindPrompt()
+	let str = input("Search: ", expand("<cword>"))
+	if str == ""
+		return
+	endif
+
+	:silent! execute " grep -srnw --binary-files=without-match --exclude-dir=migrations --exclude-dir=.git --exclude-dir=env . -e " . str
+	
+	:cw
+	:cc
+endfunction
+
 " nmap <F3> :noautocmd execute "vimgrep /" . expand("<cword>") . "/j **/*.cpp **/*.h **/*.cc **/*.c **/*.java **/*.rb **/*.py **/*.pl" <Bar> cw<CR> :cc<CR>
 "nmap <F3> :noautocmd execute "vimgrep /" . expand("<cword>") . "/j **/*.py **/*.htm* **/*.txt" <Bar> cw<CR> :cc<CR>
-map <F3> :execute " grep -srnw --binary-files=without-match --exclude-dir=.git --exclude-dir=env . -e " . expand("<cword>") . " " <bar> cwindow<CR><CR><CR>
+map <F3> :execute " grep -srnw --binary-files=without-match --exclude-dir=migrations --exclude-dir=.git --exclude-dir=env . -e " . expand("<cword>") . " " <bar> cwindow<CR><CR><CR>
+nmap f :call FindPrompt()<CR>
 
 vmap <Tab> =
 
@@ -72,8 +86,8 @@ vmap <Tab> =
 :set nowritebackup
 :endif
 
-nmap <F9> :set autowrite<CR>:cp<CR>:set noautowrite<CR>
-nmap <F10> :set autowrite<CR>:cn<CR>:set noautowrite<CR>
+nmap <F9> :set autowrite<CR>:cp<CR>:set noautowrite<CR>zz
+nmap <F10> :set autowrite<CR>:cn<CR>:set noautowrite<CR>zz
 nmap C i/*  */<CR><Esc>klllli
 nmap <F11> :w<CR>
 imap <F11> <Esc>:w<CR>

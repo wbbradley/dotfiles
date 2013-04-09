@@ -3,8 +3,6 @@ bind "set completion-ignore-case on"
 
 shopt -s cdspell
 
-alias ssh-dev='ssh will.thefundersclub.com'
-
 export SRC_ROOT=$HOME/src
 
 mymake()
