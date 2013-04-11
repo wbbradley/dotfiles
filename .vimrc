@@ -7,7 +7,8 @@ let g:ctrlp_use_caching = 1
 let g:ctrlp_clear_cache_on_exit = 0
 let g:ctrlp_show_hidden = 1
 let g:ctrlp_extensions = ['tag']
-let g:ctrlp_custom_ignore = { 'dir': '/env$', 'file': '\v\.(pyc)$' }
+" let g:ctrlp_custom_ignore = { 'dir': '/env$', 'file': '\v\.(pyc)$' }
+let g:ctrlp_custom_ignore = { 'file': '\v\.(pyc)$' }
 set wildignore+=*.pyc
 
 filetype off
@@ -62,8 +63,21 @@ imap hh <Esc>
 imap kk <Esc>
 imap lll <Esc>
 
+function! FindPromptNoFilter()
+	let str = input("Search: ", "")
+	if str == ""
+		return
+	endif
+
+	:silent! execute " grep -srnw --binary-files=without-match --exclude-dir=migrations --exclude-dir=.git . -e " . str
+	" :silent! execute " grep -srnw --binary-files=without-match --exclude-dir=migrations --exclude-dir=.git --exclude-dir=env . -e " . str
+	
+	:cw
+	:cc
+endfunction
+
 function! FindPrompt()
-	let str = input("Search: ", expand("<cword>"))
+	let str = input("Search: ", "")
 	if str == ""
 		return
 	endif
@@ -74,10 +88,37 @@ function! FindPrompt()
 	:cc
 endfunction
 
+function! FindWordNoFilter()
+	let str = expand("<cword>")
+	if str == ""
+		return
+	endif
+
+	:silent! execute " grep -srnw --binary-files=without-match --exclude-dir=migrations --exclude-dir=.git . -e " . str
+	
+	:cw
+	:cc
+endfunction
+
+function! FindWord()
+	let str = expand("<cword>")
+	if str == ""
+		return
+	endif
+
+	:silent! execute "grep -srnw --binary-files=without-match --exclude-dir=migrations --exclude-dir=.git --exclude-dir=env . -e " . str
+	
+	:cw
+	:cc
+endfunction
+
 " nmap <F3> :noautocmd execute "vimgrep /" . expand("<cword>") . "/j **/*.cpp **/*.h **/*.cc **/*.c **/*.java **/*.rb **/*.py **/*.pl" <Bar> cw<CR> :cc<CR>
 "nmap <F3> :noautocmd execute "vimgrep /" . expand("<cword>") . "/j **/*.py **/*.htm* **/*.txt" <Bar> cw<CR> :cc<CR>
-map <F3> :execute " grep -srnw --binary-files=without-match --exclude-dir=migrations --exclude-dir=.git --exclude-dir=env . -e " . expand("<cword>") . " " <bar> cwindow<CR><CR><CR>
-nmap f :call FindPrompt()<CR>
+" map <F3> :execute " grep -srnw --binary-files=without-match --exclude-dir=migrations --exclude-dir=.git --exclude-dir=env . -e " . expand("<cword>") . " " <bar> cwindow<CR><CR><CR>
+map <F3> :call FindWord()<CR>
+map <F4> :call FindWordNoFilter()<CR>
+nmap F :call FindPrompt()<CR>
+nmap E :call FindPromptNoFilter()<CR>
 
 vmap <Tab> =
 
@@ -93,9 +134,9 @@ nmap <F11> :w<CR>
 imap <F11> <Esc>:w<CR>
 
 " F4 - swap header and cpp files
-nmap <F4> :wa<CR> :e %:p:s,.h$,.X123X,:s,.cpp$,.h,:s,.X123X$,.cpp,<CR>
-imap <F4> <Esc> <F4>
-vmap <F4> <Esc> <F4>
+" nmap <F4> :wa<CR> :e %:p:s,.h$,.X123X,:s,.cpp$,.h,:s,.X123X$,.cpp,<CR>
+" imap <F4> <Esc> <F4>
+" vmap <F4> <Esc> <F4>
 
 " F7 - incremental build
 nmap <F7> :wa<CR> :!clear <CR><CR> :make<CR><CR>
@@ -107,7 +148,7 @@ nmap <S-Tab> V<
 vmap <S-Tab> <
 
 " map Tab to indent
-nmap <Tab> V>
+" nmap <Tab> V>
 vmap <Tab> >
 
 " C-F7 - clean build
