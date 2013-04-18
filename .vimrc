@@ -117,6 +117,7 @@ nmap F :call FindPrompt()<CR>
 nmap E :call FindPromptNoFilter()<CR>
 nmap T :CtrlPTag<CR>
 vmap <Tab> =
+nmap O :ls<CR>:b
 
 :if $VIM_CRONTAB == "true"
 :set nobackup
