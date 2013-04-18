@@ -6,6 +6,9 @@ files = [
     ('.bash_profile', ['.bashrc']),
     ('.vimrc', []),
     ('.inputrc', []),
+
+    # See pdbpp - a very useful python debugger extension
+    ('.pdbrc.py', []),
 ]
 
 

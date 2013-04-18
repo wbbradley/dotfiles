@@ -69,11 +69,10 @@ function! FindPromptNoFilter()
 		return
 	endif
 
-	:silent! execute " grep -srnw --binary-files=without-match --exclude-dir=migrations --exclude-dir=.git . -e " . str
-	" :silent! execute " grep -srnw --binary-files=without-match --exclude-dir=migrations --exclude-dir=.git --exclude-dir=env . -e " . str
+	:silent! execute " grep -srn --binary-files=without-match --exclude-dir=migrations --exclude-dir=.git . -e " . str
+	" :silent! execute " grep -srn --binary-files=without-match --exclude-dir=migrations --exclude-dir=.git --exclude-dir=env . -e " . str
 	
 	:cw
-	:cc
 endfunction
 
 function! FindPrompt()
@@ -82,10 +81,9 @@ function! FindPrompt()
 		return
 	endif
 
-	:silent! execute " grep -srnw --binary-files=without-match --exclude-dir=migrations --exclude-dir=.git --exclude-dir=env . -e " . str
+	:silent! execute "grep -srn --binary-files=without-match --exclude-dir=migrations --exclude-dir=.git --exclude-dir=env . -e " . str
 	
 	:cw
-	:cc
 endfunction
 
 function! FindWordNoFilter()
@@ -94,10 +92,9 @@ function! FindWordNoFilter()
 		return
 	endif
 
-	:silent! execute " grep -srnw --binary-files=without-match --exclude-dir=migrations --exclude-dir=.git . -e " . str
+	:silent! execute " grep -srn --binary-files=without-match --exclude-dir=migrations --exclude-dir=.git . -e " . str
 	
 	:cw
-	:cc
 endfunction
 
 function! FindWord()
@@ -106,20 +103,19 @@ function! FindWord()
 		return
 	endif
 
-	:silent! execute "grep -srnw --binary-files=without-match --exclude-dir=migrations --exclude-dir=.git --exclude-dir=env . -e " . str
+	:silent! execute "grep -srn --binary-files=without-match --exclude-dir=migrations --exclude-dir=.git --exclude-dir=env . -e " . str
 	
 	:cw
-	:cc
 endfunction
 
 " nmap <F3> :noautocmd execute "vimgrep /" . expand("<cword>") . "/j **/*.cpp **/*.h **/*.cc **/*.c **/*.java **/*.rb **/*.py **/*.pl" <Bar> cw<CR> :cc<CR>
 "nmap <F3> :noautocmd execute "vimgrep /" . expand("<cword>") . "/j **/*.py **/*.htm* **/*.txt" <Bar> cw<CR> :cc<CR>
-" map <F3> :execute " grep -srnw --binary-files=without-match --exclude-dir=migrations --exclude-dir=.git --exclude-dir=env . -e " . expand("<cword>") . " " <bar> cwindow<CR><CR><CR>
+" map <F3> :execute " grep -srn --binary-files=without-match --exclude-dir=migrations --exclude-dir=.git --exclude-dir=env . -e " . expand("<cword>") . " " <bar> cwindow<CR><CR><CR>
 map <F3> :call FindWord()<CR>
 map <F4> :call FindWordNoFilter()<CR>
 nmap F :call FindPrompt()<CR>
 nmap E :call FindPromptNoFilter()<CR>
-
+nmap T :CtrlPTag<CR>
 vmap <Tab> =
 
 :if $VIM_CRONTAB == "true"
