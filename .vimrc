@@ -10,6 +10,7 @@ let g:ctrlp_extensions = ['tag']
 " let g:ctrlp_custom_ignore = { 'dir': '/env$', 'file': '\v\.(pyc)$' }
 let g:ctrlp_custom_ignore = { 'file': '\v\.(pyc)$' }
 set wildignore+=*.pyc
+set wildchar=<Tab> wildmenu wildmode=full
 
 filetype off
 
@@ -22,7 +23,7 @@ Bundle 'kien/ctrlp.vim'
 Bundle 'Lokaltog/vim-powerline'
 "Bundle 'natw/keyboard_cat.vim'
 "Bundle 'scrooloose/syntastic'
-Bundle 'davidhalter/jedi-vim'
+"Bundle 'davidhalter/jedi-vim'
 Bundle 'vim-scripts/grep.vim.git'
 
 if has("gui_running")
@@ -69,8 +70,7 @@ function! FindPromptNoFilter()
 		return
 	endif
 
-	:silent! execute " grep -srn --binary-files=without-match --exclude-dir=migrations --exclude-dir=.git . -e " . str
-	" :silent! execute " grep -srn --binary-files=without-match --exclude-dir=migrations --exclude-dir=.git --exclude-dir=env . -e " . str
+	:silent! execute "grep -srn --binary-files=without-match --exclude='*.log' --exclude-dir=migrations --exclude-dir=.git . -e " . str
 	
 	:cw
 endfunction
@@ -81,7 +81,7 @@ function! FindPrompt()
 		return
 	endif
 
-	:silent! execute "grep -srn --binary-files=without-match --exclude-dir=migrations --exclude-dir=.git --exclude-dir=env . -e " . str
+	:silent! execute "grep -srn --binary-files=without-match --exclude='*.log' --exclude-dir=migrations --exclude-dir=.git --exclude-dir=env . -e " . str
 	
 	:cw
 endfunction
@@ -92,7 +92,7 @@ function! FindWordNoFilter()
 		return
 	endif
 
-	:silent! execute " grep -srn --binary-files=without-match --exclude-dir=migrations --exclude-dir=.git . -e " . str
+	:silent! execute "grep -srn --binary-files=without-match --exclude='*.log' --exclude-dir=migrations --exclude-dir=.git . -e " . str
 	
 	:cw
 endfunction
@@ -103,14 +103,11 @@ function! FindWord()
 		return
 	endif
 
-	:silent! execute "grep -srn --binary-files=without-match --exclude-dir=migrations --exclude-dir=.git --exclude-dir=env . -e " . str
+	:silent! execute "grep -srn --binary-files=without-match --exclude='*.log' --exclude-dir=migrations --exclude-dir=.git --exclude-dir=env . -e " . str
 	
 	:cw
 endfunction
 
-" nmap <F3> :noautocmd execute "vimgrep /" . expand("<cword>") . "/j **/*.cpp **/*.h **/*.cc **/*.c **/*.java **/*.rb **/*.py **/*.pl" <Bar> cw<CR> :cc<CR>
-"nmap <F3> :noautocmd execute "vimgrep /" . expand("<cword>") . "/j **/*.py **/*.htm* **/*.txt" <Bar> cw<CR> :cc<CR>
-" map <F3> :execute " grep -srn --binary-files=without-match --exclude-dir=migrations --exclude-dir=.git --exclude-dir=env . -e " . expand("<cword>") . " " <bar> cwindow<CR><CR><CR>
 map <F3> :call FindWord()<CR>
 map <F4> :call FindWordNoFilter()<CR>
 nmap F :call FindPrompt()<CR>
