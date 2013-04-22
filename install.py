@@ -20,6 +20,9 @@ def system(cmd):
     #print(basename(__file__) + ' running: ' + cmd)
     os.system(cmd)
 
+if not exists(abspath(join(expanduser('~'), '.vim', 'autoload', 'pathogen.vim')))
+    system('mkdir -p ~/.vim/autoload ~/.vim/bundle')
+    system('curl -Sso ~/.vim/autoload/pathogen.vim https://raw.github.com/tpope/vim-pathogen/master/autoload/pathogen.vim')
 
 for file_tuple in files:
     file = file_tuple[0]
