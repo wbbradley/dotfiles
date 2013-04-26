@@ -23,7 +23,7 @@ Bundle 'kien/ctrlp.vim'
 Bundle 'Lokaltog/vim-powerline'
 "Bundle 'natw/keyboard_cat.vim'
 "Bundle 'scrooloose/syntastic'
-"Bundle 'davidhalter/jedi-vim'
+Bundle 'davidhalter/jedi-vim'
 Bundle 'vim-scripts/grep.vim.git'
 
 if has("gui_running")
@@ -31,6 +31,10 @@ if has("gui_running")
 else
 	let g:Powerline_symbols = 'compatible'
 endif
+
+let g:jedi#use_tabs_not_buffers = 0
+let g:jedi#popup_on_dot = 0
+let g:jedi#show_function_definition = "0"
 
 " When started as "evim", evim.vim will already have done these settings.
 if v:progname =~? "evim"
@@ -51,6 +55,8 @@ set history=50		" keep 50 lines of command line history
 set ruler		" show the cursor position all the time
 set showcmd		" display incomplete commands
 set incsearch		" do incremental searching
+set completeopt=longest,menuone
+" :inoremap <expr> <CR> pumvisible() ? "\<C-y>" : "\<C-g>u\<CR>"
 
 " For Win32 GUI: remove 't' flag from 'guioptions': no tearoff menu entries
 " let &guioptions = substitute(&guioptions, "t", "", "g")
@@ -63,6 +69,7 @@ imap jj <Esc>
 imap hh <Esc>
 imap kk <Esc>
 imap lll <Esc>
+nmap <F5> :e<CR>
 
 function! FindPromptNoFilter()
 	let str = input("Search: ", "")
@@ -160,6 +167,7 @@ set tags=~/tags
 
 nnoremap s :exec "normal i".nr2char(getchar())."\el"<CR>
 nnoremap S :exec "normal a".nr2char(getchar())."\el"<CR>
+
 
 " CTRL-U in insert mode deletes a lot.  Use CTRL-G u to first break undo,
 " so that you can undo CTRL-U after inserting a line break.
