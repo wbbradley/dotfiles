@@ -20,11 +20,9 @@ set rtp^=~/.vim/bundle/vundle/
 call vundle#rc()
 
 Bundle 'kien/ctrlp.vim'
-Bundle 'Lokaltog/vim-powerline'
-"Bundle 'natw/keyboard_cat.vim'
-"Bundle 'scrooloose/syntastic'
+"Bundle 'Lokaltog/vim-powerline'
 Bundle 'davidhalter/jedi-vim'
-Bundle 'vim-scripts/grep.vim.git'
+"Bundle 'groenewege/vim-less.git'
 
 if has("gui_running")
 	let g:Powerline_symbols = 'fancy'
