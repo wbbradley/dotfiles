@@ -38,6 +38,7 @@ if [[ $platform == 'freebsd' ]]; then
 	# Mac OS
 	# set prompt = "%{\033[31m%}[%~] %{\033[0m%}%#"
 	alias ls='ls -G -a -l -tr'
+	alias todo='ack TODO|grep `whoami`'
 	defaults write com.apple.Xcode XCCodeSenseFormattingOptions -dict BlockSeparator "\n" CaseStatementSpacing ""
 	defaults write com.apple.Xcode PBXPageGuideLocation "79"
 	alias kgs='javaws http://files.gokgs.com/javaBin/cgoban.jnlp'
