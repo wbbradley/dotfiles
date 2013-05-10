@@ -23,6 +23,7 @@ Bundle 'kien/ctrlp.vim'
 "Bundle 'Lokaltog/vim-powerline'
 Bundle 'davidhalter/jedi-vim'
 "Bundle 'groenewege/vim-less.git'
+Bundle 'tpope/vim-fugitive'
 
 if has("gui_running")
 	let g:Powerline_symbols = 'fancy'
@@ -33,6 +34,9 @@ endif
 let g:jedi#use_tabs_not_buffers = 0
 let g:jedi#popup_on_dot = 0
 let g:jedi#show_function_definition = "0"
+
+let g:pyindent_open_paren = '&sw'
+let g:pyindent_continue = '&sw'
 
 " When started as "evim", evim.vim will already have done these settings.
 if v:progname =~? "evim"
@@ -86,7 +90,7 @@ function! FindPrompt()
 		return
 	endif
 
-	:silent! execute "grep -srn --binary-files=without-match --exclude='*.log' --exclude-dir=migrations --exclude-dir=.git --exclude-dir=env . -e " . str
+	:silent! execute "grep -srn --binary-files=without-match --exclude='*.log' --exclude='jquery*.js' --exclude-dir=migrations --exclude-dir=.git --exclude-dir=env . -e " . str
 	
 	:cw
 endfunction
@@ -97,7 +101,7 @@ function! FindWordNoFilter()
 		return
 	endif
 
-	:silent! execute "grep -srn --binary-files=without-match --exclude='*.log' --exclude-dir=migrations --exclude-dir=.git . -e " . str
+	:silent! execute "grep -srn --binary-files=without-match --exclude='*.log' --exclude-dir=migrations --exclude='jquery*.js' --exclude-dir=.git . -e " . str
 	
 	:cw
 endfunction
