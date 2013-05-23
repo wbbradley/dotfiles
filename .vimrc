@@ -8,7 +8,7 @@ let g:ctrlp_clear_cache_on_exit = 0
 let g:ctrlp_show_hidden = 1
 let g:ctrlp_extensions = ['tag']
 " let g:ctrlp_custom_ignore = { 'dir': '/env$', 'file': '\v\.(pyc)$' }
-let g:ctrlp_custom_ignore = { 'file': '\v\.(pyc)$' }
+let g:ctrlp_custom_ignore = { 'dir': 'media', 'file': '\v\.(pyc)$' }
 set wildignore+=*.pyc
 set wildchar=<Tab> wildmenu wildmode=full
 
@@ -20,10 +20,13 @@ set rtp^=~/.vim/bundle/vundle/
 call vundle#rc()
 
 Bundle 'kien/ctrlp.vim'
-"Bundle 'Lokaltog/vim-powerline'
+Bundle 'Lokaltog/vim-powerline'
 Bundle 'davidhalter/jedi-vim'
 "Bundle 'groenewege/vim-less.git'
 Bundle 'tpope/vim-fugitive'
+Bundle 'kchmck/vim-coffee-script.git'
+Bundle 'jimmyhchan/dustjs.vim.git'
+Bundle 'juvenn/mustache.vim.git'
 
 if has("gui_running")
 	let g:Powerline_symbols = 'fancy'
@@ -37,6 +40,8 @@ let g:jedi#show_function_definition = "0"
 
 let g:pyindent_open_paren = '&sw'
 let g:pyindent_continue = '&sw'
+
+au BufNewFile,BufReadPost *.coffee setl shiftwidth=2 expandtab
 
 " When started as "evim", evim.vim will already have done these settings.
 if v:progname =~? "evim"

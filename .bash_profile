@@ -44,6 +44,7 @@ if [[ $platform == 'freebsd' ]]; then
 	alias kgs='javaws http://files.gokgs.com/javaBin/cgoban.jnlp'
 	alias venv='source env/bin/activate'
 	alias venvc="virtualenv -p `brew info python | grep 'Python\.framework' | sed 's/^ *//g' | sed 's/\(.*\)Frame.*/\1bin\/python/'` env"
+	wvi () { vi `which $@`; }
 	export PGDATA=/usr/local/var/postgres
 	if [ -d "/Library/Java/Home" ]; then
 		export JAVA_HOME=/Library/Java/Home
