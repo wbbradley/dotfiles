@@ -45,6 +45,7 @@ if [[ $platform == 'freebsd' ]]; then
 	alias venv='source env/bin/activate'
 	alias venvc="virtualenv -p `brew info python | grep 'Python\.framework' | sed 's/^ *//g' | sed 's/\(.*\)Frame.*/\1bin\/python/'` env"
 	wvi () { vi `which $@`; }
+	git-get () { git show $1:$2 > $2; }
 	export PGDATA=/usr/local/var/postgres
 	if [ -d "/Library/Java/Home" ]; then
 		export JAVA_HOME=/Library/Java/Home

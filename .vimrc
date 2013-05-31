@@ -84,7 +84,7 @@ function! FindPromptNoFilter()
 		return
 	endif
 
-	:silent! execute "grep -srn --binary-files=without-match --exclude='*.log' --exclude-dir=migrations --exclude-dir=.git . -e " . str
+	:silent! execute "grep -srn --binary-files=without-match --exclude='handlebars-templates.js' --exclude='models.js' --exclude='*.log' --exclude-dir=migrations --exclude-dir=.git --exclude-dir=gen . -e " . str
 	
 	:cw
 endfunction
@@ -95,7 +95,7 @@ function! FindPrompt()
 		return
 	endif
 
-	:silent! execute "grep -srn --binary-files=without-match --exclude='*.log' --exclude='jquery*.js' --exclude-dir=migrations --exclude-dir=.git --exclude-dir=env . -e " . str
+	:silent! execute "grep -srn --binary-files=without-match --exclude='*.log' --exclude='jquery*.js' --exclude='handlebars-templates.js' --exclude='models.js' --exclude-dir=migrations --exclude-dir=.git --exclude-dir=gen --exclude-dir=env . -e " . str
 	
 	:cw
 endfunction
@@ -106,7 +106,7 @@ function! FindWordNoFilter()
 		return
 	endif
 
-	:silent! execute "grep -srn --binary-files=without-match --exclude='*.log' --exclude-dir=migrations --exclude='jquery*.js' --exclude-dir=.git . -e " . str
+	:silent! execute "grep -srn --binary-files=without-match --exclude='*.log' --exclude-dir=migrations --exclude='jquery*.js' --exclude-dir=.git --exclude-dir=gen . -e " . str
 	
 	:cw
 endfunction
@@ -117,7 +117,7 @@ function! FindWord()
 		return
 	endif
 
-	:silent! execute "grep -srn --binary-files=without-match --exclude='*.log' --exclude-dir=migrations --exclude-dir=.git --exclude-dir=env . -e " . str
+	:silent! execute "grep -srn --binary-files=without-match --exclude='*.log' --exclude-dir=migrations --exclude-dir=.git --exclude-dir=env --exclude-dir=gen . -e " . str
 	
 	:cw
 endfunction
@@ -141,6 +141,11 @@ nmap C i/*  */<CR><Esc>klllli
 nmap <F11> :w<CR>
 imap <F11> <Esc>:w<CR>
 
+nmap -- :conf qa<CR>
+nmap 0v <C-w>v<C-w>l<C-w>n<C-w>h
+nmap 90 :e ~/.vimrc<CR>
+nmap 91 :e ~/.bash_profile<CR>
+nmap 92 :e ~/local.bashrc<CR>
 " F4 - swap header and cpp files
 " nmap <F4> :wa<CR> :e %:p:s,.h$,.X123X,:s,.cpp$,.h,:s,.X123X$,.cpp,<CR>
 " imap <F4> <Esc> <F4>
