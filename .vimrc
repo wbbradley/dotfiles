@@ -138,14 +138,18 @@ nmap O :ls<CR>:b
 nmap <F9> :set autowrite<CR>:cp<CR>:set noautowrite<CR>zz
 nmap <F10> :set autowrite<CR>:cn<CR>:set noautowrite<CR>zz
 nmap C i/*  */<CR><Esc>klllli
-nmap <F11> :w<CR>
+nmap <F11> :Rexplore<CR>
+nmap <S-F11> :Explore<CR>
 imap <F11> <Esc>:w<CR>
 
 nmap -- :conf qa<CR>
 nmap 0v <C-w>v<C-w>l<C-w>n<C-w>h
 nmap 90 :e ~/.vimrc<CR>
-nmap 91 :e ~/.bash_profile<CR>
-nmap 92 :e ~/local.bashrc<CR>
+nmap 91 :e ~/local.vimrc<CR>
+nmap 92 :e ~/.bash_profile<CR>
+nmap 93 :e ~/local.bashrc<CR>
+
+
 " F4 - swap header and cpp files
 " nmap <F4> :wa<CR> :e %:p:s,.h$,.X123X,:s,.cpp$,.h,:s,.X123X$,.cpp,<CR>
 " imap <F4> <Esc> <F4>
@@ -244,3 +248,4 @@ if !exists(":DiffOrig")
 		  \ | wincmd p | diffthis
 endif
 
+silent! source ~/local.vimrc

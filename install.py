@@ -5,6 +5,7 @@ import os
 files = [
     ('.bash_profile', ['.bashrc']),
     ('.vimrc', []),
+    ('.ctags', []),
     ('.inputrc', []),
 
     # See pdbpp - a very useful python debugger extension
