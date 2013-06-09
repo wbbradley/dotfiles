@@ -127,6 +127,7 @@ map <F4> :call FindWordNoFilter()<CR>
 nmap F :call FindPrompt()<CR>
 nmap E :call FindPromptNoFilter()<CR>
 nmap T :CtrlPTag<CR>
+let g:ctrlp_working_path_mode = 0
 vmap <Tab> =
 nmap O :ls<CR>:b
 
@@ -143,7 +144,7 @@ nmap <S-F11> :Explore<CR>
 imap <F11> <Esc>:w<CR>
 
 nmap -- :conf qa<CR>
-nmap 0v <C-w>v<C-w>l<C-w>n<C-w>h
+nmap -v <C-w>v<C-w>l<C-w>n<C-w>h
 nmap 90 :e ~/.vimrc<CR>
 nmap 91 :e ~/local.vimrc<CR>
 nmap 92 :e ~/.bash_profile<CR>
