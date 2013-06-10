@@ -2,20 +2,36 @@
 from os.path import dirname, join, abspath, exists, expanduser, basename
 import os
 
-files = [
-    ('.bash_profile', ['.bashrc']),
-    ('.vimrc', []),
-    ('.ctags', []),
-    ('.inputrc', []),
+ftplugin_dir = join(expanduser('~'), '.vim', 'ftplugin')
 
+files = {
+    '.bash_profile': ['.bashrc'],
+    '.vimrc': [],
+    '.ctags': [],
+    '.inputrc': [],
+    'py.vim': ([], ftplugin_dir),
+    'coffee.vim': ([], ftplugin_dir),
     # See pdbpp - a very useful python debugger extension
-    ('.pdbrc.py', []),
-]
+    '.pdbrc.py': [],
+}
 
+def get_src_path(file):
+    return abspath(join(dirname(__file__), file))
 
-def get_dest_path(file):
+def get_home_dir_path(file):
     return abspath(join(expanduser('~'), file))
 
+def get_dest_path(file, options):
+    if type(options) == tuple:
+        if len(options) > 1:
+            return abspath(join(options[1], file))
+    return get_home_dir_path(file)
+
+def get_other_files(options):
+    if type(options) == tuple:
+        return options[0]
+    else:
+        return options
 
 def system(cmd):
     # print(basename(__file__) + ' running: ' + cmd)
@@ -39,15 +55,16 @@ def backup(filename):
     system('mv ' + filename + ' ' + backup_filename)
     print("install.py : info : moved {} to {}".format(filename, backup_filename))
 
-for file_tuple in files:
-    file = file_tuple[0]
-    source_file = abspath(join(dirname(__file__), file))
-    dest_file = get_dest_path(file)
+for file, options in files.iteritems():
+    source_file = get_src_path(file)
+    dest_file = get_dest_path(file, options)
+    dest_file_path = dirname(dest_file)
+    system('mkdir -p ' + dest_file_path)
     if exists(file):
         backup(dest_file)
 
-        for other_file in file_tuple[1]:
-            other_dest_file = get_dest_path(other_file)
+        for other_file in get_other_files(options):
+            other_dest_file = get_home_dir_path(other_file)
             backup(other_dest_file)
 
         print("install.py : info : installing {}".format(source_file))
