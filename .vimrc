@@ -129,7 +129,6 @@ nmap E :call FindPromptNoFilter()<CR>
 nmap T :CtrlPTag<CR>
 let g:ctrlp_working_path_mode = 0
 vmap <Tab> =
-nmap O :ls<CR>:b
 
 :if $VIM_CRONTAB == "true"
 :set nobackup
@@ -144,6 +143,7 @@ nmap <S-F11> :Explore<CR>
 imap <F11> <Esc>:w<CR>
 
 nmap -- :conf qa<CR>
+nmap -p :r! pbpaste<CR>
 nmap -v <C-w>v<C-w>l<C-w>n<C-w>h
 nmap 90 :e ~/.vimrc<CR>
 nmap 91 :e ~/local.vimrc<CR>

@@ -44,7 +44,7 @@ if [[ $platform == 'freebsd' ]]; then
 	alias kgs='javaws http://files.gokgs.com/javaBin/cgoban.jnlp'
 	alias venv='source env/bin/activate'
 	alias venvc="virtualenv -p `brew info python | grep 'Python\.framework' | sed 's/^ *//g' | sed 's/\(.*\)Frame.*/\1bin\/python/'` env"
-	alias grunt='node_modules/.bin/grunt'
+	eval "$(/usr/local/share/npm/bin/grunt --completion=bash)"
 	wvi () { vi `which $@`; }
 	fvi () { vi `f $@`; }
 	git-get () { git show $1:$2 > $2; }
