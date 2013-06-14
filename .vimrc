@@ -1,6 +1,9 @@
 " Link to this file from your $HOME
 " ln -s $SRC_ROOT/dotfiles/.vimrc .vimrc
 "
+set number
+set cpoptions+=n
+highlight LineNr term=bold cterm=NONE ctermfg=DarkGrey ctermbg=NONE gui=NONE guifg=DarkGrey guibg=NONE
 
 "set runtimepath^=~/.vim/bundle/vim-gitgutter
 let g:ctrlp_use_caching = 1
@@ -23,10 +26,14 @@ Bundle 'kien/ctrlp.vim'
 Bundle 'Lokaltog/vim-powerline'
 Bundle 'davidhalter/jedi-vim'
 "Bundle 'groenewege/vim-less.git'
+Bundle 'airblade/vim-gitgutter'
 Bundle 'tpope/vim-fugitive'
 Bundle 'kchmck/vim-coffee-script.git'
 Bundle 'jimmyhchan/dustjs.vim.git'
 Bundle 'juvenn/mustache.vim.git'
+
+let g:gitgutter_escape_grep = 1
+let g:gitgutter_eager = 0
 
 if has("gui_running")
 	let g:Powerline_symbols = 'fancy'
@@ -143,7 +150,7 @@ nmap <S-F11> :Explore<CR>
 imap <F11> <Esc>:w<CR>
 
 nmap -- :conf qa<CR>
-nmap -p :r! pbpaste<CR>
+nmap -p 0:r! pbpaste<CR>
 nmap -v <C-w>v<C-w>l<C-w>n<C-w>h
 nmap 90 :e ~/.vimrc<CR>
 nmap 91 :e ~/local.vimrc<CR>
@@ -213,20 +220,20 @@ if has("autocmd")
 
   " Put these in an autocmd group, so that we can delete them easily.
   augroup vimrcEx
-  au!
+	  au!
 
-  " For all text files set 'textwidth' to 78 characters.
-  autocmd FileType text setlocal textwidth=78
+	  " For all text files set 'textwidth' to 78 characters.
+	  autocmd FileType text setlocal textwidth=78
 
-  " When editing a file, always jump to the last known cursor position.
-  " Don't do it when the position is invalid or when inside an event handler
-  " (happens when dropping a file on gvim).
-  " Also don't do it when the mark is in the first line, that is the default
-  " position when opening a file.
-  autocmd BufReadPost *
-    \ if line("'\"") > 1 && line("'\"") <= line("$") |
-    \   exe "normal! g`\"" |
-    \ endif
+	  " When editing a file, always jump to the last known cursor position.
+	  " Don't do it when the position is invalid or when inside an event handler
+	  " (happens when dropping a file on gvim).
+	  " Also don't do it when the mark is in the first line, that is the default
+	  " position when opening a file.
+	  autocmd BufReadPost *
+		\ if line("'\"") > 1 && line("'\"") <= line("$") |
+		\   exe "normal! g`\"" |
+		\ endif
 
   augroup END
 
@@ -235,7 +242,6 @@ else
   set autoindent		" always set autoindenting on
 
 endif " has("autocmd")
-
 set cino=:0g0
 set sw=4
 set ts=4
@@ -248,5 +254,11 @@ if !exists(":DiffOrig")
   command DiffOrig vert new | set bt=nofile | r # | 0d_ | diffthis
 		  \ | wincmd p | diffthis
 endif
+
+augroup myvimrc
+	au!
+	au BufWritePost .vimrc,_vimrc,vimrc,.gvimrc,_gvimrc,gvimrc so $MYVIMRC | if has('gui_running') | so $MYGVIMRC | endif
+augroup END
+
 
 silent! source ~/local.vimrc
