@@ -11,8 +11,9 @@ let g:ctrlp_clear_cache_on_exit = 0
 let g:ctrlp_show_hidden = 1
 let g:ctrlp_extensions = ['tag']
 " let g:ctrlp_custom_ignore = { 'dir': '/env$', 'file': '\v\.(pyc)$' }
-let g:ctrlp_custom_ignore = { 'dir': 'media', 'file': '\v\.(pyc)$' }
+let g:ctrlp_custom_ignore = { 'dir': '.git', 'file': '\v\.(pyc)$' }
 set wildignore+=*.pyc
+set wildignore+=/media/
 set wildchar=<Tab> wildmenu wildmode=full
 
 filetype off

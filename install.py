@@ -37,6 +37,11 @@ def system(cmd):
     # print(basename(__file__) + ' running: ' + cmd)
     os.system(cmd)
 
+system('git config --global color.diff always')
+system('git config --global --add color.ui true')
+system('git config --global core.editor "/usr/bin/vim"')
+system('git config --global push.default tracking')
+
 if not exists(abspath(join(expanduser('~'), '.vim', 'autoload', 'pathogen.vim'))):
     system('mkdir -p ~/.vim/autoload ~/.vim/bundle')
     system('curl -Sso ~/.vim/autoload/pathogen.vim https://raw.github.com/tpope/vim-pathogen/master/autoload/pathogen.vim')
