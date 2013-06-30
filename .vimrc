@@ -1,9 +1,10 @@
 " Link to this file from your $HOME
 " ln -s $SRC_ROOT/dotfiles/.vimrc .vimrc
 "
+set t_Co=256
 set number
 set cpoptions+=n
-highlight LineNr term=bold cterm=NONE ctermfg=DarkGrey ctermbg=NONE gui=NONE guifg=DarkGrey guibg=NONE
+highlight LineNr term=bold cterm=NONE ctermfg=DarkGrey ctermbg=11 gui=NONE guifg=DarkGrey guibg=NONE
 
 "set runtimepath^=~/.vim/bundle/vim-gitgutter
 let g:ctrlp_use_caching = 1
@@ -25,7 +26,8 @@ call vundle#rc()
 
 Bundle 'kien/ctrlp.vim'
 Bundle 'Lokaltog/vim-powerline'
-Bundle 'davidhalter/jedi-vim'
+"Bundle 'davidhalter/jedi-vim'
+Bundle 'nvie/vim-flake8'
 "Bundle 'groenewege/vim-less.git'
 Bundle 'airblade/vim-gitgutter'
 Bundle 'tpope/vim-fugitive'
@@ -36,12 +38,7 @@ Bundle 'juvenn/mustache.vim.git'
 let g:gitgutter_escape_grep = 1
 let g:gitgutter_eager = 0
 
-if has("gui_running")
-	let g:Powerline_symbols = 'fancy'
-else
-	let g:Powerline_symbols = 'compatible'
-endif
-
+let g:Powerline_symbols = 'fancy'
 let g:jedi#use_tabs_not_buffers = 0
 let g:jedi#popup_on_dot = 0
 let g:jedi#show_function_definition = "0"
@@ -84,7 +81,7 @@ imap jj <Esc>
 imap hh <Esc>
 imap kk <Esc>
 imap lll <Esc>
-nmap <F5> :e<CR>
+nmap <F5> :e!<CR>
 
 function! FindPromptNoFilter()
 	let str = input("Search: ", "")
@@ -258,8 +255,9 @@ endif
 
 augroup myvimrc
 	au!
-	au BufWritePost .vimrc,_vimrc,vimrc,.gvimrc,_gvimrc,gvimrc so $MYVIMRC | if has('gui_running') | so $MYGVIMRC | endif
+	au BufWritePost local.vimrc,.vimrc,_vimrc,vimrc,.gvimrc,_gvimrc,gvimrc so $MYVIMRC | if has('gui_running') | so $MYGVIMRC | endif
 augroup END
 
+au BufReadPost *.prepp set syntax=python
 
 silent! source ~/local.vimrc
