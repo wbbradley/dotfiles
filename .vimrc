@@ -258,6 +258,13 @@ augroup myvimrc
 	au BufWritePost local.vimrc,.vimrc,_vimrc,vimrc,.gvimrc,_gvimrc,gvimrc so $MYVIMRC | if has('gui_running') | so $MYGVIMRC | endif
 augroup END
 
+set rtp+=$GOROOT/misc/vim
+filetype plugin indent on
+au BufRead,BufNewFile *.go set filetype=go
+
 au BufReadPost *.prepp set syntax=python
+
+set ignorecase
+set smartcase
 
 silent! source ~/local.vimrc
