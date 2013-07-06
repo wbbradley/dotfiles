@@ -3,6 +3,7 @@ from os.path import dirname, join, abspath, exists, expanduser, basename
 import os
 
 ftplugin_dir = join(expanduser('~'), '.vim', 'ftplugin')
+vim_color_dir = join(expanduser('~'), '.vim', 'colors')
 
 files = {
     '.bash_profile': ['.bashrc'],
@@ -11,6 +12,7 @@ files = {
     '.inputrc': [],
     'py.vim': ([], ftplugin_dir),
     'coffee.vim': ([], ftplugin_dir),
+    'ir_black.vim': ([], vim_color_dir),
     # See pdbpp - a very useful python debugger extension
     '.pdbrc.py': [],
 }

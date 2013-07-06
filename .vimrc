@@ -100,7 +100,7 @@ function! FindPrompt()
 		return
 	endif
 
-	:silent! execute "grep -srn --binary-files=without-match --exclude='*.log' --exclude='jquery*.js' --exclude='handlebars-templates.js' --exclude='models.js' --exclude-dir=migrations --exclude-dir=.git --exclude-dir=gen --exclude-dir=env . -e " . str
+	:silent! execute "grep -srn --binary-files=without-match --exclude='*.log' --exclude='jquery*.js' --exclude='handlebars-templates.js' --exclude='models.js' --exclude-dir=migrations --exclude-dir=.git --exclude-dir=node_modules --exclude-dir=gen --exclude-dir=env --exclude-dir=bootstrap --exclude='*.svg' --exclude='*min*.js' --exclude='bootstrap*.css' --exclude-dir=unicorn . -e " . str
 	
 	:cw
 endfunction
@@ -132,6 +132,7 @@ map <F4> :call FindWordNoFilter()<CR>
 nmap F :call FindPrompt()<CR>
 nmap E :call FindPromptNoFilter()<CR>
 nmap T :CtrlPTag<CR>
+:map <F2> :echo "hi<" . synIDattr(synID(line("."),col("."),1),"name") . '> trans<' . synIDattr(synID(line("."),col("."),0),"name") . "> lo<" . synIDattr(synIDtrans(synID(line("."),col("."),1)),"name") . ">"<CR>
 let g:ctrlp_working_path_mode = 0
 vmap <Tab> =
 
@@ -266,5 +267,11 @@ au BufReadPost *.prepp set syntax=python
 
 set ignorecase
 set smartcase
+set visualbell
+
+set gfn=Menlo\ Regular:h14
+syn match Braces display '[{}()\[\]]'
+color ir_black
+set nowrap
 
 silent! source ~/local.vimrc
