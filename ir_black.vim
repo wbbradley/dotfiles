@@ -202,7 +202,8 @@ hi link htmlEndTag      Identifier
 
 
 " Special for Javascript
-hi link javaScriptNumber      Number 
+hi link javaScriptNumber  Number 
+hi link javaScript        Normal 
 
 
 " Special for Python

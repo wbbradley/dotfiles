@@ -1,6 +1,7 @@
 " Link to this file from your $HOME
 " ln -s $SRC_ROOT/dotfiles/.vimrc .vimrc
 "
+set clipboard=unnamed
 set t_Co=256
 set number
 set cpoptions+=n
@@ -14,7 +15,11 @@ let g:ctrlp_extensions = ['tag']
 " let g:ctrlp_custom_ignore = { 'dir': '/env$', 'file': '\v\.(pyc)$' }
 let g:ctrlp_custom_ignore = { 'dir': '.git', 'file': '\v\.(pyc)$' }
 set wildignore+=*.pyc
-set wildignore+=/media/
+set wildignore+=*.png
+set wildignore+=*.jpg
+set wildignore+=*.jpeg
+set wildignore+=*.pyc
+set wildignore+=media
 set wildchar=<Tab> wildmenu wildmode=full
 
 filetype off
@@ -25,6 +30,7 @@ set rtp^=~/.vim/bundle/vundle/
 call vundle#rc()
 
 Bundle 'kien/ctrlp.vim'
+Bundle 'vim-scripts/django.vim'
 Bundle 'Lokaltog/vim-powerline'
 "Bundle 'davidhalter/jedi-vim'
 Bundle 'nvie/vim-flake8'
@@ -74,7 +80,8 @@ set completeopt=longest,menuone
 " let &guioptions = substitute(&guioptions, "t", "", "g")
 
 " Don't use Ex mode, use Q for formatting
-map Q gq
+" map Q gq
+nmap Q :q<CR>
 
 " map home row to exit Insert mode
 imap jj <Esc>
@@ -89,7 +96,7 @@ function! FindPromptNoFilter()
 		return
 	endif
 
-	:silent! execute "grep -srn --binary-files=without-match --exclude='handlebars-templates.js' --exclude='models.js' --exclude='*.log' --exclude-dir=migrations --exclude-dir=.git --exclude-dir=gen . -e " . str
+	:silent! execute "grep -srn --binary-files=without-match --exclude-dir=private --exclude='handlebars-templates.js' --exclude='models.js' --exclude='*.log' --exclude-dir=migrations --exclude-dir=.git --exclude-dir=gen . -e " . str
 	
 	:cw
 endfunction
@@ -100,7 +107,7 @@ function! FindPrompt()
 		return
 	endif
 
-	:silent! execute "grep -srn --binary-files=without-match --exclude='*.log' --exclude='jquery*.js' --exclude='handlebars-templates.js' --exclude='models.js' --exclude-dir=migrations --exclude-dir=.git --exclude-dir=node_modules --exclude-dir=gen --exclude-dir=env --exclude-dir=bootstrap --exclude='*.svg' --exclude='*min*.js' --exclude='bootstrap*.css' --exclude-dir=unicorn . -e " . str
+	:silent! execute "grep -srn --binary-files=without-match --exclude='*.log' --exclude-dir=private --exclude='jquery*.js' --exclude='handlebars-templates.js' --exclude='models.js' --exclude-dir=migrations --exclude-dir=.git --exclude-dir=node_modules --exclude-dir=gen --exclude-dir=env --exclude-dir=bootstrap --exclude='*.svg' --exclude='*min*.js' --exclude='bootstrap*.css' --exclude-dir=unicorn . -e " . str
 	
 	:cw
 endfunction
@@ -111,7 +118,7 @@ function! FindWordNoFilter()
 		return
 	endif
 
-	:silent! execute "grep -srn --binary-files=without-match --exclude='*.log' --exclude-dir=migrations --exclude='jquery*.js' --exclude-dir=.git --exclude-dir=gen . -e " . str
+	:silent! execute "grep -srn --binary-files=without-match --exclude='*.log' --exclude-dir=private --exclude-dir=migrations --exclude='jquery*.js' --exclude-dir=.git --exclude-dir=gen . -e " . str
 	
 	:cw
 endfunction
@@ -122,7 +129,7 @@ function! FindWord()
 		return
 	endif
 
-	:silent! execute "grep -srn --binary-files=without-match --exclude='*.log' --exclude-dir=migrations --exclude-dir=.git --exclude-dir=env --exclude-dir=gen . -e " . str
+	:silent! execute "grep -srn --binary-files=without-match --exclude='*.log' --exclude-dir=private --exclude-dir=migrations --exclude-dir=.git --exclude-dir=env --exclude-dir=gen . -e " . str
 	
 	:cw
 endfunction
@@ -143,7 +150,6 @@ vmap <Tab> =
 
 nmap <F9> :set autowrite<CR>:cp<CR>:set noautowrite<CR>zz
 nmap <F10> :set autowrite<CR>:cn<CR>:set noautowrite<CR>zz
-nmap C i/*  */<CR><Esc>klllli
 nmap <F11> :Rexplore<CR>
 nmap <S-F11> :Explore<CR>
 imap <F11> <Esc>:w<CR>
@@ -256,7 +262,7 @@ endif
 
 augroup myvimrc
 	au!
-	au BufWritePost local.vimrc,.vimrc,_vimrc,vimrc,.gvimrc,_gvimrc,gvimrc so $MYVIMRC | if has('gui_running') | so $MYGVIMRC | endif
+	au BufWritePost local.vimrc,.vimrc,_vimrc,vimrc,.gvimrc,_gvimrc,gvimrc so $MYVIMRC
 augroup END
 
 set rtp+=$GOROOT/misc/vim
