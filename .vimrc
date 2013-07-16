@@ -82,6 +82,7 @@ set completeopt=longest,menuone
 " Don't use Ex mode, use Q for formatting
 vmap Q gq
 nmap Q :q<CR>
+nmap O :CtrlPMRUFiles<CR>
 
 " map home row to exit Insert mode
 imap jj <Esc>
