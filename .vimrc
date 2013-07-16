@@ -80,7 +80,7 @@ set completeopt=longest,menuone
 " let &guioptions = substitute(&guioptions, "t", "", "g")
 
 " Don't use Ex mode, use Q for formatting
-" map Q gq
+vmap Q gq
 nmap Q :q<CR>
 
 " map home row to exit Insert mode
