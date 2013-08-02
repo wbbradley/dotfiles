@@ -1,10 +1,10 @@
-" Link to this file from your $HOME
-" ln -s $SRC_ROOT/dotfiles/.vimrc .vimrc
-"
 set clipboard=unnamed
 set t_Co=256
 set number
 set cpoptions+=n
+set splitbelow
+set splitright
+
 highlight LineNr term=bold cterm=NONE ctermfg=DarkGrey ctermbg=11 gui=NONE guifg=DarkGrey guibg=NONE
 
 "set runtimepath^=~/.vim/bundle/vim-gitgutter
@@ -98,7 +98,16 @@ function! FindPromptNoFilter()
 		return
 	endif
 
-	:silent! execute "grep -srn --binary-files=without-match --exclude-dir=private --exclude='handlebars-templates.js' --exclude='models.js' --exclude='*.log' --exclude-dir=migrations --exclude-dir=.git --exclude-dir=gen . -e " . str
+	:silent! execute "grep -srn "
+					\"--binary-files=without-match "
+   					\"--exclude='handlebars-templates.js' "
+   					\"--exclude='models.js' "
+					\"--exclude='*.log' "
+					\"--exclude-dir=private "
+					\"--exclude-dir=migrations "
+					\"--exclude-dir=.git "
+					\"--exclude-dir=gen "
+					\". -e " . str
 	
 	:cw
 endfunction
@@ -109,7 +118,24 @@ function! FindPrompt()
 		return
 	endif
 
-	:silent! execute "grep -srn --binary-files=without-match --exclude='*.log' --exclude-dir=private --exclude='jquery*.js' --exclude='handlebars-templates.js' --exclude='models.js' --exclude-dir=migrations --exclude-dir=.git --exclude-dir=node_modules --exclude-dir=gen --exclude-dir=env --exclude-dir=bootstrap --exclude='*.svg' --exclude='*min*.js' --exclude='bootstrap*.css' --exclude-dir=unicorn . -e " . str
+	:silent! execute "grep -srn "
+					\"--binary-files=without-match "
+					\"--exclude='*.log' "
+					\"--exclude='jquery*.js' "
+					\"--exclude='handlebars-templates.js' "
+					\"--exclude='models.js' "
+					\"--exclude='*.svg' "
+					\"--exclude='*min*.js' "
+					\"--exclude='bootstrap*.css' "
+					\"--exclude-dir=private "
+					\"--exclude-dir=migrations "
+					\"--exclude-dir=.git "
+					\"--exclude-dir=gen "
+					\"--exclude-dir=env "
+					\"--exclude-dir=node_modules "
+					\"--exclude-dir=bootstrap "
+					\"--exclude-dir=unicorn "
+					\". -e " . str
 	
 	:cw
 endfunction
@@ -120,7 +146,15 @@ function! FindWordNoFilter()
 		return
 	endif
 
-	:silent! execute "grep -srn --binary-files=without-match --exclude='*.log' --exclude-dir=private --exclude-dir=migrations --exclude='jquery*.js' --exclude-dir=.git --exclude-dir=gen . -e " . str
+	:silent! execute "grep -srn "
+					\"--binary-files=without-match "
+					\"--exclude='*.log' "
+					\"--exclude='jquery*.js' "
+					\"--exclude-dir=private "
+					\"--exclude-dir=migrations "
+					\"--exclude-dir=.git "
+					\"--exclude-dir=gen "
+					\". -e " . str
 	
 	:cw
 endfunction
@@ -131,7 +165,24 @@ function! FindWord()
 		return
 	endif
 
-	:silent! execute "grep -srn --binary-files=without-match --exclude='*.log' --exclude-dir=private --exclude-dir=migrations --exclude-dir=.git --exclude-dir=env --exclude-dir=gen . -e " . str
+	:silent! execute "grep -srn "
+					\"--binary-files=without-match "
+					\"--exclude='*.log' "
+					\"--exclude='jquery*.js' "
+					\"--exclude='handlebars-templates.js' "
+					\"--exclude='models.js' "
+					\"--exclude='*.svg' "
+					\"--exclude='*min*.js' "
+					\"--exclude='bootstrap*.css' "
+					\"--exclude-dir=private "
+					\"--exclude-dir=migrations "
+					\"--exclude-dir=.git "
+					\"--exclude-dir=gen "
+					\"--exclude-dir=env "
+					\"--exclude-dir=node_modules "
+					\"--exclude-dir=bootstrap "
+					\"--exclude-dir=unicorn "
+					\". -e " . str
 	
 	:cw
 endfunction
