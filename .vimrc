@@ -40,6 +40,7 @@ Bundle 'tpope/vim-fugitive'
 Bundle 'kchmck/vim-coffee-script.git'
 Bundle 'jimmyhchan/dustjs.vim.git'
 Bundle 'juvenn/mustache.vim.git'
+Bundle 'groenewege/vim-less'
 
 let g:gitgutter_escape_grep = 1
 let g:gitgutter_eager = 0
