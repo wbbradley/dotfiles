@@ -5,6 +5,20 @@ shopt -s cdspell
 
 export SRC_ROOT=$HOME/src
 
+export MARKPATH=$HOME/.marks
+function c {
+    cd -P $MARKPATH/$1 2>/dev/null || echo "No such mark: $1"
+}
+function mark {
+    mkdir -p $MARKPATH; ln -s $(pwd) $MARKPATH/$1
+}
+function unmark { 
+    rm -i $MARKPATH/$1 
+}
+function marks {
+    ls -l $MARKPATH | sed 's/  / /g' | cut -d' ' -f9- && echo
+}
+
 mymake()
 {
 	make -j10 $1
@@ -44,6 +58,7 @@ if [[ $platform == 'freebsd' ]]; then
 	alias kgs='javaws http://files.gokgs.com/javaBin/cgoban.jnlp'
 	alias venv='source env/bin/activate'
 	alias venvc="virtualenv -p `brew info python | grep 'Python\.framework' | sed 's/^ *//g' | sed 's/\(.*\)Frame.*/\1bin\/python/'` env"
+	alias simulator='open /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Applications/iPhone\ Simulator.app'
 	eval "$(/usr/local/share/npm/bin/grunt --completion=bash)"
 	wvi () { vi `which $@`; }
 	fvi () { vi `f $@`; }

@@ -13,7 +13,8 @@ let g:ctrlp_clear_cache_on_exit = 0
 let g:ctrlp_show_hidden = 1
 let g:ctrlp_extensions = ['tag']
 " let g:ctrlp_custom_ignore = { 'dir': '/env$', 'file': '\v\.(pyc)$' }
-let g:ctrlp_custom_ignore = { 'dir': '.git', 'file': '\v\.(pyc)$' }
+let g:ctrlp_custom_ignore = 'node_modules\'
+set wildignore+=*.swp
 set wildignore+=*.pyc
 set wildignore+=*.png
 set wildignore+=*.jpg
@@ -29,12 +30,12 @@ call pathogen#infect()
 set rtp^=~/.vim/bundle/vundle/
 call vundle#rc()
 
+Bundle 'othree/html5.vim'
 Bundle 'kien/ctrlp.vim'
 Bundle 'vim-scripts/django.vim'
 Bundle 'Lokaltog/vim-powerline'
-"Bundle 'davidhalter/jedi-vim'
+Bundle 'davidhalter/jedi-vim'
 Bundle 'nvie/vim-flake8'
-"Bundle 'groenewege/vim-less.git'
 Bundle 'airblade/vim-gitgutter'
 Bundle 'tpope/vim-fugitive'
 Bundle 'kchmck/vim-coffee-script.git'
@@ -103,6 +104,7 @@ function! FindPromptNoFilter()
    					\"--exclude='handlebars-templates.js' "
    					\"--exclude='models.js' "
 					\"--exclude='*.log' "
+					\"--exclude-dir=dist "
 					\"--exclude-dir=private "
 					\"--exclude-dir=migrations "
 					\"--exclude-dir=.git "
@@ -127,6 +129,7 @@ function! FindPrompt()
 					\"--exclude='*.svg' "
 					\"--exclude='*min*.js' "
 					\"--exclude='bootstrap*.css' "
+					\"--exclude-dir=dist "
 					\"--exclude-dir=private "
 					\"--exclude-dir=migrations "
 					\"--exclude-dir=.git "
@@ -150,6 +153,7 @@ function! FindWordNoFilter()
 					\"--binary-files=without-match "
 					\"--exclude='*.log' "
 					\"--exclude='jquery*.js' "
+					\"--exclude-dir=dist "
 					\"--exclude-dir=private "
 					\"--exclude-dir=migrations "
 					\"--exclude-dir=.git "
@@ -174,6 +178,7 @@ function! FindWord()
 					\"--exclude='*.svg' "
 					\"--exclude='*min*.js' "
 					\"--exclude='bootstrap*.css' "
+					\"--exclude-dir=dist "
 					\"--exclude-dir=private "
 					\"--exclude-dir=migrations "
 					\"--exclude-dir=.git "
