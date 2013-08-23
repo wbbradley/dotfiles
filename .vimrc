@@ -4,6 +4,7 @@ set number
 set cpoptions+=n
 set splitbelow
 set splitright
+set modelines=0
 
 highlight LineNr term=bold cterm=NONE ctermfg=DarkGrey ctermbg=11 gui=NONE guifg=DarkGrey guibg=NONE
 
@@ -21,6 +22,7 @@ set wildignore+=*.jpg
 set wildignore+=*.jpeg
 set wildignore+=*.pyc
 set wildignore+=media
+set wildignore+=bootstrap-3.0.0
 set wildchar=<Tab> wildmenu wildmode=full
 
 filetype off
@@ -42,6 +44,7 @@ Bundle 'kchmck/vim-coffee-script.git'
 Bundle 'jimmyhchan/dustjs.vim.git'
 Bundle 'juvenn/mustache.vim.git'
 Bundle 'groenewege/vim-less'
+Bundle 'mileszs/ack.vim'
 
 let g:gitgutter_escape_grep = 1
 let g:gitgutter_eager = 0
@@ -67,6 +70,11 @@ set nocompatible
 set laststatus=2
 set encoding=utf-8
 set ttyfast
+set undofile
+set undodir=~/.vim/undodir
+
+nnoremap ; :
+let g:ackprg = 'ag --nogroup --nocolor --column'
 
 " allow backspacing over everything in insert mode
 set backspace=indent,eol,start
@@ -99,18 +107,19 @@ function! FindPromptNoFilter()
 		return
 	endif
 
-	:silent! execute "grep -srn "
-					\"--binary-files=without-match "
-   					\"--exclude='handlebars-templates.js' "
-   					\"--exclude='models.js' "
-					\"--exclude='*.log' "
-					\"--exclude-dir=dist "
-					\"--exclude-dir=private "
-					\"--exclude-dir=migrations "
-					\"--exclude-dir=.git "
-					\"--exclude-dir=gen "
-					\". -e " . str
-	
+	":silent! execute "grep -srn "
+					"\"--binary-files=without-match "
+   					"\"--exclude='handlebars-templates.js' "
+   					"\"--exclude='models.js' "
+					"\"--exclude='*.log' "
+					"\"--exclude-dir=dist "
+					"\"--exclude-dir=private "
+					"\"--exclude-dir=migrations "
+					"\"--exclude-dir=bootstrap-3.0.0 "
+					"\"--exclude-dir=.git "
+					"\"--exclude-dir=gen "
+					"\". -e " . str
+	:silent! execute "Ack " . str	
 	:cw
 endfunction
 
@@ -129,6 +138,7 @@ function! FindPrompt()
 					\"--exclude='*.svg' "
 					\"--exclude='*min*.js' "
 					\"--exclude='bootstrap*.css' "
+					\"--exclude-dir=bootstrap-3.0.0 "
 					\"--exclude-dir=dist "
 					\"--exclude-dir=private "
 					\"--exclude-dir=migrations "
@@ -169,26 +179,7 @@ function! FindWord()
 		return
 	endif
 
-	:silent! execute "grep -srn "
-					\"--binary-files=without-match "
-					\"--exclude='*.log' "
-					\"--exclude='jquery*.js' "
-					\"--exclude='handlebars-templates.js' "
-					\"--exclude='models.js' "
-					\"--exclude='*.svg' "
-					\"--exclude='*min*.js' "
-					\"--exclude='bootstrap*.css' "
-					\"--exclude-dir=dist "
-					\"--exclude-dir=private "
-					\"--exclude-dir=migrations "
-					\"--exclude-dir=.git "
-					\"--exclude-dir=gen "
-					\"--exclude-dir=env "
-					\"--exclude-dir=node_modules "
-					\"--exclude-dir=bootstrap "
-					\"--exclude-dir=unicorn "
-					\". -e " . str
-	
+	:silent! execute "Ack " . str	
 	:cw
 endfunction
 
@@ -208,13 +199,13 @@ vmap <Tab> =
 
 nmap <F9> :set autowrite<CR>:cp<CR>:set noautowrite<CR>zz
 nmap <F10> :set autowrite<CR>:cn<CR>:set noautowrite<CR>zz
-nmap <F11> :Rexplore<CR>
-nmap <S-F11> :Explore<CR>
-imap <F11> <Esc>:w<CR>
 
-nmap -- :conf qa<CR>
-nmap -p 0:r! pbpaste<CR>
-nmap -v <C-w>v<C-w>l<C-w>n<C-w>h
+nnoremap <leader><space> :noh<cr>
+nnoremap <leader>t viwy:tabnew<CR>:e ~/vim-todo.txt<CR>ggPa<CR><Esc>:wq<CR>
+nnoremap <leader>T :tabnew<CR>:e ~/vim-todo.txt<CR>
+nnoremap <leader>q :conf qa<CR>
+nnoremap <leader>v <C-w>v<C-w>l<C-w>n<C-w>h
+
 nmap 90 :e ~/.vimrc<CR>
 nmap 91 :e ~/local.vimrc<CR>
 nmap 92 :e ~/.bash_profile<CR>
@@ -244,13 +235,7 @@ nmap <C-F7> :!make clean <CR><CR> <F7>
 imap <C-F7> <Esc> <C-F7>
 vmap <C-F7> <Esc> <C-F7>
 
-vmap <silent> ,y "xy<CR>:wviminfo! ~/.viminfo
-nmap <silent> ,p :rviminfo! ~/.viminfo<CR>"xp
-
-vmap <C-c> y:call system("pbcopy", getreg("\""))<CR>
-" nmap <C-v> :call setreg("\"",system("pbpaste"))<CR>p
-
-set tags=~/tags
+set tags+=tags;/
 
 nnoremap s :exec "normal i".nr2char(getchar())."\el"<CR>
 nnoremap S :exec "normal a".nr2char(getchar())."\el"<CR>
@@ -331,10 +316,15 @@ au BufReadPost *.prepp set syntax=python
 
 set ignorecase
 set smartcase
+set gdefault
 set visualbell
+set showmatch
+" set list
+" set listchars=tab:▸\ ,eol:¬
 
 set gfn=Menlo\ Regular:h14
-syn match Braces display '[{}()\[\]]'
+syn match Braces display '[<>{}()\[\]]'
+set matchtime=0
 color ir_black
 set nowrap
 

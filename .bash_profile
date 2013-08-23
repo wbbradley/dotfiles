@@ -6,7 +6,7 @@ shopt -s cdspell
 export SRC_ROOT=$HOME/src
 
 export MARKPATH=$HOME/.marks
-function c {
+function jump {
     cd -P $MARKPATH/$1 2>/dev/null || echo "No such mark: $1"
 }
 function mark {
@@ -18,6 +18,11 @@ function unmark {
 function marks {
     ls -l $MARKPATH | sed 's/  / /g' | cut -d' ' -f9- && echo
 }
+
+alias ms=marks
+alias m=mark
+alias c=jump
+alias j=jump
 
 mymake()
 {
