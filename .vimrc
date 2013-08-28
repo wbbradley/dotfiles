@@ -44,7 +44,7 @@ Bundle 'kchmck/vim-coffee-script.git'
 Bundle 'jimmyhchan/dustjs.vim.git'
 Bundle 'juvenn/mustache.vim.git'
 Bundle 'groenewege/vim-less'
-Bundle 'mileszs/ack.vim'
+Bundle 'rking/ag.vim'
 
 let g:gitgutter_escape_grep = 1
 let g:gitgutter_eager = 0
@@ -74,7 +74,6 @@ set undofile
 set undodir=~/.vim/undodir
 
 nnoremap ; :
-let g:ackprg = 'ag --nogroup --nocolor --column'
 
 " allow backspacing over everything in insert mode
 set backspace=indent,eol,start
@@ -107,19 +106,7 @@ function! FindPromptNoFilter()
 		return
 	endif
 
-	":silent! execute "grep -srn "
-					"\"--binary-files=without-match "
-   					"\"--exclude='handlebars-templates.js' "
-   					"\"--exclude='models.js' "
-					"\"--exclude='*.log' "
-					"\"--exclude-dir=dist "
-					"\"--exclude-dir=private "
-					"\"--exclude-dir=migrations "
-					"\"--exclude-dir=bootstrap-3.0.0 "
-					"\"--exclude-dir=.git "
-					"\"--exclude-dir=gen "
-					"\". -e " . str
-	:silent! execute "Ack " . str	
+	:silent! execute "Ag " . str	
 	:cw
 endfunction
 
@@ -129,27 +116,7 @@ function! FindPrompt()
 		return
 	endif
 
-	:silent! execute "grep -srn "
-					\"--binary-files=without-match "
-					\"--exclude='*.log' "
-					\"--exclude='jquery*.js' "
-					\"--exclude='handlebars-templates.js' "
-					\"--exclude='models.js' "
-					\"--exclude='*.svg' "
-					\"--exclude='*min*.js' "
-					\"--exclude='bootstrap*.css' "
-					\"--exclude-dir=bootstrap-3.0.0 "
-					\"--exclude-dir=dist "
-					\"--exclude-dir=private "
-					\"--exclude-dir=migrations "
-					\"--exclude-dir=.git "
-					\"--exclude-dir=gen "
-					\"--exclude-dir=env "
-					\"--exclude-dir=node_modules "
-					\"--exclude-dir=bootstrap "
-					\"--exclude-dir=unicorn "
-					\". -e " . str
-	
+	:silent! execute "Ag " . str	
 	:cw
 endfunction
 
@@ -159,17 +126,7 @@ function! FindWordNoFilter()
 		return
 	endif
 
-	:silent! execute "grep -srn "
-					\"--binary-files=without-match "
-					\"--exclude='*.log' "
-					\"--exclude='jquery*.js' "
-					\"--exclude-dir=dist "
-					\"--exclude-dir=private "
-					\"--exclude-dir=migrations "
-					\"--exclude-dir=.git "
-					\"--exclude-dir=gen "
-					\". -e " . str
-	
+	:silent! execute "Ag " . str	
 	:cw
 endfunction
 
@@ -179,7 +136,7 @@ function! FindWord()
 		return
 	endif
 
-	:silent! execute "Ack " . str	
+	:silent! execute "Ag " . str	
 	:cw
 endfunction
 
@@ -200,7 +157,7 @@ vmap <Tab> =
 nmap <F9> :set autowrite<CR>:cp<CR>:set noautowrite<CR>zz
 nmap <F10> :set autowrite<CR>:cn<CR>:set noautowrite<CR>zz
 
-nnoremap <leader><space> :noh<cr>
+nnoremap <leader><space> :noh<cr>:match<cr>
 nnoremap <leader>t viwy:tabnew<CR>:e ~/vim-todo.txt<CR>ggPa<CR><Esc>:wq<CR>
 nnoremap <leader>T :tabnew<CR>:e ~/vim-todo.txt<CR>
 nnoremap <leader>q :conf qa<CR>
@@ -329,3 +286,16 @@ color ir_black
 set nowrap
 
 silent! source ~/local.vimrc
+
+augroup CursorLine
+  au!
+  au VimEnter,WinEnter,BufWinEnter * setlocal cursorline
+  au WinLeave * setlocal nocursorline
+augroup END
+
+hi CursorLine cterm=NONE ctermbg=darkgray ctermfg=NONE guibg=#222222 guifg=NONE
+hi CursorLineNR cterm=NONE ctermbg=darkgray ctermfg=NONE guibg=#333333 guifg=NONE
+nnoremap <Leader>c :set cursorline!<CR>
+set cursorline
+
+:nnoremap <silent> <Leader>l ml:execute 'match Search /\%'.line('.').'l/'<CR>
