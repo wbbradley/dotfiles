@@ -65,6 +65,7 @@ if [[ $platform == 'freebsd' ]]; then
 	alias venvc="virtualenv -p `brew info python | grep 'Python\.framework' | sed 's/^ *//g' | sed 's/\(.*\)Frame.*/\1bin\/python/'` env"
 	alias simulator='open /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Applications/iPhone\ Simulator.app'
 	eval "$(/usr/local/share/npm/bin/grunt --completion=bash)"
+	alias vi=mvim
 	wvi () { vi `which $@`; }
 	fvi () { vi `f $@`; }
 	git-get () { git show $1:$2 > $2; }

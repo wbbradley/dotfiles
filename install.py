@@ -4,6 +4,7 @@ import os
 
 ftplugin_dir = join(expanduser('~'), '.vim', 'ftplugin')
 vim_color_dir = join(expanduser('~'), '.vim', 'colors')
+vim_indent_dir = join(expanduser('~'), '.vim', 'indent')
 
 files = {
     '.bash_profile': ['.bashrc'],
@@ -12,6 +13,8 @@ files = {
     '.inputrc': [],
     'py.vim': ([], ftplugin_dir),
     'coffee.vim': ([], ftplugin_dir),
+    'html.vim': ([], vim_indent_dir),
+    'htmldjango.vim': ([], vim_indent_dir),
     'ir_black.vim': ([], vim_color_dir),
     # See pdbpp - a very useful python debugger extension
     '.pdbrc.py': [],

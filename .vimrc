@@ -36,7 +36,6 @@ Bundle 'othree/html5.vim'
 Bundle 'kien/ctrlp.vim'
 Bundle 'vim-scripts/django.vim'
 Bundle 'Lokaltog/vim-powerline'
-Bundle 'davidhalter/jedi-vim'
 Bundle 'nvie/vim-flake8'
 Bundle 'airblade/vim-gitgutter'
 Bundle 'tpope/vim-fugitive'
@@ -130,6 +129,14 @@ function! FindWordNoFilter()
 	:cw
 endfunction
 
+function! DeleteAllLinesWithThisWord()
+	let str = expand("<cword>")
+	if str == ""
+		return
+	endif
+	:silent! execute "g/" . str . "/d"
+endfunction
+
 function! FindWord()
 	let str = expand("<cword>")
 	if str == ""
@@ -146,6 +153,7 @@ nmap F :call FindPrompt()<CR>
 nmap E :call FindPromptNoFilter()<CR>
 nmap T :CtrlPTag<CR>
 :map <F2> :echo "hi<" . synIDattr(synID(line("."),col("."),1),"name") . '> trans<' . synIDattr(synID(line("."),col("."),0),"name") . "> lo<" . synIDattr(synIDtrans(synID(line("."),col("."),1)),"name") . ">"<CR>
+nnoremap <leader>d :set modifiable<CR>:call DeleteAllLinesWithThisWord()<CR>:set nomodifiable<CR>
 let g:ctrlp_working_path_mode = 0
 vmap <Tab> =
 
@@ -299,3 +307,48 @@ nnoremap <Leader>c :set cursorline!<CR>
 set cursorline
 
 :nnoremap <silent> <Leader>l ml:execute 'match Search /\%'.line('.').'l/'<CR>
+
+nnoremap <leader>g :call GitGrepWord()<CR><CR>
+
+
+function! s:get_last_python_class()
+    let l:retval = ""
+    let l:last_line_declaring_a_class = search('^\s*class', 'bnW')
+    let l:last_line_starting_with_a_word_other_than_class = search('^\ \(\<\)\@=\(class\)\@!', 'bnW')
+    if l:last_line_starting_with_a_word_other_than_class < l:last_line_declaring_a_class
+        let l:nameline = getline(l:last_line_declaring_a_class)
+        let l:classend = matchend(l:nameline, '\s*class\s\+')
+        let l:classnameend = matchend(l:nameline, '\s*class\s\+[A-Za-z0-9_]\+')
+        let l:retval = strpart(l:nameline, l:classend, l:classnameend-l:classend)
+    endif
+    return l:retval
+endfunction
+ 
+function! s:get_last_python_def()
+    let l:retval = ""
+    let l:last_line_declaring_a_def = search('^\s*def', 'bnW')
+    let l:last_line_starting_with_a_word_other_than_def = search('^\ \(\<\)\@=\(def\)\@!', 'bnW')
+    if l:last_line_starting_with_a_word_other_than_def < l:last_line_declaring_a_def
+        let l:nameline = getline(l:last_line_declaring_a_def)
+        let l:defend = matchend(l:nameline, '\s*def\s\+')
+        let l:defnameend = matchend(l:nameline, '\s*def\s\+[A-Za-z0-9_]\+')
+        let l:retval = strpart(l:nameline, l:defend, l:defnameend-l:defend)
+    endif
+    return l:retval
+endfunction
+ 
+function! s:compose_python_location()
+    let l:pyloc = s:get_last_python_class()
+    if !empty(pyloc)
+        let pyloc = pyloc . "."
+    endif
+    let pyloc = pyloc . s:get_last_python_def()
+    return pyloc
+endfunction
+ 
+function! <SID>EchoPythonLocation()
+    echo s:compose_python_location()
+endfunction
+ 
+command! PythonLocation :call <SID>EchoPythonLocation()
+nnoremap <Leader>? :PythonLocation<CR>
