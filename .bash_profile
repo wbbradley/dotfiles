@@ -19,6 +19,25 @@ function marks {
     ls -l $MARKPATH | sed 's/  / /g' | cut -d' ' -f9- && echo
 }
 
+function swap()
+{
+    local TMPFILE=tmp.$$
+    mv "$1" $TMPFILE
+    mv "$2" "$1"
+    mv $TMPFILE "$2"
+}
+
+alias dus='du -sk * | sed "s/ /_/g" | sort -n | awk '\''
+{ if ($1 < 1024) { output("K", 1) }
+  else if ($1 < 1048576) { output("M", 1024) }
+  else { output("G", 1048576) }
+}
+function output(size, div)
+{
+  printf "%d%s\t%s\n", ($1/div), size, $2
+}
+'\'''
+
 alias ms=marks
 alias m=mark
 alias c=jump

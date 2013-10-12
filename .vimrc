@@ -14,7 +14,7 @@ let g:ctrlp_clear_cache_on_exit = 0
 let g:ctrlp_show_hidden = 1
 let g:ctrlp_extensions = ['tag']
 " let g:ctrlp_custom_ignore = { 'dir': '/env$', 'file': '\v\.(pyc)$' }
-let g:ctrlp_custom_ignore = 'node_modules\'
+let g:ctrlp_custom_ignore = 'node_modules'
 set wildignore+=*.swp
 set wildignore+=*.pyc
 set wildignore+=*.png
@@ -114,7 +114,7 @@ function! FindPrompt()
 		return
 	endif
 
-	:silent! execute "Ag " . str	
+	:silent! execute "Ag " . str
 	:cw
 endfunction
 
@@ -153,6 +153,7 @@ nmap E :call FindPromptNoFilter()<CR>
 nmap T :CtrlPTag<CR>
 :map <F2> :echo "hi<" . synIDattr(synID(line("."),col("."),1),"name") . '> trans<' . synIDattr(synID(line("."),col("."),0),"name") . "> lo<" . synIDattr(synIDtrans(synID(line("."),col("."),1)),"name") . ">"<CR>
 nnoremap <leader>d :set modifiable<CR>:call DeleteAllLinesWithThisWord()<CR>:set nomodifiable<CR>
+nnoremap <leader>e :e .<CR>
 let g:ctrlp_working_path_mode = 0
 vmap <Tab> =
 
@@ -163,6 +164,7 @@ vmap <Tab> =
 
 nmap <F9> :set autowrite<CR>:cp<CR>:set noautowrite<CR>zz
 nmap <F10> :set autowrite<CR>:cn<CR>:set noautowrite<CR>zz
+nmap <leader>] :ccl<CR>:help<CR>:q<CR>
 
 nnoremap <leader><space> :noh<cr>:match<cr>
 nnoremap <leader>t viwy:tabnew<CR>:e ~/vim-todo.txt<CR>ggPa<CR><Esc>:wq<CR>
