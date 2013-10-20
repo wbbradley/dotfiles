@@ -76,7 +76,6 @@ if [[ $platform == 'freebsd' ]]; then
 	# Mac OS
 	# set prompt = "%{\033[31m%}[%~] %{\033[0m%}%#"
 	alias ls='ls -G -a -l -tr'
-	alias todo='ack TODO|grep `whoami`'
 	defaults write com.apple.Xcode XCCodeSenseFormattingOptions -dict BlockSeparator "\n" CaseStatementSpacing ""
 	defaults write com.apple.Xcode PBXPageGuideLocation "79"
 	alias kgs='javaws http://files.gokgs.com/javaBin/cgoban.jnlp'
@@ -85,6 +84,7 @@ if [[ $platform == 'freebsd' ]]; then
 	alias simulator='open /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Applications/iPhone\ Simulator.app'
 	eval "$(/usr/local/share/npm/bin/grunt --completion=bash)"
 	alias vi=mvim
+	alias mails='sudo python -m smtpd -n -c DebuggingServer localhost:25'
 	wvi () { vi `which $@`; }
 	fvi () { vi `f $@`; }
 	git-get () { git show $1:$2 > $2; }
