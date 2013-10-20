@@ -44,7 +44,9 @@ Bundle 'jimmyhchan/dustjs.vim.git'
 Bundle 'juvenn/mustache.vim.git'
 Bundle 'groenewege/vim-less'
 Bundle 'rking/ag.vim'
+Bundle 'http://mg.pov.lt/vim/plugin/py-coverage-highlight.vim'
 
+let g:flake8_max_line_length=99
 let g:gitgutter_escape_grep = 1
 let g:gitgutter_eager = 0
 
@@ -172,10 +174,10 @@ nnoremap <leader>T :tabnew<CR>:e ~/vim-todo.txt<CR>
 nnoremap <leader>q :conf qa<CR>
 nnoremap <leader>v <C-w>v<C-w>l<C-w>n<C-w>h
 
-nmap 90 :e ~/.vimrc<CR>
-nmap 91 :e ~/local.vimrc<CR>
-nmap 92 :e ~/.bash_profile<CR>
-nmap 93 :e ~/local.bashrc<CR>
+nmap <leader>90 :e ~/.vimrc<CR>
+nmap <leader>91 :e ~/local.vimrc<CR>
+nmap <leader>92 :e ~/.bash_profile<CR>
+nmap <leader>93 :e ~/local.bashrc<CR>
 
 
 " F4 - swap header and cpp files
