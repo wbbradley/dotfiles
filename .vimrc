@@ -290,7 +290,7 @@ set showmatch
 " set list
 " set listchars=tab:▸\ ,eol:¬
 
-set gfn=Menlo\ Regular:h14
+set gfn=Menlo\ Regular:h12
 syn match Braces display '[<>{}()\[\]]'
 set matchtime=0
 color ir_black
