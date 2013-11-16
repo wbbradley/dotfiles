@@ -4,7 +4,6 @@ bind "set completion-ignore-case on"
 shopt -s cdspell
 
 export SRC_ROOT=$HOME/src
-
 export MARKPATH=$HOME/.marks
 function jump {
     cd -P $MARKPATH/$1 2>/dev/null || echo "No such mark: $1"
@@ -50,7 +49,7 @@ mymake()
 
 alias make=mymake
 
-export PATH=/usr/local/bin:$PATH:/usr/local/share/python:$HOME/bin
+export PATH=/usr/local/bin:$PATH:$HOME/bin:/Applications/Postgres.app/Contents/MacOS/bin
 
 if [[ -d "/usr/local/heroku/bin" ]]; then
 	export PATH="/usr/local/heroku/bin:$PATH"
