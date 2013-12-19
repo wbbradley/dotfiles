@@ -83,7 +83,6 @@ set history=50		" keep 50 lines of command line history
 set ruler		" show the cursor position all the time
 set showcmd		" display incomplete commands
 set incsearch		" do incremental searching
-set completeopt=longest,menuone
 " :inoremap <expr> <CR> pumvisible() ? "\<C-y>" : "\<C-g>u\<CR>"
 
 " For Win32 GUI: remove 't' flag from 'guioptions': no tearoff menu entries
@@ -178,6 +177,7 @@ nmap <leader>90 :e ~/.vimrc<CR>
 nmap <leader>91 :e ~/local.vimrc<CR>
 nmap <leader>92 :e ~/.bash_profile<CR>
 nmap <leader>93 :e ~/local.bashrc<CR>
+nmap <leader>i kA<CR>import ipdb;ipdb.set_trace()<Esc>
 
 
 " F4 - swap header and cpp files
