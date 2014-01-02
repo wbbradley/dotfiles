@@ -91,6 +91,7 @@ set incsearch		" do incremental searching
 " Don't use Ex mode, use Q for formatting
 vmap Q gq
 nmap O :CtrlPMRUFiles<CR>
+nmap C ct
 
 " map home row to exit Insert mode
 imap jj <Esc>
@@ -153,7 +154,7 @@ nmap F :call FindPrompt()<CR>
 nmap E :call FindPromptNoFilter()<CR>
 nmap T :CtrlPTag<CR>
 :map <F2> :echo "hi<" . synIDattr(synID(line("."),col("."),1),"name") . '> trans<' . synIDattr(synID(line("."),col("."),0),"name") . "> lo<" . synIDattr(synIDtrans(synID(line("."),col("."),1)),"name") . ">"<CR>
-nnoremap <leader>d :set modifiable<CR>:call DeleteAllLinesWithThisWord()<CR>:set nomodifiable<CR>
+"nnoremap <leader>d :set modifiable<CR>:call DeleteAllLinesWithThisWord()<CR>:set nomodifiable<CR>
 nnoremap <leader>e :e .<CR>
 let g:ctrlp_working_path_mode = 0
 vmap <Tab> =
