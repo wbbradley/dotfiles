@@ -106,7 +106,7 @@ function! FindPromptNoFilter()
 		return
 	endif
 
-	:silent! execute "Ag " . str	
+	:silent! execute "Ag '" . str . "'"
 	:cw
 endfunction
 
@@ -116,7 +116,7 @@ function! FindPrompt()
 		return
 	endif
 
-	:silent! execute "Ag " . str
+	:silent! execute "Ag '" . str . "'"
 	:cw
 endfunction
 
@@ -126,7 +126,7 @@ function! FindWordNoFilter()
 		return
 	endif
 
-	:silent! execute "Ag " . str	
+	:silent! execute "Ag '" . str . "'"
 	:cw
 endfunction
 
@@ -144,7 +144,7 @@ function! FindWord()
 		return
 	endif
 
-	:silent! execute "Ag " . str	
+	:silent! execute "Ag '" . str . "'"
 	:cw
 endfunction
 
