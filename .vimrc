@@ -46,7 +46,6 @@ Bundle 'groenewege/vim-less'
 Bundle 'rking/ag.vim'
 Bundle 'http://mg.pov.lt/vim/plugin/py-coverage-highlight.vim'
 
-let g:flake8_max_line_length=1000
 let g:gitgutter_escape_grep = 1
 let g:gitgutter_eager = 0
 
