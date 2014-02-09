@@ -49,8 +49,13 @@ system('git config --global push.default tracking')
 system('defaults write -g InitialKeyRepeat -int 15')
 system('defaults write -g KeyRepeat -int 0')
 
+if not exists(get_home_dir_path(join('.vim', 'bundle'))):
+    system('mkdir -p ~/.vim/bundle')
+
+if not exists(get_home_dir_path(join('.vim', 'bundle', 'vundle', '.git'))):
+    system('git clone https://github.com/gmarik/vundle.git ~/.vim/bundle/vundle')
+
 if not exists(abspath(join(expanduser('~'), '.vim', 'autoload', 'pathogen.vim'))):
-    system('mkdir -p ~/.vim/autoload ~/.vim/bundle')
     system('curl -Sso ~/.vim/autoload/pathogen.vim https://raw.github.com/tpope/vim-pathogen/master/autoload/pathogen.vim')
 
 def backup(filename):
