@@ -1,33 +1,91 @@
 #!/usr/local/bin/python
-
-from os.path import join, abspath, expanduser
+import argparse
 import os
+from os.path import join, expanduser
+import sys
+
 
 def system(cmd):
     print cmd
     os.system(cmd)
 
+
+def get_arg_parser():
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        '-d', '--delete',
+        action='store_true',
+        dest='delete',
+        default=False,
+        help='Delete items on the remote server that don\'t exist locally.',
+        )
+    parser.add_argument(
+        '-r', '--remote',
+        dest='remote_host',
+        default='wormhorse.com',
+        help='Override the remote hostname.',
+        )
+    return parser
+
+global_excludes = [
+    'Dropbox',
+    '*.swp',
+    '*.o',
+    ]
+
 folders_to_sync = {
     'backup/docs': {
         'local': join(expanduser('~'), 'Documents'),
-        'exclude': [
-            'Dropbox'
-            ]
+        'exclude': global_excludes + []
         }
     }
 
-remote_host = 'wormhorse.com'
 
-for remote, node in folders_to_sync.iteritems():
-    system('rsync -rauz {} {}/ {}:{}/'.format(
-        ' '.join('--exclude {}'.format(exclude) for exclude in node['exclude']),
-        node['local'],
-        remote_host,
-        remote))
+def rsync(local_host, local_folder, remote_host, remote_folder, excludes, delete):
+    cmd = 'rsync -ihrauz {}{} {}{}/ {}{}/'.format(
+        '--delete ' if delete else '',
+        ' '.join('--exclude {}'.format(exclude) for exclude in excludes),
+        '{}:'.format(local_host) if local_host else '',
+        local_folder,
+        '{}:'.format(remote_host) if remote_host else '',
+        remote_folder
+        )
 
-    system('rsync -rauz {} {}:{}/ {}/'.format(
-        ' '.join('--exclude {}'.format(exclude) for exclude in node['exclude']),
-        remote_host,
-        remote,
-        node['local']))
+    return system(cmd)
 
+
+def wormhorse(opts):
+    for remote, node in folders_to_sync.iteritems():
+        # push
+        rsync(
+            local_host=None,
+            local_folder=node['local'],
+            remote_host=opts.remote_host,
+            remote_folder=remote,
+            excludes=node['exclude'],
+            delete=opts.delete)
+
+        # pull
+        rsync(
+            local_host=opts.remote_host,
+            local_folder=remote,
+            remote_host=None,
+            remote_folder=node['local'],
+            excludes=node['exclude'],
+            delete=opts.delete)
+
+
+def parse_args(argv):
+    parser = get_arg_parser()
+    return parser.parse_args(argv)
+
+
+def main(argv=None):
+    if argv is None:
+        argv = sys.argv[1:]
+
+    wormhorse(parse_args(argv))
+
+
+if __name__ == '__main__':
+    main()
