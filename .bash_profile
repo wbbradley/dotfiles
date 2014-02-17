@@ -75,6 +75,8 @@ if [[ $platform == 'windows' ]]; then
 fi
 
 if [[ $platform == 'freebsd' ]]; then
+	export PATH=/opt/local/bin:/opt/local/sbin:$PATH
+
 	# Mac OS
 	# set prompt = "%{\033[31m%}[%~] %{\033[0m%}%#"
 	alias ls='ls -G -a -l -tr'

@@ -13,9 +13,10 @@ let g:ctrlp_use_caching = 1
 let g:ctrlp_clear_cache_on_exit = 0
 let g:ctrlp_show_hidden = 1
 let g:ctrlp_extensions = ['tag']
-" let g:ctrlp_custom_ignore = { 'dir': '/env$', 'file': '\v\.(pyc)$' }
+" let g:ctrlp_custom_ignore = { 'dir': '/env$', 'dir': 'node_modules', 'file': '\v\.(o)$' }
 let g:ctrlp_custom_ignore = 'node_modules'
 set wildignore+=*.swp
+set wildignore+=*.o
 set wildignore+=*.pyc
 set wildignore+=*.png
 set wildignore+=*.jpg
@@ -150,7 +151,7 @@ function! FindWord()
 endfunction
 
 map <F3> :call FindWord()<CR>
-map <F4> :call FindWordNoFilter()<CR>
+" map <F4> :call FindWordNoFilter()<CR>
 nmap F :call FindPrompt()<CR>
 nmap E :call FindPromptNoFilter()<CR>
 nmap T :CtrlPTag<CR>
@@ -183,12 +184,12 @@ nmap <leader>i kA<CR>import ipdb;ipdb.set_trace()<Esc>
 
 
 " F4 - swap header and cpp files
-" nmap <F4> :wa<CR> :e %:p:s,.h$,.X123X,:s,.cpp$,.h,:s,.X123X$,.cpp,<CR>
-" imap <F4> <Esc> <F4>
-" vmap <F4> <Esc> <F4>
+nmap <F4> :wa<CR> :e %:p:s,.h$,.X123X,:s,.cpp$,.h,:s,.X123X$,.cpp,<CR>
+imap <F4> <Esc> <F4>
+vmap <F4> <Esc> <F4>
 
 " F7 - incremental build
-nmap <F7> :wa<CR> :!clear <CR><CR> :make<CR><CR>
+nmap <F7> :wa<CR> :!clear <CR><CR> :make -j4<CR><CR>
 imap <F7> <Esc> <F7>
 vmap <F7> <Esc> <F7>
 
@@ -205,7 +206,7 @@ nmap <C-F7> :!make clean <CR><CR> <F7>
 imap <C-F7> <Esc> <C-F7>
 vmap <C-F7> <Esc> <C-F7>
 
-set tags+=tags;/
+set tags+=tags;./tags
 
 nnoremap s :exec "normal i".nr2char(getchar())."\el"<CR>
 nnoremap S :exec "normal a".nr2char(getchar())."\el"<CR>

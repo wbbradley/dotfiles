@@ -20,11 +20,14 @@ files = {
     '.pdbrc.py': [],
 }
 
+
 def get_src_path(file):
     return abspath(join(dirname(__file__), file))
 
+
 def get_home_dir_path(file):
     return abspath(join(expanduser('~'), file))
+
 
 def get_dest_path(file, options):
     if type(options) == tuple:
@@ -32,16 +35,20 @@ def get_dest_path(file, options):
             return abspath(join(options[1], file))
     return get_home_dir_path(file)
 
+
 def get_other_files(options):
     if type(options) == tuple:
         return options[0]
     else:
         return options
 
+
 def system(cmd):
     # print(basename(__file__) + ' running: ' + cmd)
     os.system(cmd)
 
+system('git config --global user.name "Will Bradley"')
+system('git config --global user.email williambbradley@gmail.com')
 system('git config --global color.diff always')
 system('git config --global --add color.ui true')
 system('git config --global core.editor "/usr/bin/vim"')
@@ -57,6 +64,7 @@ if not exists(get_home_dir_path(join('.vim', 'bundle', 'vundle', '.git'))):
 
 if not exists(abspath(join(expanduser('~'), '.vim', 'autoload', 'pathogen.vim'))):
     system('curl -Sso ~/.vim/autoload/pathogen.vim https://raw.github.com/tpope/vim-pathogen/master/autoload/pathogen.vim')
+
 
 def backup(filename):
     if not exists(filename):
