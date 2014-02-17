@@ -1,0 +1,33 @@
+#!/usr/local/bin/python
+
+from os.path import join, abspath, expanduser
+import os
+
+def system(cmd):
+    print cmd
+    os.system(cmd)
+
+folders_to_sync = {
+    'backup/docs': {
+        'local': join(expanduser('~'), 'Documents'),
+        'exclude': [
+            'Dropbox'
+            ]
+        }
+    }
+
+remote_host = 'wormhorse.com'
+
+for remote, node in folders_to_sync.iteritems():
+    system('rsync -rauz {} {}/ {}:{}/'.format(
+        ' '.join('--exclude {}'.format(exclude) for exclude in node['exclude']),
+        node['local'],
+        remote_host,
+        remote))
+
+    system('rsync -rauz {} {}:{}/ {}/'.format(
+        ' '.join('--exclude {}'.format(exclude) for exclude in node['exclude']),
+        remote_host,
+        remote,
+        node['local']))
+

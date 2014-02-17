@@ -88,16 +88,18 @@ set incsearch		" do incremental searching
 " let &guioptions = substitute(&guioptions, "t", "", "g")
 
 " Don't use Ex mode, use Q for formatting
-vmap Q gq
-nmap O :CtrlPMRUFiles<CR>
-nmap C ct
+vnoremap Q gq
+nnoremap O :CtrlPMRUFiles<CR>
 
 " map home row to exit Insert mode
 imap jj <Esc>
 imap hh <Esc>
 imap kk <Esc>
 imap lll <Esc>
-nmap <F5> :e!<CR>
+inoremap jk <Esc>
+inoremap kj <Esc>
+
+vnoremap . :norm.<CR>
 
 function! FindPromptNoFilter()
 	let str = input("Search: ", "")
@@ -355,3 +357,15 @@ endfunction
  
 command! PythonLocation :call <SID>EchoPythonLocation()
 nnoremap <Leader>? :PythonLocation<CR>
+
+" Search for the ... arguments separated with whitespace (if no '!'),
+" or with non-word characters (if '!' added to command).
+function! SearchMultiLine(bang, ...)
+  if a:0 > 0
+    let sep = '\_.\{-}'
+    let @/ = join(a:000, sep)
+  endif
+endfunction
+
+command! -bang -nargs=* -complete=tag S call SearchMultiLine(<bang>0, <f-args>)|normal! /<C-R>/<CR>
+"runtime $VIMRUNTIME/macros/matchit.vim
