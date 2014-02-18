@@ -29,6 +29,7 @@ def get_arg_parser():
 
 global_excludes = [
     'Dropbox',
+    'Virtual Machines',
     '*.swp',
     '*.o',
     ]
@@ -44,7 +45,7 @@ folders_to_sync = {
 def rsync(local_host, local_folder, remote_host, remote_folder, excludes, delete):
     cmd = 'rsync -ihrauz {}{} {}{}/ {}{}/'.format(
         '--delete ' if delete else '',
-        ' '.join('--exclude {}'.format(exclude) for exclude in excludes),
+        ' '.join("--exclude '{}'".format(exclude) for exclude in excludes),
         '{}:'.format(local_host) if local_host else '',
         local_folder,
         '{}:'.format(remote_host) if remote_host else '',
