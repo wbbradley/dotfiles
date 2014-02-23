@@ -90,8 +90,6 @@ set incsearch		" do incremental searching
 
 " Don't use Ex mode, use Q for formatting
 vnoremap Q gq
-nnoremap O :CtrlPMRUFiles<CR>
-
 " map home row to exit Insert mode
 imap jj <Esc>
 imap hh <Esc>
@@ -168,8 +166,8 @@ vmap <Tab> =
 
 nmap <F9> :set autowrite<CR>:cp<CR>:set noautowrite<CR>zz
 nmap <F10> :set autowrite<CR>:cn<CR>:set noautowrite<CR>zz
-nmap <leader>] :ccl<CR>:help<CR>:q<CR>
 
+nnoremap O :CtrlPMRUFiles<CR>
 nnoremap <leader><space> :noh<cr>:match<cr>
 nnoremap <leader>t viwy:tabnew<CR>:e ~/vim-todo.txt<CR>ggPa<CR><Esc>:wq<CR>
 nnoremap <leader>T :tabnew<CR>:e ~/vim-todo.txt<CR>

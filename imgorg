@@ -1,0 +1,102 @@
+#!/usr/bin/env python
+import sys
+import os
+from os.path import join, abspath, exists, expanduser, basename, getctime, splitext
+import argparse
+import shutil
+import time
+import hashlib
+
+
+global opts
+opts = {}
+
+
+def system(cmd):
+    print basename(__file__) + ' running: ' + cmd
+    os.system(cmd)
+
+
+def get_arg_parser():
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        '-s', '--source_dir',
+        dest='source_dir',
+        default='.',
+        help='Specify which directory to traverse to look for input images.',
+        )
+    parser.add_argument(
+        '-d', '--dest_dir',
+        dest='dest_dir',
+        default=os.environ.get('IMGORG_ROOT', abspath(join(expanduser('~'), 'imgorg'))),
+        help='Override the remote hostname.',
+        )
+    parser.add_argument(
+        '-t', '--tag',
+        dest='tag',
+        default=None,
+        help='Add a tag.',
+        )
+    return parser
+
+
+def hashfile(filename, blocksize=65536):
+    afile = open(filename, 'rb')
+    hasher = hashlib.sha256()
+    buf = afile.read(blocksize)
+    while len(buf) > 0:
+        hasher.update(buf)
+        buf = afile.read(blocksize)
+    return hasher.hexdigest()[:16]
+
+
+image_exts = set(['.jpg', '.nef', '.raw', '.png', '.gif', '.tif', '.mov', '.jpeg', '.tiff', '.rw2'])
+def is_image_name(name):
+    ext = splitext(name)[1].lower()
+    return ext in image_exts
+
+
+def guess_date(name):
+    return time.strftime('%Y-%m-%d-%H-%M-%S', time.localtime(getctime(name)))
+
+
+def move_file(src, dst):
+    print "imgorg : info : moving {} to {}".format(src, dst)
+    shutil.move(src, dst)
+
+
+def imgorg(opts):
+    if not exists(opts.source_dir):
+        print 'Source directory does not exist'
+        return -1
+
+    if not exists(opts.dest_dir):
+        system("mkdir -p '{}'".format(opts.dest_dir))
+    
+    for path, subdirs, files in os.walk(opts.source_dir):
+        for name in filter(lambda name: is_image_name(name), files):
+            file_name = os.path.join(path, name)
+            date = guess_date(file_name)
+            ext = splitext(name)[1].lower()
+            file_hash = hashfile(file_name)
+            dest_name = '{}-H{}{}{}'.format(date, file_hash, ext, ('-' + opts.tag.lower()) if opts.tag else '')
+            dest_file = join(opts.dest_dir, dest_name)
+            move_file(file_name, dest_file)
+
+
+def parse_args(argv):
+    parser = get_arg_parser()
+    global opts
+    opts = parser.parse_args(argv)
+    return opts
+
+
+def main(argv=None):
+    if argv is None:
+        argv = sys.argv[1:]
+
+    return imgorg(parse_args(argv))
+
+
+if __name__ == '__main__':
+    main()

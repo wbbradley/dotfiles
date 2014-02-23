@@ -2,15 +2,19 @@
 from os.path import dirname, join, abspath, exists, expanduser, basename
 import os
 
-ftplugin_dir = join(expanduser('~'), '.vim', 'ftplugin')
-vim_color_dir = join(expanduser('~'), '.vim', 'colors')
-vim_indent_dir = join(expanduser('~'), '.vim', 'indent')
+user_dir = expanduser('~')
+vim_dir = join(user_dir, '.vim')
+vim_color_dir = join(vim_dir, 'colors')
+vim_indent_dir = join(vim_dir, 'indent')
+ftplugin_dir = join(vim_dir, 'ftplugin')
+bin_dir = join(user_dir, 'bin')
 
 files = {
     '.bash_profile': ['.bashrc'],
     '.vimrc': [],
     '.ctags': [],
     '.inputrc': [],
+    'imgorg': ([], bin_dir),
     'py.vim': ([], ftplugin_dir),
     'coffee.vim': ([], ftplugin_dir),
     'html.vim': ([], vim_indent_dir),
@@ -84,7 +88,10 @@ for file, options in files.iteritems():
     source_file = get_src_path(file)
     dest_file = get_dest_path(file, options)
     dest_file_path = dirname(dest_file)
-    system('mkdir -p ' + dest_file_path)
+
+    if not exists(dest_file_path):
+        system('mkdir -p ' + dest_file_path)
+
     if exists(file):
         backup(dest_file)
 
