@@ -45,7 +45,8 @@ Bundle 'jimmyhchan/dustjs.vim.git'
 Bundle 'juvenn/mustache.vim.git'
 Bundle 'groenewege/vim-less'
 Bundle 'rking/ag.vim'
-Bundle 'http://mg.pov.lt/vim/plugin/py-coverage-highlight.vim'
+Bundle 'pangloss/vim-javascript'
+Bundle 'mxw/vim-jsx'
 
 let g:gitgutter_escape_grep = 1
 let g:gitgutter_eager = 0
