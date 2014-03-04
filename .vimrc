@@ -91,6 +91,8 @@ set incsearch		" do incremental searching
 
 " Don't use Ex mode, use Q for formatting
 vnoremap Q gq
+nnoremap M :CtrlPMRUFiles<CR>
+
 " map home row to exit Insert mode
 imap jj <Esc>
 imap hh <Esc>
