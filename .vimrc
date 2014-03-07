@@ -170,7 +170,7 @@ vmap <Tab> =
 nmap <F9> :set autowrite<CR>:cp<CR>:set noautowrite<CR>zz
 nmap <F10> :set autowrite<CR>:cn<CR>:set noautowrite<CR>zz
 
-nnoremap O :CtrlPMRUFiles<CR>
+nnoremap M :CtrlPMRUFiles<CR>
 nnoremap <leader><space> :noh<cr>:match<cr>
 nnoremap <leader>t viwy:tabnew<CR>:e ~/vim-todo.txt<CR>ggPa<CR><Esc>:wq<CR>
 nnoremap <leader>T :tabnew<CR>:e ~/vim-todo.txt<CR>
