@@ -1,4 +1,4 @@
-#!/usr/local/bin/python
+#!/usr/bin/python
 from os.path import dirname, join, abspath, exists, expanduser, basename
 import os
 
@@ -62,6 +62,9 @@ system('defaults write -g KeyRepeat -int 0')
 
 if not exists(get_home_dir_path(join('.vim', 'bundle'))):
     system('mkdir -p ~/.vim/bundle')
+
+if not exists(get_home_dir_path(join('.vim', 'autoload'))):
+    system('mkdir -p ~/.vim/autoload')
 
 if not exists(get_home_dir_path(join('.vim', 'bundle', 'vundle', '.git'))):
     system('git clone https://github.com/gmarik/vundle.git ~/.vim/bundle/vundle')
