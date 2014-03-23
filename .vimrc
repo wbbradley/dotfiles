@@ -109,7 +109,7 @@ function! FindPromptNoFilter()
 		return
 	endif
 
-	:silent! execute "Ag '" . str . "'"
+	:silent! execute "Ag -a '" . str . "'"
 	:cw
 endfunction
 
@@ -368,6 +368,8 @@ function! SearchMultiLine(bang, ...)
     let @/ = join(a:000, sep)
   endif
 endfunction
+
+let c_no_curly_error=1
 
 command! -bang -nargs=* -complete=tag S call SearchMultiLine(<bang>0, <f-args>)|normal! /<C-R>/<CR>
 "runtime $VIMRUNTIME/macros/matchit.vim

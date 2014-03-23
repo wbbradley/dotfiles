@@ -55,6 +55,10 @@ if [[ -d "/usr/local/heroku/bin" ]]; then
 	export PATH="/usr/local/heroku/bin:$PATH"
 fi
 
+if [[ -d "/var/lib/gems/1.8/bin" ]]; then
+	export PATH=/var/lib/gems/1.8/bin:$PATH
+fi
+
 platform='unknown'
 unamestr=`uname`
 if [[ "$unamestr" == 'Linux' ]]; then
