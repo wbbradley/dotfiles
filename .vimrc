@@ -15,6 +15,7 @@ let g:ctrlp_show_hidden = 1
 let g:ctrlp_extensions = ['tag']
 " let g:ctrlp_custom_ignore = { 'dir': '/env$', 'dir': 'node_modules', 'file': '\v\.(o)$' }
 let g:ctrlp_custom_ignore = 'node_modules'
+set wildignore+=migrations
 set wildignore+=*.swp
 set wildignore+=*.o
 set wildignore+=*.pyc
@@ -23,6 +24,7 @@ set wildignore+=*.jpg
 set wildignore+=*.jpeg
 set wildignore+=*.pyc
 set wildignore+=media
+set wildignore+=.git
 set wildignore+=bootstrap-3.0.0
 set wildchar=<Tab> wildmenu wildmode=full
 
@@ -47,6 +49,7 @@ Bundle 'groenewege/vim-less'
 Bundle 'rking/ag.vim'
 Bundle 'pangloss/vim-javascript'
 Bundle 'mxw/vim-jsx'
+Bundle 'wookiehangover/jshint.vim.git'
 
 let g:gitgutter_escape_grep = 1
 let g:gitgutter_eager = 0
@@ -91,7 +94,6 @@ set incsearch		" do incremental searching
 
 " Don't use Ex mode, use Q for formatting
 vnoremap Q gq
-nnoremap M :CtrlPMRUFiles<CR>
 
 " map home row to exit Insert mode
 imap jj <Esc>
@@ -159,6 +161,11 @@ nmap T :CtrlPTag<CR>
 :map <F2> :echo "hi<" . synIDattr(synID(line("."),col("."),1),"name") . '> trans<' . synIDattr(synID(line("."),col("."),0),"name") . "> lo<" . synIDattr(synIDtrans(synID(line("."),col("."),1)),"name") . ">"<CR>
 "nnoremap <leader>d :set modifiable<CR>:call DeleteAllLinesWithThisWord()<CR>:set nomodifiable<CR>
 nnoremap <leader>e :e .<CR>
+nnoremap <leader><leader> za
+set foldmethod=indent
+set foldminlines=10
+set foldnestmax=5
+
 let g:ctrlp_working_path_mode = 0
 vmap <Tab> =
 
@@ -171,23 +178,24 @@ nmap <F9> :set autowrite<CR>:cp<CR>:set noautowrite<CR>zz
 nmap <F10> :set autowrite<CR>:cn<CR>:set noautowrite<CR>zz
 
 nnoremap M :CtrlPMRUFiles<CR>
+
 nnoremap <leader><space> :noh<cr>:match<cr>
 nnoremap <leader>t viwy:tabnew<CR>:e ~/vim-todo.txt<CR>ggPa<CR><Esc>:wq<CR>
 nnoremap <leader>T :tabnew<CR>:e ~/vim-todo.txt<CR>
 nnoremap <leader>q :conf qa<CR>
 nnoremap <leader>v <C-w>v<C-w>l<C-w>n<C-w>h
 
-nmap <leader>90 :e ~/.vimrc<CR>
-nmap <leader>91 :e ~/local.vimrc<CR>
-nmap <leader>92 :e ~/.bash_profile<CR>
-nmap <leader>93 :e ~/local.bashrc<CR>
-nmap <leader>i kA<CR>import ipdb;ipdb.set_trace()<Esc>
+nnoremap <leader>90 :e ~/.vimrc<CR>
+nnoremap <leader>91 :e ~/local.vimrc<CR>
+nnoremap <leader>92 :e ~/.bash_profile<CR>
+nnoremap <leader>93 :e ~/local.bashrc<CR>
+nnoremap <leader>i Oimport ipdb;ipdb.set_trace()<Esc>j_
 
 
 " F4 - swap header and cpp files
-nmap <F4> :wa<CR> :e %:p:s,.h$,.X123X,:s,.cpp$,.h,:s,.X123X$,.cpp,<CR>
-imap <F4> <Esc> <F4>
-vmap <F4> <Esc> <F4>
+nnoremap <F4> :wa<CR> :e %:p:s,.h$,.X123X,:s,.cpp$,.h,:s,.X123X$,.cpp,<CR>
+inoremap <F4> <Esc> <F4>
+vnoremap <F4> <Esc> <F4>
 
 " F7 - incremental build
 nmap <F7> :wa<CR> :!clear <CR><CR> :make -j4<CR><CR>
@@ -294,7 +302,7 @@ set showmatch
 " set list
 " set listchars=tab:▸\ ,eol:¬
 
-set gfn=Menlo\ Regular:h12
+set gfn=Menlo\ Regular:h10
 syn match Braces display '[<>{}()\[\]]'
 set matchtime=0
 color ir_black
