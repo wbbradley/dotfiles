@@ -319,7 +319,7 @@ augroup END
 hi CursorLine cterm=NONE ctermbg=darkgray ctermfg=NONE guibg=#222222 guifg=NONE
 hi CursorLineNR cterm=NONE ctermbg=darkgray ctermfg=NONE guibg=#333333 guifg=NONE
 nnoremap <Leader>c :set cursorline!<CR>
-set cursorline
+set nocursorline
 
 :nnoremap <silent> <Leader>l ml:execute 'match Search /\%'.line('.').'l/'<CR>
 

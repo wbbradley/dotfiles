@@ -93,7 +93,9 @@ if [[ $platform == 'freebsd' ]]; then
 	alias kgs='javaws http://files.gokgs.com/javaBin/cgoban.jnlp'
 	alias venvc="virtualenv -p `brew info python | grep 'Python\.framework' | sed 's/^ *//g' | sed 's/\(.*\)Frame.*/\1bin\/python/'` env"
 	alias simulator='open /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Applications/iPhone\ Simulator.app'
-	eval "$(/usr/local/share/npm/bin/grunt --completion=bash)"
+	if [[ -f "local.bashrc" ]]; then
+		eval "$(/usr/local/share/npm/bin/grunt --completion=bash)"
+	fi
 	alias vi=mvim
 	alias mails='sudo python -m smtpd -n -c DebuggingServer localhost:25'
 	fvi () { vi `f $@`; }
@@ -184,3 +186,4 @@ if [[ -f "local.bashrc" ]]; then
 	source local.bashrc
 fi
 
+export PATH=/usr/local/sbin:$PATH
