@@ -42,6 +42,10 @@ alias m=mark
 alias c=jump
 alias j=jump
 
+if [[ -f "/usr/local/bin/mvim" ]]; then
+	export EDITOR="mvim -f"
+fi
+
 mymake()
 {
 	make -j10 $1
@@ -57,6 +61,14 @@ fi
 
 if [[ -d "/var/lib/gems/1.8/bin" ]]; then
 	export PATH=/var/lib/gems/1.8/bin:$PATH
+fi
+
+if [[ -d "/usr/local/opt/ccache/libexec" ]]; then
+	export PATH=/usr/local/opt/ccache/libexec:$PATH
+fi
+
+if [[ -d "/usr/local/Cellar/f90cache/0.95/libexec" ]]; then
+	export PATH=/usr/local/Cellar/f90cache/0.95/libexec:$PATH
 fi
 
 if [ -f ~/.git-completion.sh ]; then
@@ -93,9 +105,6 @@ if [[ $platform == 'freebsd' ]]; then
 	alias kgs='javaws http://files.gokgs.com/javaBin/cgoban.jnlp'
 	alias venvc="virtualenv -p `brew info python | grep 'Python\.framework' | sed 's/^ *//g' | sed 's/\(.*\)Frame.*/\1bin\/python/'` env"
 	alias simulator='open /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Applications/iPhone\ Simulator.app'
-	if [[ -f "local.bashrc" ]]; then
-		eval "$(/usr/local/share/npm/bin/grunt --completion=bash)"
-	fi
 	alias vi=mvim
 	alias mails='sudo python -m smtpd -n -c DebuggingServer localhost:25'
 	fvi () { vi `f $@`; }
