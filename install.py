@@ -16,6 +16,7 @@ files = {
     '.ctags': [],
     '.inputrc': [],
     'imgorg': ([], bin_dir),
+    'f': ([], bin_dir),
     'py.vim': ([], ftplugin_dir),
     'coffee.vim': ([], ftplugin_dir),
     'html.vim': ([], vim_indent_dir),
