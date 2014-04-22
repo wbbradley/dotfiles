@@ -6,7 +6,7 @@ set splitbelow
 set splitright
 set modelines=0
 
-highlight LineNr term=bold cterm=NONE ctermfg=DarkGrey ctermbg=11 gui=NONE guifg=DarkGrey guibg=NONE
+" highlight LineNr term=bold cterm=NONE ctermfg=DarkGrey ctermbg=11 gui=NONE guifg=DarkGrey guibg=NONE
 
 "set runtimepath^=~/.vim/bundle/vim-gitgutter
 let g:ctrlp_use_caching = 1
