@@ -26,6 +26,11 @@ function swap()
     mv $TMPFILE "$2"
 }
 
+function port()
+{
+	lsof -n -i4TCP:$1 | grep LISTEN
+}
+
 alias dus='du -sk * | sed "s/ /_/g" | sort -n | awk '\''
 { if ($1 < 1024) { output("K", 1) }
   else if ($1 < 1048576) { output("M", 1024) }
@@ -110,9 +115,6 @@ if [[ $platform == 'freebsd' ]]; then
 	fvi () { vi `f $@`; }
 	git-get () { git show $1:$2 > $2; }
 	export PGDATA=/usr/local/var/postgres
-	if [ -d "/Library/Java/Home" ]; then
-		export JAVA_HOME=/Library/Java/Home
-	fi
 
 	DULL=0
 	BRIGHT=1
@@ -195,6 +197,10 @@ fi
 
 if [[ -f "local.bashrc" ]]; then
 	source local.bashrc
+fi
+
+if [[ -f "/usr/libexec/java_home" ]]; then
+	export JAVA_HOME=`/usr/libexec/java_home` 
 fi
 
 export PATH=/usr/local/sbin:$PATH

@@ -1,6 +1,7 @@
 #!/usr/bin/python
 from os.path import dirname, join, abspath, exists, expanduser, basename
 import os
+from sys import platform
 
 user_dir = expanduser('~')
 vim_dir = join(user_dir, '.vim')
@@ -16,6 +17,7 @@ files = {
     '.ctags': [],
     '.inputrc': [],
     'imgorg': ([], bin_dir),
+    'gs': ([], bin_dir),
     'f': ([], bin_dir),
     'py.vim': ([], ftplugin_dir),
     'coffee.vim': ([], ftplugin_dir),
@@ -59,8 +61,12 @@ system('git config --global color.diff always')
 system('git config --global --add color.ui true')
 system('git config --global core.editor "/usr/bin/vim"')
 system('git config --global push.default tracking')
-system('defaults write -g InitialKeyRepeat -int 15')
-system('defaults write -g KeyRepeat -int 0')
+
+if platform == 'darwin':
+    system('defaults write -g InitialKeyRepeat -int 15')
+    system('defaults write -g KeyRepeat -int 0')
+elif platform.find('linux') != -1:
+    system('sudo apt-get install ctags')
 
 if not exists(get_home_dir_path(join('.vim', 'bundle'))):
     system('mkdir -p ~/.vim/bundle')

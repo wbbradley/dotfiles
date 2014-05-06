@@ -6,8 +6,6 @@ set splitbelow
 set splitright
 set modelines=0
 
-" highlight LineNr term=bold cterm=NONE ctermfg=DarkGrey ctermbg=11 gui=NONE guifg=DarkGrey guibg=NONE
-
 "set runtimepath^=~/.vim/bundle/vim-gitgutter
 let g:ctrlp_use_caching = 1
 let g:ctrlp_clear_cache_on_exit = 0
@@ -15,6 +13,9 @@ let g:ctrlp_show_hidden = 1
 let g:ctrlp_extensions = ['tag']
 " let g:ctrlp_custom_ignore = { 'dir': '/env$', 'dir': 'node_modules', 'file': '\v\.(o)$' }
 let g:ctrlp_custom_ignore = 'node_modules'
+
+" let g:ctrlp_user_command = 'find %s -type f'        " MacOSX/Linux
+
 set wildignore+=migrations
 set wildignore+=*.swp
 set wildignore+=*.o
@@ -22,6 +23,7 @@ set wildignore+=*.pyc
 set wildignore+=*.png
 set wildignore+=*.jpg
 set wildignore+=*.jpeg
+set wildignore+=*.class
 set wildignore+=*.pyc
 set wildignore+=media
 set wildignore+=.git
@@ -35,6 +37,7 @@ call pathogen#infect()
 set rtp^=~/.vim/bundle/vundle/
 call vundle#rc()
 
+Bundle 'gmarik/Vundle.vim'
 Bundle 'othree/html5.vim'
 Bundle 'kien/ctrlp.vim'
 Bundle 'vim-scripts/django.vim'
@@ -43,13 +46,13 @@ Bundle 'nvie/vim-flake8'
 Bundle 'airblade/vim-gitgutter'
 Bundle 'tpope/vim-fugitive'
 Bundle 'kchmck/vim-coffee-script.git'
-Bundle 'jimmyhchan/dustjs.vim.git'
+" Bundle 'jimmyhchan/dustjs.vim.git'
 Bundle 'juvenn/mustache.vim.git'
 Bundle 'groenewege/vim-less'
 Bundle 'rking/ag.vim'
+Bundle 'fweep/vim-tabber'
 Bundle 'pangloss/vim-javascript'
 Bundle 'mxw/vim-jsx'
-Bundle 'wookiehangover/jshint.vim.git'
 
 let g:gitgutter_escape_grep = 1
 let g:gitgutter_eager = 0
@@ -155,16 +158,16 @@ endfunction
 
 map <F3> :call FindWord()<CR>
 " map <F4> :call FindWordNoFilter()<CR>
-nmap F :call FindPrompt()<CR>
-nmap E :call FindPromptNoFilter()<CR>
-nmap T :CtrlPTag<CR>
+nnoremap F :call FindPrompt()<CR>
+nnoremap E :call FindPromptNoFilter()<CR>
+nnoremap T :CtrlPTag<CR>
 :map <F2> :echo "hi<" . synIDattr(synID(line("."),col("."),1),"name") . '> trans<' . synIDattr(synID(line("."),col("."),0),"name") . "> lo<" . synIDattr(synIDtrans(synID(line("."),col("."),1)),"name") . ">"<CR>
 "nnoremap <leader>d :set modifiable<CR>:call DeleteAllLinesWithThisWord()<CR>:set nomodifiable<CR>
 nnoremap <leader>e :e .<CR>
-nnoremap <leader><leader> za
-set foldmethod=indent
-set foldminlines=10
-set foldnestmax=5
+
+" set foldmethod=indent
+" set foldminlines=10
+" set foldnestmax=5
 
 let g:ctrlp_working_path_mode = 0
 vmap <Tab> =
@@ -274,6 +277,10 @@ set cino=:0g0
 set sw=4
 set ts=4
 autocmd FileType python setlocal sw=4 sts=4 ts=4 expandtab
+autocmd FileType htmldjango setlocal sw=2 sts=2 ts=2 expandtab
+autocmd FileType html setlocal sw=2 sts=2 ts=2 expandtab
+autocmd FileType less setlocal sw=2 sts=2 ts=2 expandtab
+autocmd FileType css setlocal sw=2 sts=2 ts=2 expandtab
 
 " Convenient command to see the difference between the current buffer and the
 " file it was loaded from, thus the changes you made.
@@ -302,7 +309,7 @@ set showmatch
 " set list
 " set listchars=tab:▸\ ,eol:¬
 
-set gfn=Menlo\ Regular:h10
+set gfn=Menlo\ Regular:h12
 syn match Braces display '[<>{}()\[\]]'
 set matchtime=0
 color ir_black
@@ -368,5 +375,25 @@ endfunction
 
 let c_no_curly_error=1
 
+" Tabber options
+set tabline=%!tabber#TabLine()
+set guioptions-=e
+let g:tabber_filename_style = 'filename'
+let g:tabber_divider_style = 'fancy'
+
 command! -bang -nargs=* -complete=tag S call SearchMultiLine(<bang>0, <f-args>)|normal! /<C-R>/<CR>
 "runtime $VIMRUNTIME/macros/matchit.vim
+
+" Add the virtualenv's site-packages to vim path
+if has('python')
+py << EOF
+import os.path
+import sys
+import vim
+if 'VIRTUAL_ENV' in os.environ:
+    project_base_dir = os.environ['VIRTUAL_ENV']
+    sys.path.insert(0, project_base_dir)
+    activate_this = os.path.join(project_base_dir, 'bin/activate_this.py')
+    execfile(activate_this, dict(__file__=activate_this))
+EOF
+endif
