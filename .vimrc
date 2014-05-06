@@ -17,7 +17,7 @@ let g:ctrlp_extensions = ['tag']
 let g:ctrlp_custom_ignore = 'node_modules'
 set wildignore+=migrations
 set wildignore+=*.swp
-set wildignore+=*.o
+set wildignorecurs+=*.o
 set wildignore+=*.pyc
 set wildignore+=*.png
 set wildignore+=*.jpg
@@ -309,17 +309,6 @@ color ir_black
 set nowrap
 
 silent! source ~/local.vimrc
-
-augroup CursorLine
-  au!
-  au VimEnter,WinEnter,BufWinEnter * setlocal cursorline
-  au WinLeave * setlocal nocursorline
-augroup END
-
-hi CursorLine cterm=NONE ctermbg=darkgray ctermfg=NONE guibg=#222222 guifg=NONE
-hi CursorLineNR cterm=NONE ctermbg=darkgray ctermfg=NONE guibg=#333333 guifg=NONE
-nnoremap <Leader>c :set cursorline!<CR>
-set nocursorline
 
 :nnoremap <silent> <Leader>l ml:execute 'match Search /\%'.line('.').'l/'<CR>
 
