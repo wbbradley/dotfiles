@@ -1,8 +1,3 @@
-echo "------"
-bind "set completion-ignore-case on"
-
-shopt -s cdspell
-
 export SRC_ROOT=$HOME/src
 export MARKPATH=$HOME/.marks
 function jump {
@@ -100,6 +95,9 @@ if [[ $platform == 'windows' ]]; then
 fi
 
 if [[ $platform == 'freebsd' ]]; then
+	bind "set completion-ignore-case on"
+	shopt -s cdspell
+
 	export PATH=/opt/local/bin:/opt/local/sbin:$PATH
 
 	# Mac OS
