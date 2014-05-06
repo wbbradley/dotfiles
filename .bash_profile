@@ -180,7 +180,6 @@ if [[ $platform == 'freebsd' ]]; then
 	PS1="${BRIGHT_RED}[\w]${NORMAL}\$ ${RESET}"
 fi
 
-
 if [[ $platform == 'linux' ]]; then
 	alias ls='ls -G -a -l -tr --color'
 	# Debian
@@ -189,6 +188,9 @@ if [[ $platform == 'linux' ]]; then
 	#set color = (ls-F)
 	#set term=xterm
 	# limit coredumpsize 16000
+	if [[ -f "/usr/local/bin/ssh_proxy_via_bastion" ]]; then
+		export GIT_SSH=/usr/local/bin/ssh_proxy_via_bastion
+	fi
 fi
 
 if [[ -f "local.bashrc" ]]; then
