@@ -56,7 +56,6 @@ def system(cmd):
     os.system(cmd)
 
 system('git config --global user.name "Will Bradley"')
-system('git config --global user.email williambbradley@gmail.com')
 system('git config --global color.diff always')
 system('git config --global --add color.ui true')
 system('git config --global core.editor "/usr/bin/vim"')

@@ -88,7 +88,7 @@ elif [ -d "/c/Windows" ]; then
 fi
 
 alias venv='source env/bin/activate'
-wvi () { vi `which $@`; }
+wvi () { $EDITOR `which $@`; }
 
 if [[ $platform == 'windows' ]]; then
 	alias ls='ls -G -a -l -tr --color'
@@ -103,6 +103,7 @@ if [[ $platform == 'freebsd' ]]; then
 	# Mac OS
 	# set prompt = "%{\033[31m%}[%~] %{\033[0m%}%#"
 	alias ls='ls -G -a -l -tr'
+	defaults write com.apple.finder AppleShowAllFiles true
 	defaults write com.apple.Xcode XCCodeSenseFormattingOptions -dict BlockSeparator "\n" CaseStatementSpacing ""
 	defaults write com.apple.Xcode PBXPageGuideLocation "79"
 	alias kgs='javaws http://files.gokgs.com/javaBin/cgoban.jnlp'

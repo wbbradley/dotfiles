@@ -53,6 +53,8 @@ Bundle 'rking/ag.vim'
 Bundle 'fweep/vim-tabber'
 Bundle 'pangloss/vim-javascript'
 Bundle 'mxw/vim-jsx'
+Bundle 'scrooloose/syntastic'
+Bundle 'hynek/vim-python-pep8-indent.git'
 
 let g:gitgutter_escape_grep = 1
 let g:gitgutter_eager = 0
@@ -64,6 +66,8 @@ let g:jedi#show_function_definition = "0"
 
 let g:pyindent_open_paren = '&sw'
 let g:pyindent_continue = '&sw'
+
+let g:flake8_max_line_length=100
 
 au BufNewFile,BufReadPost *.coffee setl shiftwidth=2 expandtab
 
@@ -192,7 +196,7 @@ nnoremap <leader>90 :e ~/.vimrc<CR>
 nnoremap <leader>91 :e ~/local.vimrc<CR>
 nnoremap <leader>92 :e ~/.bash_profile<CR>
 nnoremap <leader>93 :e ~/local.bashrc<CR>
-nnoremap <leader>i Oimport ipdb;ipdb.set_trace()<Esc>j_
+nnoremap <leader>i Oimport ipdb<CR>ipdb.set_trace()<Esc>j_
 
 
 " F4 - swap header and cpp files
@@ -276,6 +280,8 @@ endif " has("autocmd")
 set cino=:0g0
 set sw=4
 set ts=4
+autocmd FileType javascript setlocal sw=2 sts=2 ts=2 expandtab
+autocmd FileType yaml setlocal sw=2 sts=2 ts=2 expandtab
 autocmd FileType python setlocal sw=4 sts=4 ts=4 expandtab
 autocmd FileType htmldjango setlocal sw=2 sts=2 ts=2 expandtab
 autocmd FileType html setlocal sw=2 sts=2 ts=2 expandtab
