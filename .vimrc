@@ -26,6 +26,7 @@ set wildignore+=*.jpeg
 set wildignore+=*.class
 set wildignore+=*.pyc
 set wildignore+=media
+set wildignore+=build
 set wildignore+=.git
 set wildignore+=bootstrap-3.0.0
 set wildchar=<Tab> wildmenu wildmode=full
@@ -67,7 +68,7 @@ let g:jedi#show_function_definition = "0"
 let g:pyindent_open_paren = '&sw'
 let g:pyindent_continue = '&sw'
 
-let g:flake8_max_line_length=100
+let g:flake8_max_line_length=79
 
 au BufNewFile,BufReadPost *.coffee setl shiftwidth=2 expandtab
 
@@ -138,7 +139,7 @@ function! FindWordNoFilter()
 		return
 	endif
 
-	:silent! execute "Ag '" . str . "'"
+	:silent! execute "Ag -a '" . str . "'"
 	:cw
 endfunction
 
@@ -160,14 +161,15 @@ function! FindWord()
 	:cw
 endfunction
 
-map <F3> :call FindWord()<CR>
-" map <F4> :call FindWordNoFilter()<CR>
-nnoremap F :call FindPrompt()<CR>
-nnoremap E :call FindPromptNoFilter()<CR>
+nnoremap <F3> :call FindWord()<CR>
+nnoremap <F4> :call FindWordNoFilter()<CR>
+nnoremap F :wa<CR>:call FindPrompt()<CR>
+nnoremap E :wa<CR>:call FindPromptNoFilter()<CR>
 nnoremap T :CtrlPTag<CR>
 :map <F2> :echo "hi<" . synIDattr(synID(line("."),col("."),1),"name") . '> trans<' . synIDattr(synID(line("."),col("."),0),"name") . "> lo<" . synIDattr(synIDtrans(synID(line("."),col("."),1)),"name") . ">"<CR>
 "nnoremap <leader>d :set modifiable<CR>:call DeleteAllLinesWithThisWord()<CR>:set nomodifiable<CR>
 nnoremap <leader>e :e .<CR>
+nnoremap <leader>D :cd `=expand('%:p:h')`<CR>:pwd<CR>
 
 " set foldmethod=indent
 " set foldminlines=10
@@ -196,13 +198,8 @@ nnoremap <leader>90 :e ~/.vimrc<CR>
 nnoremap <leader>91 :e ~/local.vimrc<CR>
 nnoremap <leader>92 :e ~/.bash_profile<CR>
 nnoremap <leader>93 :e ~/local.bashrc<CR>
-nnoremap <leader>i Oimport ipdb<CR>ipdb.set_trace()<Esc>j_
+nnoremap <leader>i Oimport pdb<CR>pdb.set_trace()<Esc>j_
 
-
-" F4 - swap header and cpp files
-nnoremap <F4> :wa<CR> :e %:p:s,.h$,.X123X,:s,.cpp$,.h,:s,.X123X$,.cpp,<CR>
-inoremap <F4> <Esc> <F4>
-vnoremap <F4> <Esc> <F4>
 
 " F7 - incremental build
 nmap <F7> :wa<CR> :!clear <CR><CR> :make -j4<CR><CR>
@@ -304,6 +301,7 @@ augroup END
 set rtp+=$GOROOT/misc/vim
 filetype plugin indent on
 au BufRead,BufNewFile *.go set filetype=go
+au BufRead,BufNewFile *.eco set filetype=html
 
 au BufReadPost *.prepp set syntax=python
 
@@ -315,7 +313,7 @@ set showmatch
 " set list
 " set listchars=tab:▸\ ,eol:¬
 
-set gfn=Menlo\ Regular:h12
+set gfn=Menlo\ Regular:h10
 syn match Braces display '[<>{}()\[\]]'
 set matchtime=0
 color ir_black
@@ -328,6 +326,9 @@ augroup CursorLine
   au VimEnter,WinEnter,BufWinEnter * setlocal cursorline
   au WinLeave * setlocal nocursorline
 augroup END
+
+set cc=80
+hi ColorColumn cterm=NONE ctermbg=NONE ctermfg=NONE guibg=#111111 guifg=NONE
 
 hi CursorLine cterm=NONE ctermbg=NONE ctermfg=NONE guibg=#222222 guifg=NONE
 hi CursorLineNR cterm=NONE ctermbg=NONE ctermfg=NONE guibg=#333333 guifg=NONE
@@ -398,6 +399,8 @@ let g:tabber_divider_style = 'fancy'
 
 command! -bang -nargs=* -complete=tag S call SearchMultiLine(<bang>0, <f-args>)|normal! /<C-R>/<CR>
 "runtime $VIMRUNTIME/macros/matchit.vim
+
+:match ErrorMsg '\%>80v.\+'
 
 " Add the virtualenv's site-packages to vim path
 if has('python')

@@ -26,6 +26,16 @@ function port()
 	lsof -n -i4TCP:$1 | grep LISTEN
 }
 
+_fab_completion() {
+    COMPREPLY=()
+
+    local cur="${COMP_WORDS[COMP_CWORD]}"
+
+    local tasks=$(fab --shortlist 2>/dev/null)
+    COMPREPLY=( $(compgen -W "${tasks}" -- ${cur}) )
+}
+complete -F _fab_completion fab
+
 alias dus='du -sk * | sed "s/ /_/g" | sort -n | awk '\''
 { if ($1 < 1024) { output("K", 1) }
   else if ($1 < 1048576) { output("M", 1024) }
@@ -43,7 +53,7 @@ alias c=jump
 alias j=jump
 
 if [[ -f "/usr/local/bin/mvim" ]]; then
-	export EDITOR="mvim -f"
+	export EDITOR="mvim -p --remote-tab-silent -f"
 fi
 
 mymake()
@@ -109,7 +119,7 @@ if [[ $platform == 'freebsd' ]]; then
 	alias kgs='javaws http://files.gokgs.com/javaBin/cgoban.jnlp'
 	alias venvc="virtualenv -p `brew info python | grep 'Python\.framework' | sed 's/^ *//g' | sed 's/\(.*\)Frame.*/\1bin\/python/'` env"
 	alias simulator='open /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Applications/iPhone\ Simulator.app'
-	alias vi=mvim
+	alias vi='mvim -p --remote-tab-silent'
 	alias mails='sudo python -m smtpd -n -c DebuggingServer localhost:25'
 	fvi () { vi `f $@`; }
 	git-get () { git show $1:$2 > $2; }
