@@ -6,17 +6,22 @@ set splitbelow
 set splitright
 set modelines=0
 
+" set columns=117
+set columns=210
+
 "set runtimepath^=~/.vim/bundle/vim-gitgutter
 let g:ctrlp_use_caching = 1
 let g:ctrlp_clear_cache_on_exit = 0
 let g:ctrlp_show_hidden = 1
 let g:ctrlp_extensions = ['tag']
-" let g:ctrlp_custom_ignore = { 'dir': '/env$', 'dir': 'node_modules', 'file': '\v\.(o)$' }
-let g:ctrlp_custom_ignore = 'node_modules'
-
-" let g:ctrlp_user_command = 'find %s -type f'        " MacOSX/Linux
+let g:ctrlp_custom_ignore = 'build'
+let g:ctrlp_regexp = 0
+" let g:ctrlp_user_command = 'find %s -type f'       " MacOSX/Linux
 
 set wildignore+=migrations
+set wildignore+=bower_components
+set wildignore+=node_modules
+set wildignore+=assets
 set wildignore+=*.swp
 set wildignore+=*.o
 set wildignore+=*.pyc
@@ -102,6 +107,8 @@ set incsearch		" do incremental searching
 
 " Don't use Ex mode, use Q for formatting
 vnoremap Q gq
+vnoremap gQ gq
+nnoremap gQ gq
 
 " map home row to exit Insert mode
 imap jj <Esc>
@@ -170,7 +177,6 @@ nnoremap T :CtrlPTag<CR>
 "nnoremap <leader>d :set modifiable<CR>:call DeleteAllLinesWithThisWord()<CR>:set nomodifiable<CR>
 nnoremap <leader>e :e .<CR>
 nnoremap <leader>D :cd `=expand('%:p:h')`<CR>:pwd<CR>
-
 " set foldmethod=indent
 " set foldminlines=10
 " set foldnestmax=5
@@ -198,7 +204,7 @@ nnoremap <leader>90 :e ~/.vimrc<CR>
 nnoremap <leader>91 :e ~/local.vimrc<CR>
 nnoremap <leader>92 :e ~/.bash_profile<CR>
 nnoremap <leader>93 :e ~/local.bashrc<CR>
-nnoremap <leader>i Oimport pdb<CR>pdb.set_trace()<Esc>j_
+nnoremap <leader>i Oimport ipdb<CR>ipdb.set_trace()<Esc>j_
 
 
 " F7 - incremental build
@@ -316,7 +322,7 @@ set showmatch
 set gfn=Menlo\ Regular:h10
 syn match Braces display '[<>{}()\[\]]'
 set matchtime=0
-color ir_black
+colorscheme ir_black
 set nowrap
 
 silent! source ~/local.vimrc
@@ -400,7 +406,7 @@ let g:tabber_divider_style = 'fancy'
 command! -bang -nargs=* -complete=tag S call SearchMultiLine(<bang>0, <f-args>)|normal! /<C-R>/<CR>
 "runtime $VIMRUNTIME/macros/matchit.vim
 
-:match ErrorMsg '\%>80v.\+'
+" :match ErrorMsg '\%>80v.\+'
 
 " Add the virtualenv's site-packages to vim path
 if has('python')
@@ -415,3 +421,4 @@ if 'VIRTUAL_ENV' in os.environ:
     execfile(activate_this, dict(__file__=activate_this))
 EOF
 endif
+

@@ -53,7 +53,7 @@ alias c=jump
 alias j=jump
 
 if [[ -f "/usr/local/bin/mvim" ]]; then
-	export EDITOR="mvim -p --remote-tab-silent -f"
+	export EDITOR="mvim -f"
 fi
 
 mymake()
