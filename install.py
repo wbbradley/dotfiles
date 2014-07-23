@@ -12,6 +12,7 @@ bin_dir = join(user_dir, 'bin')
 
 files = {
     '.bash_profile': ['.bashrc'],
+    '.tmux.conf': [],
     '.git-completion.sh': [],
     '.vimrc': [],
     '.ctags': [],

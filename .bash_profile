@@ -52,9 +52,7 @@ alias m=mark
 alias c=jump
 alias j=jump
 
-if [[ -f "/usr/local/bin/mvim" ]]; then
-	export EDITOR="mvim -f"
-fi
+export EDITOR="vim"
 
 mymake()
 {
@@ -119,7 +117,6 @@ if [[ $platform == 'freebsd' ]]; then
 	alias kgs='javaws http://files.gokgs.com/javaBin/cgoban.jnlp'
 	alias venvc="virtualenv -p `brew info python | grep 'Python\.framework' | sed 's/^ *//g' | sed 's/\(.*\)Frame.*/\1bin\/python/'` env"
 	alias simulator='open /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Applications/iPhone\ Simulator.app'
-	alias vi='mvim -p --remote-tab-silent'
 	alias mails='sudo python -m smtpd -n -c DebuggingServer localhost:25'
 	fvi () { vi `f $@`; }
 	git-get () { git show $1:$2 > $2; }

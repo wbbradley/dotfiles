@@ -43,24 +43,25 @@ call pathogen#infect()
 set rtp^=~/.vim/bundle/vundle/
 call vundle#rc()
 
-Bundle 'gmarik/Vundle.vim'
-Bundle 'othree/html5.vim'
-Bundle 'kien/ctrlp.vim'
-Bundle 'vim-scripts/django.vim'
-Bundle 'Lokaltog/vim-powerline'
-Bundle 'nvie/vim-flake8'
-Bundle 'airblade/vim-gitgutter'
-Bundle 'tpope/vim-fugitive'
-Bundle 'kchmck/vim-coffee-script.git'
-" Bundle 'jimmyhchan/dustjs.vim.git'
-Bundle 'juvenn/mustache.vim.git'
-Bundle 'groenewege/vim-less'
-Bundle 'rking/ag.vim'
-Bundle 'fweep/vim-tabber'
-Bundle 'pangloss/vim-javascript'
-Bundle 'mxw/vim-jsx'
-Bundle 'scrooloose/syntastic'
-Bundle 'hynek/vim-python-pep8-indent.git'
+" Plugin 'gmarik/Vundle.vim'
+" Plugin 'othree/html5.vim'
+Plugin 'kien/ctrlp.vim'
+" Plugin 'vim-scripts/django.vim'
+Plugin 'Lokaltog/vim-powerline'
+Plugin 'nvie/vim-flake8'
+Plugin 'airblade/vim-gitgutter'
+Plugin 'tpope/vim-fugitive'
+Plugin 'kchmck/vim-coffee-script.git'
+" Plugin 'jimmyhchan/dustjs.vim.git'
+Plugin 'juvenn/mustache.vim.git'
+Plugin 'groenewege/vim-less'
+Plugin 'rking/ag.vim'
+Plugin 'fweep/vim-tabber'
+" Plugin 'pangloss/vim-javascript'
+Plugin 'mxw/vim-jsx'
+Plugin 'scrooloose/syntastic'
+Plugin 'hynek/vim-python-pep8-indent.git'
+Plugin 'christoomey/vim-tmux-navigator'
 
 let g:gitgutter_escape_grep = 1
 let g:gitgutter_eager = 0
@@ -109,6 +110,8 @@ set incsearch		" do incremental searching
 vnoremap Q gq
 vnoremap gQ gq
 nnoremap gQ gq
+
+nmap <leader>f :CtrlP<CR><C-\>w
 
 " map home row to exit Insert mode
 imap jj <Esc>
