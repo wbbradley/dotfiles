@@ -192,8 +192,8 @@ if [[ -d "$(echo $HOME/src/powerline-shell)" ]]; then
 	export PROMPT_COMMAND="_update_ps1"
 fi
 
-if [[ -f "local.bashrc" ]]; then
-	source local.bashrc
+if [[ -f "$HOME/local.bashrc" ]]; then
+	source $HOME/local.bashrc
 fi
 
 if [[ -f "/usr/libexec/java_home" ]]; then
