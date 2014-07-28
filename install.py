@@ -61,6 +61,7 @@ system('git config --global color.diff always')
 system('git config --global --add color.ui true')
 system('git config --global core.editor "/usr/bin/vim"')
 system('git config --global push.default tracking')
+system('git config --global branch.autosetuprebase always')
 
 if platform == 'darwin':
     system('defaults write -g InitialKeyRepeat -int 15')
