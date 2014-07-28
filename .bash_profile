@@ -185,6 +185,13 @@ if [[ $platform == 'linux' ]]; then
 	fi
 fi
 
+if [[ -d "$(echo $HOME/src/powerline-shell)" ]]; then
+	function _update_ps1() {
+		export PS1="$($HOME/src/powerline-shell/powerline-shell.py $?)"
+	}
+	export PROMPT_COMMAND="_update_ps1"
+fi
+
 if [[ -f "local.bashrc" ]]; then
 	source local.bashrc
 fi
