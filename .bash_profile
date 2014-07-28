@@ -61,23 +61,7 @@ mymake()
 
 alias make=mymake
 
-export PATH=/usr/local/bin:$PATH:$HOME/bin:/Applications/Postgres.app/Contents/MacOS/bin
-
-if [[ -d "/usr/local/heroku/bin" ]]; then
-	export PATH="/usr/local/heroku/bin:$PATH"
-fi
-
-if [[ -d "/var/lib/gems/1.8/bin" ]]; then
-	export PATH=/var/lib/gems/1.8/bin:$PATH
-fi
-
-if [[ -d "/usr/local/opt/ccache/libexec" ]]; then
-	export PATH=/usr/local/opt/ccache/libexec:$PATH
-fi
-
-if [[ -d "/usr/local/Cellar/f90cache/0.95/libexec" ]]; then
-	export PATH=/usr/local/Cellar/f90cache/0.95/libexec:$PATH
-fi
+export PATH=$PATH:$HOME/bin
 
 if [ -f ~/.git-completion.sh ]; then
 	. ~/.git-completion.sh
@@ -106,7 +90,7 @@ if [[ $platform == 'freebsd' ]]; then
 	bind "set completion-ignore-case on"
 	shopt -s cdspell
 
-	export PATH=/opt/local/bin:/opt/local/sbin:$PATH
+	# export PATH=/opt/local/bin:/opt/local/sbin:$PATH
 
 	# Mac OS
 	# set prompt = "%{\033[31m%}[%~] %{\033[0m%}%#"
@@ -115,7 +99,7 @@ if [[ $platform == 'freebsd' ]]; then
 	defaults write com.apple.Xcode XCCodeSenseFormattingOptions -dict BlockSeparator "\n" CaseStatementSpacing ""
 	defaults write com.apple.Xcode PBXPageGuideLocation "79"
 	alias kgs='javaws http://files.gokgs.com/javaBin/cgoban.jnlp'
-	alias venvc="virtualenv -p `brew info python | grep 'Python\.framework' | sed 's/^ *//g' | sed 's/\(.*\)Frame.*/\1bin\/python/'` env"
+	alias venvc="virtualenv env && source env/bin/activate"
 	alias simulator='open /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Applications/iPhone\ Simulator.app'
 	alias mails='sudo python -m smtpd -n -c DebuggingServer localhost:25'
 	fvi () { vi `f $@`; }

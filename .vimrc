@@ -62,6 +62,7 @@ Plugin 'mxw/vim-jsx'
 Plugin 'scrooloose/syntastic'
 Plugin 'hynek/vim-python-pep8-indent.git'
 Plugin 'christoomey/vim-tmux-navigator'
+Plugin 'sjl/threesome.vim.git'
 
 let g:gitgutter_escape_grep = 1
 let g:gitgutter_eager = 0
@@ -93,6 +94,7 @@ set undofile
 set undodir=~/.vim/undodir
 
 nnoremap ; :
+nnoremap <leader>rm! :call delete(expand('%')) \| bdelete!<CR>
 
 " allow backspacing over everything in insert mode
 set backspace=indent,eol,start
