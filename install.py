@@ -66,8 +66,8 @@ system('git config --global branch.autosetuprebase always')
 if platform == 'darwin':
     system('defaults write -g InitialKeyRepeat -int 15')
     system('defaults write -g KeyRepeat -int 0')
-elif platform.find('linux') != -1:
-    system('sudo apt-get install ctags')
+# elif platform.find('linux') != -1:
+#     system('sudo apt-get install ctags')
 
 if not exists(get_home_dir_path(join('.vim', 'bundle'))):
     system('mkdir -p ~/.vim/bundle')
