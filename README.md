@@ -1,12 +1,8 @@
 dotfiles
 ========
 
-My dotfiles
-
-You'll need to install pathogen and vundle. To get everything installed, run `./install.py`
 
 ```sh
-apt-get install git
 mkdir $HOME/src
 cd $HOME/src
 git clone https://github.com/milkbikis/powerline-shell
@@ -19,3 +15,4 @@ cd dotfiles
 ./install.py
 vi +BundleInstall
 ```
+
