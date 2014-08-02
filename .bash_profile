@@ -22,7 +22,7 @@ _fab_completion() {
     COMPREPLY=( $(compgen -W "${tasks}" -- ${cur}) )
 }
 complete -F _fab_completion fab
-
+alias agent='eval `ssh-agent` && ssh-add'
 alias dus='du -sk * | sed "s/ /_/g" | sort -n | awk '\''
 { if ($1 < 1024) { output("K", 1) }
   else if ($1 < 1048576) { output("M", 1024) }
