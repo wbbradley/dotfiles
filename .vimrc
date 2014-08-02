@@ -36,18 +36,20 @@ set wildignore+=.git
 set wildignore+=bootstrap-3.0.0
 set wildchar=<Tab> wildmenu wildmode=full
 
+python from powerline.vim import setup as powerline_setup
+python powerline_setup()
+python del powerline_setup
+
 filetype off
 
-call pathogen#infect()
+" call pathogen#infect()
 
 set rtp^=~/.vim/bundle/vundle/
 call vundle#rc()
 
-" Plugin 'gmarik/Vundle.vim'
 " Plugin 'othree/html5.vim'
 Plugin 'kien/ctrlp.vim'
 " Plugin 'vim-scripts/django.vim'
-Plugin 'Lokaltog/vim-powerline'
 Plugin 'nvie/vim-flake8'
 Plugin 'airblade/vim-gitgutter'
 Plugin 'tpope/vim-fugitive'

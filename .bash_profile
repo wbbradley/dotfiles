@@ -1,17 +1,4 @@
 export SRC_ROOT=$HOME/src
-export MARKPATH=$HOME/.marks
-function jump {
-    cd -P $MARKPATH/$1 2>/dev/null || echo "No such mark: $1"
-}
-function mark {
-    mkdir -p $MARKPATH; ln -s $(pwd) $MARKPATH/$1
-}
-function unmark { 
-    rm -i $MARKPATH/$1 
-}
-function marks {
-    ls -l $MARKPATH | sed 's/  / /g' | cut -d' ' -f9- && echo
-}
 
 function swap()
 {
@@ -61,7 +48,7 @@ mymake()
 
 alias make=mymake
 
-export PATH=$PATH:$HOME/bin
+export PATH=$PATH:$HOME/bin:$HOME/.local/bin
 
 if [[ -d "/usr/local/heroku/bin" ]]; then
 	export PATH="/usr/local/heroku/bin:$PATH"
@@ -83,7 +70,7 @@ elif [ -d "/c/Windows" ]; then
 	platform='windows'
 fi
 
-alias venv='source env/bin/activate'
+alias venv='. env/bin/activate'
 wvi () { $EDITOR `which $@`; }
 
 if [[ $platform == 'windows' ]]; then
@@ -101,7 +88,7 @@ if [[ $platform == 'freebsd' ]]; then
 	defaults write com.apple.Xcode XCCodeSenseFormattingOptions -dict BlockSeparator "\n" CaseStatementSpacing ""
 	defaults write com.apple.Xcode PBXPageGuideLocation "79"
 	alias kgs='javaws http://files.gokgs.com/javaBin/cgoban.jnlp'
-	alias venvc="virtualenv env && source env/bin/activate"
+	alias venvc="virtualenv env && . env/bin/activate"
 	alias simulator='open /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Applications/iPhone\ Simulator.app'
 	alias mails='sudo python -m smtpd -n -c DebuggingServer localhost:25'
 	fvi () { vi `f $@`; }
@@ -187,19 +174,16 @@ if [[ $platform == 'linux' ]]; then
 	fi
 fi
 
-if [[ -d "$(echo $HOME/src/powerline-shell)" ]]; then
-	function _update_ps1() {
-		export PS1="$($HOME/src/powerline-shell/powerline-shell.py $?)"
-	}
-	export PROMPT_COMMAND="_update_ps1"
+export POWERLINE_ROOT=$HOME/.local/lib/python2.7/site-packages/powerline
+if [[ -d "$POWERLINE_ROOT" ]]; then
+	$HOME/.local/bin/powerline-daemon -q
+	. $POWERLINE_ROOT/bindings/bash/powerline.sh
 fi
 
 if [[ -f "$HOME/local.bashrc" ]]; then
-	source $HOME/local.bashrc
+	. $HOME/local.bashrc
 fi
 
 if [[ -f "/usr/libexec/java_home" ]]; then
 	export JAVA_HOME=`/usr/libexec/java_home` 
 fi
-
-export PATH=/usr/local/sbin:$PATH
