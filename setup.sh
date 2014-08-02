@@ -1,8 +1,5 @@
-dotfiles
-========
+#!/bin/bash
 
-
-```sh
 mkdir $HOME/src
 cd $HOME/src
 git clone https://github.com/milkbikis/powerline-shell
@@ -14,5 +11,3 @@ git clone https://github.com/wbbradley/dotfiles.git
 cd dotfiles
 ./install.py
 vi +BundleInstall
-```
-

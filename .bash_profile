@@ -1,8 +1,3 @@
-echo "------"
-bind "set completion-ignore-case on"
-
-shopt -s cdspell
-
 export SRC_ROOT=$HOME/src
 export MARKPATH=$HOME/.marks
 function jump {
@@ -26,6 +21,21 @@ function swap()
     mv $TMPFILE "$2"
 }
 
+function port()
+{
+	lsof -n -i4TCP:$1 | grep LISTEN
+}
+
+_fab_completion() {
+    COMPREPLY=()
+
+    local cur="${COMP_WORDS[COMP_CWORD]}"
+
+    local tasks=$(fab --shortlist 2>/dev/null)
+    COMPREPLY=( $(compgen -W "${tasks}" -- ${cur}) )
+}
+complete -F _fab_completion fab
+
 alias dus='du -sk * | sed "s/ /_/g" | sort -n | awk '\''
 { if ($1 < 1024) { output("K", 1) }
   else if ($1 < 1048576) { output("M", 1024) }
@@ -42,6 +52,8 @@ alias m=mark
 alias c=jump
 alias j=jump
 
+export EDITOR="vim"
+
 mymake()
 {
 	make -j10 $1
@@ -49,10 +61,14 @@ mymake()
 
 alias make=mymake
 
-export PATH=/usr/local/bin:$PATH:$HOME/bin:/Applications/Postgres.app/Contents/MacOS/bin
+export PATH=$PATH:$HOME/bin
 
 if [[ -d "/usr/local/heroku/bin" ]]; then
 	export PATH="/usr/local/heroku/bin:$PATH"
+fi
+
+if [ -f ~/.git-completion.sh ]; then
+	. ~/.git-completion.sh
 fi
 
 platform='unknown'
@@ -68,32 +84,29 @@ elif [ -d "/c/Windows" ]; then
 fi
 
 alias venv='source env/bin/activate'
-wvi () { vi `which $@`; }
+wvi () { $EDITOR `which $@`; }
 
 if [[ $platform == 'windows' ]]; then
 	alias ls='ls -G -a -l -tr --color'
 fi
 
 if [[ $platform == 'freebsd' ]]; then
-	export PATH=/opt/local/bin:/opt/local/sbin:/usr/local/sbin:$PATH
+	bind "set completion-ignore-case on"
+	shopt -s cdspell
 
 	# Mac OS
 	# set prompt = "%{\033[31m%}[%~] %{\033[0m%}%#"
 	alias ls='ls -G -a -l -tr'
+	defaults write com.apple.finder AppleShowAllFiles true
 	defaults write com.apple.Xcode XCCodeSenseFormattingOptions -dict BlockSeparator "\n" CaseStatementSpacing ""
 	defaults write com.apple.Xcode PBXPageGuideLocation "79"
 	alias kgs='javaws http://files.gokgs.com/javaBin/cgoban.jnlp'
-	alias venvc="virtualenv -p `brew info python | grep 'Python\.framework' | sed 's/^ *//g' | sed 's/\(.*\)Frame.*/\1bin\/python/'` env"
+	alias venvc="virtualenv env && source env/bin/activate"
 	alias simulator='open /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Applications/iPhone\ Simulator.app'
-	eval "$(/usr/local/share/npm/bin/grunt --completion=bash)"
-	alias vi=mvim
 	alias mails='sudo python -m smtpd -n -c DebuggingServer localhost:25'
 	fvi () { vi `f $@`; }
 	git-get () { git show $1:$2 > $2; }
 	export PGDATA=/usr/local/var/postgres
-	if [ -d "/Library/Java/Home" ]; then
-		export JAVA_HOME=/Library/Java/Home
-	fi
 
 	DULL=0
 	BRIGHT=1
@@ -161,7 +174,6 @@ if [[ $platform == 'freebsd' ]]; then
 	PS1="${BRIGHT_RED}[\w]${NORMAL}\$ ${RESET}"
 fi
 
-
 if [[ $platform == 'linux' ]]; then
 	alias ls='ls -G -a -l -tr --color'
 	# Debian
@@ -170,9 +182,24 @@ if [[ $platform == 'linux' ]]; then
 	#set color = (ls-F)
 	#set term=xterm
 	# limit coredumpsize 16000
+	if [[ -f "/usr/local/bin/ssh_proxy_via_bastion" ]]; then
+		export GIT_SSH=/usr/local/bin/ssh_proxy_via_bastion
+	fi
 fi
 
-if [[ -f "local.bashrc" ]]; then
-	source local.bashrc
+if [[ -d "$(echo $HOME/src/powerline-shell)" ]]; then
+	function _update_ps1() {
+		export PS1="$($HOME/src/powerline-shell/powerline-shell.py $?)"
+	}
+	export PROMPT_COMMAND="_update_ps1"
 fi
 
+if [[ -f "$HOME/local.bashrc" ]]; then
+	source $HOME/local.bashrc
+fi
+
+if [[ -f "/usr/libexec/java_home" ]]; then
+	export JAVA_HOME=`/usr/libexec/java_home` 
+fi
+
+export PATH=/usr/local/sbin:$PATH

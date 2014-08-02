@@ -1,6 +1,7 @@
 #!/usr/bin/python
 from os.path import dirname, join, abspath, exists, expanduser, basename
 import os
+from sys import platform
 
 user_dir = expanduser('~')
 vim_dir = join(user_dir, '.vim')
@@ -11,10 +12,14 @@ bin_dir = join(user_dir, 'bin')
 
 files = {
     '.bash_profile': ['.bashrc'],
+    '.tmux.conf': [],
+    '.git-completion.sh': [],
     '.vimrc': [],
     '.ctags': [],
     '.inputrc': [],
     'imgorg': ([], bin_dir),
+    'gs': ([], bin_dir),
+    'f': ([], bin_dir),
     'py.vim': ([], ftplugin_dir),
     'coffee.vim': ([], ftplugin_dir),
     'html.vim': ([], vim_indent_dir),
@@ -52,13 +57,17 @@ def system(cmd):
     os.system(cmd)
 
 system('git config --global user.name "Will Bradley"')
-system('git config --global user.email williambbradley@gmail.com')
 system('git config --global color.diff always')
 system('git config --global --add color.ui true')
 system('git config --global core.editor "/usr/bin/vim"')
 system('git config --global push.default tracking')
-system('defaults write -g InitialKeyRepeat -int 15')
-system('defaults write -g KeyRepeat -int 0')
+system('git config --global branch.autosetuprebase always')
+
+if platform == 'darwin':
+    system('defaults write -g InitialKeyRepeat -int 15')
+    system('defaults write -g KeyRepeat -int 0')
+# elif platform.find('linux') != -1:
+#     system('sudo apt-get install ctags')
 
 if not exists(get_home_dir_path(join('.vim', 'bundle'))):
     system('mkdir -p ~/.vim/bundle')
