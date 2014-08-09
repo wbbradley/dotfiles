@@ -45,44 +45,42 @@ def get_dest_path(file, options):
     return get_home_dir_path(file)
 
 
-def get_other_files(options):
+def _get_other_files(options):
     if type(options) == tuple:
         return options[0]
     else:
         return options
 
 
-def system(cmd):
+def _system(cmd):
     # print(basename(__file__) + ' running: ' + cmd)
     os.system(cmd)
 
-system('git config --global user.name "Will Bradley"')
-system('git config --global color.diff always')
-system('git config --global --add color.ui true')
-system('git config --global core.editor "/usr/bin/vim"')
-system('git config --global push.default tracking')
-system('git config --global branch.autosetuprebase always')
 
-if platform == 'darwin':
-    system('defaults write -g InitialKeyRepeat -int 15')
-    system('defaults write -g KeyRepeat -int 0')
-# elif platform.find('linux') != -1:
-#     system('sudo apt-get install ctags')
-
-if not exists(get_home_dir_path(join('.vim', 'bundle'))):
-    system('mkdir -p ~/.vim/bundle')
-
-if not exists(get_home_dir_path(join('.vim', 'autoload'))):
-    system('mkdir -p ~/.vim/autoload')
-
-if not exists(get_home_dir_path(join('.vim', 'bundle', 'vundle', '.git'))):
-    system('git clone https://github.com/gmarik/vundle.git ~/.vim/bundle/vundle')
-
-if not exists(abspath(join(expanduser('~'), '.vim', 'autoload', 'pathogen.vim'))):
-    system('curl -Sso ~/.vim/autoload/pathogen.vim https://raw.github.com/tpope/vim-pathogen/master/autoload/pathogen.vim')
+def setup_git():
+    _system('git config --global user.name "Will Bradley"')
+    _system('git config --global color.diff always')
+    _system('git config --global --add color.ui true')
+    _system('git config --global core.editor "/usr/bin/vim"')
+    _system('git config --global push.default tracking')
+    _system('git config --global branch.autosetuprebase always')
 
 
-def backup(filename):
+def setup_system_prefs():
+    if platform == 'darwin':
+        _system('defaults write -g InitialKeyRepeat -int 15')
+        _system('defaults write -g KeyRepeat -int 0')
+
+
+def setup_vim():
+    _system('rm -rf $HOME/.vim')
+    _system('mkdir -p ~/.vim/bundle')
+    _system('mkdir -p ~/.vim/autoload')
+    _system('git clone https://github.com/gmarik/vundle.git ~/.vim/bundle/vundle')
+    _system('curl -Sso ~/.vim/autoload/pathogen.vim https://raw.github.com/tpope/vim-pathogen/master/autoload/pathogen.vim')
+
+
+def _backup(filename):
     if not exists(filename):
         return
     trash_dir = abspath(join(expanduser('~'), '.Trash'))
@@ -93,23 +91,38 @@ def backup(filename):
     if trash_dir:
         backup_filename = join(trash_dir, basename(backup_filename))
 
-    system('mv ' + filename + ' ' + backup_filename)
+    _system('mv ' + filename + ' ' + backup_filename)
     print("install.py : info : moved {} to {}".format(filename, backup_filename))
 
-for file, options in files.iteritems():
-    source_file = get_src_path(file)
-    dest_file = get_dest_path(file, options)
-    dest_file_path = dirname(dest_file)
 
-    if not exists(dest_file_path):
-        system('mkdir -p ' + dest_file_path)
+def link_files():
+    for file, options in files.iteritems():
+        source_file = get_src_path(file)
+        dest_file = get_dest_path(file, options)
+        dest_file_path = dirname(dest_file)
 
-    if exists(file):
-        backup(dest_file)
+        if not exists(dest_file_path):
+            _system('mkdir -p ' + dest_file_path)
 
-        for other_file in get_other_files(options):
-            other_dest_file = get_home_dir_path(other_file)
-            backup(other_dest_file)
+        if exists(file):
+            _backup(dest_file)
 
-        print("install.py : info : installing {}".format(source_file))
-        system('ln -sf ' + source_file + ' ' + dest_file)
+            for other_file in _get_other_files(options):
+                other_dest_file = get_home_dir_path(other_file)
+                _backup(other_dest_file)
+
+            print("install.py : info : installing {}".format(source_file))
+            _system('ln -sf ' + source_file + ' ' + dest_file)
+
+
+def setup_powerline():
+    _system('pip install --user --upgrade git+git://github.com/Lokaltog/powerline')
+
+
+if __name__ == '__main__':
+    setup_powerline()
+    setup_git()
+    setup_system_prefs()
+    setup_vim()
+    link_files()
+    _system('vi +BundleInstall +q +q')

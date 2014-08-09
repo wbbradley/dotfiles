@@ -110,6 +110,7 @@ export PATH=$PATH:$PYTHON_USER_BIN
 if [[ -d "$POWERLINE_ROOT" ]]; then
 	$PYTHON_USER_BIN/powerline-daemon -q
 	. $POWERLINE_ROOT/bindings/bash/powerline.sh
+	POWERLINE_COMMAND="$POWERLINE_COMMAND -c ext.shell.theme=default_leftonly"
 fi
 
 if [[ -f "$HOME/local.bashrc" ]]; then
