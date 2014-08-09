@@ -34,11 +34,6 @@ function output(size, div)
 }
 '\'''
 
-alias ms=marks
-alias m=mark
-alias c=jump
-alias j=jump
-
 export EDITOR="vim"
 export PATH=$PATH:$HOME/bin
 
