@@ -116,7 +116,7 @@ def link_files():
 
 
 def setup_powerline():
-    _system('pip install --user --upgrade git+git://github.com/Lokaltog/powerline')
+    _system('pip install --user --install-option="--prefix=" --upgrade git+git://github.com/Lokaltog/powerline')
 
 
 if __name__ == '__main__':
