@@ -175,6 +175,8 @@ function! FindWord()
 	:cw
 endfunction
 
+nnoremap <leader>` :!ctags -R --exclude=env --exclude=node_modules --exclude=bower_components .<CR><CR>:echo 'Tags are done.'<CR>
+nnoremap <leader>~ :!ctags -R --exclude=node_modules "--exclude=*.js" --exclude=bower_components .<CR><CR>:echo 'Tags +envare done.'<CR>
 nnoremap <F3> :call FindWord()<CR>
 nnoremap <F4> :call FindWordNoFilter()<CR>
 nnoremap F :wa<CR>:call FindPrompt()<CR>
