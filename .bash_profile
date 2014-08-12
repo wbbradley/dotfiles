@@ -99,18 +99,16 @@ fi
 if [[ $platform == 'freebsd' ]]; then
 	PYTHON_ROOT=$HOME/Library/Python/2.7
 	POWERLINE_ROOT=$PYTHON_ROOT/lib/python/site-packages/powerline
-else
-	PYTHON_ROOT=$HOME/.local
-	POWERLINE_ROOT=$HOME/.local/lib/python2.7/site-packages/powerline
+	PYTHON_USER_BIN=$PYTHON_ROOT/bin
+	export PATH=$PATH:$PYTHON_USER_BIN
 fi
 
-PYTHON_USER_BIN=$PYTHON_ROOT/bin
-export PATH=$PATH:$PYTHON_USER_BIN
+export POWERLINE_SHELL=$(find $(pip show powerline|grep Location:|sed -e "s/Location: //") | grep "bash/powerline\.sh$")
 
-if [[ -d "$POWERLINE_ROOT" ]]; then
-	$PYTHON_USER_BIN/powerline-daemon -q
-	. $POWERLINE_ROOT/bindings/bash/powerline.sh
-	POWERLINE_COMMAND="$POWERLINE_COMMAND -c ext.shell.theme=default_leftonly"
+if [[ -f "$POWERLINE_SHELL" ]]; then
+	powerline-daemon -q
+	. $POWERLINE_SHELL
+	export POWERLINE_COMMAND="$POWERLINE_COMMAND -c ext.shell.theme=default_leftonly"
 fi
 
 if [[ -f "$HOME/local.bashrc" ]]; then

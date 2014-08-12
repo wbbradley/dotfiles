@@ -74,6 +74,7 @@ def setup_system_prefs():
 
 def setup_vim():
     _system('rm -rf $HOME/.vim')
+    _system('rm -rf $HOME/.config/powerline')
     _system('mkdir -p ~/.vim/bundle')
     _system('mkdir -p ~/.vim/autoload')
     _system('git clone https://github.com/gmarik/vundle.git ~/.vim/bundle/vundle')
