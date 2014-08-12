@@ -93,6 +93,7 @@ if [[ $platform == 'linux' ]]; then
 	# if [[ -f "/usr/local/bin/ssh_proxy_via_bastion" ]]; then
 	# 	export GIT_SSH=/usr/local/bin/ssh_proxy_via_bastion
 	# fi
+	export PATH=$PATH:$HOME/.local/bin
 fi
 
 
