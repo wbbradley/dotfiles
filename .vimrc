@@ -61,9 +61,9 @@ Plugin 'kchmck/vim-coffee-script.git'
 Plugin 'juvenn/mustache.vim.git'
 Plugin 'groenewege/vim-less'
 Plugin 'rking/ag.vim'
-Plugin 'fweep/vim-tabber'
+" Plugin 'fweep/vim-tabber'
 " Plugin 'pangloss/vim-javascript'
-Plugin 'mxw/vim-jsx'
+" Plugin 'mxw/vim-jsx'
 Plugin 'scrooloose/syntastic'
 Plugin 'hynek/vim-python-pep8-indent.git'
 Plugin 'christoomey/vim-tmux-navigator'
@@ -419,18 +419,3 @@ command! -bang -nargs=* -complete=tag S call SearchMultiLine(<bang>0, <f-args>)|
 "runtime $VIMRUNTIME/macros/matchit.vim
 
 " :match ErrorMsg '\%>80v.\+'
-
-" Add the virtualenv's site-packages to vim path
-if has('python')
-py << EOF
-import os.path
-import sys
-import vim
-if 'VIRTUAL_ENV' in os.environ:
-    project_base_dir = os.environ['VIRTUAL_ENV']
-    sys.path.insert(0, project_base_dir)
-    activate_this = os.path.join(project_base_dir, 'bin/activate_this.py')
-    execfile(activate_this, dict(__file__=activate_this))
-EOF
-endif
-
