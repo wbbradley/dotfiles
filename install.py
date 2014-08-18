@@ -1,5 +1,5 @@
 #!/usr/bin/python
-from os.path import dirname, join, abspath, exists, expanduser, basename
+from os.path import dirname, join, abspath, exists, expanduser, basename, islink
 import os
 from sys import platform
 
@@ -11,22 +11,47 @@ ftplugin_dir = join(vim_dir, 'ftplugin')
 bin_dir = join(user_dir, 'bin')
 
 files = {
-    '.bash_profile': ['.bashrc'],
-    '.tmux.conf': [],
-    '.git-completion.sh': [],
-    '.vimrc': [],
-    '.ctags': [],
-    '.inputrc': [],
-    'imgorg': ([], bin_dir),
-    'gs': ([], bin_dir),
-    'f': ([], bin_dir),
-    'py.vim': ([], ftplugin_dir),
-    'coffee.vim': ([], ftplugin_dir),
-    # 'html.vim': ([], vim_indent_dir),
-    # 'htmldjango.vim': ([], vim_indent_dir),
-    'ir_black.vim': ([], vim_color_dir),
+    '.bash_profile': {
+        'install_dir': user_dir,
+        'overwrite': False,
+    },
+    '.bashrc': {
+        'install_dir': user_dir,
+    },
+    '.tmux.conf': {
+        'install_dir': user_dir,
+    },
+    '.git-completion.sh': {
+        'install_dir': user_dir,
+    },
+    '.vimrc': {
+        'install_dir': user_dir,
+    },
+    '.ctags': {
+        'install_dir': user_dir,
+    },
+    '.inputrc': {
+        'install_dir': user_dir,
+    },
+    'gs': {
+        'install_dir': bin_dir,
+    },
+    'f': {
+        'install_dir': bin_dir,
+    },
+    'py.vim': {
+        'install_dir': ftplugin_dir,
+    },
+    'coffee.vim': {
+        'install_dir': ftplugin_dir,
+    },
+    'ir_black.vim': {
+        'install_dir': vim_color_dir,
+    },
     # See pdbpp - a very useful python debugger extension
-    '.pdbrc.py': [],
+    '.pdbrc.py': {
+        'install_dir': user_dir,
+    },
 }
 
 
@@ -38,11 +63,9 @@ def get_home_dir_path(file):
     return abspath(join(expanduser('~'), file))
 
 
-def get_dest_path(file, options):
-    if type(options) == tuple:
-        if len(options) > 1:
-            return abspath(join(options[1], file))
-    return get_home_dir_path(file)
+def get_dest_path(file_, options):
+    install_dir = options['install_dir']
+    return abspath(join(install_dir, file_))
 
 
 def _get_other_files(options):
@@ -102,6 +125,10 @@ def link_files():
         dest_file = get_dest_path(file, options)
         dest_file_path = dirname(dest_file)
 
+        if exists(dest_file) and not options.get('overwrite', True):
+            print "install.py : info : skipping {}".format(dest_file)
+            continue
+
         if not exists(dest_file_path):
             _system('mkdir -p ' + dest_file_path)
 
@@ -112,7 +139,7 @@ def link_files():
                 other_dest_file = get_home_dir_path(other_file)
                 _backup(other_dest_file)
 
-            print("install.py : info : installing {}".format(source_file))
+            print "install.py : info : installing {}".format(source_file)
             _system('ln -sf ' + source_file + ' ' + dest_file)
 
 
