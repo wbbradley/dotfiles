@@ -117,7 +117,11 @@ def link_files():
 
 
 def setup_powerline():
-    _system('pip install --user --install-option="--prefix=" --upgrade git+git://github.com/Lokaltog/powerline')
+    if platform == 'darwin':
+        print "install.py : info : installing powerline..."
+        _system('sudo pip install --upgrade git+git://github.com/Lokaltog/powerline')
+    else:
+        _system('pip install --user --install-option="--prefix=" --upgrade git+git://github.com/Lokaltog/powerline')
 
 
 if __name__ == '__main__':
