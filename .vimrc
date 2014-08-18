@@ -39,10 +39,6 @@ set wildignore+=.git
 set wildignore+=bootstrap-3.0.0
 set wildchar=<Tab> wildmenu wildmode=full
 
-python from powerline.vim import setup as powerline_setup
-python powerline_setup()
-python del powerline_setup
-
 filetype off
 
 " call pathogen#infect()
@@ -51,6 +47,7 @@ set rtp^=~/.vim/bundle/vundle/
 call vundle#rc()
 
 " Plugin 'othree/html5.vim'
+Plugin 'jmcantrell/vim-virtualenv'
 Plugin 'kien/ctrlp.vim'
 " Plugin 'vim-scripts/django.vim'
 Plugin 'nvie/vim-flake8'
@@ -68,6 +65,9 @@ Plugin 'scrooloose/syntastic'
 Plugin 'hynek/vim-python-pep8-indent.git'
 Plugin 'christoomey/vim-tmux-navigator'
 Plugin 'sjl/threesome.vim.git'
+Plugin 'bling/vim-airline'
+
+let g:airline_powerline_fonts = 1
 
 let g:gitgutter_escape_grep = 1
 let g:gitgutter_eager = 0
@@ -351,7 +351,7 @@ hi ColorColumn cterm=NONE ctermbg=NONE ctermfg=NONE guibg=#111111 guifg=NONE
 hi CursorLine cterm=NONE ctermbg=NONE ctermfg=NONE guibg=#222222 guifg=NONE
 hi CursorLineNR cterm=NONE ctermbg=NONE ctermfg=NONE guibg=#333333 guifg=NONE
 set cursorline
-:nnoremap <silent> <Leader>l ml:execute 'match Search /\%'.line('.').'l/'<CR>
+nnoremap <silent> <Leader>l ml:execute 'match Search /\%'.line('.').'l/'<CR>
 
 nnoremap <leader>g :call GitGrepWord()<CR><CR>
 
