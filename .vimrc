@@ -6,8 +6,8 @@ set splitbelow
 set splitright
 set modelines=0
 set noesckeys
-set lazyredraw
-set ttyfast
+" set lazyredraw
+" set ttyfast
 
 " set columns=117
 set columns=210
