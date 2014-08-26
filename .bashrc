@@ -115,7 +115,7 @@ export POWERLINE_SHELL=$(find $(pip show powerline|grep Location:|sed -e "s/Loca
 if [[ -f "$POWERLINE_SHELL" ]]; then
 	# powerline-daemon -q
 	. $POWERLINE_SHELL
-	export POWERLINE_COMMAND="$POWERLINE_COMMAND"
+	export POWERLINE_COMMAND="$POWERLINE_COMMAND -c ext.shell.theme=default_leftonly"
 fi
 
 if [[ -f "$HOME/local.bashrc" ]]; then
