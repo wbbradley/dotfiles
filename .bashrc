@@ -22,6 +22,12 @@ _fab_completion() {
     COMPREPLY=( $(compgen -W "${tasks}" -- ${cur}) )
 }
 complete -F _fab_completion fab
+function acc() {
+	find . -type f -amin -$1 | grep -v -e "\.git" -e sass -e node_
+}
+function mod() {
+	find . -type f -mmin -$1 | grep -v -e "\.git" -e sass -e node_ -e "pyc$"
+}
 alias agent='eval `ssh-agent` && ssh-add'
 alias dus='du -sk * | sed "s/ /_/g" | sort -n | awk '\''
 { if ($1 < 1024) { output("K", 1) }
