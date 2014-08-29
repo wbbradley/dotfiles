@@ -100,6 +100,17 @@ if [[ $platform == 'linux' ]]; then
 	# 	export GIT_SSH=/usr/local/bin/ssh_proxy_via_bastion
 	# fi
 	export PATH=$PATH:$HOME/.local/bin
+	ssh-reagent () {
+		for agent in /tmp/ssh-*/agent.*; do
+			export SSH_AUTH_SOCK=$agent
+			if ssh-add -l 2>&1 > /dev/null; then
+				echo Found working SSH Agent:
+				ssh-add -l
+				return
+			fi
+		done
+		echo "Cannot find ssh agent - maybe you should reconnect and forward it?"
+	}
 fi
 
 
