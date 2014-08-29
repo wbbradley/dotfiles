@@ -68,6 +68,7 @@ Plugin 'sjl/threesome.vim.git'
 Plugin 'bling/vim-airline'
 
 let g:airline_powerline_fonts = 1
+let g:syntastic_python_pylint_post_args='--disable=E1101'
 
 let g:gitgutter_escape_grep = 1
 let g:gitgutter_eager = 0
