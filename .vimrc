@@ -21,7 +21,7 @@ let g:ctrlp_custom_ignore = 'build'
 let g:ctrlp_regexp = 0
 " let g:ctrlp_user_command = 'find %s -type f'       " MacOSX/Linux
 
-set wildignore+=migrations
+" set wildignore+=migrations
 set wildignore+=bower_components
 set wildignore+=node_modules
 set wildignore+=assets
@@ -121,12 +121,12 @@ nnoremap gQ gq
 nmap <leader>f :CtrlP<CR><C-\>w
 
 " map home row to exit Insert mode
-imap jj <Esc>
-imap hh <Esc>
-imap kk <Esc>
-imap lll <Esc>
-inoremap jk <Esc>
-inoremap kj <Esc>
+" imap jj <Esc>
+" imap hh <Esc>
+" imap kk <Esc>
+" imap lll <Esc>
+" inoremap jk <Esc>
+" inoremap kj <Esc>
 
 vnoremap . :norm.<CR>
 
