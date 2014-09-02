@@ -43,7 +43,7 @@ function output(size, div)
 export EDITOR="vim"
 export PATH=$PATH:$HOME/bin
 
-if [[ -d "/usr/local/heroku/bin" ]]; then
+if [ -d "/usr/local/heroku/bin" ]; then
 	export PATH="/usr/local/heroku/bin:$PATH"
 fi
 
@@ -54,11 +54,11 @@ fi
 platform='unknown'
 unamestr=`uname`
 
-if [[ "$unamestr" == 'Linux' ]]; then
+if [ "$unamestr" = 'Linux' ]; then
 	platform='linux'
-elif [[ "$unamestr" == 'FreeBSD' ]]; then
+elif [ "$unamestr" = 'FreeBSD' ]; then
 	platform='freebsd'
-elif [[ "$unamestr" == 'Darwin' ]]; then
+elif [ "$unamestr" = 'Darwin' ]; then
 	platform='freebsd'
 elif [ -d "/c/Windows" ]; then
 	platform='windows'
@@ -67,13 +67,15 @@ fi
 alias venv='. env/bin/activate'
 alias venvc='virtualenv env && . env/bin/activate'
 
-wvi () { $EDITOR `which $@`; }
+wvi () {
+	$EDITOR `which $@`;
+}
 
-if [[ $platform == 'windows' ]]; then
+if [ $platform == 'windows' ]; then
 	alias ls='ls -G -a -l -tr --color'
 fi
 
-if [[ $platform == 'freebsd' ]]; then
+if [ $platform == 'freebsd' ]; then
 	bind "set completion-ignore-case on"
 	shopt -s cdspell
 
@@ -88,7 +90,7 @@ if [[ $platform == 'freebsd' ]]; then
 	# alias mails='sudo python -m smtpd -n -c DebuggingServer localhost:25'
 fi
 
-if [[ $platform == 'linux' ]]; then
+if [ $platform == 'linux' ]; then
 	alias ls='ls -G -a -l -tr --color'
 	# Debian
 	#set prompt = "%{\033[32m%}[%~] %{\033[0m%}%#"
@@ -114,7 +116,7 @@ if [[ $platform == 'linux' ]]; then
 fi
 
 
-if [[ $platform == 'freebsd' ]]; then
+if [ $platform == 'freebsd' ]; then
 	PYTHON_ROOT=$HOME/Library/Python/2.7
 	POWERLINE_ROOT=$PYTHON_ROOT/lib/python/site-packages/powerline
 	PYTHON_USER_BIN=$PYTHON_ROOT/bin
@@ -123,12 +125,12 @@ fi
 
 export POWERLINE_SHELL=$(find $(pip show powerline|grep Location:|sed -e "s/Location: //") | grep "bash/powerline\.sh$")
 
-if [[ -f "$POWERLINE_SHELL" ]]; then
+if [ -f "$POWERLINE_SHELL" ]; then
 	# powerline-daemon -q
 	. $POWERLINE_SHELL
 	export POWERLINE_COMMAND="$POWERLINE_COMMAND -c ext.shell.theme=default_leftonly"
 fi
 
-if [[ -f "$HOME/local.bashrc" ]]; then
+if [ -f "$HOME/local.bashrc" ]; then
 	. $HOME/local.bashrc
 fi

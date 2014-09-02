@@ -22,8 +22,8 @@ let g:ctrlp_regexp = 0
 " let g:ctrlp_user_command = 'find %s -type f'       " MacOSX/Linux
 
 " set wildignore+=migrations
-set wildignore+=bower_components
-set wildignore+=node_modules
+" set wildignore+=bower_components
+" set wildignore+=node_modules
 set wildignore+=assets
 set wildignore+=*.swp
 set wildignore+=*.o
@@ -32,7 +32,6 @@ set wildignore+=*.png
 set wildignore+=*.jpg
 set wildignore+=*.jpeg
 set wildignore+=*.class
-set wildignore+=*.pyc
 set wildignore+=media
 set wildignore+=build
 set wildignore+=.git
@@ -68,7 +67,9 @@ Plugin 'sjl/threesome.vim.git'
 Plugin 'bling/vim-airline'
 
 let g:airline_powerline_fonts = 1
-let g:syntastic_python_pylint_post_args='--disable=E1101'
+let g:airline_section_z = ''
+let g:airline_section_warning = ''
+let g:syntastic_python_pylint_post_args='--disable=E1101,F0401,R0913,C0103,W0142,C0111,C0103,W0232,E0611,R0201,R0903,E1002,W0613'
 
 let g:gitgutter_escape_grep = 1
 let g:gitgutter_eager = 0
@@ -84,6 +85,7 @@ let g:pyindent_continue = '&sw'
 let g:flake8_max_line_length=79
 
 au BufNewFile,BufReadPost *.coffee setl shiftwidth=2 expandtab
+au BufNewFile,BufReadPost *.jsx set autoindent noexpandtab ts=2 sw=2
 
 " When started as "evim", evim.vim will already have done these settings.
 if v:progname =~? "evim"
@@ -188,7 +190,7 @@ nnoremap E :wa<CR>:call FindPromptNoFilter()<CR>
 nnoremap T :CtrlPTag<CR>
 :map <F2> :echo "hi<" . synIDattr(synID(line("."),col("."),1),"name") . '> trans<' . synIDattr(synID(line("."),col("."),0),"name") . "> lo<" . synIDattr(synIDtrans(synID(line("."),col("."),1)),"name") . ">"<CR>
 "nnoremap <leader>d :set modifiable<CR>:call DeleteAllLinesWithThisWord()<CR>:set nomodifiable<CR>
-nnoremap <leader>e :e .<CR>
+nnoremap <leader>e :e `=expand('%:p:h')`<CR>
 nnoremap <leader>D :cd `=expand('%:p:h')`<CR>:pwd<CR>
 " set foldmethod=indent
 " set foldminlines=10
@@ -215,7 +217,7 @@ nnoremap <leader>v <C-w>v<C-w>l<C-w>n<C-w>h
 
 nnoremap <leader>90 :e ~/.vimrc<CR>
 nnoremap <leader>91 :e ~/local.vimrc<CR>
-nnoremap <leader>92 :e ~/.bash_profile<CR>
+nnoremap <leader>92 :e ~/.bashrc<CR>
 nnoremap <leader>93 :e ~/local.bashrc<CR>
 nnoremap <leader>i Oimport ipdb<CR>ipdb.set_trace()<Esc>j_
 

@@ -1,5 +1,5 @@
 #!/usr/bin/python
-from os.path import dirname, join, abspath, exists, expanduser, basename, islink
+from os.path import dirname, join, abspath, exists, expanduser, basename
 import os
 from sys import platform
 
@@ -100,8 +100,9 @@ def setup_vim():
     _system('rm -rf $HOME/.config/powerline')
     _system('mkdir -p ~/.vim/bundle')
     _system('mkdir -p ~/.vim/autoload')
-    _system('git clone https://github.com/gmarik/vundle.git ~/.vim/bundle/vundle')
-    _system('curl -Sso ~/.vim/autoload/pathogen.vim https://raw.github.com/tpope/vim-pathogen/master/autoload/pathogen.vim')
+    _system('git clone https://github.com/gmarik/vundle.git '
+            '~/.vim/bundle/vundle')
+    _system('curl -Sso ~/.vim/autoload/pathogen.vim https://raw.github.com/tpope/vim-pathogen/master/autoload/pathogen.vim')  # noqa
 
 
 def _backup(filename):
@@ -116,7 +117,10 @@ def _backup(filename):
         backup_filename = join(trash_dir, basename(backup_filename))
 
     _system('mv ' + filename + ' ' + backup_filename)
-    print("install.py : info : moved {} to {}".format(filename, backup_filename))
+    print (
+        "install.py : info : moved {} to {}"
+        .format(filename, backup_filename)
+    )
 
 
 def link_files():
@@ -144,17 +148,27 @@ def link_files():
 
 
 def setup_powerline():
+    print "install.py : info : installing powerline..."
     if platform == 'darwin':
-        print "install.py : info : installing powerline..."
-        _system('sudo pip install --upgrade git+git://github.com/Lokaltog/powerline@21b10ee7e14be5e2d78d3f084218def7195efe32#egg=powerline')
+        _system('sudo pip install --upgrade git+git://github.com/Lokaltog/powerline@21b10ee7e14be5e2d78d3f084218def7195efe32#egg=powerline')  # noqa
     else:
-        _system('pip install --user --install-option="--prefix=" --upgrade git+git://github.com/Lokaltog/powerline@21b10ee7e14be5e2d78d3f084218def7195efe32#egg=powerline')
+        _system('pip install --user --install-option="--prefix=" --upgrade git+git://github.com/Lokaltog/powerline@21b10ee7e14be5e2d78d3f084218def7195efe32#egg=powerline')  # noqa
+
+
+def setup_vim_bundles():
+    _system('vi +BundleInstall +q +q')
 
 
 if __name__ == '__main__':
-    setup_powerline()
-    setup_git()
-    setup_system_prefs()
-    setup_vim()
-    link_files()
-    _system('vi +BundleInstall +q +q')
+    steps = [
+        setup_powerline,
+        setup_git,
+        setup_system_prefs,
+        setup_vim,
+        link_files,
+        setup_vim_bundles,
+    ]
+
+    for step in steps:
+        print 'install.py : info : running {}'.format(step.__name__)
+        step()
