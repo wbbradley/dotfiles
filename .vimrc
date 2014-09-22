@@ -221,7 +221,6 @@ nnoremap <leader>92 :e ~/.bashrc<CR>
 nnoremap <leader>93 :e ~/local.bashrc<CR>
 nnoremap <leader>i Oimport ipdb<CR>ipdb.set_trace()<Esc>j_
 
-
 " F7 - incremental build
 nmap <F7> :wa<CR> :!clear <CR><CR> :make -j4<CR><CR>
 imap <F7> <Esc> <F7>
