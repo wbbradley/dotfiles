@@ -156,7 +156,27 @@ def setup_powerline():
 
 
 def setup_vim_bundles():
-    _system('vi +BundleInstall +q +q')
+    _system('vi +BundleInstall +qa')
+
+
+def setup_ctags():
+    if platform == 'darwin':
+        _system('brew install ctags-exuberant')
+    else:
+        _system('sudo apt-get install exuberant-ctags')
+
+
+def setup_the_silver_searcher():
+    if platform == 'darwin':
+        _system('brew install the_silver_searcher')
+    else:
+        _system('sudo apt-get install -y automake pkg-config libpcre3-dev zlib1g-dev liblzma-dev')
+        _system('rm -rf ~/src/the_silver_searcher')
+        _system('mkdir -p ~/src')
+        os.chdir(get_home_dir_path('src'))
+        _system('git clone https://github.com/ggreer/the_silver_searcher.git')
+        os.chdir(get_home_dir_path('src/the_silver_searcher'))
+        _system('./build.sh')
 
 
 if __name__ == '__main__':
@@ -167,6 +187,8 @@ if __name__ == '__main__':
         setup_vim,
         link_files,
         setup_vim_bundles,
+        setup_ctags,
+        setup_the_silver_searcher,
     ]
 
     for step in steps:
