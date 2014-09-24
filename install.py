@@ -177,7 +177,7 @@ def setup_the_silver_searcher():
         _system('git clone https://github.com/ggreer/the_silver_searcher.git')
         os.chdir(get_home_dir_path('src/the_silver_searcher'))
         _system('./build.sh')
-        _system('make install')
+        _system('sudo make install')
 
 
 if __name__ == '__main__':
