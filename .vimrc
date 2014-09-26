@@ -19,6 +19,8 @@ let g:ctrlp_show_hidden = 1
 let g:ctrlp_extensions = ['tag']
 let g:ctrlp_custom_ignore = 'build'
 let g:ctrlp_regexp = 0
+let g:ctrlp_lazy_update = 1
+let g:ctrlp_switch_buffer = 0
 " let g:ctrlp_user_command = 'find %s -type f'       " MacOSX/Linux
 
 " set wildignore+=migrations
