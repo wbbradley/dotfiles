@@ -71,7 +71,7 @@ Plugin 'bling/vim-airline'
 let g:airline_powerline_fonts = 1
 let g:airline_section_z = ''
 let g:airline_section_warning = ''
-let g:syntastic_python_pylint_post_args='--disable=E1101,F0401,R0913,C0103,W0142,C0111,C0103,W0232,E0611,R0201,R0903,E1002,W0613'
+let g:syntastic_python_pylint_post_args='--disable=W0511,E1103,E1101,F0401,R0913,C0103,W0142,C0111,C0103,W0232,E0611,R0201,R0903,E1002,W0613'
 
 let g:gitgutter_escape_grep = 1
 let g:gitgutter_eager = 0
@@ -414,7 +414,7 @@ endfunction
 let c_no_curly_error=1
 
 " Tabber options
-set tabline=%!tabber#TabLine()
+" set tabline=%!tabber#TabLine()
 set guioptions-=e
 let g:tabber_filename_style = 'filename'
 let g:tabber_divider_style = 'fancy'
@@ -422,4 +422,4 @@ let g:tabber_divider_style = 'fancy'
 command! -bang -nargs=* -complete=tag S call SearchMultiLine(<bang>0, <f-args>)|normal! /<C-R>/<CR>
 "runtime $VIMRUNTIME/macros/matchit.vim
 
-" :match ErrorMsg '\%>80v.\+'
+:match ErrorMsg '\%>80v.\+'
