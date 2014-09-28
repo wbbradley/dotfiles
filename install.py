@@ -171,13 +171,24 @@ def setup_the_silver_searcher():
         _system('brew install the_silver_searcher')
     else:
         _system('sudo apt-get install -y automake pkg-config libpcre3-dev zlib1g-dev liblzma-dev')
-        _system('rm -rf ~/src/the_silver_searcher')
         _system('mkdir -p ~/src')
+        _system('rm -rf ~/src/the_silver_searcher')
         os.chdir(get_home_dir_path('src'))
         _system('git clone https://github.com/ggreer/the_silver_searcher.git')
         os.chdir(get_home_dir_path('src/the_silver_searcher'))
         _system('./build.sh')
         _system('sudo make install')
+
+
+def setup_fak():
+    _system('mkdir -p ~/src')
+    _system('rm -rf ~/src/fak')
+    os.chdir(get_home_dir_path('src'))
+    _system('git clone git@github.com:wbbradley/fak.git')
+    fak_dir = get_home_dir_path('src/fak')
+    os.chdir(fak_dir)
+    _system('make')
+    _system('ln -sf {} {}'.format(join(fak_dir, 'fak'), bin_dir))
 
 
 if __name__ == '__main__':
@@ -190,6 +201,7 @@ if __name__ == '__main__':
         setup_vim_bundles,
         setup_ctags,
         setup_the_silver_searcher,
+        setup_fak,
     ]
 
     for step in steps:
