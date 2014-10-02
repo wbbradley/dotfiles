@@ -126,12 +126,12 @@ nnoremap gQ gq
 nmap <leader>f :CtrlP<CR><C-\>w
 
 " map home row to exit Insert mode
-" imap jj <Esc>
-" imap hh <Esc>
-" imap kk <Esc>
-" imap lll <Esc>
-" inoremap jk <Esc>
-" inoremap kj <Esc>
+imap jj <Esc>
+imap hh <Esc>
+imap kk <Esc>
+imap lll <Esc>
+inoremap jk <Esc>
+inoremap kj <Esc>
 
 vnoremap . :norm.<CR>
 

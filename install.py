@@ -39,6 +39,9 @@ files = {
     'f': {
         'install_dir': bin_dir,
     },
+    'master': {
+        'install_dir': bin_dir,
+    },
     'py.vim': {
         'install_dir': ftplugin_dir,
     },
