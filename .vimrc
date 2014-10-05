@@ -132,7 +132,8 @@ imap kk <Esc>
 imap lll <Esc>
 inoremap jk <Esc>
 inoremap kj <Esc>
-
+nmap <leader>' i'<CR>'<Esc>gqj
+nmap <leader>" i"<CR>"<Esc>gqj
 vnoremap . :norm.<CR>
 
 function! FindPromptNoFilter()
