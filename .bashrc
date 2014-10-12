@@ -1,5 +1,10 @@
 export SRC_ROOT=$HOME/src
 
+function dp()
+{
+	git diff $1^ $1
+}
+
 function swap()
 {
     local TMPFILE=tmp.$$
