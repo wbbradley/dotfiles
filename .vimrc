@@ -69,7 +69,7 @@ Plugin 'sjl/threesome.vim.git'
 Plugin 'bling/vim-airline'
 
 let g:airline_powerline_fonts = 1
-let g:airline_section_z = ''
+" let g:airline_section_z = ''
 let g:airline_section_warning = ''
 let g:syntastic_python_pylint_post_args='--disable=W0511,E1103,E1101,F0401,R0913,C0103,W0142,C0111,C0103,W0232,E0611,R0201,R0903,E1002,W0613'
 
@@ -191,6 +191,7 @@ nnoremap <F4> :call FindWordNoFilter()<CR>
 nnoremap F :wa<CR>:call FindPrompt()<CR>
 nnoremap E :wa<CR>:call FindPromptNoFilter()<CR>
 nnoremap T :CtrlPTag<CR>
+
 :map <F2> :echo "hi<" . synIDattr(synID(line("."),col("."),1),"name") . '> trans<' . synIDattr(synID(line("."),col("."),0),"name") . "> lo<" . synIDattr(synIDtrans(synID(line("."),col("."),1)),"name") . ">"<CR>
 "nnoremap <leader>d :set modifiable<CR>:call DeleteAllLinesWithThisWord()<CR>:set nomodifiable<CR>
 nnoremap <leader>e :e `=expand('%:p:h')`<CR>

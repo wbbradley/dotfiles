@@ -1,5 +1,16 @@
 export SRC_ROOT=$HOME/src
 
+function dp()
+{
+	git diff $1^ $1
+}
+
+function scroll-clear()
+{
+	clear
+	echo -en "\e[3J"
+}
+
 function swap()
 {
     local TMPFILE=tmp.$$
