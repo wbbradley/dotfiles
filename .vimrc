@@ -67,6 +67,7 @@ Plugin 'hynek/vim-python-pep8-indent.git'
 Plugin 'christoomey/vim-tmux-navigator'
 Plugin 'sjl/threesome.vim.git'
 Plugin 'bling/vim-airline'
+Plugin 'toyamarinyon/vim-swift'
 
 let g:airline_powerline_fonts = 1
 " let g:airline_section_z = ''
