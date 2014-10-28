@@ -102,6 +102,7 @@ if [ $platform == 'freebsd' ]; then
 fi
 
 if [ $platform == 'linux' ]; then
+	bind '"\C-i": menu-complete'
 	alias ls='ls -G -a -l -tr --color'
 	# Debian
 	#set prompt = "%{\033[32m%}[%~] %{\033[0m%}%#"

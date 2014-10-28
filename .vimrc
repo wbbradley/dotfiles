@@ -105,7 +105,7 @@ set undodir=~/.vim/undodir
 
 nnoremap ; :
 nnoremap <leader>rm! :call delete(expand('%')) \| bdelete!<CR>
-
+nnoremap <leader>+ viwyo"""<Esc>pA."""<Esc>_wvU<Esc>V:s/_/ /<CR>:noh<CR>:match<CR>
 " allow backspacing over everything in insert mode
 set backspace=indent,eol,start
 
