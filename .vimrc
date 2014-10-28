@@ -1,4 +1,7 @@
-set clipboard=unnamed
+if $TMUX == ''
+	set clipboard=unnamed
+endif
+
 set t_Co=256
 set number
 set cpoptions+=n
