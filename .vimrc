@@ -67,6 +67,7 @@ Plugin 'hynek/vim-python-pep8-indent.git'
 Plugin 'christoomey/vim-tmux-navigator'
 Plugin 'sjl/threesome.vim.git'
 Plugin 'bling/vim-airline'
+Plugin 'toyamarinyon/vim-swift'
 
 let g:airline_powerline_fonts = 1
 " let g:airline_section_z = ''
@@ -184,8 +185,8 @@ function! FindWord()
 	:cw
 endfunction
 
-nnoremap <leader>` :!ctags -R --exclude=env --exclude=node_modules --exclude=bower_components .<CR><CR>:echo 'Tags are done.'<CR>
-nnoremap <leader>~ :!ctags -R --exclude=node_modules "--exclude=*.js" --exclude=bower_components .<CR><CR>:echo 'Tags +env are done.'<CR>
+nnoremap <leader>` :!ctags -R --exclude=env --exclude=assets --exclude=node_modules --exclude=bower_components .<CR><CR>:echo 'Tags are done.'<CR>
+nnoremap <leader>~ :!ctags -R --exclude=node_modules --exclude=assets "--exclude=*.js" --exclude=bower_components .<CR><CR>:echo 'Tags +env are done.'<CR>
 nnoremap <F3> :call FindWord()<CR>
 nnoremap <F4> :call FindWordNoFilter()<CR>
 nnoremap F :wa<CR>:call FindPrompt()<CR>
@@ -424,4 +425,4 @@ let g:tabber_divider_style = 'fancy'
 command! -bang -nargs=* -complete=tag S call SearchMultiLine(<bang>0, <f-args>)|normal! /<C-R>/<CR>
 "runtime $VIMRUNTIME/macros/matchit.vim
 
-:match ErrorMsg '\%>80v.\+'
+" :match ErrorMsg '\%>80v.\+'

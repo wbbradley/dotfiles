@@ -1,5 +1,5 @@
 export SRC_ROOT=$HOME/src
-
+alias vi=vim
 function dp()
 {
 	git diff $1^ $1
