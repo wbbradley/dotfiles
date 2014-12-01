@@ -5,6 +5,10 @@ function dp()
 	git diff $1^ $1
 }
 
+function fup() {
+	x=`pwd`; while [ "$x" != "/" ] ; do x=`dirname "$x"`; find "$x" -maxdepth 1 -name $1; done
+}
+
 function scroll-clear()
 {
 	clear
@@ -76,7 +80,7 @@ elif [ -d "/c/Windows" ]; then
 fi
 
 alias venv='. env/bin/activate'
-alias venvc='virtualenv env && . env/bin/activate'
+alias venvc='virtualenv --no-site-packages env && . env/bin/activate'
 
 wvi () {
 	$EDITOR `which $@`;
