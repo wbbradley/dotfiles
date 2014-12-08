@@ -91,6 +91,7 @@ if [ $platform == 'windows' ]; then
 fi
 
 if [ $platform == 'freebsd' ]; then
+	export PATH="/usr/local/sbin:$PATH"
 	bind "set completion-ignore-case on"
 	shopt -s cdspell
 
