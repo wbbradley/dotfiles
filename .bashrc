@@ -5,6 +5,10 @@ function dp()
 	git diff $1^ $1
 }
 
+function fup() {
+	x=`pwd`; while [ "$x" != "/" ] ; do x=`dirname "$x"`; find "$x" -maxdepth 1 -name $1; done
+}
+
 function scroll-clear()
 {
 	clear
@@ -76,7 +80,7 @@ elif [ -d "/c/Windows" ]; then
 fi
 
 alias venv='. env/bin/activate'
-alias venvc='virtualenv env && . env/bin/activate'
+alias venvc='virtualenv --no-site-packages env && . env/bin/activate'
 
 wvi () {
 	$EDITOR `which $@`;
@@ -87,6 +91,7 @@ if [ $platform == 'windows' ]; then
 fi
 
 if [ $platform == 'freebsd' ]; then
+	export PATH="/usr/local/sbin:$PATH"
 	bind "set completion-ignore-case on"
 	shopt -s cdspell
 
@@ -102,7 +107,7 @@ if [ $platform == 'freebsd' ]; then
 fi
 
 if [ $platform == 'linux' ]; then
-	bind '"\C-i": menu-complete'
+	bind '"\C-i": menu-complete' 2> /dev/null
 	alias ls='ls -G -a -l -tr --color'
 	# Debian
 	#set prompt = "%{\033[32m%}[%~] %{\033[0m%}%#"

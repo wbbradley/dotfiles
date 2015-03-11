@@ -188,8 +188,8 @@ function! FindWord()
 	:cw
 endfunction
 
-nnoremap <leader>` :!ctags -R --exclude=env --exclude=assets --exclude=node_modules --exclude=bower_components .<CR><CR>:echo 'Tags are done.'<CR>
-nnoremap <leader>~ :!ctags -R --exclude=node_modules --exclude=assets "--exclude=*.js" --exclude=bower_components .<CR><CR>:echo 'Tags +env are done.'<CR>
+nnoremap <leader>` :!ctags -R --exclude=build --exclude=env --exclude=assets --exclude=node_modules --exclude=bower_components .<CR><CR>:echo 'Tags are done.'<CR>
+nnoremap <leader>~ :!ctags -R --exclude=build --exclude=node_modules --exclude=assets "--exclude=*.js" --exclude=bower_components .<CR><CR>:echo 'Tags +env are done.'<CR>
 nnoremap <F3> :call FindWord()<CR>
 nnoremap <F4> :call FindWordNoFilter()<CR>
 nnoremap F :wa<CR>:call FindPrompt()<CR>
@@ -228,6 +228,8 @@ nnoremap <leader>91 :e ~/local.vimrc<CR>
 nnoremap <leader>92 :e ~/.bashrc<CR>
 nnoremap <leader>93 :e ~/local.bashrc<CR>
 nnoremap <leader>i Oimport ipdb<CR>ipdb.set_trace()<Esc>j_
+nnoremap <leader>p Oimport pdb<CR>pdb.set_trace()<Esc>j_
+nnoremap <leader>r Ofrom celery.contrib import rdb<CR>rdb.set_trace()<Esc>j_
 
 " F7 - incremental build
 nmap <F7> :wa<CR> :!clear <CR><CR> :make -j4<CR><CR>
