@@ -1,6 +1,4 @@
-if $TMUX == ''
-	set clipboard=unnamed
-endif
+set clipboard=unnamed
 
 set t_Co=256
 set number
@@ -27,11 +25,13 @@ let g:ctrlp_switch_buffer = 0
 " let g:ctrlp_user_command = 'find %s -type f'       " MacOSX/Linux
 
 " set wildignore+=migrations
-" set wildignore+=bower_components
-" set wildignore+=node_modules
+set wildignore+=bower_components
+set wildignore+=.sass-cache
+set wildignore+=node_modules
 set wildignore+=assets
 set wildignore+=*.swp
 set wildignore+=*.o
+set wildignore+=.coverage
 set wildignore+=*.pyc
 set wildignore+=*.png
 set wildignore+=*.jpg
@@ -57,6 +57,7 @@ Plugin 'kien/ctrlp.vim'
 Plugin 'nvie/vim-flake8'
 Plugin 'airblade/vim-gitgutter'
 Plugin 'tpope/vim-fugitive'
+Plugin 'tpope/vim-unimpaired'
 Plugin 'kchmck/vim-coffee-script.git'
 " Plugin 'jimmyhchan/dustjs.vim.git'
 Plugin 'juvenn/mustache.vim.git'
@@ -71,11 +72,19 @@ Plugin 'christoomey/vim-tmux-navigator'
 Plugin 'sjl/threesome.vim.git'
 Plugin 'bling/vim-airline'
 Plugin 'toyamarinyon/vim-swift'
+Plugin 'ryanss/vim-hackernews'
+Plugin 'fatih/vim-go'
 
+let g:gitgutter_max_signs = 2000
 let g:airline_powerline_fonts = 1
 " let g:airline_section_z = ''
 let g:airline_section_warning = ''
-let g:syntastic_python_pylint_post_args='--disable=W0511,E1103,E1101,F0401,R0913,C0103,W0142,C0111,C0103,W0232,E0611,R0201,R0903,E1002,W0613'
+" let g:syntastic_python_pylint_post_args='--disable=W0511,E1103,E1101,F0401,R0913,C0103,W0142,C0111,C0103,W0232,E0611,R0201,R0903,E1002,W0613'
+let g:syntastic_javascript_checkers = ['jsxhint']
+
+let g:syntastic_always_populate_loc_list = 1
+let g:syntastic_check_on_open = 1
+let g:syntastic_check_on_wq = 0
 
 let g:gitgutter_escape_grep = 1
 let g:gitgutter_eager = 0
@@ -190,6 +199,9 @@ endfunction
 
 nnoremap <leader>` :!ctags -R --exclude=build --exclude=env --exclude=assets --exclude=node_modules --exclude=bower_components .<CR><CR>:echo 'Tags are done.'<CR>
 nnoremap <leader>~ :!ctags -R --exclude=build --exclude=node_modules --exclude=assets "--exclude=*.js" --exclude=bower_components .<CR><CR>:echo 'Tags +env are done.'<CR>
+nnoremap <leader>[ :set paste<CR>i
+inoremap <leader>] <Esc>:set nopaste<CR>
+
 nnoremap <F3> :call FindWord()<CR>
 nnoremap <F4> :call FindWordNoFilter()<CR>
 nnoremap F :wa<CR>:call FindPrompt()<CR>
@@ -328,9 +340,9 @@ augroup myvimrc
 	au BufWritePost local.vimrc,.vimrc,_vimrc,vimrc,.gvimrc,_gvimrc,gvimrc so $MYVIMRC
 augroup END
 
-set rtp+=$GOROOT/misc/vim
+" set rtp+=$GOROOT/misc/vim
 filetype plugin indent on
-au BufRead,BufNewFile *.go set filetype=go
+" au BufRead,BufNewFile *.go set filetype=go
 au BufRead,BufNewFile *.eco set filetype=html
 
 au BufReadPost *.prepp set syntax=python

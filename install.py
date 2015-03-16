@@ -159,7 +159,7 @@ def setup_powerline():
 
 
 def setup_vim_bundles():
-    _system('vi +BundleInstall +qa')
+    _system('vim +BundleInstall +qa')
 
 
 def setup_ctags():
@@ -194,6 +194,24 @@ def setup_fak():
     _system('ln -sf {} {}'.format(join(fak_dir, 'fak'), bin_dir))
 
 
+def setup_tmux_powerline():
+    try:
+        os.unlink('.powerline.tmux.conf')
+    except OSError:
+        pass
+
+    if platform == 'darwin':
+        target_location = '/usr/local/lib/python2.7/site-packages/powerline/bindings/tmux/powerline.conf'  # noqa
+    else:
+        target_location = join(user_dir, '.local/lib/python2.7/site-packages/powerline/bindings/tmux/powerline.conf')  # noqa
+
+    if os.path.exists(target_location):
+        _system('ln -sf {} {}'
+                .format(target_location, join(user_dir, '.powerline.tmux.conf')))
+    else:
+        print "Damn. {} doesn't exist.".format(target_location)
+        sys.exit(2)
+
 if __name__ == '__main__':
     steps = [
         setup_powerline,
@@ -205,6 +223,7 @@ if __name__ == '__main__':
         setup_ctags,
         setup_the_silver_searcher,
         setup_fak,
+        setup_tmux_powerline,
     ]
 
     for step in steps:
