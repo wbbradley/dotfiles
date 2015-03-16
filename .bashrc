@@ -1,4 +1,5 @@
 export SRC_ROOT=$HOME/src
+export TZ=UTC
 alias vi=vim
 function dp()
 {
@@ -26,6 +27,10 @@ function swap()
 function port()
 {
 	lsof -n -i4TCP:$1 | grep LISTEN
+}
+
+function tree() {
+	ls -R | grep ":$" | sed -e 's/:$//' -e 's/[^-][^\/]*\//--/g' -e 's/^/   /' -e 's/-/|/' | grep -v -e pycache -e 'env$'
 }
 
 _fab_completion() {
@@ -58,10 +63,6 @@ function output(size, div)
 export EDITOR="vim"
 export PATH=$PATH:$HOME/bin
 
-if [ -d "/usr/local/heroku/bin" ]; then
-	export PATH="/usr/local/heroku/bin:$PATH"
-fi
-
 if [ -f $HOME/.git-completion.sh ]; then
 	. $HOME/.git-completion.sh
 fi
@@ -91,7 +92,7 @@ if [ $platform == 'windows' ]; then
 fi
 
 if [ $platform == 'freebsd' ]; then
-	export PATH="/usr/local/sbin:$PATH"
+	export PATH="/usr/local/sbin:/usr/local/bin:$PATH"
 	bind "set completion-ignore-case on"
 	shopt -s cdspell
 
