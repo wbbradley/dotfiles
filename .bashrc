@@ -93,15 +93,13 @@ fi
 
 if [ $platform == 'freebsd' ]; then
 	export PATH="/usr/local/sbin:/usr/local/bin:$PATH"
+	export GOPATH=$HOME/go
 	bind "set completion-ignore-case on"
 	shopt -s cdspell
 
 	# Mac OS
 	# set prompt = "%{\033[31m%}[%~] %{\033[0m%}%#"
 	alias ls='ls -G -a -l -tr'
-	defaults write com.apple.finder AppleShowAllFiles true
-	# defaults write com.apple.Xcode XCCodeSenseFormattingOptions -dict BlockSeparator "\n" CaseStatementSpacing ""
-	# defaults write com.apple.Xcode PBXPageGuideLocation "79"
 	# alias kgs='javaws http://files.gokgs.com/javaBin/cgoban.jnlp'
 	# alias simulator='open /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Applications/iPhone\ Simulator.app'
 	# alias mails='sudo python -m smtpd -n -c DebuggingServer localhost:25'
