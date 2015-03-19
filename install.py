@@ -79,12 +79,10 @@ def _get_other_files(options):
 
 
 def _system(cmd):
-    # print(basename(__file__) + ' running: ' + cmd)
     os.system(cmd)
 
 
 def setup_git():
-    _system('git config --global user.name "Will Bradley"')
     _system('git config --global color.diff always')
     _system('git config --global --add color.ui true')
     _system('git config --global core.editor "/usr/bin/vim"')
@@ -96,7 +94,7 @@ def setup_system_prefs():
     if platform == 'darwin':
         _system('defaults write -g InitialKeyRepeat -int 15')
         _system('defaults write -g KeyRepeat -int 0')
-
+        _system('defaults write com.apple.finder AppleShowAllFiles true')
 
 def setup_vim():
     _system('rm -rf $HOME/.vim')
@@ -194,6 +192,11 @@ def setup_fak():
     _system('ln -sf {} {}'.format(join(fak_dir, 'fak'), bin_dir))
 
 
+def setup_reattach_to_user_namespace():
+    if platform == 'darwin':
+        _system('brew install reattach-to-user-namespace')
+
+
 def setup_tmux_powerline():
     try:
         os.unlink('.powerline.tmux.conf')
@@ -212,6 +215,13 @@ def setup_tmux_powerline():
         print "Damn. {} doesn't exist.".format(target_location)
         sys.exit(2)
 
+
+def setup_go():
+    _system('mkdir $HOME/go')
+    if platform == 'darwin':
+        _system('brew install go')
+
+
 if __name__ == '__main__':
     steps = [
         setup_powerline,
@@ -223,7 +233,9 @@ if __name__ == '__main__':
         setup_ctags,
         setup_the_silver_searcher,
         setup_fak,
+        setup_reattach_to_user_namespace,
         setup_tmux_powerline,
+        setup_go,
     ]
 
     for step in steps:
