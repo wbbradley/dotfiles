@@ -24,7 +24,7 @@ let g:ctrlp_lazy_update = 1
 let g:ctrlp_switch_buffer = 0
 " let g:ctrlp_user_command = 'find %s -type f'       " MacOSX/Linux
 
-" set wildignore+=migrations
+set wildignore+=migrations
 set wildignore+=bower_components
 set wildignore+=.sass-cache
 set wildignore+=node_modules
@@ -96,8 +96,6 @@ let g:jedi#show_function_definition = "0"
 
 let g:pyindent_open_paren = '&sw'
 let g:pyindent_continue = '&sw'
-
-let g:flake8_max_line_length=79
 
 let g:go_highlight_functions = 1
 let g:go_highlight_methods = 1
