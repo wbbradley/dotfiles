@@ -139,12 +139,14 @@ if [ $platform == 'freebsd' ]; then
 	export PATH=$PATH:$PYTHON_USER_BIN
 fi
 
-export POWERLINE_SHELL=$(find $(pip show powerline|grep Location:|sed -e "s/Location: //") | grep "bash/powerline\.sh$")
+export POWERLINE_SHELL=$(find $(pip show powerline-status|grep Location:|sed -e "s/Location: //") | grep "bash/powerline\.sh$")
 
 if [ -f "$POWERLINE_SHELL" ]; then
-	# powerline-daemon -q
+	powerline-daemon -q
+	POWERLINE_BASH_CONTINUATION=1
+	POWERLINE_BASH_SELECT=1
 	. $POWERLINE_SHELL
-	export POWERLINE_COMMAND="$POWERLINE_COMMAND -c ext.shell.theme=default_leftonly"
+	# export POWERLINE_COMMAND="$POWERLINE_COMMAND -c ext.shell.theme=default_leftonly"
 fi
 
 if [ -f "$HOME/local.bashrc" ]; then
