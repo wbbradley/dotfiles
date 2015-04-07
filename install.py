@@ -1,12 +1,14 @@
 #!/usr/bin/python
 from os.path import dirname, join, abspath, exists, expanduser, basename
 import os
+import sys
 from sys import platform
 
 user_dir = expanduser('~')
 vim_dir = join(user_dir, '.vim')
 vim_color_dir = join(vim_dir, 'colors')
 vim_indent_dir = join(vim_dir, 'indent')
+powerline_config_dir = join(user_dir, '.config', 'powerline')
 ftplugin_dir = join(vim_dir, 'ftplugin')
 bin_dir = join(user_dir, 'bin')
 
@@ -14,6 +16,9 @@ files = {
     '.bash_profile': {
         'install_dir': user_dir,
         'overwrite': False,
+    },
+    'config.json': {
+        'install_dir': powerline_config_dir,
     },
     '.bashrc': {
         'install_dir': user_dir,
@@ -96,6 +101,7 @@ def setup_system_prefs():
         _system('defaults write -g KeyRepeat -int 0')
         _system('defaults write com.apple.finder AppleShowAllFiles true')
 
+
 def setup_vim():
     _system('rm -rf $HOME/.vim')
     _system('rm -rf $HOME/.config/powerline')
@@ -171,7 +177,8 @@ def setup_the_silver_searcher():
     if platform == 'darwin':
         _system('brew install the_silver_searcher')
     else:
-        _system('sudo apt-get install -y automake pkg-config libpcre3-dev zlib1g-dev liblzma-dev')
+        _system('sudo apt-get install -y automake pkg-config libpcre3-dev '
+                'zlib1g-dev liblzma-dev')
         _system('mkdir -p ~/src')
         _system('rm -rf ~/src/the_silver_searcher')
         os.chdir(get_home_dir_path('src'))
@@ -210,7 +217,8 @@ def setup_tmux_powerline():
 
     if os.path.exists(target_location):
         _system('ln -sf {} {}'
-                .format(target_location, join(user_dir, '.powerline.tmux.conf')))
+                .format(target_location, join(user_dir,
+                                              '.powerline.tmux.conf')))
     else:
         print "Damn. {} doesn't exist.".format(target_location)
         sys.exit(2)
