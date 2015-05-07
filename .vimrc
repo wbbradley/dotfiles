@@ -61,6 +61,7 @@ Plugin 'tpope/vim-unimpaired'
 Plugin 'kchmck/vim-coffee-script.git'
 " Plugin 'jimmyhchan/dustjs.vim.git'
 Plugin 'juvenn/mustache.vim.git'
+" Plugin 'Lokaltog/vim-easymotion'
 Plugin 'groenewege/vim-less'
 Plugin 'rking/ag.vim'
 " Plugin 'fweep/vim-tabber'
@@ -120,6 +121,7 @@ au FileType go nmap <Leader>ds <Plug>(go-def-split)
 au FileType go nmap <Leader>dv <Plug>(go-def-vertical)
 au FileType go nmap <Leader>dt <Plug>(go-def-tab)
 au FileType go nmap <Leader>e <Plug>(go-rename)
+au FileType go nmap <C-]> :GoDef<CR>
 
 " When started as "evim", evim.vim will already have done these settings.
 if v:progname =~? "evim"
