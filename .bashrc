@@ -1,6 +1,7 @@
 export SRC_ROOT=$HOME/src
 export TZ=UTC
 alias vi=vim
+
 function dp()
 {
 	git diff $1^ $1
@@ -108,6 +109,8 @@ fi
 if [ $platform == 'linux' ]; then
 	bind '"\C-i": menu-complete' 2> /dev/null
 	alias ls='ls -G -a -l -tr --color'
+	alias netmon='strace -f -e trace=network -s 10000'
+
 	# Debian
 	#set prompt = "%{\033[32m%}[%~] %{\033[0m%}%#"
 	#setenv LS_COLORS 'no=00:fi=00:di=01;33:ln=01;36:pi=40;33:so=40;33:bd=40;33:cd=40;33:ex=01;32:*.sh=01;32:*.pl=01;32:'
