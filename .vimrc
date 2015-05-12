@@ -242,6 +242,8 @@ nnoremap <leader>D :cd `=expand('%:p:h')`<CR>:pwd<CR>
 let g:ctrlp_working_path_mode = 0
 vmap <Tab> =
 
+let g:agprg="ag --vimgrep"
+
 :if $VIM_CRONTAB == "true"
 :set nobackup
 :set nowritebackup
