@@ -2,6 +2,8 @@ export SRC_ROOT=$HOME/src
 export TZ=UTC
 alias vi=vim
 
+shopt -s histappend
+
 function dp()
 {
 	git diff $1^ $1
