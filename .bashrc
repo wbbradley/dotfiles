@@ -96,7 +96,6 @@ fi
 
 if [ $platform == 'freebsd' ]; then
 	export PATH="/usr/local/sbin:/usr/local/bin:$PATH"
-	export GOPATH=$HOME/go
 	bind "set completion-ignore-case on"
 	shopt -s cdspell
 
