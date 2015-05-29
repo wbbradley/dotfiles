@@ -344,7 +344,7 @@ endif " has("autocmd")
 set cino=:0g0
 set sw=4
 set ts=4
-autocmd FileType javascript setlocal sw=2 sts=2 ts=2 expandtab
+autocmd FileType javascript setlocal sw=4 sts=4 ts=4 expandtab
 autocmd FileType yaml setlocal sw=2 sts=2 ts=2 expandtab
 autocmd FileType python setlocal sw=4 sts=4 ts=4 expandtab
 autocmd FileType htmldjango setlocal sw=2 sts=2 ts=2 expandtab
