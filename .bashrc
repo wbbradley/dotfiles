@@ -83,8 +83,8 @@ elif [ -d "/c/Windows" ]; then
 	platform='windows'
 fi
 
-alias venv='. env/bin/activate'
-alias venvc='virtualenv --no-site-packages env && . env/bin/activate'
+alias venv='. env/bin/activate ; python --version ; pip --version'
+alias venvc='virtualenv env && . env/bin/activate ; python --version ; pip --version'
 
 wvi () {
 	$EDITOR `which $@`;

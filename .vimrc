@@ -75,6 +75,7 @@ Plugin 'bling/vim-airline'
 Plugin 'toyamarinyon/vim-swift'
 Plugin 'ryanss/vim-hackernews'
 Plugin 'fatih/vim-go'
+Plugin 'terryma/vim-expand-region'
 
 let g:gitgutter_max_signs = 2000
 let g:airline_powerline_fonts = 1
@@ -82,7 +83,8 @@ let g:airline_powerline_fonts = 1
 let g:airline_section_warning = ''
 " let g:syntastic_python_pylint_post_args='--disable=W0511,E1103,E1101,F0401,R0913,C0103,W0142,C0111,C0103,W0232,E0611,R0201,R0903,E1002,W0613'
 let g:syntastic_javascript_checkers = ['jsxhint']
-
+let g:syntastic_cpp_compiler = 'clang++'
+let g:syntastic_cpp_compiler_options = ' -std=c++11 -stdlib=libc++'
 let g:syntastic_always_populate_loc_list = 1
 let g:syntastic_check_on_open = 1
 let g:syntastic_check_on_wq = 0
@@ -220,7 +222,7 @@ function! FindWord()
 	:cw
 endfunction
 
-nnoremap <leader>` :!ctags -R --exclude=build --exclude=generated --exclude=thrift --exclude=env --exclude=assets --exclude=node_modules --exclude=bower_components .<CR><CR>:echo 'Tags are done.'<CR>
+nnoremap <leader>` :!ctags -R --exclude=build --exclude=generated --exclude=env --exclude=assets --exclude=node_modules --exclude=bower_components .<CR><CR>:echo 'Tags are done.'<CR>
 nnoremap <leader>~ :!ctags -R --exclude=build --exclude=node_modules --exclude=assets "--exclude=*.js" --exclude=bower_components .<CR><CR>:echo 'Tags +env are done.'<CR>
 nnoremap <leader>[ :set paste<CR>i
 inoremap <leader>] <Esc>:set nopaste<CR>
@@ -241,6 +243,8 @@ nnoremap <leader>D :cd `=expand('%:p:h')`<CR>:pwd<CR>
 
 let g:ctrlp_working_path_mode = 0
 vmap <Tab> =
+vmap v <Plug>(expand_region_expand)
+vmap <C-v> <Plug>(expand_region_shrink)
 
 let g:agprg="ag --vimgrep"
 
@@ -249,8 +253,8 @@ let g:agprg="ag --vimgrep"
 :set nowritebackup
 :endif
 
-nmap <F9> :set autowrite<CR>:cp<CR>:set noautowrite<CR>zz
-nmap <F10> :set autowrite<CR>:cn<CR>:set noautowrite<CR>zz
+nmap <F9> :set autowrite<CR>:lprev<CR>:set noautowrite<CR>zz
+nmap <F10> :set autowrite<CR>:lnext<CR>:set noautowrite<CR>zz
 
 nnoremap M :CtrlPMRUFiles<CR>
 

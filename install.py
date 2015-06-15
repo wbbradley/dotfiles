@@ -157,7 +157,7 @@ def link_files():
 def setup_powerline():
     print "install.py : info : installing powerline..."
     if platform == 'darwin':
-        _system('pip install --upgrade --user powerline-status')
+        _system('pip install --upgrade powerline-status')
     else:
         _system('pip install --user --install-option="--prefix=" --upgrade git+git://github.com/Lokaltog/powerline@21b10ee7e14be5e2d78d3f084218def7195efe32#egg=powerline')  # noqa
 
@@ -230,8 +230,17 @@ def setup_go():
         _system('brew install go')
 
 
+def clean_tmp_junk():
+    if platform == 'darwin':
+        tmp_dir = os.environ.get('TMPDIR')
+        if len(tmp_dir) > 10 and tmp_dir.find('..') == -1:
+            # sanity check before running this STRONG command
+            _system('rm -rf {}/*'.format(tmp_dir))
+
+
 if __name__ == '__main__':
     steps = [
+        clean_tmp_junk,
         setup_powerline,
         setup_git,
         setup_system_prefs,
