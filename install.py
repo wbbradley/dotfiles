@@ -157,9 +157,9 @@ def link_files():
 def setup_powerline():
     print "install.py : info : installing powerline..."
     if platform == 'darwin':
-        _system('pip install --upgrade --user powerline-status')
+        _system('pip install --upgrade powerline-status')
     else:
-        _system('pip install --user --install-option="--prefix=" --upgrade git+git://github.com/Lokaltog/powerline@21b10ee7e14be5e2d78d3f084218def7195efe32#egg=powerline')  # noqa
+        _system('pip install --install-option="--prefix=" --upgrade git+git://github.com/Lokaltog/powerline@21b10ee7e14be5e2d78d3f084218def7195efe32#egg=powerline')  # noqa
 
 
 def setup_vim_bundles():
