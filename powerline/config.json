@@ -2,6 +2,9 @@
 	"ext": {
 		"shell": {
 			"theme": "default_leftonly"
+		},
+		"tmux": {
+			"theme": "default"
 		}
 	}
 }

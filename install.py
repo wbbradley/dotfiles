@@ -17,9 +17,6 @@ files = {
         'install_dir': user_dir,
         'overwrite': False,
     },
-    'config.json': {
-        'install_dir': powerline_config_dir,
-    },
     '.bashrc': {
         'install_dir': user_dir,
     },
@@ -83,8 +80,12 @@ def _get_other_files(options):
         return options
 
 
-def _system(cmd):
-    os.system(cmd)
+def _system(cmd, cwd=None):
+    if cwd:
+        from subprocess import Popen
+        Popen(cmd, shell=True, cwd=cwd)
+    else:
+        os.system(cmd)
 
 
 def setup_git():
@@ -181,21 +182,17 @@ def setup_the_silver_searcher():
                 'zlib1g-dev liblzma-dev')
         _system('mkdir -p ~/src')
         _system('rm -rf ~/src/the_silver_searcher')
-        os.chdir(get_home_dir_path('src'))
-        _system('git clone https://github.com/ggreer/the_silver_searcher.git')
-        os.chdir(get_home_dir_path('src/the_silver_searcher'))
-        _system('./build.sh')
-        _system('sudo make install')
+        _system('git clone https://github.com/ggreer/the_silver_searcher.git', cwd=get_home_dir_path('src'))
+        _system('./build.sh', cwd=get_home_dir_path('src/the_silver_searcher'))
+        _system('sudo make install', cwd=get_home_dir_path('src/the_silver_searcher'))
 
 
 def setup_fak():
     _system('mkdir -p ~/src')
     _system('rm -rf ~/src/fak')
-    os.chdir(get_home_dir_path('src'))
-    _system('git clone https://github.com/wbbradley/fak.git')
+    _system('git clone https://github.com/wbbradley/fak.git', cwd=get_home_dir_path('src'))
     fak_dir = get_home_dir_path('src/fak')
-    os.chdir(fak_dir)
-    _system('make')
+    _system('make -C {}'.format(fak_dir))
     _system('ln -sf {} {}'.format(join(fak_dir, 'fak'), bin_dir))
 
 
@@ -216,6 +213,8 @@ def setup_tmux_powerline():
         target_location = join(user_dir, '.local/lib/python2.7/site-packages/powerline/bindings/tmux/powerline.conf')  # noqa
 
     if os.path.exists(target_location):
+        _system('ln -sf {} {}'.format(get_src_path('powerline'),
+                                      powerline_config_dir))
         _system('ln -sf {} {}'
                 .format(target_location, join(user_dir,
                                               '.powerline.tmux.conf')))
