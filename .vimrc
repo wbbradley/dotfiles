@@ -253,8 +253,8 @@ let g:agprg="ag --vimgrep"
 :set nowritebackup
 :endif
 
-nmap <F9> :set autowrite<CR>:lprev<CR>:set noautowrite<CR>zz
-nmap <F10> :set autowrite<CR>:lnext<CR>:set noautowrite<CR>zz
+nmap <F9> :set autowrite<CR>:cprev<CR>:set noautowrite<CR>zz
+nmap <F10> :set autowrite<CR>:cnext<CR>:set noautowrite<CR>zz
 
 nnoremap M :CtrlPMRUFiles<CR>
 
@@ -268,7 +268,7 @@ nnoremap <leader>90 :e ~/.vimrc<CR>
 nnoremap <leader>91 :e ~/local.vimrc<CR>
 nnoremap <leader>92 :e ~/.bashrc<CR>
 nnoremap <leader>93 :e ~/local.bashrc<CR>
-nnoremap <leader>d O__debugbreak()<Esc>
+nnoremap <leader>d O__debugbreak();<Esc>_
 nnoremap <leader>i Oimport ipdb<CR>ipdb.set_trace()<Esc>j_
 nnoremap <leader>p Oimport pdb<CR>pdb.set_trace()<Esc>j_
 nnoremap <leader>r Ofrom celery.contrib import rdb<CR>rdb.set_trace()<Esc>j_

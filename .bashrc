@@ -1,6 +1,7 @@
 export SRC_ROOT=$HOME/src
 export TZ=UTC
 alias vi=vim
+HISTFILESIZE=5000
 
 shopt -s histappend
 
