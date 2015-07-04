@@ -1,4 +1,5 @@
 {
+	"common":{"watcher":"stat"},
 	"ext": {
 		"shell": {
 			"theme": "default_leftonly"
