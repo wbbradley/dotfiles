@@ -28,7 +28,7 @@ set wildignore+=migrations
 set wildignore+=bower_components
 set wildignore+=.sass-cache
 set wildignore+=node_modules
-set wildignore+=assets
+" set wildignore+=assets
 set wildignore+=*.swp
 set wildignore+=*.o
 set wildignore+=.coverage
@@ -37,10 +37,12 @@ set wildignore+=*.png
 set wildignore+=*.jpg
 set wildignore+=*.jpeg
 set wildignore+=*.class
+set wildignore+=vcrpy_*
 set wildignore+=media
-set wildignore+=build
+set wildignore+=/build
 set wildignore+=.git
 set wildignore+=bootstrap-3.0.0
+set wildignore+=site-packages
 set wildchar=<Tab> wildmenu wildmode=full
 
 filetype off
@@ -51,6 +53,7 @@ set rtp^=~/.vim/bundle/vundle/
 call vundle#rc()
 
 " Plugin 'othree/html5.vim'
+" Plugin 'vim-scripts/YankRing.vim'
 Plugin 'jmcantrell/vim-virtualenv'
 Plugin 'kien/ctrlp.vim'
 " Plugin 'vim-scripts/django.vim'
@@ -222,8 +225,8 @@ function! FindWord()
 	:cw
 endfunction
 
-nnoremap <leader>` :!ctags -R --exclude=build --exclude=generated --exclude=env --exclude=assets --exclude=node_modules --exclude=bower_components .<CR><CR>:echo 'Tags are done.'<CR>
-nnoremap <leader>~ :!ctags -R --exclude=build --exclude=node_modules --exclude=assets "--exclude=*.js" --exclude=bower_components .<CR><CR>:echo 'Tags +env are done.'<CR>
+nnoremap <leader>` :!ctags -R --exclude=/build --exclude=generated --exclude=env --exclude=assets --exclude=node_modules --exclude=bower_components .<CR><CR>:echo 'Tags are done.'<CR>
+nnoremap <leader>~ :!ctags -R --exclude=/build --exclude=node_modules --exclude=assets "--exclude=*.js" --exclude=bower_components .<CR><CR>:echo 'Tags +env are done.'<CR>
 nnoremap <leader>[ :set paste<CR>i
 inoremap <leader>] <Esc>:set nopaste<CR>
 
