@@ -7,9 +7,10 @@ from sys import platform
 user_dir = expanduser('~')
 vim_dir = join(user_dir, '.vim')
 vim_color_dir = join(vim_dir, 'colors')
+vim_syntax_dir = join(vim_dir, 'syntax')
 vim_indent_dir = join(vim_dir, 'indent')
+vim_ftplugin_dir = join(vim_dir, 'ftplugin')
 powerline_config_dir = join(user_dir, '.config', 'powerline')
-ftplugin_dir = join(vim_dir, 'ftplugin')
 bin_dir = join(user_dir, 'bin')
 
 files = {
@@ -45,13 +46,22 @@ files = {
         'install_dir': bin_dir,
     },
     'py.vim': {
-        'install_dir': ftplugin_dir,
+        'install_dir': vim_ftplugin_dir,
     },
     'coffee.vim': {
-        'install_dir': ftplugin_dir,
+        'install_dir': vim_ftplugin_dir,
     },
-    'ir_black.vim': {
+    'vim/colors/ir_black.vim': {
         'install_dir': vim_color_dir,
+    },
+    'vim/syntax/cider.vim': {
+        'install_dir': vim_syntax_dir,
+    },
+    'vim/indent/cider.vim': {
+        'install_dir': vim_indent_dir,
+    },
+    'vim/ftplugin/cider.vim': {
+        'install_dir': vim_ftplugin_dir,
     },
     # See pdbpp - a very useful python debugger extension
     '.pdbrc.py': {
@@ -70,7 +80,7 @@ def get_home_dir_path(file):
 
 def get_dest_path(file_, options):
     install_dir = options['install_dir']
-    return abspath(join(install_dir, file_))
+    return abspath(join(install_dir, basename(file_)))
 
 
 def _get_other_files(options):
@@ -136,6 +146,10 @@ def link_files():
         source_file = get_src_path(file)
         dest_file = get_dest_path(file, options)
         dest_file_path = dirname(dest_file)
+
+        print source_file
+        print dest_file
+        print dest_file_path
 
         if exists(dest_file) and not options.get('overwrite', True):
             print "install.py : info : skipping {}".format(dest_file)

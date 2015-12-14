@@ -54,6 +54,7 @@ call vundle#rc()
 
 " Plugin 'othree/html5.vim'
 " Plugin 'vim-scripts/YankRing.vim'
+" Plugin 'maxbrunsfeld/vim-yankstack'
 Plugin 'jmcantrell/vim-virtualenv'
 Plugin 'kien/ctrlp.vim'
 " Plugin 'vim-scripts/django.vim'
@@ -70,7 +71,7 @@ Plugin 'rking/ag.vim'
 " Plugin 'fweep/vim-tabber'
 " Plugin 'pangloss/vim-javascript'
 " Plugin 'mxw/vim-jsx'
-Plugin 'scrooloose/syntastic'
+" Plugin 'scrooloose/syntastic'
 Plugin 'hynek/vim-python-pep8-indent.git'
 Plugin 'christoomey/vim-tmux-navigator'
 Plugin 'sjl/threesome.vim.git'
@@ -110,23 +111,23 @@ let g:go_highlight_operators = 1
 let g:go_highlight_build_constraints = 1
 let g:go_fmt_command = "goimports"
 
-au BufNewFile,BufReadPost *.coffee setl shiftwidth=2 expandtab
-au BufNewFile,BufReadPost *.jsx set autoindent noexpandtab ts=2 sw=2
+autocmd BufNewFile,BufReadPost *.coffee setl shiftwidth=2 expandtab
+autocmd BufNewFile,BufReadPost *.jsx set autoindent noexpandtab ts=2 sw=2
 
-au FileType go nmap <Leader>s <Plug>(go-implements)
-au FileType go nmap <Leader>i <Plug>(go-info)
-au FileType go nmap <Leader>gd <Plug>(go-doc)
-au FileType go nmap <Leader>gv <Plug>(go-doc-vertical)
-au FileType go nmap <Leader>gb <Plug>(go-doc-browser)
-au FileType go nmap <leader>r <Plug>(go-run)
-au FileType go nmap <leader>b <Plug>(go-build)
-au FileType go nmap <leader>t <Plug>(go-test)
-au FileType go nmap <leader>c <Plug>(go-coverage)
-au FileType go nmap <Leader>ds <Plug>(go-def-split)
-au FileType go nmap <Leader>dv <Plug>(go-def-vertical)
-au FileType go nmap <Leader>dt <Plug>(go-def-tab)
-au FileType go nmap <Leader>e <Plug>(go-rename)
-au FileType go nmap <C-]> :GoDef<CR>
+autocmd FileType go nmap <Leader>s <Plug>(go-implements)
+autocmd FileType go nmap <Leader>i <Plug>(go-info)
+autocmd FileType go nmap <Leader>gd <Plug>(go-doc)
+autocmd FileType go nmap <Leader>gv <Plug>(go-doc-vertical)
+autocmd FileType go nmap <Leader>gb <Plug>(go-doc-browser)
+autocmd FileType go nmap <leader>r <Plug>(go-run)
+autocmd FileType go nmap <leader>b <Plug>(go-build)
+autocmd FileType go nmap <leader>t <Plug>(go-test)
+autocmd FileType go nmap <leader>c <Plug>(go-coverage)
+autocmd FileType go nmap <Leader>ds <Plug>(go-def-split)
+autocmd FileType go nmap <Leader>dv <Plug>(go-def-vertical)
+autocmd FileType go nmap <Leader>dt <Plug>(go-def-tab)
+autocmd FileType go nmap <Leader>e <Plug>(go-rename)
+autocmd FileType go nmap <C-]> :GoDef<CR>zz
 
 " When started as "evim", evim.vim will already have done these settings.
 if v:progname =~? "evim"
@@ -231,7 +232,12 @@ nnoremap <leader>[ :set paste<CR>i
 inoremap <leader>] <Esc>:set nopaste<CR>
 
 nnoremap <F3> :call FindWord()<CR>
-nnoremap <F4> :call FindWordNoFilter()<CR>
+nnoremap <C-F3> :call FindWordNoFilter()<CR>
+
+nnoremap <F4> :wa<CR> :e %:p:s,.h$,.X123X,:s,.cpp$,.h,:s,.X123X$,.cpp,<CR>
+inoremap <F4> <Esc> <F4>
+vnoremap <F4> <Esc> <F4>
+
 nnoremap F :wa<CR>:call FindPrompt()<CR>
 nnoremap E :wa<CR>:call FindPromptNoFilter()<CR>
 nnoremap T :CtrlPTag<CR>
@@ -261,7 +267,8 @@ nmap <F10> :set autowrite<CR>:cnext<CR>:set noautowrite<CR>zz
 
 nnoremap M :CtrlPMRUFiles<CR>
 
-nnoremap <leader><space> :noh<cr>:match<cr>
+" turning syntax on tends to redraw the screen nicely
+nnoremap <leader><space> :syn on<cr>:noh<cr>:match<cr>
 nnoremap <leader>t viwy:tabnew<CR>:e ~/vim-todo.txt<CR>ggPa<CR><Esc>:wq<CR>
 nnoremap <leader>T :tabnew<CR>:e ~/vim-todo.txt<CR>
 nnoremap <leader>q :conf qa<CR>
@@ -271,13 +278,13 @@ nnoremap <leader>90 :e ~/.vimrc<CR>
 nnoremap <leader>91 :e ~/local.vimrc<CR>
 nnoremap <leader>92 :e ~/.bashrc<CR>
 nnoremap <leader>93 :e ~/local.bashrc<CR>
-nnoremap <leader>d O__debugbreak();<Esc>_
+nnoremap <leader>d Odbg();<Esc>_
 nnoremap <leader>i Oimport ipdb<CR>ipdb.set_trace()<Esc>j_
 nnoremap <leader>p Oimport pdb<CR>pdb.set_trace()<Esc>j_
 nnoremap <leader>r Ofrom celery.contrib import rdb<CR>rdb.set_trace()<Esc>j_
 
 " F7 - incremental build
-nmap <F7> :wa<CR> :!clear <CR><CR> :make -j4<CR><CR>
+nmap <F7> :wa<CR> :!clear <CR><CR> :make -j4<CR><CR>zz
 imap <F7> <Esc> <F7>
 vmap <F7> <Esc> <F7>
 
@@ -294,6 +301,8 @@ nmap <C-F7> :!make clean <CR><CR> <F7>
 imap <C-F7> <Esc> <C-F7>
 vmap <C-F7> <Esc> <C-F7>
 
+nmap c<Space> ct_
+
 set tags+=tags;./tags
 
 nnoremap s :exec "normal i".nr2char(getchar())."\el"<CR>
@@ -307,13 +316,6 @@ inoremap <C-U> <C-G>u<C-U>
 " In many terminal emulators the mouse works just fine, thus enable it.
 if has('mouse')
   set mouse=a
-endif
-
-" Switch syntax highlighting on, when the terminal has colors
-" Also switch on highlighting the last used search pattern.
-if &t_Co > 2 || has("gui_running")
-  syntax on
-  set hlsearch
 endif
 
 " Only do this part when compiled with support for autocommands.
@@ -369,16 +371,16 @@ if !exists(":DiffOrig")
 endif
 
 augroup myvimrc
-	au!
-	au BufWritePost local.vimrc,.vimrc,_vimrc,vimrc,.gvimrc,_gvimrc,gvimrc so $MYVIMRC
+	autocmd!
+	autocmd BufWritePost local.vimrc,.vimrc,_vimrc,vimrc,.gvimrc,_gvimrc,gvimrc so $MYVIMRC
 augroup END
 
 " set rtp+=$GOROOT/misc/vim
 filetype plugin indent on
-" au BufRead,BufNewFile *.go set filetype=go
-au BufRead,BufNewFile *.eco set filetype=html
+" autocmd BufRead,BufNewFile *.go set filetype=go
+autocmd BufRead,BufNewFile *.eco set filetype=html
 
-au BufReadPost *.prepp set syntax=python
+autocmd BufReadPost *.prepp set syntax=python
 
 set ignorecase
 set smartcase
@@ -397,9 +399,9 @@ set nowrap
 silent! source ~/local.vimrc
 
 augroup CursorLine
-  au!
-  au VimEnter,WinEnter,BufWinEnter * setlocal cursorline
-  au WinLeave * setlocal nocursorline
+  autocmd!
+  autocmd VimEnter,WinEnter,BufWinEnter * setlocal cursorline
+  autocmd WinLeave * setlocal nocursorline
 augroup END
 
 " set cc=80
@@ -476,3 +478,11 @@ command! -bang -nargs=* -complete=tag S call SearchMultiLine(<bang>0, <f-args>)|
 "runtime $VIMRUNTIME/macros/matchit.vim
 
 " :match ErrorMsg '\%>80v.\+'
+"
+" Switch syntax highlighting on, when the terminal has colors
+" Also switch on highlighting the last used search pattern.
+if &t_Co > 2 || has("gui_running")
+  syntax on
+  set hlsearch
+endif
+
