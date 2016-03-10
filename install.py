@@ -51,7 +51,7 @@ files = {
     'coffee.vim': {
         'install_dir': vim_ftplugin_dir,
     },
-    'vim/colors/ir_black.vim': {
+    'ir_black.vim': {
         'install_dir': vim_color_dir,
     },
     'vim/syntax/cider.vim': {
