@@ -80,6 +80,7 @@ Plugin 'toyamarinyon/vim-swift'
 Plugin 'ryanss/vim-hackernews'
 Plugin 'fatih/vim-go'
 Plugin 'terryma/vim-expand-region'
+Plugin 'terryma/vim-multiple-cursors'
 
 let g:gitgutter_max_signs = 2000
 let g:airline_powerline_fonts = 1
