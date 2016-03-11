@@ -1,5 +1,5 @@
 set clipboard=unnamed
-
+set makeprg=make\ -j4
 set t_Co=256
 set number
 set cpoptions+=n
@@ -31,6 +31,7 @@ set wildignore+=node_modules
 " set wildignore+=assets
 set wildignore+=*.swp
 set wildignore+=*.o
+set wildignore+=*.bc
 set wildignore+=.coverage
 set wildignore+=*.pyc
 set wildignore+=*.png
@@ -63,6 +64,7 @@ Plugin 'airblade/vim-gitgutter'
 Plugin 'tpope/vim-fugitive'
 Plugin 'tpope/vim-unimpaired'
 Plugin 'kchmck/vim-coffee-script.git'
+Plugin 'terryma/vim-multiple-cursors'
 " Plugin 'jimmyhchan/dustjs.vim.git'
 Plugin 'juvenn/mustache.vim.git'
 " Plugin 'Lokaltog/vim-easymotion'
@@ -227,8 +229,8 @@ function! FindWord()
 	:cw
 endfunction
 
-nnoremap <leader>` :!ctags -R --exclude=/build --exclude=generated --exclude=env --exclude=assets --exclude=node_modules --exclude=bower_components .<CR><CR>:echo 'Tags are done.'<CR>
-nnoremap <leader>~ :!ctags -R --exclude=/build --exclude=node_modules --exclude=assets "--exclude=*.js" --exclude=bower_components .<CR><CR>:echo 'Tags +env are done.'<CR>
+nnoremap <leader>` :!ctags -R --exclude=/build --exclude=Transforms --exclude=TableGen --exclude=Target --exclude=Analysis --exclude=CodeGen --exclude=generated --exclude=env --exclude=assets --exclude=node_modules --exclude=bower_components .<CR><CR>:echo 'Tags are done.'<CR>
+nnoremap <leader>~ :!ctags -R --exclude=/build --exclude=node_modules --exclude=assets "--exclude=*.js" --exclude=bower_components /usr/local/Cellar/llvm37/3.7.0/lib/llvm-3.7/lib .<CR><CR>:echo 'Tags +env are done.'<CR>
 nnoremap <leader>[ :set paste<CR>i
 inoremap <leader>] <Esc>:set nopaste<CR>
 
@@ -269,7 +271,7 @@ nmap <F10> :set autowrite<CR>:cnext<CR>:set noautowrite<CR>zz
 nnoremap M :CtrlPMRUFiles<CR>
 
 " turning syntax on tends to redraw the screen nicely
-nnoremap <leader><space> :syn on<cr>:noh<cr>:match<cr>
+nnoremap <leader><space> :syn on<cr>:noh<cr>:match<cr>:set nopaste<CR>
 nnoremap <leader>t viwy:tabnew<CR>:e ~/vim-todo.txt<CR>ggPa<CR><Esc>:wq<CR>
 nnoremap <leader>T :tabnew<CR>:e ~/vim-todo.txt<CR>
 nnoremap <leader>q :conf qa<CR>
@@ -362,6 +364,7 @@ autocmd FileType htmldjango setlocal sw=2 sts=2 ts=2 expandtab
 autocmd FileType html setlocal sw=2 sts=2 ts=2 expandtab
 autocmd FileType less setlocal sw=2 sts=2 ts=2 expandtab
 autocmd FileType css setlocal sw=2 sts=2 ts=2 expandtab
+autocmd FileType cpp setlocal sw=4 sts=4 ts=4
 
 " Convenient command to see the difference between the current buffer and the
 " file it was loaded from, thus the changes you made.
