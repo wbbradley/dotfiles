@@ -16,7 +16,7 @@ function fup() {
 
 function diff-mine()
 {
-	git diff `git log --format='%h %ae' | grep -v -e `git config user.email` | head -n 1 | sed -e "s/\(.*\) .*/\1/"` HEAD
+	git diff `git log --format='%h %ae' | (grep -v -e `git config user.email`) | head -n 1 | sed -e "s/\(.*\) .*/\1/"` HEAD
 }
 
 function scroll-clear()
