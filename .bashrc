@@ -28,6 +28,11 @@ function diff-mine()
 	git diff `git log --format='%h %ae' | grep -v -e $(git config user.email) | head -n 1 | sed -e "s/\(.*\) .*/\1/"` HEAD
 }
 
+function rebase-mine()
+{
+       git rebase -i `git log --format='%h %ae' | grep -v -e $(git config user.email) | head -n 1 | sed -e "s/\(.*\) .*/\1/"`~
+}
+
 function scroll-clear()
 {
 	clear
