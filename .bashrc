@@ -4,6 +4,15 @@ alias vi=vim
 HISTFILESIZE=5000
 
 shopt -s histappend
+function nowrap()
+{
+       printf '\033[?7l'
+}
+
+function wrap()
+{
+       printf '\033[?7h'
+}
 
 function dp()
 {
@@ -56,6 +65,10 @@ function acc() {
 }
 function mod() {
 	find . -type f -mmin -$1 | grep -v -e "\.git" -e sass -e node_ -e "pyc$"
+}
+function flake() {
+       (. env/bin/activate; git diff --name-only | grep "\.py$" | xargs flake8)
+       (. env/bin/activate; git diff --cached --name-only | grep "\.py$" | xargs flake8)
 }
 alias agent='eval `ssh-agent` && ssh-add'
 alias dus='du -sk * | sed "s/ /_/g" | sort -n | awk '\''
@@ -139,24 +152,6 @@ if [ $platform == 'linux' ]; then
 		done
 		echo "Cannot find ssh agent - maybe you should reconnect and forward it?"
 	}
-fi
-
-
-if [ $platform == 'freebsd' ]; then
-	PYTHON_ROOT=$HOME/Library/Python/2.7
-	POWERLINE_ROOT=$PYTHON_ROOT/lib/python/site-packages/powerline
-	PYTHON_USER_BIN=$PYTHON_ROOT/bin
-	export PATH=$PATH:$PYTHON_USER_BIN
-fi
-
-export POWERLINE_SHELL=$(find $(pip show powerline-status|grep Location:|sed -e "s/Location: //") | grep "bash/powerline\.sh$")
-
-if [ -f "$POWERLINE_SHELL" ]; then
-	powerline-daemon -q
-	POWERLINE_BASH_CONTINUATION=1
-	POWERLINE_BASH_SELECT=1
-	. $POWERLINE_SHELL
-	# export POWERLINE_COMMAND="$POWERLINE_COMMAND -c ext.shell.theme=default_leftonly"
 fi
 
 if [ -f "$HOME/local.bashrc" ]; then
