@@ -10,7 +10,6 @@ vim_color_dir = join(vim_dir, 'colors')
 vim_syntax_dir = join(vim_dir, 'syntax')
 vim_indent_dir = join(vim_dir, 'indent')
 vim_ftplugin_dir = join(vim_dir, 'ftplugin')
-powerline_config_dir = join(user_dir, '.config', 'powerline')
 bin_dir = join(user_dir, 'bin')
 
 files = {
@@ -115,7 +114,6 @@ def setup_system_prefs():
 
 def setup_vim():
     _system('rm -rf $HOME/.vim')
-    _system('rm -rf $HOME/.config/powerline')
     _system('mkdir -p ~/.vim/bundle')
     _system('mkdir -p ~/.vim/autoload')
     _system('git clone https://github.com/gmarik/vundle.git '
@@ -169,14 +167,6 @@ def link_files():
             _system('ln -sf ' + source_file + ' ' + dest_file)
 
 
-def setup_powerline():
-    print "install.py : info : installing powerline..."
-    if platform == 'darwin':
-        _system('pip install --upgrade powerline-status')
-    else:
-        _system('pip install --user --install-option="--prefix=" --upgrade git+git://github.com/Lokaltog/powerline@21b10ee7e14be5e2d78d3f084218def7195efe32#egg=powerline')  # noqa
-
-
 def setup_vim_bundles():
     _system('vim +BundleInstall +qa')
 
@@ -215,28 +205,6 @@ def setup_reattach_to_user_namespace():
         _system('brew install reattach-to-user-namespace')
 
 
-def setup_tmux_powerline():
-    try:
-        os.unlink('.powerline.tmux.conf')
-    except OSError:
-        pass
-
-    if platform == 'darwin':
-        target_location = '/usr/local/lib/python2.7/site-packages/powerline/bindings/tmux/powerline.conf'  # noqa
-    else:
-        target_location = join(user_dir, '.local/lib/python2.7/site-packages/powerline/bindings/tmux/powerline.conf')  # noqa
-
-    if os.path.exists(target_location):
-        _system('ln -sf {} {}'.format(get_src_path('powerline'),
-                                      powerline_config_dir))
-        _system('ln -sf {} {}'
-                .format(target_location, join(user_dir,
-                                              '.powerline.tmux.conf')))
-    else:
-        print "Damn. {} doesn't exist.".format(target_location)
-        sys.exit(2)
-
-
 def setup_go():
     _system('mkdir $HOME/go')
     if platform == 'darwin':
@@ -254,7 +222,6 @@ def clean_tmp_junk():
 if __name__ == '__main__':
     steps = [
         clean_tmp_junk,
-        setup_powerline,
         setup_git,
         setup_system_prefs,
         setup_vim,
@@ -264,7 +231,6 @@ if __name__ == '__main__':
         setup_the_silver_searcher,
         setup_fak,
         setup_reattach_to_user_namespace,
-        setup_tmux_powerline,
         setup_go,
     ]
 
