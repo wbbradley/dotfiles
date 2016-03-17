@@ -35,6 +35,7 @@ set wildignore+=*.bc
 set wildignore+=.coverage
 set wildignore+=*.pyc
 set wildignore+=*.png
+set wildignore+=*.egg
 set wildignore+=*.jpg
 set wildignore+=*.jpeg
 set wildignore+=*.class
@@ -82,6 +83,7 @@ Plugin 'ryanss/vim-hackernews'
 Plugin 'fatih/vim-go'
 Plugin 'terryma/vim-expand-region'
 Plugin 'terryma/vim-multiple-cursors'
+Plugin 'solarnz/thrift.vim'
 
 let g:gitgutter_max_signs = 2000
 let g:airline_powerline_fonts = 1
@@ -94,6 +96,7 @@ let g:syntastic_cpp_compiler_options = ' -std=c++11 -stdlib=libc++'
 let g:syntastic_always_populate_loc_list = 1
 let g:syntastic_check_on_open = 1
 let g:syntastic_check_on_wq = 0
+let g:syntastic_mode_map = { 'mode': 'passive', 'active_filetypes': [],'passive_filetypes': [] }
 
 let g:gitgutter_escape_grep = 1
 let g:gitgutter_eager = 0
