@@ -114,6 +114,10 @@ def setup_system_prefs():
 
 def setup_vim():
     _system('rm -rf $HOME/.vim')
+    _system('mkdir -p ' + vim_color_dir)
+    _system('mkdir -p ' + vim_syntax_dir)
+    _system('mkdir -p ' + vim_indent_dir)
+    _system('mkdir -p ' + vim_ftplugin_dir)
     _system('mkdir -p ~/.vim/bundle')
     _system('mkdir -p ~/.vim/autoload')
     _system('git clone https://github.com/gmarik/vundle.git '
@@ -211,6 +215,12 @@ def setup_go():
         _system('brew install go')
 
 
+def setup_git_aware_prompt():
+    _system('rm -rf ~/.bash')
+    _system('mkdir -p ~/.bash')
+    _system('git clone git://github.com/jimeh/git-aware-prompt.git', cwd=get_home_dir_path('.bash'))
+
+
 def clean_tmp_junk():
     if platform == 'darwin':
         tmp_dir = os.environ.get('TMPDIR')
@@ -222,6 +232,7 @@ def clean_tmp_junk():
 if __name__ == '__main__':
     steps = [
         clean_tmp_junk,
+        setup_git_aware_prompt,
         setup_git,
         setup_system_prefs,
         setup_vim,
