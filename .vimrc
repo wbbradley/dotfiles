@@ -18,7 +18,7 @@ let g:ctrlp_use_caching = 1
 let g:ctrlp_clear_cache_on_exit = 0
 let g:ctrlp_show_hidden = 1
 let g:ctrlp_extensions = ['tag']
-let g:ctrlp_custom_ignore = 'build'
+let g:ctrlp_custom_ignore = ''
 let g:ctrlp_regexp = 0
 let g:ctrlp_lazy_update = 1
 let g:ctrlp_switch_buffer = 0
@@ -231,7 +231,7 @@ function! FindWord()
 	:cw
 endfunction
 
-nnoremap <leader>` :!ctags -R --exclude=/build --exclude=Transforms --exclude=TableGen --exclude=Target --exclude=Analysis --exclude=CodeGen --exclude=generated --exclude=env --exclude=assets --exclude=node_modules --exclude=bower_components .<CR><CR>:echo 'Tags are done.'<CR>
+nnoremap <leader>` :!ctags -R --exclude=/build --exclude=makefile --exclude=Transforms --exclude=TableGen --exclude=Target --exclude=Analysis --exclude=CodeGen --exclude=generated --exclude=env --exclude=assets --exclude=node_modules --exclude=bower_components .<CR><CR>:echo 'Tags are done.'<CR>
 nnoremap <leader>~ :!ctags -R --exclude=/build --exclude=node_modules --exclude=assets "--exclude=*.js" --exclude=bower_components /usr/local/Cellar/llvm37/3.7.0/lib/llvm-3.7/lib .<CR><CR>:echo 'Tags +env are done.'<CR>
 nnoremap <leader>[ :set paste<CR>i
 inoremap <leader>] <Esc>:set nopaste<CR>
