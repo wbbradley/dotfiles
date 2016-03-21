@@ -209,8 +209,8 @@ def setup_reattach_to_user_namespace():
 
 
 def setup_go():
-    _system('mkdir $HOME/go')
     if platform == 'darwin':
+        _system('mkdir -p $HOME/go')
         _system('brew install go')
 
 
