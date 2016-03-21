@@ -15,7 +15,6 @@ bin_dir = join(user_dir, 'bin')
 files = {
     '.bash_profile': {
         'install_dir': user_dir,
-        'overwrite': False,
     },
     '.bashrc': {
         'install_dir': user_dir,
@@ -153,7 +152,7 @@ def link_files():
         print dest_file
         print dest_file_path
 
-        if exists(dest_file) and not options.get('overwrite', True):
+        if exists(dest_file):
             print "install.py : info : skipping {}".format(dest_file)
             continue
 
