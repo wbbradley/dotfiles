@@ -152,10 +152,6 @@ def link_files():
         print dest_file
         print dest_file_path
 
-        if exists(dest_file):
-            print "install.py : info : skipping {}".format(dest_file)
-            continue
-
         if not exists(dest_file_path):
             _system('mkdir -p ' + dest_file_path)
 
