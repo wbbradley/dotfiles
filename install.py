@@ -88,7 +88,15 @@ def _get_other_files(options):
         return options
 
 
-def _system(cmd, cwd=None):
+def _system(cmd, cwd=None, sudo=False):
+    if sudo:
+        if os.system('sudo -n true') == 0:
+            cmd = 'sudo %s' % cmd
+        else:
+            # if we don't have passwordless sudo privileges, just skip it
+            print "SKIPPING RUNNING %s" % cmd
+            return
+
     if cwd:
         from subprocess import Popen
         Popen(cmd, shell=True, cwd=cwd)
@@ -174,20 +182,20 @@ def setup_ctags():
     if platform == 'darwin':
         _system('brew install ctags-exuberant')
     else:
-        _system('sudo apt-get install exuberant-ctags')
+        _system('apt-get install exuberant-ctags', sudo=True)
 
 
 def setup_the_silver_searcher():
     if platform == 'darwin':
         _system('brew install the_silver_searcher')
     else:
-        _system('sudo apt-get install -y automake pkg-config libpcre3-dev '
-                'zlib1g-dev liblzma-dev')
+        _system('apt-get install -y automake pkg-config libpcre3-dev '
+                'zlib1g-dev liblzma-dev', sudo=True)
         _system('mkdir -p ~/src')
         _system('rm -rf ~/src/the_silver_searcher')
         _system('git clone https://github.com/ggreer/the_silver_searcher.git', cwd=get_home_dir_path('src'))
         _system('./build.sh', cwd=get_home_dir_path('src/the_silver_searcher'))
-        _system('sudo make install', cwd=get_home_dir_path('src/the_silver_searcher'))
+        _system('make install', cwd=get_home_dir_path('src/the_silver_searcher', sudo=True))
 
 
 def setup_fak():
