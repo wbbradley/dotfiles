@@ -52,15 +52,6 @@ files = {
     'vim/colors/ir_black.vim': {
         'install_dir': vim_color_dir,
     },
-    'vim/syntax/cider.vim': {
-        'install_dir': vim_syntax_dir,
-    },
-    'vim/indent/cider.vim': {
-        'install_dir': vim_indent_dir,
-    },
-    'vim/ftplugin/cider.vim': {
-        'install_dir': vim_ftplugin_dir,
-    },
     # See pdbpp - a very useful python debugger extension
     '.pdbrc.py': {
         'install_dir': user_dir,
