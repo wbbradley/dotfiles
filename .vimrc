@@ -5,7 +5,8 @@ set number
 set cpoptions+=n
 set splitbelow
 set splitright
-set modelines=0
+set modeline
+set modelines=1
 set noesckeys
 " set lazyredraw
 " set ttyfast
