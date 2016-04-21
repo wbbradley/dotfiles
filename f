@@ -8,7 +8,10 @@ sys_args = [arg.lower() for arg in sys.argv[1:]]
 def args_filter(item):
     item = item.lower()
     for arg in sys_args:
-        if item.find(arg) == -1:
+        if arg and arg[0] == '-':
+            if item.find(arg[1:]) != -1:
+                return False
+        elif item.find(arg) == -1:
             return False
     return True
 
