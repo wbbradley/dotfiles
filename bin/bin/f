@@ -18,4 +18,4 @@ def args_filter(item):
 for path, subdirs, files in os.walk('.'):
     for name in filter(args_filter, (join(path, name) for name in files)):
         name = name[2:]
-        print name
+        print(name)
