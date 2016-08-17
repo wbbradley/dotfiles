@@ -12,7 +12,7 @@ set noesckeys
 " set ttyfast
 
 " set columns=117
-set columns=210
+set columns=80
 
 "set runtimepath^=~/.vim/bundle/vim-gitgutter
 let g:ctrlp_use_caching = 1
