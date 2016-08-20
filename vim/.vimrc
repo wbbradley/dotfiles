@@ -85,6 +85,7 @@ Plugin 'fatih/vim-go'
 Plugin 'terryma/vim-expand-region'
 Plugin 'terryma/vim-multiple-cursors'
 Plugin 'solarnz/thrift.vim'
+Plugin 'hdima/python-syntax'
 
 let g:gitgutter_max_signs = 2000
 let g:airline_powerline_fonts = 1
