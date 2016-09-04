@@ -1,6 +1,6 @@
 [submodule "vim/.vim/bundle/vundle"]
 	path = vim/.vim/bundle/vundle
 	url = https://github.com/gmarik/vundle.git
-[submodule "bash/.bash/git-aware-prompt"]
-	path = bash/.bash/git-aware-prompt
-	url = git://github.com/jimeh/git-aware-prompt.git
+[submodule "bash/git-aware-prompt"]
+	path = bash/git-aware-prompt
+	url = https://github.com/jimeh/git-aware-prompt.git
