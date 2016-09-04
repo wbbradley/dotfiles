@@ -141,6 +141,8 @@ if [ $platform == 'freebsd' ]; then
 	# alias kgs='javaws http://files.gokgs.com/javaBin/cgoban.jnlp'
 	# alias simulator='open /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Applications/iPhone\ Simulator.app'
 	# alias mails='sudo python -m smtpd -n -c DebuggingServer localhost:25'
+	alias stopify='pkill -STOP Spotify\ Helper'
+	alias startify='pkill -CONT Spotify\ Helper'
 fi
 
 if [ $platform == 'linux' ]; then

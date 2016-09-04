@@ -38,6 +38,8 @@ set wildignore+=*.pyc
 set wildignore+=*.png
 set wildignore+=*.egg
 set wildignore+=*.jpg
+set wildignore+=*.ir
+set wildignore+=*.s
 set wildignore+=*.jpeg
 set wildignore+=*.class
 set wildignore+=vcrpy_*
@@ -86,6 +88,15 @@ Plugin 'terryma/vim-expand-region'
 Plugin 'terryma/vim-multiple-cursors'
 Plugin 'solarnz/thrift.vim'
 Plugin 'hdima/python-syntax'
+Plugin 'zionlang/vim-zion'
+Plugin 'haya14busa/incsearch.vim'
+Plugin 'haya14busa/incsearch-fuzzy.vim'
+
+map /  <Plug>(incsearch-forward)
+map ?  <Plug>(incsearch-backward)
+map g/ <Plug>(incsearch-stay)
+
+map <leader>] <Plug>(incsearch-fuzzy-/)
 
 let g:gitgutter_max_signs = 2000
 let g:airline_powerline_fonts = 1
@@ -234,7 +245,7 @@ function! FindWord()
 endfunction
 
 nnoremap <leader>` :!ctags -R --exclude=/build --exclude=makefile --exclude=Transforms --exclude=TableGen --exclude=Target --exclude=Analysis --exclude=CodeGen --exclude=generated --exclude=env --exclude=assets --exclude=node_modules --exclude=bower_components .<CR><CR>:echo 'Tags are done.'<CR>
-nnoremap <leader>~ :!ctags -R --exclude=/build --exclude=node_modules --exclude=assets "--exclude=*.js" --exclude=bower_components /usr/local/Cellar/llvm37/3.7.0/lib/llvm-3.7/lib .<CR><CR>:echo 'Tags +env are done.'<CR>
+nnoremap <leader>~ :!ctags -R --exclude=/build --exclude=node_modules --exclude=assets "--exclude=*.js" --exclude=bower_components /usr/local/Cellar/python/2.7.8_2/Frameworks/Python.framework/Versions/2.7/include/python2.7 /usr/local/Cellar/llvm37/3.7.0/lib/llvm-3.7/lib .<CR><CR>:echo 'Tags +env are done.'<CR>
 nnoremap <leader>[ :set paste<CR>i
 inoremap <leader>] <Esc>:set nopaste<CR>
 

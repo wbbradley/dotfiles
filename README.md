@@ -4,10 +4,13 @@ dotfiles
 # Pre-installation steps
 
 ```sh
-# Clone the repo somewhere
-mkdir $HOME/src
-cd $HOME/src
+# Clone the repo somewhere. I use ~/src for all my Github repos.
+
+export INSTALL_DIR=$HOME/src
+mkdir -p $INSTALL_DIR
+cd $INSTALL_DIR
 git clone https://github.com/wbbradley/dotfiles.git
+cd $INSTALL_DIR/dotfiles
 git submodule init
 git submodule update
 
@@ -18,8 +21,9 @@ brew install stow
 # Installing vim files
 
 ```sh
-cd $HOME/src/dotfiles
+cd $INSTALL_DIR/dotfiles
 stow -t $HOME vim
+vim +BundleInstall +qa
 ```
 
 # Installing bash files
@@ -27,10 +31,10 @@ stow -t $HOME vim
 My bash setup requires special steps.
 
 ```sh
-mkdir ~/.bash
-cd ~/.bash
+mkdir $HOME/.bash
+cd $HOME/.bash
 git clone git://github.com/jimeh/git-aware-prompt.git
 
-cd $HOME/src/dotfiles
+cd $INSTALL_DIR/dotfiles
 stow -t $HOME bash
 ```
