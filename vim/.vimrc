@@ -91,6 +91,7 @@ Plugin 'hdima/python-syntax'
 Plugin 'zionlang/vim-zion'
 Plugin 'haya14busa/incsearch.vim'
 Plugin 'haya14busa/incsearch-fuzzy.vim'
+Plugin 'IN3D/vim-raml'
 
 map /  <Plug>(incsearch-forward)
 map ?  <Plug>(incsearch-backward)
@@ -184,6 +185,7 @@ vnoremap gQ gq
 nnoremap gQ gq
 
 nmap <leader>f :CtrlP<CR><C-\>w
+nmap <CR><CR> :!<CR>
 
 " map home row to exit Insert mode
 imap jj <Esc>
