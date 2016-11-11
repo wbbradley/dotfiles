@@ -8,11 +8,8 @@ set splitright
 set modeline
 set modelines=1
 set noesckeys
-" set lazyredraw
-" set ttyfast
 
-" set columns=117
-set columns=80
+set textwidth=80
 
 "set runtimepath^=~/.vim/bundle/vim-gitgutter
 let g:ctrlp_use_caching = 1
@@ -89,15 +86,8 @@ Plugin 'terryma/vim-multiple-cursors'
 " Plugin 'solarnz/thrift.vim'
 Plugin 'hdima/python-syntax'
 Plugin 'zionlang/vim-zion'
-Plugin 'haya14busa/incsearch.vim'
-Plugin 'haya14busa/incsearch-fuzzy.vim'
-Plugin 'IN3D/vim-raml'
+" Plugin 'IN3D/vim-raml'
 
-map /  <Plug>(incsearch-forward)
-map ?  <Plug>(incsearch-backward)
-map g/ <Plug>(incsearch-stay)
-
-map <leader>] <Plug>(incsearch-fuzzy-/)
 
 let g:gitgutter_max_signs = 2000
 let g:airline_powerline_fonts = 1

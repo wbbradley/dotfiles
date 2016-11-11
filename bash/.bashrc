@@ -1,6 +1,7 @@
 export SRC_ROOT=$HOME/src
 export TZ=UTC
 alias vi=vim
+alias uuid='python -c "import uuid;print(uuid.uuid4())" | tee | pbcopy'
 HISTFILESIZE=5000
 
 shopt -s histappend
