@@ -60,16 +60,16 @@ call vundle#rc()
 " Plugin 'othree/html5.vim'
 " Plugin 'vim-scripts/YankRing.vim'
 " Plugin 'maxbrunsfeld/vim-yankstack'
-Plugin 'jmcantrell/vim-virtualenv'
+" Plugin 'jmcantrell/vim-virtualenv'
 Plugin 'kien/ctrlp.vim'
 " Plugin 'vim-scripts/django.vim'
 Plugin 'nvie/vim-flake8'
 Plugin 'airblade/vim-gitgutter'
 Plugin 'tpope/vim-fugitive'
-Plugin 'tpope/vim-unimpaired'
-Plugin 'kchmck/vim-coffee-script.git'
+" Plugin 'tpope/vim-unimpaired'
+" Plugin 'kchmck/vim-coffee-script.git'
 " Plugin 'jimmyhchan/dustjs.vim.git'
-Plugin 'juvenn/mustache.vim.git'
+" Plugin 'juvenn/mustache.vim.git'
 " Plugin 'Lokaltog/vim-easymotion'
 Plugin 'groenewege/vim-less'
 Plugin 'rking/ag.vim'
@@ -79,14 +79,14 @@ Plugin 'rking/ag.vim'
 " Plugin 'scrooloose/syntastic'
 Plugin 'hynek/vim-python-pep8-indent.git'
 Plugin 'christoomey/vim-tmux-navigator'
-Plugin 'sjl/threesome.vim.git'
+" Plugin 'sjl/threesome.vim.git'
 Plugin 'bling/vim-airline'
-Plugin 'toyamarinyon/vim-swift'
-Plugin 'ryanss/vim-hackernews'
+" Plugin 'toyamarinyon/vim-swift'
+" Plugin 'ryanss/vim-hackernews'
 Plugin 'fatih/vim-go'
 Plugin 'terryma/vim-expand-region'
 Plugin 'terryma/vim-multiple-cursors'
-Plugin 'solarnz/thrift.vim'
+" Plugin 'solarnz/thrift.vim'
 Plugin 'hdima/python-syntax'
 Plugin 'zionlang/vim-zion'
 Plugin 'haya14busa/incsearch.vim'
@@ -129,6 +129,10 @@ let g:go_highlight_structs = 1
 let g:go_highlight_operators = 1
 let g:go_highlight_build_constraints = 1
 let g:go_fmt_command = "goimports"
+
+" Make the quickfix window take up the entirety of the bottom of the window
+" when it opens
+autocmd FileType qf wincmd J
 
 autocmd BufNewFile,BufReadPost *.coffee setl shiftwidth=2 expandtab
 autocmd BufNewFile,BufReadPost *.jsx set autoindent noexpandtab ts=2 sw=2
