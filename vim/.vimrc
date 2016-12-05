@@ -87,6 +87,7 @@ Plugin 'terryma/vim-multiple-cursors'
 Plugin 'hdima/python-syntax'
 Plugin 'zionlang/vim-zion'
 " Plugin 'IN3D/vim-raml'
+Plugin 'elzr/vim-json'
 
 
 let g:gitgutter_max_signs = 2000
