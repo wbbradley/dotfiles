@@ -1,3 +1,4 @@
+export PS1="\[\033[48;5;95;38;5;214m\] \u@\h \[\033[0;38;5;31;48;5;240;22m\] \$git_branch\$git_dirty \[\033[0;38;5;252;48;5;240;1m\]\$PWD \[\033[0;38;5;240;49;22m\]\[\033[0m\] "
 export SRC_ROOT=$HOME/src
 export TZ=UTC
 alias vi=vim
@@ -139,6 +140,7 @@ if [ $platform == 'freebsd' ]; then
 	# Mac OS
 	# set prompt = "%{\033[31m%}[%~] %{\033[0m%}%#"
 	alias ls='ls -G -a -l -tr'
+
 	# alias kgs='javaws http://files.gokgs.com/javaBin/cgoban.jnlp'
 	# alias simulator='open /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Applications/iPhone\ Simulator.app'
 	# alias mails='sudo python -m smtpd -n -c DebuggingServer localhost:25'
@@ -147,9 +149,68 @@ if [ $platform == 'freebsd' ]; then
 fi
 
 if [ $platform == 'linux' ]; then
-	bind '"\C-i": menu-complete' 2> /dev/null
+	#bind '"\C-i": menu-complete' 2> /dev/null
 	alias ls='ls -G -a -l -tr --color'
-	alias netmon='strace -f -e trace=network -s 10000'
+	shopt -s histappend
+	shopt -s checkwinsize
+
+
+	# make less more friendly for non-text input files, see lesspipe(1)
+	[ -x /usr/bin/lesspipe ] && eval "$(SHELL=/bin/sh lesspipe)"
+
+	# set variable identifying the chroot you work in (used in the prompt below)
+	if [ -z "${debian_chroot:-}" ] && [ -r /etc/debian_chroot ]; then
+		debian_chroot=$(cat /etc/debian_chroot)
+	fi
+
+	# set a fancy prompt (non-color, unless we know we "want" color)
+	case "$TERM" in
+		xterm-color|*-256color) color_prompt=yes;;
+	esac
+
+	# uncomment for a colored prompt, if the terminal has the capability; turned
+	# off by default to not distract the user: the focus in a terminal window
+	# should be on the output of commands, not on the prompt
+	force_color_prompt=yes
+
+	if [ -n "$force_color_prompt" ]; then
+		if [ -x /usr/bin/tput ] && tput setaf 1 >&/dev/null; then
+		# We have color support; assume it's compliant with Ecma-48
+		# (ISO/IEC-6429). (Lack of such support is extremely rare, and such
+		# a case would tend to support setf rather than setaf.)
+		color_prompt=yes
+		else
+		color_prompt=
+		fi
+	fi
+
+	parse_git_branch() {
+		git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/(\1):/'
+	}
+
+	if [ "$color_prompt" = yes ]; then
+		PS1='${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@\h\[\033[00m\]:$(parse_git_branch)\[\033[02;34m\]\w\[\033[00m\] \$ '
+	else
+		PS1='${debian_chroot:+($debian_chroot)}$(parse_git_branch)\u@\h:\w\$ '
+	fi
+	unset color_prompt force_color_prompt
+
+	# enable color support of ls and also add handy aliases
+	if [ -x /usr/bin/dircolors ]; then
+		test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)" || eval "$(dircolors -b)"
+		alias ls='ls -G -a -l -tr --color'
+		#alias dir='dir --color=auto'
+		#alias vdir='vdir --color=auto'
+
+		alias grep='grep --color=auto'
+		alias fgrep='fgrep --color=auto'
+		alias egrep='egrep --color=auto'
+	fi
+
+	# colored GCC warnings and errors
+	export GCC_COLORS='error=01;31:warning=01;35:note=01;36:caret=01;32:locus=01:quote=01'
+
+	#alias netmon='strace -f -e trace=network -s 10000'
 
 	# Debian
 	#set prompt = "%{\033[32m%}[%~] %{\033[0m%}%#"
@@ -160,7 +221,6 @@ if [ $platform == 'linux' ]; then
 	# if [[ -f "/usr/local/bin/ssh_proxy_via_bastion" ]]; then
 	# 	export GIT_SSH=/usr/local/bin/ssh_proxy_via_bastion
 	# fi
-	export PATH=$PATH:$HOME/.local/bin
 	ssh-reagent () {
 		for agent in /tmp/ssh-*/agent.*; do
 			export SSH_AUTH_SOCK=$agent

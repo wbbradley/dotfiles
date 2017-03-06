@@ -35,7 +35,6 @@ set wildignore+=*.pyc
 set wildignore+=*.png
 set wildignore+=*.egg
 set wildignore+=*.jpg
-set wildignore+=*.ir
 set wildignore+=*.s
 set wildignore+=*.jpeg
 set wildignore+=*.class
@@ -88,6 +87,7 @@ Plugin 'hdima/python-syntax'
 Plugin 'zionlang/vim-zion'
 " Plugin 'IN3D/vim-raml'
 Plugin 'elzr/vim-json'
+" Plugin 'Superbil/llvm.vim'
 
 
 let g:gitgutter_max_signs = 2000
@@ -120,6 +120,7 @@ let g:go_highlight_structs = 1
 let g:go_highlight_operators = 1
 let g:go_highlight_build_constraints = 1
 let g:go_fmt_command = "goimports"
+let g:vim_json_syntax_conceal = 0
 
 " Make the quickfix window take up the entirety of the bottom of the window
 " when it opens
@@ -161,6 +162,7 @@ nnoremap ; :
 nnoremap <leader>rm! :call delete(expand('%')) \| bdelete!<CR>
 nnoremap <leader>+ viwyo"""<Esc>pA."""<Esc>_wvU<Esc>V:s/_/ /<CR>:noh<CR>:match<CR>
 nnoremap <C-b> :echo "You're not in tmux!"<CR>
+" set clipboard=unnamedplus
 
 " allow backspacing over everything in insert mode
 set backspace=indent,eol,start
@@ -270,7 +272,7 @@ vmap <Tab> =
 vmap v <Plug>(expand_region_expand)
 vmap <C-v> <Plug>(expand_region_shrink)
 
-let g:agprg="ag --vimgrep"
+let g:ag_prg="ag --vimgrep"
 
 :if $VIM_CRONTAB == "true"
 :set nobackup
@@ -298,10 +300,14 @@ nnoremap <leader>i Oimport ipdb<CR>ipdb.set_trace()<Esc>j_
 nnoremap <leader>p Oimport pdb<CR>pdb.set_trace()<Esc>j_
 nnoremap <leader>r Ofrom celery.contrib import rdb<CR>rdb.set_trace()<Esc>j_
 
-" F7 - incremental build
-nmap <F7> :wa<CR> :!clear <CR><CR> :make -j4<CR><CR>zz
+" F7 & F8 - incremental build
+nmap <F7> :wa<CR> :!clear <CR><CR> :make<CR><CR>zz
 imap <F7> <Esc> <F7>
 vmap <F7> <Esc> <F7>
+
+nmap <F8> :wa<CR> :!clear <CR><CR> :make<CR><CR>zz
+imap <F8> <Esc> <F7>
+vmap <F8> <Esc> <F7>
 
 " map Shift Tab to outdent
 nmap <S-Tab> V<
