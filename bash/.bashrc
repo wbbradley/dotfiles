@@ -1,4 +1,8 @@
-export PS1="\[\033[48;5;95;38;5;214m\] \u@\h \[\033[0;38;5;31;48;5;240;22m\] \$git_branch\$git_dirty \[\033[0;38;5;252;48;5;240;1m\]\$PWD \[\033[0;38;5;240;49;22m\]\[\033[0m\] "
+parse_git_branch() {
+	git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/\1/'
+}
+
+export PS1="\[\033[48;5;95;38;5;214m\] \u@\h \[\033[0;38;5;31;48;5;240;22m\] \$(parse_git_branch) \[\033[0;38;5;252;48;5;240;1m\]\$PWD \[\033[0;38;5;240;49;22m\]\[\033[0m\] "
 export SRC_ROOT=$HOME/src
 export TZ=UTC
 alias vi=vim
@@ -183,10 +187,6 @@ if [ $platform == 'linux' ]; then
 		color_prompt=
 		fi
 	fi
-
-	parse_git_branch() {
-		git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/(\1):/'
-	}
 
 	if [ "$color_prompt" = yes ]; then
 		PS1='${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@\h\[\033[00m\]:$(parse_git_branch)\[\033[02;34m\]\w\[\033[00m\] \$ '
