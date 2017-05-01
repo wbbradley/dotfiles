@@ -2,7 +2,7 @@ parse_git_branch() {
 	git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/\1/'
 }
 
-export PS1="\[\033[48;5;95;38;5;214m\] \u@\h \[\033[0;38;5;31;48;5;240;22m\] \$(parse_git_branch) \[\033[0;38;5;252;48;5;240;1m\]\$PWD \[\033[0;38;5;240;49;22m\]\[\033[0m\] "
+export PS1="\[\033[48;5;95;38;5;214m\] \u@\h \[\033[0;38;5;31;48;5;240;22m\]\[\033[0;38;5;252;48;5;240;1m\] \$(parse_git_branch) \$PWD \[\033[0;38;5;240;49;22m\]\[\033[0m\] "
 export SRC_ROOT=$HOME/src
 export TZ=UTC
 alias vi=vim

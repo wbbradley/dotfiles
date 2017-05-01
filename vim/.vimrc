@@ -39,6 +39,7 @@ set wildignore+=*.s
 set wildignore+=*.jpeg
 set wildignore+=*.class
 set wildignore+=vcrpy_*
+set wildignore+=*.zx
 set wildignore+=media
 set wildignore+=/build
 set wildignore+=.git
@@ -70,8 +71,8 @@ Plugin 'tpope/vim-fugitive'
 Plugin 'groenewege/vim-less'
 Plugin 'rking/ag.vim'
 " Plugin 'fweep/vim-tabber'
-" Plugin 'pangloss/vim-javascript'
-" Plugin 'mxw/vim-jsx'
+Plugin 'pangloss/vim-javascript'
+Plugin 'mxw/vim-jsx'
 " Plugin 'scrooloose/syntastic'
 Plugin 'hynek/vim-python-pep8-indent.git'
 Plugin 'christoomey/vim-tmux-navigator'
@@ -121,13 +122,15 @@ let g:go_highlight_operators = 1
 let g:go_highlight_build_constraints = 1
 let g:go_fmt_command = "goimports"
 let g:vim_json_syntax_conceal = 0
+let g:jsx_ext_required = 0
 
 " Make the quickfix window take up the entirety of the bottom of the window
 " when it opens
 autocmd FileType qf wincmd J
 
 autocmd BufNewFile,BufReadPost *.coffee setl shiftwidth=2 expandtab
-autocmd BufNewFile,BufReadPost *.jsx set autoindent noexpandtab ts=2 sw=2
+" autocmd BufNewFile,BufReadPost *.js set autoindent noexpandtab ts=2 sw=2
+" autocmd BufNewFile,BufReadPost *.jsx set autoindent noexpandtab ts=2 sw=2
 
 autocmd FileType go nmap <Leader>s <Plug>(go-implements)
 autocmd FileType go nmap <Leader>i <Plug>(go-info)
@@ -143,6 +146,7 @@ autocmd FileType go nmap <Leader>dv <Plug>(go-def-vertical)
 autocmd FileType go nmap <Leader>dt <Plug>(go-def-tab)
 autocmd FileType go nmap <Leader>e <Plug>(go-rename)
 autocmd FileType go nmap <C-]> :GoDef<CR>zz
+
 
 " When started as "evim", evim.vim will already have done these settings.
 if v:progname =~? "evim"
