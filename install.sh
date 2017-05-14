@@ -1,7 +1,17 @@
-#! /bin/sh
+#!/bin/sh
+# curl https://raw.githubusercontent.com/wbbradley/dotfiles/master/install.sh | bash
 set -e
 
-apt-get install -y exuberant-ctags stow
+sudo apt-get update
+sudo apt-get install -y exuberant-ctags stow git vim bash tmux
+
+cd $HOME
+mkdir src
+cd src
+git clone git@github.com:wbbradley/dotfiles
+cd dotfiles
+git submodule init
+git submodule update
 
 # Make sure needed tools are available
 git --version > /dev/null
@@ -19,10 +29,3 @@ git config --global --add color.ui true
 git config --global core.editor `which vim`
 git config --global push.default tracking
 git config --global branch.autosetuprebase always
-
-rm -rf ~/.vim/bundle
-rm -rf ~/.vim/autoload
-mkdir -p ~/.vim/bundle
-mkdir -p ~/.vim/autoload
-git clone git@github.com:gmarik/vundle $HOME/.vim/bundle/vundle
-curl -Sso ~/.vim/autoload/pathogen.vim https://raw.github.com/tpope/vim-pathogen/master/autoload/pathogen.vim
