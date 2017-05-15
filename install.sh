@@ -19,6 +19,7 @@ curl --version > /dev/null
 vim --version > /dev/null
 stow --version > /dev/null
 
+mv ~/.bashrc ~/.bashrc.bak
 stow -t $HOME bash
 stow -t $HOME vim
 stow -t $HOME tmux
