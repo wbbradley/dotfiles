@@ -30,3 +30,5 @@ git config --global --add color.ui true
 git config --global core.editor `which vim`
 git config --global push.default tracking
 git config --global branch.autosetuprebase always
+
+vim +BundleInstall +qa
