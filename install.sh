@@ -1,6 +1,6 @@
 #!/bin/sh
 # curl https://raw.githubusercontent.com/wbbradley/dotfiles/master/install.sh | bash
-set -e
+set -ex
 
 sudo apt-get update
 sudo apt-get install -y exuberant-ctags stow git vim bash tmux
@@ -32,3 +32,6 @@ git config --global push.default tracking
 git config --global branch.autosetuprebase always
 
 vim +BundleInstall +qa
+
+set +x
+echo "Dotfiles installation was successful, please logout, and log back in."
