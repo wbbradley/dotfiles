@@ -73,7 +73,7 @@ Plugin 'rking/ag.vim'
 " Plugin 'fweep/vim-tabber'
 Plugin 'pangloss/vim-javascript'
 Plugin 'mxw/vim-jsx'
-" Plugin 'scrooloose/syntastic'
+Plugin 'scrooloose/syntastic'
 Plugin 'hynek/vim-python-pep8-indent.git'
 Plugin 'christoomey/vim-tmux-navigator'
 " Plugin 'sjl/threesome.vim.git'
@@ -96,6 +96,7 @@ let g:airline_powerline_fonts = 1
 " let g:airline_section_z = ''
 let g:airline_section_warning = ''
 " let g:syntastic_python_pylint_post_args='--disable=W0511,E1103,E1101,F0401,R0913,C0103,W0142,C0111,C0103,W0232,E0611,R0201,R0903,E1002,W0613'
+let g:syntastic_go_checkers = ['go', 'golint', 'govet', 'errcheck']
 let g:syntastic_javascript_checkers = ['jsxhint']
 let g:syntastic_cpp_compiler = 'clang++'
 let g:syntastic_cpp_compiler_options = ' -std=c++11 -stdlib=libc++'
