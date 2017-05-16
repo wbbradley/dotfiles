@@ -189,9 +189,9 @@ if [ $platform == 'linux' ]; then
 	fi
 
 	if [ "$color_prompt" = yes ]; then
-		PS1='${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@\h\[\033[00m\]:$(parse_git_branch)\[\033[02;34m\]\w\[\033[00m\] \$ '
+		export PS1='${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@\h\[\033[00m\]:$(parse_git_branch)\[\033[02;34m\]\w\[\033[00m\] \$ '
 	else
-		PS1='${debian_chroot:+($debian_chroot)}$(parse_git_branch)\u@\h:\w\$ '
+		export PS1='${debian_chroot:+($debian_chroot)} $(parse_git_branch) \u@\h:\w\$ '
 	fi
 	unset color_prompt force_color_prompt
 
