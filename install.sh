@@ -14,13 +14,19 @@ if [ $(uname) == 'Darwin' ]; then
     defaults write com.apple.finder AppleShowAllFiles true
 
     echo "Getting Exuberant-Ctags..."
-    brew install ctags-exuberant reattach-to-user-namespace go
+    brew install ctags-exuberant reattach-to-user-namespace go git vim bash tmux stow
 fi
 
 if [ $(uname) == 'Linux' ]; then
     sudo apt-get update
     sudo apt-get install -y exuberant-ctags stow git vim bash tmux
 fi
+
+# Make sure needed tools are available
+git --version > /dev/null
+curl --version > /dev/null
+vim --version > /dev/null
+stow --version > /dev/null
 
 cd $HOME
 mkdir -p $HOME/src
@@ -29,12 +35,6 @@ git clone git@github.com:wbbradley/dotfiles
 cd $HOME/src/dotfiles
 git submodule init
 git submodule update
-
-# Make sure needed tools are available
-git --version > /dev/null
-curl --version > /dev/null
-vim --version > /dev/null
-stow --version > /dev/null
 
 mv ~/.bashrc ~/.bashrc.bak
 stow -t $HOME bash
@@ -48,6 +48,7 @@ git config --global --add color.ui true
 git config --global core.editor `which vim`
 git config --global push.default tracking
 git config --global branch.autosetuprebase always
+git config --global merge.ff only
 
 vim +BundleInstall +qa
 
