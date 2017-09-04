@@ -126,7 +126,7 @@ elif [ -d "/c/Windows" ]; then
 fi
 
 alias venv='. env/bin/activate ; python --version ; pip --version'
-alias venvc='virtualenv env && . env/bin/activate ; python --version ; pip --version'
+alias venvc='virtualenv -p python3 env && . env/bin/activate ; python --version ; pip --version'
 
 wvi () {
 	$EDITOR `which $@`;

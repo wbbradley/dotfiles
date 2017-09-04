@@ -149,14 +149,8 @@ autocmd FileType go nmap <Leader>e <Plug>(go-rename)
 autocmd FileType go nmap <C-]> :GoDef<CR>zz
 
 
-" When started as "evim", evim.vim will already have done these settings.
-if v:progname =~? "evim"
-  finish
-endif
-
 " Use Vim settings, rather then Vi settings (much better!).
 " This must be first, because it changes other options as a side effect.
-set nocompatible
 set laststatus=2
 set encoding=utf-8
 set ttyfast
@@ -164,14 +158,24 @@ set undofile
 set undodir=~/.vim/undodir
 
 nnoremap ; :
+nnoremap <C-]> <C-]>zz
+nnoremap <C-o> <C-o>zz
+nnoremap <C-i> <C-i>zz
 nnoremap <leader>rm! :call delete(expand('%')) \| bdelete!<CR>
 nnoremap <leader>+ viwyo"""<Esc>pA."""<Esc>_wvU<Esc>V:s/_/ /<CR>:noh<CR>:match<CR>
 nnoremap <C-b> :echo "You're not in tmux!"<CR>
+nnoremap n nzz
+nnoremap N Nzz
+nnoremap * *zz
+inoremap } }<Esc>mhv%='h<Esc>a
+
+
 " set clipboard=unnamedplus
 
 " allow backspacing over everything in insert mode
 set backspace=indent,eol,start
 
+set lazyredraw
 set history=50		" keep 50 lines of command line history
 set ruler		" show the cursor position all the time
 set showcmd		" display incomplete commands
