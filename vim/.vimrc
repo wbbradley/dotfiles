@@ -9,7 +9,7 @@ set modeline
 set modelines=1
 set noesckeys
 
-set textwidth=80
+set textwidth=120
 
 "set runtimepath^=~/.vim/bundle/vim-gitgutter
 let g:ctrlp_use_caching = 1
@@ -57,6 +57,7 @@ filetype off
 set rtp^=~/.vim/bundle/vundle/
 call vundle#rc()
 
+Plugin 'OmniSharp/omnisharp-vim'
 " Plugin 'othree/html5.vim'
 " Plugin 'vim-scripts/YankRing.vim'
 " Plugin 'maxbrunsfeld/vim-yankstack'
@@ -66,6 +67,7 @@ Plugin 'kien/ctrlp.vim'
 Plugin 'nvie/vim-flake8'
 Plugin 'airblade/vim-gitgutter'
 Plugin 'tpope/vim-fugitive'
+Plugin 'tpope/vim-dispatch'
 " Plugin 'tpope/vim-unimpaired'
 " Plugin 'kchmck/vim-coffee-script.git'
 " Plugin 'jimmyhchan/dustjs.vim.git'
@@ -128,6 +130,14 @@ let g:go_highlight_build_constraints = 1
 let g:go_fmt_command = "goimports"
 let g:vim_json_syntax_conceal = 0
 let g:jsx_ext_required = 0
+
+let g:OmniSharp_selector_ui = 'ctrlp'  " Use ctrlp.vim
+
+augroup omnisharp_commands
+    autocmd FileType cs nnoremap gd :OmniSharpGotoDefinition<cr>
+    autocmd FileType cs nnoremap <leader>ft :OmniSharpFindType<cr>
+    autocmd FileType cs nnoremap <leader>fu :OmniSharpFindUsages<cr>
+augroup END
 
 " Make the quickfix window take up the entirety of the bottom of the window
 " when it opens
@@ -256,8 +266,8 @@ function! FindWord()
 	:cw
 endfunction
 
-nnoremap <leader>` :!ctags -R --exclude=.mypy_cache --exclude=dist --exclude=/build --exclude=makefile --exclude=Transforms --exclude=TableGen --exclude=Target --exclude=Analysis --exclude=CodeGen --exclude=generated --exclude=env --exclude=assets --exclude=node_modules --exclude=bower_components .<CR><CR>:echo 'Tags are done.'<CR>
-nnoremap <leader>~ :!ctags -R --exclude=.mypy_cache --exclude=dist --exclude=/build --exclude=node_modules --exclude=assets "--exclude=*.js" --exclude=bower_components /usr/local/Cellar/python/2.7.8_2/Frameworks/Python.framework/Versions/2.7/include/python2.7 /usr/local/Cellar/llvm37/3.7.0/lib/llvm-3.7/lib .<CR><CR>:echo 'Tags +env are done.'<CR>
+nnoremap <leader>` :!ctags -R --exclude=/build --exclude=makefile --exclude=Transforms --exclude=TableGen --exclude=Target --exclude=Analysis --exclude=CodeGen --exclude=generated --exclude=env --exclude=assets --exclude=node_modules --exclude=bower_components .<CR><CR>:echo 'Tags are done.'<CR>
+nnoremap <leader>~ :!ctags -R --exclude=/build --exclude=node_modules --exclude=assets "--exclude=*.js" --exclude=bower_components /usr/local/opt/llvm@4/include/llvm .<CR><CR>:echo 'Tags +env are done.'<CR>
 nnoremap <leader>[ :set paste<CR>i
 inoremap <leader>] <Esc>:set nopaste<CR>
 
@@ -298,7 +308,7 @@ nmap <F10> :set autowrite<CR>:cnext<CR>:set noautowrite<CR>zz
 nnoremap M :CtrlPMRUFiles<CR>
 
 " turning syntax on tends to redraw the screen nicely
-nnoremap <leader><space> :syn on<cr>:noh<cr>:match<cr>:set nopaste<CR>
+nnoremap <leader><space> :syn on<cr>:noh<cr>:match<cr>:set nopaste<CR>:set textwidth=100<CR>
 nnoremap <leader>t viwy:tabnew<CR>:e ~/vim-todo.txt<CR>ggPa<CR><Esc>:wq<CR>
 nnoremap <leader>T :tabnew<CR>:e ~/vim-todo.txt<CR>
 nnoremap <leader>q :conf qa<CR>
