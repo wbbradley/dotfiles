@@ -1,3 +1,10 @@
+" Use Vim settings, rather then Vi settings (much better!).
+set laststatus=2
+set encoding=utf-8
+set ttyfast
+set undofile
+set undodir=~/.vim/undodir
+
 set clipboard=unnamed
 set makeprg=make\ -j4
 set t_Co=256
@@ -163,14 +170,6 @@ autocmd FileType go nmap <Leader>e <Plug>(go-rename)
 autocmd FileType go nmap <C-]> :GoDef<CR>zz
 
 
-" Use Vim settings, rather then Vi settings (much better!).
-" This must be first, because it changes other options as a side effect.
-set laststatus=2
-set encoding=utf-8
-set ttyfast
-set undofile
-set undodir=~/.vim/undodir
-
 nnoremap ; :
 nnoremap <C-]> <C-]>zz
 nnoremap <C-o> <C-o>zz
@@ -181,7 +180,9 @@ nnoremap <C-b> :echo "You're not in tmux!"<CR>
 nnoremap n nzz
 nnoremap N Nzz
 nnoremap * *zz
-autocmd FileType cpp inoremap } }<Esc>mhv%='h<Esc>a
+
+" autocmd FileType cpp inoremap } }<Esc>mhv%='h<Esc>a
+" autocmd FileType c inoremap } }<Esc>mhv%='h<Esc>a
 
 
 " set clipboard=unnamedplus
