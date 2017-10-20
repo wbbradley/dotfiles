@@ -6,7 +6,7 @@ prompt_prefix() {
 	if [ "$unamestr" = 'Linux' ]; then
 		echo '\[\033[48;5;92;32;5;214m\] linux \e[0m'
 	else
-		echo '\[\033[48;5;98;34;5;214m\] macOS \e[0m'
+		echo '\[\033[48;5;88;34;5;214m\] macOS \e[0m'
 	fi
 }
 
