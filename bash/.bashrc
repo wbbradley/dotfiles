@@ -2,7 +2,16 @@ parse_git_branch() {
 	git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/\1/'
 }
 
-export PS1="\[\033[48;5;95;38;5;214m\] \u@\h \[\033[0;38;5;31;48;5;240;22m\]\[\033[0;38;5;252;48;5;240;1m\] \$(parse_git_branch) \$PWD \[\033[0;38;5;240;49;22m\]\[\033[0m\] "
+prompt_prefix() {
+	if [ "$unamestr" = 'Linux' ]; then
+		echo '\[\033[48;5;92;32;5;214m\] linux \e[0m'
+	else
+		echo '\[\033[48;5;98;34;5;214m\] macOS \e[0m'
+	fi
+}
+
+export PS1="$(prompt_prefix) \[\033[48;5;95;38;5;214m\] \u@\h \[\033[0;38;5;31;48;5;240;22m\]\[\033[0;38;5;252;48;5;240;1m\] \$(parse_git_branch) \$PWD \[\033[0;38;5;240;49;22m\]\[\033[0m\] "
+
 export SRC_ROOT=$HOME/src
 export TZ=UTC
 alias vi=vim
@@ -48,7 +57,7 @@ function diff-mine()
 
 function rebase-mine()
 {
-       git rebase -i `git log --format='%h %ae' | grep -v -e $(git config user.email) | head -n 1 | sed -e "s/\(.*\) .*/\1/"`~
+    git rebase -i `git log --format='%h %ae' | grep -v -e $(git config user.email) | head -n 1 | sed -e "s/\(.*\) .*/\1/"`~
 }
 
 function scroll-clear()
@@ -153,54 +162,16 @@ if [ $platform == 'freebsd' ]; then
 fi
 
 if [ $platform == 'linux' ]; then
-	#bind '"\C-i": menu-complete' 2> /dev/null
 	alias ls='ls -G -a -l -tr --color'
 	shopt -s histappend
 	shopt -s checkwinsize
 
-
 	# make less more friendly for non-text input files, see lesspipe(1)
 	[ -x /usr/bin/lesspipe ] && eval "$(SHELL=/bin/sh lesspipe)"
-
-	# set variable identifying the chroot you work in (used in the prompt below)
-	if [ -z "${debian_chroot:-}" ] && [ -r /etc/debian_chroot ]; then
-		debian_chroot=$(cat /etc/debian_chroot)
-	fi
-
-	# set a fancy prompt (non-color, unless we know we "want" color)
-	case "$TERM" in
-		xterm-color|*-256color) color_prompt=yes;;
-	esac
-
-	# uncomment for a colored prompt, if the terminal has the capability; turned
-	# off by default to not distract the user: the focus in a terminal window
-	# should be on the output of commands, not on the prompt
-	force_color_prompt=yes
-
-	if [ -n "$force_color_prompt" ]; then
-		if [ -x /usr/bin/tput ] && tput setaf 1 >&/dev/null; then
-		# We have color support; assume it's compliant with Ecma-48
-		# (ISO/IEC-6429). (Lack of such support is extremely rare, and such
-		# a case would tend to support setf rather than setaf.)
-		color_prompt=yes
-		else
-		color_prompt=
-		fi
-	fi
-
-	if [ "$color_prompt" = yes ]; then
-		export PS1='${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@\h\[\033[00m\]:$(parse_git_branch)\[\033[02;34m\]\w\[\033[00m\] \$ '
-	else
-		export PS1='${debian_chroot:+($debian_chroot)} $(parse_git_branch) \u@\h:\w\$ '
-	fi
-	unset color_prompt force_color_prompt
 
 	# enable color support of ls and also add handy aliases
 	if [ -x /usr/bin/dircolors ]; then
 		test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)" || eval "$(dircolors -b)"
-		alias ls='ls -G -a -l -tr --color'
-		#alias dir='dir --color=auto'
-		#alias vdir='vdir --color=auto'
 
 		alias grep='grep --color=auto'
 		alias fgrep='fgrep --color=auto'
@@ -210,28 +181,7 @@ if [ $platform == 'linux' ]; then
 	# colored GCC warnings and errors
 	export GCC_COLORS='error=01;31:warning=01;35:note=01;36:caret=01;32:locus=01:quote=01'
 
-	#alias netmon='strace -f -e trace=network -s 10000'
-
-	# Debian
-	#set prompt = "%{\033[32m%}[%~] %{\033[0m%}%#"
-	#setenv LS_COLORS 'no=00:fi=00:di=01;33:ln=01;36:pi=40;33:so=40;33:bd=40;33:cd=40;33:ex=01;32:*.sh=01;32:*.pl=01;32:'
-	#set color = (ls-F)
-	#set term=xterm
-	# limit coredumpsize 16000
-	# if [[ -f "/usr/local/bin/ssh_proxy_via_bastion" ]]; then
-	# 	export GIT_SSH=/usr/local/bin/ssh_proxy_via_bastion
-	# fi
-	ssh-reagent () {
-		for agent in /tmp/ssh-*/agent.*; do
-			export SSH_AUTH_SOCK=$agent
-			if ssh-add -l 2>&1 > /dev/null; then
-				echo Found working SSH Agent:
-				ssh-add -l
-				return
-			fi
-		done
-		echo "Cannot find ssh agent - maybe you should reconnect and forward it?"
-	}
+	alias netmon='strace -f -e trace=network -s 10000'
 fi
 
 if [ -f "$HOME/local.bashrc" ]; then
