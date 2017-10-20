@@ -23,6 +23,9 @@ let g:ctrlp_switch_buffer = 0
 " let g:ctrlp_user_command = 'find %s -type f'       " MacOSX/Linux
 
 set wildignore+=migrations
+set wildignore+=build
+set wildignore+=env
+set wildignore+=.mypy_cache
 set wildignore+=bower_components
 set wildignore+=.sass-cache
 set wildignore+=node_modules
@@ -89,6 +92,7 @@ Plugin 'zionlang/vim-zion'
 " Plugin 'IN3D/vim-raml'
 Plugin 'elzr/vim-json'
 " Plugin 'Superbil/llvm.vim'
+" Plugin 'flowtype/vim-flow'
 
 
 let g:gitgutter_max_signs = 2000
@@ -167,7 +171,7 @@ nnoremap <C-b> :echo "You're not in tmux!"<CR>
 nnoremap n nzz
 nnoremap N Nzz
 nnoremap * *zz
-inoremap } }<Esc>mhv%='h<Esc>a
+autocmd FileType cpp inoremap } }<Esc>mhv%='h<Esc>a
 
 
 " set clipboard=unnamedplus
@@ -252,8 +256,8 @@ function! FindWord()
 	:cw
 endfunction
 
-nnoremap <leader>` :!ctags -R --exclude=/build --exclude=makefile --exclude=Transforms --exclude=TableGen --exclude=Target --exclude=Analysis --exclude=CodeGen --exclude=generated --exclude=env --exclude=assets --exclude=node_modules --exclude=bower_components .<CR><CR>:echo 'Tags are done.'<CR>
-nnoremap <leader>~ :!ctags -R --exclude=/build --exclude=node_modules --exclude=assets "--exclude=*.js" --exclude=bower_components /usr/local/Cellar/python/2.7.8_2/Frameworks/Python.framework/Versions/2.7/include/python2.7 /usr/local/Cellar/llvm37/3.7.0/lib/llvm-3.7/lib .<CR><CR>:echo 'Tags +env are done.'<CR>
+nnoremap <leader>` :!ctags -R --exclude=.mypy_cache --exclude=dist --exclude=/build --exclude=makefile --exclude=Transforms --exclude=TableGen --exclude=Target --exclude=Analysis --exclude=CodeGen --exclude=generated --exclude=env --exclude=assets --exclude=node_modules --exclude=bower_components .<CR><CR>:echo 'Tags are done.'<CR>
+nnoremap <leader>~ :!ctags -R --exclude=.mypy_cache --exclude=dist --exclude=/build --exclude=node_modules --exclude=assets "--exclude=*.js" --exclude=bower_components /usr/local/Cellar/python/2.7.8_2/Frameworks/Python.framework/Versions/2.7/include/python2.7 /usr/local/Cellar/llvm37/3.7.0/lib/llvm-3.7/lib .<CR><CR>:echo 'Tags +env are done.'<CR>
 nnoremap <leader>[ :set paste<CR>i
 inoremap <leader>] <Esc>:set nopaste<CR>
 
