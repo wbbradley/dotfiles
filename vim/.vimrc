@@ -6,7 +6,7 @@ set undofile
 set undodir=~/.vim/undodir
 
 set clipboard=unnamed
-set makeprg=make\ -j4
+set makeprg=make\ -j8
 set t_Co=256
 set number
 set cpoptions+=n
@@ -140,6 +140,11 @@ let g:jsx_ext_required = 0
 
 let g:OmniSharp_selector_ui = 'ctrlp'  " Use ctrlp.vim
 
+augroup filetypedetect
+    au BufRead,BufNewFile *.pyi setfiletype python
+    " associate *.foo with php filetype
+augroup END
+
 augroup omnisharp_commands
     autocmd FileType cs nnoremap gd :OmniSharpGotoDefinition<cr>
     autocmd FileType cs nnoremap <leader>ft :OmniSharpFindType<cr>
@@ -168,7 +173,7 @@ autocmd FileType go nmap <Leader>dv <Plug>(go-def-vertical)
 autocmd FileType go nmap <Leader>dt <Plug>(go-def-tab)
 autocmd FileType go nmap <Leader>e <Plug>(go-rename)
 autocmd FileType go nmap <C-]> :GoDef<CR>zz
-
+autocmd FileType config set tabstop=2 softtabstop=0 expandtab shiftwidth=2 smarttab
 
 nnoremap ; :
 nnoremap <C-]> <C-]>zz
@@ -181,9 +186,9 @@ nnoremap n nzz
 nnoremap N Nzz
 nnoremap * *zz
 
-" autocmd FileType cpp inoremap } }<Esc>mhv%='h<Esc>a
+autocmd FileType cpp inoremap } }<Esc>mhv%='h<Esc>a
+autocmd Syntax cpp call EnhanceCppSyntax()
 " autocmd FileType c inoremap } }<Esc>mhv%='h<Esc>a
-
 
 " set clipboard=unnamedplus
 
@@ -209,12 +214,7 @@ nmap <leader>f :CtrlP<CR><C-\>w
 nmap <CR><CR> :!<CR>
 
 " map home row to exit Insert mode
-imap jj <Esc>
-imap hh <Esc>
-imap kk <Esc>
-imap lll <Esc>
 inoremap jk <Esc>
-inoremap kj <Esc>
 nmap <leader>' i'<CR>'<Esc>gqj
 nmap <leader>" i"<CR>"<Esc>gqj
 vnoremap . :norm.<CR>
@@ -265,6 +265,12 @@ function! FindWord()
 
 	:silent! execute "Ag '" . str . "'"
 	:cw
+endfunction
+
+" Add highlighting for function definition in C++
+function! EnhanceCppSyntax()
+  syn match cppFuncDef "::\~\?\zs\h\w*\ze([^)]*\()\s*\(const\)\?\)\?$"
+  hi def link cppFuncDef Special
 endfunction
 
 nnoremap <leader>` :!ctags -R --exclude=/build --exclude=makefile --exclude=Transforms --exclude=TableGen --exclude=Target --exclude=Analysis --exclude=CodeGen --exclude=generated --exclude=env --exclude=assets --exclude=node_modules --exclude=bower_components .<CR><CR>:echo 'Tags are done.'<CR>
