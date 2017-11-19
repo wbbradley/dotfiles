@@ -64,7 +64,9 @@ filetype off
 set rtp^=~/.vim/bundle/vundle/
 call vundle#rc()
 
+Plugin 'maxbrunsfeld/vim-yankstack'
 Plugin 'OmniSharp/omnisharp-vim'
+Plugin 'tpope/vim-fireplace'
 " Plugin 'othree/html5.vim'
 " Plugin 'vim-scripts/YankRing.vim'
 " Plugin 'maxbrunsfeld/vim-yankstack'
@@ -186,9 +188,8 @@ nnoremap n nzz
 nnoremap N Nzz
 nnoremap * *zz
 
-autocmd FileType cpp inoremap } }<Esc>mhv%='h<Esc>a
+nnoremap <Leader>} mhv%='h
 autocmd Syntax cpp call EnhanceCppSyntax()
-" autocmd FileType c inoremap } }<Esc>mhv%='h<Esc>a
 
 " set clipboard=unnamedplus
 
