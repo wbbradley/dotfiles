@@ -1,12 +1,18 @@
 #!/bin/sh
-set -ex
+set -e
 
-LLVM_ROOT=$HOME/src/llvm-test
+mkdir -p $HOME/src
+LLVM_ROOT=$HOME/src/llvm
 INSTALL_DIR=/opt
 RELEASE=release_40
 
 function enlist() {
-	git clone git@github.com:llvm-mirror/$1 $2
+	if [ ! -d $2 ]; then
+		git clone git@github.com:llvm-mirror/$1 $2
+	else
+		echo $2 already exists, skipping cloning $1 into it...
+	fi
+
 	cd $2
 	git checkout $RELEASE
 }
@@ -20,17 +26,25 @@ enlist libcxxabi $LLVM_ROOT/projects/libcxxabi
 # Set up the installation dir
 sudo chown -R `whoami` $INSTALL_DIR
 sudo chgrp -R staff $INSTALL_DIR
+mkdir -p $INSTALL_DIR/debug
+mkdir -p $INSTALL_DIR/release
 
-# Run the actual build
-mkdir -p /var/tmp/llvm/build
-cd /var/tmp/llvm/build
+# Run the Debug build
+function build() {
+	mkdir -p /var/tmp/llvm/$1
+	cd /var/tmp/llvm/$1
 
-time cmake \
-	-DCMAKE_INSTALL_PREFIX=$INSTALL_DIR \
-	-DLLVM_ENABLE_RTTI=On \
-	-DCMAKE_BUILD_TYPE=Debug \
-	-DLLVM_ENABLE_ASSERTIONS=On
-	$LLVM_ROOT
+	time cmake \
+		-DCMAKE_INSTALL_PREFIX=$INSTALL_DIR/$1 \
+		-DLLVM_ENABLE_RTTI=On \
+		-DCMAKE_BUILD_TYPE=$1 \
+		-DLLVM_ENABLE_ASSERTIONS=$(if [ $1 = Debug ]; then echo On; else echo Off; fi) \
+		$LLVM_ROOT
 
-time make -j8
-time make install
+	time make -j8
+	time make install
+}
+
+build Debug
+build MinSizeRel
+
