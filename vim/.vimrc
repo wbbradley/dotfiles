@@ -64,6 +64,7 @@ filetype off
 set rtp^=~/.vim/bundle/vundle/
 call vundle#rc()
 
+Plugin 'hylang/vim-hy'
 Plugin 'maxbrunsfeld/vim-yankstack'
 Plugin 'OmniSharp/omnisharp-vim'
 Plugin 'tpope/vim-fireplace'
@@ -274,8 +275,31 @@ function! EnhanceCppSyntax()
   hi def link cppFuncDef Special
 endfunction
 
-nnoremap <leader>` :!ctags -R --exclude=/build --exclude=makefile --exclude=Transforms --exclude=TableGen --exclude=Target --exclude=Analysis --exclude=CodeGen --exclude=generated --exclude=env --exclude=assets --exclude=node_modules --exclude=bower_components .<CR><CR>:echo 'Tags are done.'<CR>
-nnoremap <leader>~ :!ctags -R --exclude=/build --exclude=node_modules --exclude=assets "--exclude=*.js" --exclude=bower_components /usr/local/opt/llvm@4/include/llvm .<CR><CR>:echo 'Tags +env are done.'<CR>
+nnoremap <leader>` :!ctags 
+	\ -R
+	\ --exclude=/build
+	\ --exclude=makefile
+	\ --exclude=Transforms
+	\ --exclude=TableGen
+	\ --exclude=Target
+	\ --exclude=Analysis
+	\ --exclude=CodeGen
+	\ --exclude=generated
+	\ --exclude=env
+	\ --exclude=assets
+	\ --exclude=node_modules
+	\ --exclude=bower_components
+	\ .<CR><CR>:echo 'Tags are done.'<CR>
+
+nnoremap <leader>~ :!ctags
+			\ -R
+			\ --exclude=/build
+			\ --exclude=node_modules
+			\ --exclude=assets
+			\ "--exclude=*.js"
+			\ --exclude=bower_components
+			\ /opt/debug/include
+			\ .<CR><CR>:echo 'Tags +env are done.'<CR>
 nnoremap <leader>[ :set paste<CR>i
 inoremap <leader>] <Esc>:set nopaste<CR>
 
