@@ -3,7 +3,7 @@ parse_git_branch() {
 }
 
 prompt_prefix() {
-	if [ "$unamestr" = 'Linux' ]; then
+	if [ `uname` = 'Linux' ]; then
 		echo '\[\033[48;5;92;32;5;214m\] linux \[\033[0m\]'
 	else
 		echo '\[\033[48;5;88;34;5;214m\] macOS \[\033[0m\]'
