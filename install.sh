@@ -20,6 +20,7 @@ fi
 if [ $(uname) == 'Linux' ]; then
     sudo apt-get update
     sudo apt-get install -y exuberant-ctags stow git vim bash tmux
+    sudo apt-get upgrade -y exuberant-ctags stow git vim bash tmux
 fi
 
 # Make sure needed tools are available
