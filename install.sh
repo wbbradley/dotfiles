@@ -1,6 +1,6 @@
 #!/bin/bash
 # curl https://raw.githubusercontent.com/wbbradley/dotfiles/master/install.sh | bash
-set -e
+set -ex
 
 if [ $(uname) == 'Darwin' ]; then
     echo "Checking that homebrew is installed..."
