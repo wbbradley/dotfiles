@@ -31,6 +31,7 @@ stow --version > /dev/null
 cd $HOME
 mkdir -p $HOME/src
 cd $HOME/src
+rm -rf dotfiles
 git clone git@github.com:wbbradley/dotfiles
 cd $HOME/src/dotfiles
 git submodule init
