@@ -37,7 +37,10 @@ cd $HOME/src/dotfiles
 git submodule init
 git submodule update
 
-mv ~/.bashrc ~/.bashrc.bak
+if [ -f $HOME/.bashrc ]; then
+    mv $HOME/.bashrc $HOME/.bashrc.bak
+fi
+
 stow -t $HOME bash
 stow -t $HOME vim
 stow -t $HOME tmux
