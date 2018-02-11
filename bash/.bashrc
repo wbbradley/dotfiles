@@ -31,6 +31,11 @@ man() {
 		man "$@"
 }
 
+dbg() {
+	echo Running LLDB debugger...
+	lldb -o run -- "$@"
+}
+
 function nowrap()
 {
        printf '\033[?7l'
@@ -159,6 +164,7 @@ if [ $platform == 'freebsd' ]; then
 	# alias mails='sudo python -m smtpd -n -c DebuggingServer localhost:25'
 	alias stopify='pkill -STOP Spotify\ Helper'
 	alias startify='pkill -CONT Spotify\ Helper'
+	alias grep='grep --color'
 fi
 
 if [ $platform == 'linux' ]; then

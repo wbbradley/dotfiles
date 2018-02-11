@@ -31,11 +31,17 @@ let g:ctrlp_switch_buffer = 0
 
 set wildignore+=migrations
 set wildignore+=build
+set wildignore+=*.trace
 set wildignore+=env
 set wildignore+=.mypy_cache
 set wildignore+=bower_components
+set wildignore+=htmlcov
 set wildignore+=.sass-cache
 set wildignore+=node_modules
+set wildignore+=docs
+set wildignore+=tools
+set wildignore+=TableGen
+set wildignore+=llvm-c
 " set wildignore+=assets
 set wildignore+=*.swp
 set wildignore+=*.o
@@ -64,10 +70,9 @@ filetype off
 set rtp^=~/.vim/bundle/vundle/
 call vundle#rc()
 
-Plugin 'hylang/vim-hy'
-Plugin 'maxbrunsfeld/vim-yankstack'
 Plugin 'OmniSharp/omnisharp-vim'
 Plugin 'tpope/vim-fireplace'
+Plugin 'tomlion/vim-solidity'
 " Plugin 'othree/html5.vim'
 " Plugin 'vim-scripts/YankRing.vim'
 " Plugin 'maxbrunsfeld/vim-yankstack'
@@ -190,6 +195,7 @@ nnoremap N Nzz
 nnoremap * *zz
 
 nnoremap <Leader>} mhv%='h
+nnoremap <Leader><Leader> mhva}='h
 autocmd Syntax cpp call EnhanceCppSyntax()
 
 " set clipboard=unnamedplus
