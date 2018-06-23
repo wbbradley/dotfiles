@@ -5,7 +5,7 @@ set ttyfast
 set undofile
 set undodir=~/.vim/undodir
 
-set clipboard=unnamed
+set clipboard=unnamedplus
 set makeprg=make\ -j8
 set t_Co=256
 set number
@@ -16,7 +16,7 @@ set modeline
 set modelines=1
 set noesckeys
 
-set textwidth=120
+set textwidth=100
 
 "set runtimepath^=~/.vim/bundle/vim-gitgutter
 let g:ctrlp_use_caching = 1

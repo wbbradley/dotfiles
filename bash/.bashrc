@@ -1,3 +1,12 @@
+# enable bash completion in interactive shells
+if ! shopt -oq posix; then
+  if [ -f /usr/share/bash-completion/bash_completion ]; then
+    . /usr/share/bash-completion/bash_completion
+  elif [ -f /etc/bash_completion ]; then
+    . /etc/bash_completion
+  fi
+fi
+
 parse_git_branch() {
 	git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/\1/'
 }
@@ -10,10 +19,10 @@ prompt_prefix() {
 	fi
 }
 
-export PS1="$(prompt_prefix) \[\033[48;5;95;38;5;214m\] \u@\h \[\033[0;38;5;31;48;5;240;22m\]\[\033[0;38;5;252;48;5;240;1m\] \$(parse_git_branch) \$PWD \[\033[0;38;5;240;49;22m\]\[\033[0m\] "
+export PS1="$(prompt_prefix) \[\033[48;5;95;38;5;214m\] \u@\h \[\033[0;38;5;31;48;5;240;22m\] \[\033[0;38;5;252;48;5;240;1m\] \$(parse_git_branch) \$PWD \[\033[0;38;5;240;49;22m\]\[\033[0m\] "
 
 export SRC_ROOT=$HOME/src
-export TZ=UTC
+# export TZ=UTC
 alias vi=vim
 alias uuid='python -c "import uuid;print(uuid.uuid4())" | tee | pbcopy'
 HISTFILESIZE=5000
