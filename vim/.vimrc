@@ -55,9 +55,10 @@ set wildignore+=*.s
 set wildignore+=*.jpeg
 set wildignore+=*.class
 set wildignore+=vcrpy_*
+set wildignore+=vendor
+set wildignore+=.elasticbeanstalk
 set wildignore+=*.zx
 set wildignore+=media
-set wildignore+=/build
 set wildignore+=.git
 set wildignore+=bootstrap-3.0.0
 set wildignore+=site-packages
@@ -68,11 +69,11 @@ filetype off
 " call pathogen#infect()
 
 set rtp^=~/.vim/bundle/vundle/
-call vundle#rc()
 
-Plugin 'OmniSharp/omnisharp-vim'
-Plugin 'tpope/vim-fireplace'
-Plugin 'tomlion/vim-solidity'
+call vundle#begin()
+
+" Plugin 'OmniSharp/omnisharp-vim'
+" Plugin 'tpope/vim-fireplace'
 " Plugin 'othree/html5.vim'
 " Plugin 'vim-scripts/YankRing.vim'
 " Plugin 'maxbrunsfeld/vim-yankstack'
@@ -80,44 +81,51 @@ Plugin 'tomlion/vim-solidity'
 Plugin 'kien/ctrlp.vim'
 " Plugin 'vim-scripts/django.vim'
 Plugin 'nvie/vim-flake8'
-Plugin 'airblade/vim-gitgutter'
+" Plugin 'airblade/vim-gitgutter'
 Plugin 'tpope/vim-fugitive'
-Plugin 'tpope/vim-dispatch'
+" Plugin 'tpope/vim-dispatch'
 " Plugin 'tpope/vim-unimpaired'
 " Plugin 'kchmck/vim-coffee-script.git'
 " Plugin 'jimmyhchan/dustjs.vim.git'
 " Plugin 'juvenn/mustache.vim.git'
 " Plugin 'Lokaltog/vim-easymotion'
-Plugin 'groenewege/vim-less'
+" Plugin 'groenewege/vim-less'
 Plugin 'rking/ag.vim'
 " Plugin 'fweep/vim-tabber'
-Plugin 'pangloss/vim-javascript'
-Plugin 'mxw/vim-jsx'
-Plugin 'scrooloose/syntastic'
+" Plugin 'pangloss/vim-javascript'
+" Plugin 'mxw/vim-jsx'
+" Plugin 'scrooloose/syntastic'
 Plugin 'hynek/vim-python-pep8-indent.git'
 Plugin 'christoomey/vim-tmux-navigator'
 " Plugin 'sjl/threesome.vim.git'
 Plugin 'bling/vim-airline'
 " Plugin 'toyamarinyon/vim-swift'
 " Plugin 'ryanss/vim-hackernews'
-Plugin 'fatih/vim-go'
+Plugin 'fatih/vim-go', { 'do': ':GoUpdateBinaries' }
 Plugin 'terryma/vim-expand-region'
 Plugin 'terryma/vim-multiple-cursors'
 " Plugin 'solarnz/thrift.vim'
 Plugin 'hdima/python-syntax'
 Plugin 'zionlang/vim-zion'
 " Plugin 'IN3D/vim-raml'
-Plugin 'elzr/vim-json'
+" Plugin 'elzr/vim-json'
 " Plugin 'Superbil/llvm.vim'
 " Plugin 'flowtype/vim-flow'
+call vundle#end()
 
+
+let g:airline#extensions#ale#enabled = 1
+
+nnoremap <Leader>ht :GhcModType<cr>
+nnoremap <Leader>htc :GhcModTypeClear<cr>
+autocmd FileType haskell nnoremap <buffer> <leader>? :call ale#cursor#ShowCursorDetail()<CR>
 
 let g:gitgutter_max_signs = 2000
 let g:airline_powerline_fonts = 1
 " let g:airline_section_z = ''
 let g:airline_section_warning = ''
 " let g:syntastic_python_pylint_post_args='--disable=W0511,E1103,E1101,F0401,R0913,C0103,W0142,C0111,C0103,W0232,E0611,R0201,R0903,E1002,W0613'
-let g:syntastic_go_checkers = ['go', 'golint', 'govet', 'errcheck']
+" let g:syntastic_go_checkers = ['go', 'golint', 'govet', 'errcheck']
 let g:syntastic_javascript_checkers = ['jsxhint']
 let g:syntastic_cpp_compiler = 'clang++'
 let g:syntastic_cpp_compiler_options = ' -std=c++11 -stdlib=libc++'
@@ -137,10 +145,10 @@ let g:jedi#show_function_definition = "0"
 let g:pyindent_open_paren = '&sw'
 let g:pyindent_continue = '&sw'
 
-let g:go_highlight_functions = 1
-let g:go_highlight_methods = 1
-let g:go_highlight_structs = 1
-let g:go_highlight_operators = 1
+" let g:go_highlight_functions = 1
+" let g:go_highlight_methods = 1
+" let g:go_highlight_structs = 1
+" let g:go_highlight_operators = 1
 let g:go_highlight_build_constraints = 1
 let g:go_fmt_command = "goimports"
 let g:vim_json_syntax_conceal = 0
@@ -281,31 +289,8 @@ function! EnhanceCppSyntax()
   hi def link cppFuncDef Special
 endfunction
 
-nnoremap <leader>` :!ctags 
-	\ -R
-	\ --exclude=/build
-	\ --exclude=makefile
-	\ --exclude=Transforms
-	\ --exclude=TableGen
-	\ --exclude=Target
-	\ --exclude=Analysis
-	\ --exclude=CodeGen
-	\ --exclude=generated
-	\ --exclude=env
-	\ --exclude=assets
-	\ --exclude=node_modules
-	\ --exclude=bower_components
-	\ .<CR><CR>:echo 'Tags are done.'<CR>
-
-nnoremap <leader>~ :!ctags
-			\ -R
-			\ --exclude=/build
-			\ --exclude=node_modules
-			\ --exclude=assets
-			\ "--exclude=*.js"
-			\ --exclude=bower_components
-			\ /opt/debug/include
-			\ .<CR><CR>:echo 'Tags +env are done.'<CR>
+nnoremap <leader>~ :!build-ctags<CR>
+nnoremap <leader>` :!build-ctags<CR>
 nnoremap <leader>[ :set paste<CR>i
 inoremap <leader>] <Esc>:set nopaste<CR>
 
@@ -356,6 +341,7 @@ nnoremap <leader>90 :e ~/.vimrc<CR>
 nnoremap <leader>91 :e ~/local.vimrc<CR>
 nnoremap <leader>92 :e ~/.bashrc<CR>
 nnoremap <leader>93 :e ~/local.bashrc<CR>
+nnoremap <leader>9z :e ~/src/vim-zion/syntax/zion.vim<CR>
 nnoremap <leader>d Odbg();<Esc>_
 nnoremap <leader>i Oimport ipdb<CR>ipdb.set_trace()<Esc>j_
 nnoremap <leader>p Oimport pdb<CR>pdb.set_trace()<Esc>j_
@@ -444,6 +430,8 @@ autocmd FileType html setlocal sw=2 sts=2 ts=2 expandtab
 autocmd FileType less setlocal sw=2 sts=2 ts=2 expandtab
 autocmd FileType css setlocal sw=2 sts=2 ts=2 expandtab
 autocmd FileType cpp setlocal sw=4 sts=4 ts=4
+autocmd FileType haskell setlocal sw=2 sts=2 ts=8 expandtab shiftround
+autocmd FileType haskell set makeprg=stack\ build
 
 " Convenient command to see the difference between the current buffer and the
 " file it was loaded from, thus the changes you made.

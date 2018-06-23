@@ -117,16 +117,6 @@ function flake() {
        (. env/bin/activate; git diff --cached --name-only | grep "\.py$" | xargs flake8)
 }
 alias agent='eval `ssh-agent` && ssh-add'
-alias dus='du -sk * | sed "s/ /_/g" | sort -n | awk '\''
-{ if ($1 < 1024) { output("K", 1) }
-  else if ($1 < 1048576) { output("M", 1024) }
-  else { output("G", 1048576) }
-}
-function output(size, div)
-{
-  printf "%d%s\t%s\n", ($1/div), size, $2
-}
-'\'''
 
 export EDITOR="vim"
 export PATH=$PATH:$HOME/bin

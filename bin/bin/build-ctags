@@ -1,0 +1,30 @@
+#!/bin/bash
+set -e
+
+ctags \
+	-R \
+	--exclude=/build \
+	--exclude=makefile \
+	--exclude=TableGen \
+	--exclude=Target \
+	--exclude=Analysis \
+	--exclude=CodeGen \
+	--exclude=generated \
+	--exclude=env \
+	--exclude=assets \
+	--exclude=node_modules \
+	--exclude=bower_components \
+	.
+#	/Users/wbbradley/opt/llvm/release_50/MinSizeRel/include/llvm
+
+wc -l tags
+ZION_TAGS=/var/tmp/tags.zion
+if [ -f "lib/std.zion" ]; then
+	zion ctags lib/std | sort | uniq > $ZION_TAGS
+	cat $ZION_TAGS >> tags
+	wc -l $ZION_TAGS
+	cat tags | sort | uniq > tags.new
+	mv tags.new tags
+fi
+
+echo "Tags are complete."

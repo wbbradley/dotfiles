@@ -1,4 +1,5 @@
 Tab: menu-complete
+set revert-all-at-newline
 set completion-ignore-case on
 set show-all-if-ambiguous on
 set colored-stats on
