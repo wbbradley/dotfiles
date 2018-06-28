@@ -5,7 +5,13 @@ set ttyfast
 set undofile
 set undodir=~/.vim/undodir
 
-set clipboard=unnamedplus
+if has('win32')
+elseif has('mac')
+	set clipboard=unnamed
+elseif has('unix')
+	set clipboard=unnamedplus
+endif
+
 set makeprg=make\ -j8
 set t_Co=256
 set number

@@ -44,7 +44,7 @@ fi
 
 stow -t $HOME bash
 stow -t $HOME vim
-stow -t $HOME tmux
+(cd tmux && stow -t $HOME `uname`)
 stow -t $HOME bin
 
 # Set up my git defaults
