@@ -3,7 +3,7 @@ set -e
 
 ctags \
 	-R \
-	--exclude=/build \
+	--exclude=build \
 	--exclude=makefile \
 	--exclude=TableGen \
 	--exclude=Target \
@@ -15,7 +15,16 @@ ctags \
 	--exclude=node_modules \
 	--exclude=bower_components \
 	.
-#	/Users/wbbradley/opt/llvm/release_50/MinSizeRel/include/llvm
+
+ctags -R -a --c-kinds=+p --c++-kinds=+p \
+	-I DECLSPEC \
+	-I SDLCALL \
+	-I SDL_PRINTF_VARARG_FUNC+ \
+	-I SDL_PRINTF_FORMAT_STRING \
+	/usr/include/SDL2 \
+	/usr/include/openssl \
+	/usr/include/x86_64-linux-gnu \
+	$HOME/opt/llvm/release_40/MinSizeRel/include/llvm
 
 wc -l tags
 ZION_TAGS=/var/tmp/tags.zion
