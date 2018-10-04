@@ -78,6 +78,7 @@ set rtp^=~/.vim/bundle/vundle/
 
 call vundle#begin()
 
+Plugin 'mileszs/ack.vim'
 " Plugin 'OmniSharp/omnisharp-vim'
 " Plugin 'tpope/vim-fireplace'
 " Plugin 'othree/html5.vim'
@@ -156,6 +157,7 @@ let g:pyindent_continue = '&sw'
 " let g:go_highlight_methods = 1
 " let g:go_highlight_structs = 1
 " let g:go_highlight_operators = 1
+let g:go_version_warning = 0
 let g:go_highlight_build_constraints = 1
 let g:go_fmt_command = "goimports"
 let g:vim_json_syntax_conceal = 0
@@ -248,7 +250,7 @@ function! FindPromptNoFilter()
 		return
 	endif
 
-	:silent! execute "Ag -a '" . str . "'"
+	:silent! execute "Ack -a '" . str . "'"
 	:cw
 endfunction
 
@@ -258,7 +260,7 @@ function! FindPrompt()
 		return
 	endif
 
-	:silent! execute "Ag '" . str . "'"
+	:silent! execute "Ack '" . str . "'"
 	:cw
 endfunction
 
@@ -268,7 +270,7 @@ function! FindWordNoFilter()
 		return
 	endif
 
-	:silent! execute "Ag -a '" . str . "'"
+	:silent! execute "Ack -a '" . str . "'"
 	:cw
 endfunction
 
@@ -286,7 +288,7 @@ function! FindWord()
 		return
 	endif
 
-	:silent! execute "Ag '" . str . "'"
+	:silent! execute "Ack '" . str . "'"
 	:cw
 endfunction
 
@@ -429,7 +431,8 @@ endif " has("autocmd")
 set cino=:0g0
 set sw=4
 set ts=4
-autocmd FileType javascript setlocal sw=4 sts=4 ts=4 expandtab
+autocmd FileType ts setlocal sw=2 sts=2 ts=2 expandtab
+autocmd FileType javascript setlocal sw=2 sts=2 ts=2 expandtab
 autocmd FileType yaml setlocal sw=2 sts=2 ts=2 expandtab
 autocmd FileType python setlocal sw=4 sts=4 ts=4 expandtab
 autocmd FileType htmldjango setlocal sw=2 sts=2 ts=2 expandtab

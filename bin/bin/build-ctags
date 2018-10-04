@@ -9,6 +9,7 @@ ctags \
 	--exclude=Target \
 	--exclude=Analysis \
 	--exclude=CodeGen \
+	--exclude=static \
 	--exclude=generated \
 	--exclude=env \
 	--exclude=assets \
@@ -25,6 +26,15 @@ ctags -R -a --c-kinds=+p --c++-kinds=+p \
 	/usr/include/openssl \
 	/usr/include/x86_64-linux-gnu \
 	$HOME/opt/llvm/release_40/MinSizeRel/include/llvm
+
+case "$(uname -s)" in
+    Linux)
+      sed -i -E 's/^[a-zA-Z]+\.(.*)/\1/' tags
+      ;;
+    *)
+      echo "TODO: Fix tags"
+      ;;
+esac
 
 wc -l tags
 ZION_TAGS=/var/tmp/tags.zion
