@@ -117,6 +117,7 @@ Plugin 'zionlang/vim-zion'
 " Plugin 'elzr/vim-json'
 " Plugin 'Superbil/llvm.vim'
 " Plugin 'flowtype/vim-flow'
+Plugin 'leafgarden/typescript-vim'
 call vundle#end()
 
 
