@@ -12,7 +12,7 @@ elseif has('unix')
 	set clipboard=unnamedplus
 endif
 
-set makeprg=make\ -j8
+set makeprg=make
 set t_Co=256
 set number
 set cpoptions+=n
@@ -88,7 +88,7 @@ Plugin 'mileszs/ack.vim'
 Plugin 'kien/ctrlp.vim'
 " Plugin 'vim-scripts/django.vim'
 Plugin 'nvie/vim-flake8'
-" Plugin 'airblade/vim-gitgutter'
+Plugin 'airblade/vim-gitgutter'
 Plugin 'tpope/vim-fugitive'
 " Plugin 'tpope/vim-dispatch'
 " Plugin 'tpope/vim-unimpaired'
@@ -118,7 +118,7 @@ Plugin 'zionlang/vim-zion'
 " Plugin 'elzr/vim-json'
 " Plugin 'Superbil/llvm.vim'
 " Plugin 'flowtype/vim-flow'
-Plugin 'leafgarden/typescript-vim'
+" Plugin 'leafgarden/typescript-vim'
 call vundle#end()
 
 
@@ -346,6 +346,7 @@ nnoremap <leader>T :tabnew<CR>:e ~/vim-todo.txt<CR>
 nnoremap <leader>q :conf qa<CR>
 nnoremap <leader>v <C-w>v<C-w>l<C-w>n<C-w>h
 
+nnoremap <leader>9t :e tests/test_basic.zion<CR>:make<CR>
 nnoremap <leader>90 :e ~/.vimrc<CR>
 nnoremap <leader>91 :e ~/local.vimrc<CR>
 nnoremap <leader>92 :e ~/.bashrc<CR>

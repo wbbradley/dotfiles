@@ -1,8 +1,15 @@
 #!/bin/bash
 set -e
 
+function maybe-dir {
+	[[ -d $1 ]] && echo $1
+}
+
+# First index the local directory
 ctags \
 	-R \
+	--c-kinds=+p \
+	--c++-kinds=+p \
 	--exclude=build \
 	--exclude=makefile \
 	--exclude=TableGen \
@@ -17,15 +24,22 @@ ctags \
 	--exclude=bower_components \
 	.
 
-ctags -R -a --c-kinds=+p --c++-kinds=+p \
+# Now index any other interesting includes that I may want to peruse.
+ctags \
+	-R \
+	-a \
+	--c-kinds=+p \
+	--c++-kinds=+p \
 	-I DECLSPEC \
 	-I SDLCALL \
 	-I SDL_PRINTF_VARARG_FUNC+ \
 	-I SDL_PRINTF_FORMAT_STRING \
-	/usr/include/SDL2 \
-	/usr/include/openssl \
-	/usr/include/x86_64-linux-gnu \
-	$HOME/opt/llvm/release_40/MinSizeRel/include/llvm
+	$(maybe-dir /usr/include/SDL2) \
+	$(maybe-dir /usr/include/SDL2) \
+	$(maybe-dir /usr/include/x86_64-linux-gnu)
+# $(maybe-dir /usr/local/Cellar/llvm\@4/4.0.1/include/llvm/IR) \
+# $(maybe-dir /usr/local/Cellar/llvm\@4/4.0.1/include/llvm/Transforms/Utils)
+	
 
 case "$(uname -s)" in
     Linux)
@@ -38,7 +52,11 @@ esac
 
 wc -l tags
 ZION_TAGS=/var/tmp/tags.zion
-if [ -f "lib/std.zion" ]; then
+echo "Tags are complete."
+exit 0
+
+if [[ -f "lib/std.zion" ]]; then
+	# We are in the Zion codebase, let's use Zion's tags generation support
 	zion ctags lib/std | sort | uniq > $ZION_TAGS
 	cat $ZION_TAGS >> tags
 	wc -l $ZION_TAGS
