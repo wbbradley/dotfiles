@@ -36,9 +36,9 @@ ctags \
 	-I SDL_PRINTF_FORMAT_STRING \
 	$(maybe-dir /usr/include/SDL2) \
 	$(maybe-dir /usr/include/SDL2) \
-	$(maybe-dir /usr/include/x86_64-linux-gnu)
-# $(maybe-dir /usr/local/Cellar/llvm\@4/4.0.1/include/llvm/IR) \
-# $(maybe-dir /usr/local/Cellar/llvm\@4/4.0.1/include/llvm/Transforms/Utils)
+	$(maybe-dir /usr/include/x86_64-linux-gnu) \
+	$(maybe-dir /usr/local/Cellar/llvm\@6/6.0.1_1/include/llvm/IR) \
+	$(maybe-dir /usr/local/Cellar/llvm\@6/6.0.1_1/include/llvm/Transforms/Utils)
 	
 
 case "$(uname -s)" in

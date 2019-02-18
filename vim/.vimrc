@@ -443,6 +443,7 @@ autocmd FileType css setlocal sw=2 sts=2 ts=2 expandtab
 autocmd FileType cpp setlocal sw=4 sts=4 ts=4
 autocmd FileType haskell setlocal sw=2 sts=2 ts=8 expandtab shiftround
 autocmd FileType haskell set makeprg=stack\ build
+autocmd FileType cpp setlocal cindent cino=j1,(0,ws,Ws
 
 " Convenient command to see the difference between the current buffer and the
 " file it was loaded from, thus the changes you made.
