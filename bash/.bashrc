@@ -13,24 +13,16 @@ parse_git_branch() {
 	git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/\1/'
 }
 
-prompt_prefix() {
-	if [ `uname` = 'Linux' ]; then
-		echo '\[\033[48;5;92;32;5;214m\] linux \[\033[0m\]'
-	else
-		echo '\[\033[48;5;88;34;5;214m\] macOS \[\033[0m\]'
-	fi
+parse_working_dir() {
+	echo `pwd` | sed s%`echo $HOME`%~%
 }
 
-prompt_pwd() {
-	pwd | sed -e s%$HOME%~%
-}
-
-export PS1="\$(if [ \$? != 0 ]; then echo '\[\033[47;5;88;34;5;1m\] ERROR \[\033[0m\]'; fi)$(prompt_prefix) \[\033[48;5;95;38;5;214m\] \u \[\033[0;38;5;31;48;5;240;22m\] \[\033[0;38;5;252;48;5;240;1m\]\$(parse_git_branch) \$(prompt_pwd) \[\033[0;38;5;240;49;22m\]\[\033[0m\] "
+export PS1="\$(if [ \$? != 0 ]; then echo '\[\033[47;5;88;34;5;1m\] ERROR \[\033[0m\]'; fi) \[\033[48;5;95;38;5;214m\] \u \[\033[0;38;5;31;48;5;240;22m\] \[\033[0;38;5;252;48;5;240;1m\] \$(parse_git_branch) \$(parse_working_dir) \[\033[0;38;5;240;49;22m\]\[\033[0m\] "
 
 export SRC_ROOT=$HOME/src
 alias vi=vim
 alias uuid='python -c "import uuid;print(uuid.uuid4())" | tee | pbcopy'
-HISTFILESIZE=5000
+HISTFILESIZE=15000
 
 shopt -s histappend
 man() {
@@ -49,79 +41,6 @@ dbg() {
 	echo Running LLDB debugger...
 	lldb -o run -- "$@"
 }
-
-function nowrap()
-{
-       printf '\033[?7l'
-}
-
-function wrap()
-{
-       printf '\033[?7h'
-}
-
-function dp()
-{
-	git diff $1^ $1
-}
-
-function fup() {
-	x=`pwd`; while [ "$x" != "/" ] ; do x=`dirname "$x"`; find "$x" -maxdepth 1 -name $1; done
-}
-
-function diff-mine()
-{
-	git diff `git log --format='%h %ae' | grep -v -e $(git config user.email) | head -n 1 | sed -e "s/\(.*\) .*/\1/"` HEAD
-}
-
-function rebase-mine()
-{
-    git rebase -i `git log --format='%h %ae' | grep -v -e $(git config user.email) | head -n 1 | sed -e "s/\(.*\) .*/\1/"`~
-}
-
-function scroll-clear()
-{
-	clear
-	echo -en "\e[3J"
-}
-
-function swap()
-{
-    local TMPFILE=tmp.$$
-    mv "$1" $TMPFILE
-    mv "$2" "$1"
-    mv $TMPFILE "$2"
-}
-
-function port()
-{
-	lsof -n -i4TCP:$1 | grep LISTEN
-}
-
-function tree() {
-	ls -R | grep ":$" | sed -e 's/:$//' -e 's/[^-][^\/]*\//--/g' -e 's/^/   /' -e 's/-/|/' | grep -v -e pycache -e 'env$'
-}
-
-_fab_completion() {
-    COMPREPLY=()
-
-    local cur="${COMP_WORDS[COMP_CWORD]}"
-
-    local tasks=$(fab --shortlist 2>/dev/null)
-    COMPREPLY=( $(compgen -W "${tasks}" -- ${cur}) )
-}
-complete -F _fab_completion fab
-function acc() {
-	find . -type f -amin -$1 | grep -v -e "\.git" -e sass -e node_
-}
-function mod() {
-	find . -type f -mmin -$1 | grep -v -e "\.git" -e sass -e node_ -e "pyc$"
-}
-function flake() {
-       (. env/bin/activate; git diff --name-only | grep "\.py$" | xargs flake8)
-       (. env/bin/activate; git diff --cached --name-only | grep "\.py$" | xargs flake8)
-}
-alias agent='eval `ssh-agent` && ssh-add'
 
 export EDITOR="vim"
 export PATH=$PATH:$HOME/bin
@@ -169,7 +88,6 @@ fi
 
 if [ $platform == 'linux' ]; then
 	alias ls='ls -G -a -l -tr --color'
-	shopt -s histappend
 	shopt -s checkwinsize
 
 	# make less more friendly for non-text input files, see lesspipe(1)
