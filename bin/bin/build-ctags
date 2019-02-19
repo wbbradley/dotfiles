@@ -34,8 +34,7 @@ ctags \
 	-I SDLCALL \
 	-I SDL_PRINTF_VARARG_FUNC+ \
 	-I SDL_PRINTF_FORMAT_STRING \
-	$(maybe-dir /usr/include/SDL2) \
-	$(maybe-dir /usr/include/SDL2) \
+	$(maybe-dir /usr/include) \
 	$(maybe-dir /usr/include/x86_64-linux-gnu) \
 	$(maybe-dir /usr/local/Cellar/llvm\@6/6.0.1_1/include/llvm/IR) \
 	$(maybe-dir /usr/local/Cellar/llvm\@6/6.0.1_1/include/llvm/Transforms/Utils)
