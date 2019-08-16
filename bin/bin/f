@@ -1,21 +1,16 @@
-#!/usr/bin/env python
-import os
-import sys
-from os.path import join
+#!/bin/bash
 
-sys_args = [arg.lower() for arg in sys.argv[1:]]
+anded_terms=""
+ored_terms=""
 
-def args_filter(item):
-    item = item.lower()
-    for arg in sys_args:
-        if arg and arg[0] == '-':
-            if item.find(arg[1:]) != -1:
-                return False
-        elif item.find(arg) == -1:
-            return False
-    return True
+for r in "${@}"; do
+	if [ "$anded_terms" = "" ]; then
+		anded_terms="rg -e \"$r\""
+		ored_terms="-e \"$r\""
+	else
+		anded_terms="${anded_terms} | rg -e \"${r}\""
+		ored_terms="${ored_terms} -e \"$r\""
+	fi
+done
 
-for path, subdirs, files in os.walk('.'):
-    for name in filter(args_filter, (join(path, name) for name in files)):
-        name = name[2:]
-        print(name)
+eval "rg -uuu --files | ${anded_terms} | rg $ored_terms" 2>/dev/null

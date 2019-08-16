@@ -1,6 +1,12 @@
-. $HOME/.bashrc
-df -h .
+[[ -f "${HOME}/.bashrc" ]] && . "$HOME/.bashrc"
+[[ -f "${HOME}/xmodmap.file" ]] && xmodmap -v "${HOME}/xmodmap.file"
 
-# export PS1="\[\033[48;5;95;38;5;214m\] \u@\h \[\033[0;38;5;31;48;5;240;22m\] \$git_branch\$git_dirty \[\033[0;38;5;252;48;5;240;1m\]\$PWD \[\033[0;38;5;240;49;22m\]\[\033[0m\] "
-
-[[ -s "$HOME/.rvm/scripts/rvm" ]] && source "$HOME/.rvm/scripts/rvm" # Load RVM into a shell session *as a function*
+# My xmodmap.file looks like this because I have a Macally SLIMKEYC keyboard.
+# This setup enables me to always lock the fn keys, but still use the arrow
+# keys as normal keys, instead of their mapping to pgup, pgdn, home, end.
+: '
+  keycode 112 = Up
+  keycode 117 = Down
+  keycode 110 = Left
+  keycode 115 = Right
+'

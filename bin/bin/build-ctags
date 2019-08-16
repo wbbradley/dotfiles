@@ -1,16 +1,67 @@
 #!/bin/bash
-set -e
 
 function maybe-dir {
 	[[ -d $1 ]] && echo $1
 }
 
-# First index the local directory
-ctags \
-	-R \
-	--c-kinds=+p \
-	--c++-kinds=+p \
+CTAGS=$([[ -f $HOME/bin/ctags ]] && echo $HOME/bin/ctags || echo ctags)
+
+I_FLAGS=$(echo \
+	-I DECLSPEC \
+	-I SDLCALL \
+	-I BASE_EXPORT \
+	-I SDL_PRINTF_VARARG_FUNC+ \
+	-I SDL_PRINTF_FORMAT_STRING \
+	-I TEST_F+ \
+	-I TEST_P+ \
+	-I DISALLOW_COPY_AND_ASSIGN+ \
+	-I FRIEND_TEST \
+	-I operator+ \
+	-I TEST+ \
+	-I shill \
+	-I EXPECT_EQ+ \
+	-I ASSERT_TRUE+ \
+	-I PROTOBUF_EXPORT \
+	-I MOCK_CONST_METHOD+ \
+	-I MOCK_CONST_METHOD0+ \
+	-I MOCK_CONST_METHOD1+ \
+	-I MOCK_CONST_METHOD2+ \
+	-I MOCK_CONST_METHOD3+ \
+	-I MOCK_CONST_METHOD4+ \
+	-I EXPECT_CALL+ \
+	-I EXPECT_TRUE+ \
+	-I BRILLO_EXPORT \
+	-I EXPECT_FALSE+ \
+	-I MOCK_METHOD0+ \
+	-I MOCK_METHOD1+ \
+	-I MOCK_METHOD2+ \
+	-I MOCK_METHOD3+ \
+	-I MOCK_METHOD4+ \
+	-I MOCK_METHOD5+)
+
+EXCLUDES=$(echo \
+	'--exclude=*.java' \
+	'--exclude=*.patch' \
+	'--exclude=toolchains' \
+	'--exclude=toolchain' \
+	'--exclude=libassistant' \
+	'--exclude=*.json' \
+	'--exclude=*.xml' \
+	'--exclude=*.yaml' \
+	'--exclude=*.md' \
+	'--exclude=*.mk' \
+	'--exclude=*.pb' \
+	'--exclude=*.sh' \
+	'--exclude=*.css' \
+	'--exclude=gtest-filepath.h' \
 	--exclude=build \
+	--exclude=rkisp1_regs.h \
+	--exclude=gtest-type-util.h \
+	--exclude=camera_metadata_tags.h \
+	--exclude=shill \
+	--exclude=hal \
+	'--exclude=pkcs11t.h' \
+	'--exclude=*.js' \
 	--exclude=makefile \
 	--exclude=TableGen \
 	--exclude=Target \
@@ -18,49 +69,136 @@ ctags \
 	--exclude=CodeGen \
 	--exclude=static \
 	--exclude=generated \
+	'--exclude=*generated.*' \
 	--exclude=env \
 	--exclude=assets \
 	--exclude=node_modules \
-	--exclude=bower_components \
-	.
+	--exclude=bower_components)
 
-# Now index any other interesting includes that I may want to peruse.
-ctags \
-	-R \
-	-a \
-	--c-kinds=+p \
-	--c++-kinds=+p \
-	-I DECLSPEC \
-	-I SDLCALL \
-	-I SDL_PRINTF_VARARG_FUNC+ \
-	-I SDL_PRINTF_FORMAT_STRING \
-	$(maybe-dir /usr/include) \
-	$(maybe-dir /usr/include/x86_64-linux-gnu) \
-	$(maybe-dir /usr/local/Cellar/llvm\@6/6.0.1_1/include/llvm/IR) \
-	$(maybe-dir /usr/local/Cellar/llvm\@6/6.0.1_1/include/llvm/Transforms/Utils)
-	
+CPP_KINDS="--c-kinds=+p --c++-kinds=+p"
 
-case "$(uname -s)" in
-    Linux)
-      sed -i -E 's/^[a-zA-Z]+\.(.*)/\1/' tags
-      ;;
-    *)
-      echo "TODO: Fix tags"
-      ;;
-esac
+function list-files() {
+	find $(realpath $HOME/src/googletest/googlemock/include/gmock) \
+		| grep -E -e '\.cc$|\.h$|\.proto$'
+	find $(realpath .) \
+		| grep -E -e '\.cc$|\.h$|\.proto$' \
+		| grep -E -e '/third_party/cros_system_api/'
+	find $(realpath .) \
+		| grep -E '\.cc$|\.h$|\.proto$' \
+		| grep -E -v \
+			-e '/GLES2/' \
+			-e '/Release[^/]+/' \
+			-e '/android_ndk/' \
+			-e '/android_tools/' \
+			-e '/angle/' \
+			-e '/assistant/' \
+			-e '/base/win/' \
+			-e '/breakpad/' \
+			-e '/build/' \
+			-e '/buildtools/' \
+			-e '/camera_metadata_tags.h' \
+			-e '/chrome/grit/' \
+			-e '/chromeos/components/' \
+			-e '/cicerone/' \
+			-e '/compiler/' \
+			-e '/dawn/' \
+			-e '/device_management_backend.pb.h' \
+			-e '/ffmpeg/' \
+			-e '/gen/components/' \
+			-e '/gen/media/' \
+			-e '/gl/' \
+			-e '/glfw/' \
+			-e '/gpu/' \
+			-e '/grpc/src/' \
+			-e '/ia_imaging/' \
+			-e '/icu/' \
+			-e '/input_devices' \
+			-e '/khronos' \
+			-e '/libassistant/' \
+			-e '/libxml/' \
+			-e '/llvm-build/' \
+			-e '/mesa_headers' \
+			-e '/nasm/' \
+			-e '/native_client/' \
+			-e '/net/spdy' \
+			-e '/node/' \
+			-e '/openssl/' \
+			-e '/pkcs11t.h' \
+			-e '/protobuf/' \
+			-e '/rockchip/' \
+			-e '/safe_browsing/' \
+			-e '/shill/.*_test' \
+			-e '/shill/metrics.h' \
+			-e '/sqlite/' \
+			-e '/src/media/' \
+			-e '/swiftshader/' \
+			-e '/third_party/' \
+			-e '/toolchain.?/' \
+			-e '/tpm_generated' \
+			-e '/v8/' \
+			-e '/vulkan[^/]*/' \
+			-e '/web_contents/' \
+			-e '/wifi_test.cc' \
+			-e '\.patch$' \
+			-e '_browsertest\.' \
+			-e '_unittest\.cc' \
+			-e 'extension_function_histogram_value'
+}
 
-wc -l tags
-ZION_TAGS=/var/tmp/tags.zion
-echo "Tags are complete."
-exit 0
-
-if [[ -f "lib/std.zion" ]]; then
-	# We are in the Zion codebase, let's use Zion's tags generation support
-	zion ctags lib/std | sort | uniq > $ZION_TAGS
-	cat $ZION_TAGS >> tags
-	wc -l $ZION_TAGS
-	cat tags | sort | uniq > tags.new
-	mv tags.new tags
+if [[ "$1" == "list-files" ]]; then
+	if [[ "$2" != "" ]]; then
+		cd $2
+	fi
+	list-files 2>/dev/null
+	exit 0
 fi
 
+# First index the local directory
+list-files 2>/dev/null \
+	| $CTAGS \
+		$CPP_KINDS \
+		-L - \
+		$I_FLAGS
+
+# Now index any other interesting includes that I may want to peruse.
+$CTAGS \
+	-R \
+	-a \
+	--exclude="*.cc" \
+	--exclude="*.cpp" \
+	--exclude="*.c" \
+	$CPP_KINDS \
+	$EXCLUDES \
+	$I_FLAGS \
+	$(maybe-dir $(find /build/{grunt,*}/usr/include/base-* 2> /dev/null | head -n 1)) \
+	$(maybe-dir $(find /build/{grunt,*}/usr/include/brillo 2> /dev/null | head -n 1)) \
+	$(maybe-dir $(find /build/{grunt,*}/usr/include/gmock 2> /dev/null | head -n 1)) \
+	$(maybe-dir $(find /build/{grunt,*}/usr/include/debugd-client 2> /dev/null | head -n 1)) \
+	$(maybe-dir $(find /build/{grunt,*}/usr/include/gtest 2> /dev/null | head -n 1)) \
+	$(maybe-dir $(find /build/{grunt,*}/var/cache/portage/chromeos-base/diagnostics/out/Default/gen/include 2> /dev/null | head -n 1))
+
+grep -E -v \
+	-e '^~.*' \
+	-e '\boperator\b' \
+	-e '\bnamespace base\b' \
+	-e '^SetUp\b' \
+	-e '^TearDown\b' \
+	-e '^request\b' \
+	-e '^cryptohome\b' \
+	-e '^Start\b' \
+	-e '^power_manager\b' \
+	-e '^GetProtoDebugString.*\b' \
+	-e '^Initialize\b' \
+	-e '^ToString\b' \
+	-e '^FromString\b' \
+	-e '^Create\b' \
+	-e '^system\b' \
+	-e '^value\b' \
+	-e '^internal\b' \
+	tags \
+	| awk '$2 ~ /^\.\/.*/ {next} {if (length($1) >= 7 && (length($1) < 50)) print}' \
+	> tags.clean
+rm tags
+mv tags.clean tags
+wc -l tags
 echo "Tags are complete."

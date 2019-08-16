@@ -1,0 +1,8 @@
+#!/bin/bash
+eval "$(stack config env | grep -E "^GHC_PACKAGE_PATH=")"
+export MY_GHC_PACKAGE_PATH="${GHC_PACKAGE_PATH}"
+unset GHC_PACKAGE_PATH
+
+#--cabalopts "--package-db=${MY_GHC_PACKAGE_PATH}" \
+stack exec --no-ghc-package-path -- \
+  hdevtools "${@}"

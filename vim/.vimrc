@@ -4,6 +4,7 @@ set encoding=utf-8
 set ttyfast
 set undofile
 set undodir=~/.vim/undodir
+" set path=src,$HOME/src
 
 if has('win32')
 elseif has('mac')
@@ -12,9 +13,9 @@ elseif has('unix')
 	set clipboard=unnamedplus
 endif
 
-set makeprg=make
+set makeprg=wmake
 set t_Co=256
-set number
+set nonumber
 set cpoptions+=n
 set splitbelow
 set splitright
@@ -22,70 +23,34 @@ set modeline
 set modelines=1
 set noesckeys
 
-set textwidth=100
-
-"set runtimepath^=~/.vim/bundle/vim-gitgutter
-let g:ctrlp_use_caching = 1
-let g:ctrlp_clear_cache_on_exit = 0
-let g:ctrlp_show_hidden = 1
-let g:ctrlp_extensions = ['tag']
-let g:ctrlp_custom_ignore = ''
-let g:ctrlp_regexp = 0
-let g:ctrlp_lazy_update = 1
-let g:ctrlp_switch_buffer = 0
-" let g:ctrlp_user_command = 'find %s -type f'       " MacOSX/Linux
-
-set wildignore+=migrations
-set wildignore+=build
-set wildignore+=*.trace
-set wildignore+=env
-set wildignore+=.mypy_cache
-set wildignore+=bower_components
-set wildignore+=htmlcov
-set wildignore+=.sass-cache
-set wildignore+=node_modules
-set wildignore+=docs
-set wildignore+=tools
-set wildignore+=TableGen
-set wildignore+=llvm-c
-" set wildignore+=assets
-set wildignore+=*.swp
 set wildignore+=*.o
-set wildignore+=*.bc
-set wildignore+=.coverage
-set wildignore+=*.pyc
-set wildignore+=*.png
-set wildignore+=*.egg
-set wildignore+=*.jpg
-set wildignore+=*.s
-set wildignore+=*.jpeg
-set wildignore+=*.class
-set wildignore+=vcrpy_*
-set wildignore+=vendor
-set wildignore+=.elasticbeanstalk
-set wildignore+=*.zx
-set wildignore+=media
-set wildignore+=.git
-set wildignore+=bootstrap-3.0.0
-set wildignore+=site-packages
+set wildignore+=*.a
+set wildignore+=experimental
+set wildignore+=toolchains
+
+let g:EditorConfig_max_line_indicator = 'none'
+
 set wildchar=<Tab> wildmenu wildmode=full
 
 filetype off
 
-" call pathogen#infect()
-
-set rtp^=~/.vim/bundle/vundle/
+set rtp+=~/.vim/bundle/Vundle.vim
 
 call vundle#begin()
 
-Plugin 'mileszs/ack.vim'
-" Plugin 'OmniSharp/omnisharp-vim'
+" let Vundle manage Vundle, required
+Plugin 'VundleVim/Vundle.vim'
+
+Plugin 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
+Plugin 'junegunn/fzf.vim'
+
+Plugin 'editorconfig/editorconfig-vim'
+" Plugin 'mileszs/ack.vim'
 " Plugin 'tpope/vim-fireplace'
 " Plugin 'othree/html5.vim'
 " Plugin 'vim-scripts/YankRing.vim'
 " Plugin 'maxbrunsfeld/vim-yankstack'
 " Plugin 'jmcantrell/vim-virtualenv'
-Plugin 'kien/ctrlp.vim'
 " Plugin 'vim-scripts/django.vim'
 Plugin 'nvie/vim-flake8'
 Plugin 'airblade/vim-gitgutter'
@@ -97,11 +62,15 @@ Plugin 'tpope/vim-fugitive'
 " Plugin 'juvenn/mustache.vim.git'
 " Plugin 'Lokaltog/vim-easymotion'
 " Plugin 'groenewege/vim-less'
-Plugin 'rking/ag.vim'
+" Plugin 'rking/ag.vim'
 " Plugin 'fweep/vim-tabber'
 " Plugin 'pangloss/vim-javascript'
 " Plugin 'mxw/vim-jsx'
-" Plugin 'scrooloose/syntastic'
+Plugin 'scrooloose/syntastic'
+
+Plugin 'prabirshrestha/vim-lsp'
+
+Plugin 'bitc/vim-hdevtools'
 Plugin 'hynek/vim-python-pep8-indent.git'
 Plugin 'christoomey/vim-tmux-navigator'
 " Plugin 'sjl/threesome.vim.git'
@@ -122,6 +91,7 @@ Plugin 'zionlang/vim-zion'
 call vundle#end()
 
 
+let g:hdevtools_stack = 1
 let g:airline#extensions#ale#enabled = 1
 
 nnoremap <Leader>ht :GhcModType<cr>
@@ -129,7 +99,7 @@ nnoremap <Leader>htc :GhcModTypeClear<cr>
 autocmd FileType haskell nnoremap <buffer> <leader>? :call ale#cursor#ShowCursorDetail()<CR>
 
 let g:gitgutter_max_signs = 2000
-let g:airline_powerline_fonts = 1
+" let g:airline_powerline_fonts = 1
 " let g:airline_section_z = ''
 let g:airline_section_warning = ''
 " let g:syntastic_python_pylint_post_args='--disable=W0511,E1103,E1101,F0401,R0913,C0103,W0142,C0111,C0103,W0232,E0611,R0201,R0903,E1002,W0613'
@@ -163,17 +133,8 @@ let g:go_fmt_command = "goimports"
 let g:vim_json_syntax_conceal = 0
 let g:jsx_ext_required = 0
 
-let g:OmniSharp_selector_ui = 'ctrlp'  " Use ctrlp.vim
-
 augroup filetypedetect
     au BufRead,BufNewFile *.pyi setfiletype python
-    " associate *.foo with php filetype
-augroup END
-
-augroup omnisharp_commands
-    autocmd FileType cs nnoremap gd :OmniSharpGotoDefinition<cr>
-    autocmd FileType cs nnoremap <leader>ft :OmniSharpFindType<cr>
-    autocmd FileType cs nnoremap <leader>fu :OmniSharpFindUsages<cr>
 augroup END
 
 " Make the quickfix window take up the entirety of the bottom of the window
@@ -184,6 +145,8 @@ autocmd BufNewFile,BufReadPost *.coffee setl shiftwidth=2 expandtab
 " autocmd BufNewFile,BufReadPost *.js set autoindent noexpandtab ts=2 sw=2
 " autocmd BufNewFile,BufReadPost *.jsx set autoindent noexpandtab ts=2 sw=2
 
+autocmd FileType gitcommit setlocal textwidth=71
+autocmd FileType go setlocal tabstop=4 shiftwidth=4
 autocmd FileType go nmap <Leader>s <Plug>(go-implements)
 autocmd FileType go nmap <Leader>i <Plug>(go-info)
 autocmd FileType go nmap <Leader>gd <Plug>(go-doc)
@@ -198,7 +161,13 @@ autocmd FileType go nmap <Leader>dv <Plug>(go-def-vertical)
 autocmd FileType go nmap <Leader>dt <Plug>(go-def-tab)
 autocmd FileType go nmap <Leader>e <Plug>(go-rename)
 autocmd FileType go nmap <C-]> :GoDef<CR>zz
-autocmd FileType config set tabstop=2 softtabstop=0 expandtab shiftwidth=2 smarttab
+autocmd FileType config setlocal tabstop=2 softtabstop=0 expandtab shiftwidth=2 smarttab
+
+augroup Haskell
+  autocmd FileType haskell nnoremap <buffer> <F1> :HdevtoolsType<CR>
+  autocmd FileType haskell nnoremap <buffer> <F2> :HdevtoolsInfo<CR>
+  autocmd FileType haskell nnoremap <buffer> <F3> :HdevtoolsClear<CR>
+augroup END
 
 nnoremap ; :
 nnoremap <C-]> <C-]>zz
@@ -215,11 +184,8 @@ nnoremap <Leader>} mhv%='h
 nnoremap <Leader><Leader> mhva}='h
 autocmd Syntax cpp call EnhanceCppSyntax()
 
-" set clipboard=unnamedplus
-
 " allow backspacing over everything in insert mode
 set backspace=indent,eol,start
-
 set lazyredraw
 set history=50		" keep 50 lines of command line history
 set ruler		" show the cursor position all the time
@@ -231,11 +197,11 @@ set incsearch		" do incremental searching
 " let &guioptions = substitute(&guioptions, "t", "", "g")
 
 " Don't use Ex mode, use Q for formatting
-vnoremap Q gq
-vnoremap gQ gq
-nnoremap gQ gq
+vmap Q gq
+nmap Q VQ
 
-nmap <leader>f :CtrlP<CR><C-\>w
+nmap <C-p> :Files<CR>
+nmap M :History<CR>
 nmap <CR><CR> :!<CR>
 
 " map home row to exit Insert mode
@@ -244,15 +210,13 @@ nmap <leader>' i'<CR>'<Esc>gqj
 nmap <leader>" i"<CR>"<Esc>gqj
 vnoremap . :norm.<CR>
 
-function! FindPromptNoFilter()
-	let str = input("Search: ", "")
-	if str == ""
-		return
-	endif
-
-	:silent! execute "Ack -a '" . str . "'"
-	:cw
+function! Peg()
+	let filename = expand('%:p')
+	execute "!peg " . filename
 endfunction
+
+nmap <leader>P :call Peg()<CR>
+nmap <leader>9P :e ~/pegged.txt<CR>
 
 function! FindPrompt()
 	let str = input("Search: ", "")
@@ -260,18 +224,7 @@ function! FindPrompt()
 		return
 	endif
 
-	:silent! execute "Ack '" . str . "'"
-	:cw
-endfunction
-
-function! FindWordNoFilter()
-	let str = expand("<cword>")
-	if str == ""
-		return
-	endif
-
-	:silent! execute "Ack -a '" . str . "'"
-	:cw
+	execute "Rg " . str
 endfunction
 
 function! DeleteAllLinesWithThisWord()
@@ -282,14 +235,22 @@ function! DeleteAllLinesWithThisWord()
 	:silent! execute "g/" . str . "/d"
 endfunction
 
-function! FindWord()
+function! FindWordUnderCursor()
 	let str = expand("<cword>")
 	if str == ""
 		return
 	endif
 
-	:silent! execute "Ack '" . str . "'"
-	:cw
+	execute "Rg " . str
+endfunction
+
+function! FindTagUnderCursor()
+	let str = expand("<cword>")
+	if str == ""
+		return
+	endif
+
+	execute "Tags " . str
 endfunction
 
 " Add highlighting for function definition in C++
@@ -300,53 +261,44 @@ endfunction
 
 nnoremap <leader>~ :!build-ctags<CR>
 nnoremap <leader>` :!build-ctags<CR>
-nnoremap <leader>[ :set paste<CR>i
-inoremap <leader>] <Esc>:set nopaste<CR>
 
-nnoremap <F3> :call FindWord()<CR>
-nnoremap <C-F3> :call FindWordNoFilter()<CR>
+nnoremap <F3> :call FindWordUnderCursor()<CR>
 
-nnoremap <F4> :wa<CR> :e %:p:s,.h$,.X123X,:s,.cpp$,.h,:s,.X123X$,.cpp,<CR>
+nmap <F4> :wa<CR> :e %:p:s,.h$,.X123X,:s,.cpp$,.h,:s,.X123X$,.cpp,<CR>
 inoremap <F4> <Esc> <F4>
 vnoremap <F4> <Esc> <F4>
 
 nnoremap F :wa<CR>:call FindPrompt()<CR>
-nnoremap E :wa<CR>:call FindPromptNoFilter()<CR>
-nnoremap T :CtrlPTag<CR>
+nnoremap T :Tags<CR>
+nnoremap g] :call FindTagUnderCursor()<CR>
 
-:map <F2> :echo "hi<" . synIDattr(synID(line("."),col("."),1),"name") . '> trans<' . synIDattr(synID(line("."),col("."),0),"name") . "> lo<" . synIDattr(synIDtrans(synID(line("."),col("."),1)),"name") . ">"<CR>
+map <F5> :echo "hi<" . synIDattr(synID(line("."),col("."),1),"name") . '> trans<' . synIDattr(synID(line("."),col("."),0),"name") . "> lo<" . synIDattr(synIDtrans(synID(line("."),col("."),1)),"name") . ">"<CR>
 "nnoremap <leader>d :set modifiable<CR>:call DeleteAllLinesWithThisWord()<CR>:set nomodifiable<CR>
 nnoremap <leader>e :e `=expand('%:p:h')`<CR>
 nnoremap <leader>D :cd `=expand('%:p:h')`<CR>:pwd<CR>
-" set foldmethod=indent
-" set foldminlines=10
-" set foldnestmax=5
 
-let g:ctrlp_working_path_mode = 0
 vmap <Tab> =
 vmap v <Plug>(expand_region_expand)
 vmap <C-v> <Plug>(expand_region_shrink)
-
-let g:ag_prg="ag --vimgrep"
 
 :if $VIM_CRONTAB == "true"
 :set nobackup
 :set nowritebackup
 :endif
 
-nmap <F9> :set autowrite<CR>:cprev<CR>:set noautowrite<CR>zz
-nmap <F10> :set autowrite<CR>:cnext<CR>:set noautowrite<CR>zz
-
-nnoremap M :CtrlPMRUFiles<CR>
+nmap <F9> :setlocal autowrite<CR>:cprev<CR>:setlocal noautowrite<CR>zz
+nmap <F10> :setlocal autowrite<CR>:cnext<CR>:setlocal noautowrite<CR>zz
 
 " turning syntax on tends to redraw the screen nicely
-nnoremap <leader><space> :syn on<cr>:noh<cr>:match<cr>:set nopaste<CR>:set textwidth=100<CR>
+nnoremap <leader><space> :syn on<cr>:noh<cr>:match<cr>:set nopaste<CR>:set colorcolumn=0<CR>:HdevtoolsClear<CR>
 nnoremap <leader>t viwy:tabnew<CR>:e ~/vim-todo.txt<CR>ggPa<CR><Esc>:wq<CR>
 nnoremap <leader>T :tabnew<CR>:e ~/vim-todo.txt<CR>
 nnoremap <leader>q :conf qa<CR>
 nnoremap <leader>v <C-w>v<C-w>l<C-w>n<C-w>h
 
 nnoremap <leader>9t :e tests/test_basic.zion<CR>:make<CR>
+" nnoremap <leader>9w :cexpr system('wmake ' . shellescape(expand('%:r')))
+nnoremap <leader>9w :e .wmake<CR>
 nnoremap <leader>90 :e ~/.vimrc<CR>
 nnoremap <leader>91 :e ~/local.vimrc<CR>
 nnoremap <leader>92 :e ~/.bashrc<CR>
@@ -381,7 +333,7 @@ vmap <C-F7> <Esc> <C-F7>
 
 nmap c<Space> ct_
 
-set tags+=tags;./tags
+set tags=tags
 
 nnoremap s :exec "normal i".nr2char(getchar())."\el"<CR>
 nnoremap S :exec "normal a".nr2char(getchar())."\el"<CR>
@@ -391,47 +343,32 @@ nnoremap S :exec "normal a".nr2char(getchar())."\el"<CR>
 " so that you can undo CTRL-U after inserting a line break.
 inoremap <C-U> <C-G>u<C-U>
 
-" In many terminal emulators the mouse works just fine, thus enable it.
-if has('mouse')
-  set mouse=a
-endif
+" Enable file type detection.
+" Use the default filetype settings, so that mail gets 'tw' set to 72,
+" 'cindent' is on in C files, etc.
+" Also load indent files, to automatically do language-dependent indenting.
+filetype plugin indent on
 
-" Only do this part when compiled with support for autocommands.
-if has("autocmd")
+" Put these in an autocmd group, so that we can delete them easily.
+augroup vimrcEx
+  au!
 
-  " Enable file type detection.
-  " Use the default filetype settings, so that mail gets 'tw' set to 72,
-  " 'cindent' is on in C files, etc.
-  " Also load indent files, to automatically do language-dependent indenting.
-  filetype plugin indent on
+  " For all text files set 'textwidth' to 78 characters.
+  autocmd FileType text setlocal textwidth=78
 
-  " Put these in an autocmd group, so that we can delete them easily.
-  augroup vimrcEx
-	  au!
+  " When editing a file, always jump to the last known cursor position.
+  " Don't do it when the position is invalid or when inside an event handler
+  " (happens when dropping a file on gvim).
+  " Also don't do it when the mark is in the first line, that is the default
+  " position when opening a file.
+  autocmd BufReadPost *
+	\ if line("'\"") > 1 && line("'\"") <= line("$") |
+	\   exe "normal! g`\"" |
+	\ endif
 
-	  " For all text files set 'textwidth' to 78 characters.
-	  autocmd FileType text setlocal textwidth=78
+augroup END
 
-	  " When editing a file, always jump to the last known cursor position.
-	  " Don't do it when the position is invalid or when inside an event handler
-	  " (happens when dropping a file on gvim).
-	  " Also don't do it when the mark is in the first line, that is the default
-	  " position when opening a file.
-	  autocmd BufReadPost *
-		\ if line("'\"") > 1 && line("'\"") <= line("$") |
-		\   exe "normal! g`\"" |
-		\ endif
-
-  augroup END
-
-else
-
-  set autoindent		" always set autoindenting on
-
-endif " has("autocmd")
-set cino=:0g0
-set sw=4
-set ts=4
+autocmd FileType * setlocal colorcolumn=0
 autocmd FileType ts setlocal sw=2 sts=2 ts=2 expandtab
 autocmd FileType javascript setlocal sw=2 sts=2 ts=2 expandtab
 autocmd FileType yaml setlocal sw=2 sts=2 ts=2 expandtab
@@ -440,132 +377,32 @@ autocmd FileType htmldjango setlocal sw=2 sts=2 ts=2 expandtab
 autocmd FileType html setlocal sw=2 sts=2 ts=2 expandtab
 autocmd FileType less setlocal sw=2 sts=2 ts=2 expandtab
 autocmd FileType css setlocal sw=2 sts=2 ts=2 expandtab
-autocmd FileType cpp setlocal sw=4 sts=4 ts=4
 autocmd FileType haskell setlocal sw=2 sts=2 ts=8 expandtab shiftround
-autocmd FileType haskell set makeprg=stack\ build
-autocmd FileType cpp setlocal cindent cino=j1,(0,ws,Ws
-
-" Convenient command to see the difference between the current buffer and the
-" file it was loaded from, thus the changes you made.
-" Only define it when not defined already.
-if !exists(":DiffOrig")
-  command DiffOrig vert new | set bt=nofile | r # | 0d_ | diffthis
-		  \ | wincmd p | diffthis
-endif
+autocmd FileType haskell setlocal makeprg=stack\ build
+autocmd FileType markdown setlocal textwidth=80 expandtab nocindent noautoindent nosmartindent cino=
+autocmd FileType conf setlocal expandtab sw=2 sts=2 smartindent
+autocmd FileType sh setlocal expandtab sw=2 sts=2 ts=2 expandtab smartindent
 
 augroup myvimrc
 	autocmd!
-	autocmd BufWritePost local.vimrc,.vimrc,_vimrc,vimrc,.gvimrc,_gvimrc,gvimrc so $MYVIMRC
+	autocmd BufWritePost local.vimrc,.vimrc so $MYVIMRC
 augroup END
-
-" set rtp+=$GOROOT/misc/vim
-filetype plugin indent on
-" autocmd BufRead,BufNewFile *.go set filetype=go
-autocmd BufRead,BufNewFile *.eco set filetype=html
-
-autocmd BufReadPost *.prepp set syntax=python
 
 set ignorecase
 set smartcase
 set gdefault
 set visualbell
 set showmatch
-" set list
-" set listchars=tab:▸\ ,eol:¬
-
-set gfn=Menlo\ Regular:h10
-syn match Braces display '[<>{}()\[\]]'
-set matchtime=0
-colorscheme ir_black
 set nowrap
+set guifont=Menlo\ Regular:h10
+set matchtime=0
+set hlsearch
+syntax on
+colorscheme ir_black
 
-silent! source ~/local.vimrc
-
-augroup CursorLine
-  autocmd!
-  autocmd VimEnter,WinEnter,BufWinEnter * setlocal cursorline
-  autocmd WinLeave * setlocal nocursorline
-augroup END
-
-" set cc=80
-" hi ColorColumn cterm=NONE ctermbg=NONE ctermfg=NONE guibg=#111111 guifg=NONE
-
-hi CursorLine cterm=NONE ctermbg=NONE ctermfg=NONE guibg=#222222 guifg=NONE
-hi CursorLineNR cterm=NONE ctermbg=NONE ctermfg=NONE guibg=#333333 guifg=NONE
-set cursorline
-nnoremap <silent> <Leader>l ml:execute 'match Search /\%'.line('.').'l/'<CR>
-
-nnoremap <leader>g :call GitGrepWord()<CR><CR>
-
-
-function! s:get_last_python_class()
-    let l:retval = ""
-    let l:last_line_declaring_a_class = search('^\s*class', 'bnW')
-    let l:last_line_starting_with_a_word_other_than_class = search('^\ \(\<\)\@=\(class\)\@!', 'bnW')
-    if l:last_line_starting_with_a_word_other_than_class < l:last_line_declaring_a_class
-        let l:nameline = getline(l:last_line_declaring_a_class)
-        let l:classend = matchend(l:nameline, '\s*class\s\+')
-        let l:classnameend = matchend(l:nameline, '\s*class\s\+[A-Za-z0-9_]\+')
-        let l:retval = strpart(l:nameline, l:classend, l:classnameend-l:classend)
-    endif
-    return l:retval
-endfunction
- 
-function! s:get_last_python_def()
-    let l:retval = ""
-    let l:last_line_declaring_a_def = search('^\s*def', 'bnW')
-    let l:last_line_starting_with_a_word_other_than_def = search('^\ \(\<\)\@=\(def\)\@!', 'bnW')
-    if l:last_line_starting_with_a_word_other_than_def < l:last_line_declaring_a_def
-        let l:nameline = getline(l:last_line_declaring_a_def)
-        let l:defend = matchend(l:nameline, '\s*def\s\+')
-        let l:defnameend = matchend(l:nameline, '\s*def\s\+[A-Za-z0-9_]\+')
-        let l:retval = strpart(l:nameline, l:defend, l:defnameend-l:defend)
-    endif
-    return l:retval
-endfunction
- 
-function! s:compose_python_location()
-    let l:pyloc = s:get_last_python_class()
-    if !empty(pyloc)
-        let pyloc = pyloc . "."
-    endif
-    let pyloc = pyloc . s:get_last_python_def()
-    return pyloc
-endfunction
- 
-function! <SID>EchoPythonLocation()
-    echo s:compose_python_location()
-endfunction
- 
-command! PythonLocation :call <SID>EchoPythonLocation()
-nnoremap <Leader>? :PythonLocation<CR>
-
-" Search for the ... arguments separated with whitespace (if no '!'),
-" or with non-word characters (if '!' added to command).
-function! SearchMultiLine(bang, ...)
-  if a:0 > 0
-    let sep = '\_.\{-}'
-    let @/ = join(a:000, sep)
-  endif
-endfunction
+syn match Braces display '[<>{}()\[\]]'
 
 let c_no_curly_error=1
 
-" Tabber options
-" set tabline=%!tabber#TabLine()
-set guioptions-=e
-let g:tabber_filename_style = 'filename'
-let g:tabber_divider_style = 'fancy'
-
-command! -bang -nargs=* -complete=tag S call SearchMultiLine(<bang>0, <f-args>)|normal! /<C-R>/<CR>
-"runtime $VIMRUNTIME/macros/matchit.vim
-
-" :match ErrorMsg '\%>80v.\+'
-"
-" Switch syntax highlighting on, when the terminal has colors
-" Also switch on highlighting the last used search pattern.
-if &t_Co > 2 || has("gui_running")
-  syntax on
-  set hlsearch
-endif
+silent! source ~/local.vimrc
 
