@@ -22,3 +22,4 @@ set visible-stats on
 "\xE2\x80\x94": "--"
 # Ellipsis...
 "\xE2\x80\xA6": "..."
+Control-j: "\C-a$(\C-e)"

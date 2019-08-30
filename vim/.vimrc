@@ -381,11 +381,15 @@ autocmd FileType haskell setlocal sw=2 sts=2 ts=8 expandtab shiftround
 autocmd FileType haskell setlocal makeprg=stack\ build
 autocmd FileType markdown setlocal textwidth=80 expandtab nocindent noautoindent nosmartindent cino=
 autocmd FileType conf setlocal expandtab sw=2 sts=2 smartindent
-autocmd FileType sh setlocal expandtab sw=2 sts=2 ts=2 expandtab smartindent
+" autocmd FileType sh setlocal expandtab sw=2 sts=2 ts=2 expandtab smartindent
 
 augroup myvimrc
 	autocmd!
 	autocmd BufWritePost local.vimrc,.vimrc so $MYVIMRC
+augroup END
+
+augroup filetypedetect
+    au! BufRead,BufNewFile *.bashrc setfiletype sh
 augroup END
 
 set ignorecase
