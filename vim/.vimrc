@@ -35,6 +35,7 @@ set wildchar=<Tab> wildmenu wildmode=full
 filetype off
 
 set rtp+=~/.vim/bundle/Vundle.vim
+set rtp+=~/src/vim-zion
 
 call vundle#begin()
 
