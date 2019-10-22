@@ -13,7 +13,6 @@ elseif has('unix')
 	set clipboard=unnamedplus
 endif
 
-set makeprg=wmake
 set t_Co=256
 set nonumber
 set cpoptions+=n
@@ -83,7 +82,6 @@ Plugin 'terryma/vim-expand-region'
 Plugin 'terryma/vim-multiple-cursors'
 " Plugin 'solarnz/thrift.vim'
 Plugin 'hdima/python-syntax'
-Plugin 'zionlang/vim-zion'
 " Plugin 'IN3D/vim-raml'
 " Plugin 'elzr/vim-json'
 " Plugin 'Superbil/llvm.vim'

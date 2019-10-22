@@ -1,3 +1,2 @@
 #!/bin/bash
-#!/bin/bash
-xinput --set-prop "PixArt Lenovo USB Optical Mouse" "libinput Accel Speed" -0.9
+# xinput --set-prop "PixArt Lenovo USB Optical Mouse" "libinput Accel Speed" -0.9
