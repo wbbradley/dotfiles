@@ -108,3 +108,5 @@ fi
 if [ -f "$HOME/local.bashrc" ]; then
 	. $HOME/local.bashrc
 fi
+
+[ -f ~/.fzf.bash ] && source ~/.fzf.bash

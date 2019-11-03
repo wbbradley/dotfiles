@@ -89,35 +89,21 @@ Plugin 'hdima/python-syntax'
 " Plugin 'leafgarden/typescript-vim'
 call vundle#end()
 
-
 let g:hdevtools_stack = 1
-let g:airline#extensions#ale#enabled = 1
 
 nnoremap <Leader>ht :GhcModType<cr>
 nnoremap <Leader>htc :GhcModTypeClear<cr>
 autocmd FileType haskell nnoremap <buffer> <leader>? :call ale#cursor#ShowCursorDetail()<CR>
 
 let g:gitgutter_max_signs = 2000
-" let g:airline_powerline_fonts = 1
+
+let g:airline#extensions#ale#enabled = 1
+let g:airline_powerline_fonts = 0
 " let g:airline_section_z = ''
-let g:airline_section_warning = ''
-" let g:syntastic_python_pylint_post_args='--disable=W0511,E1103,E1101,F0401,R0913,C0103,W0142,C0111,C0103,W0232,E0611,R0201,R0903,E1002,W0613'
-" let g:syntastic_go_checkers = ['go', 'golint', 'govet', 'errcheck']
-let g:syntastic_javascript_checkers = ['jsxhint']
-let g:syntastic_cpp_compiler = 'clang++'
-let g:syntastic_cpp_compiler_options = ' -std=c++11 -stdlib=libc++'
-let g:syntastic_always_populate_loc_list = 1
-let g:syntastic_check_on_open = 1
-let g:syntastic_check_on_wq = 0
-let g:syntastic_mode_map = { 'mode': 'passive', 'active_filetypes': [],'passive_filetypes': [] }
+" let g:airline_section_warning = ''
 
 let g:gitgutter_escape_grep = 1
 let g:gitgutter_eager = 0
-
-let g:Powerline_symbols = 'fancy'
-let g:jedi#use_tabs_not_buffers = 0
-let g:jedi#popup_on_dot = 0
-let g:jedi#show_function_definition = "0"
 
 let g:pyindent_open_paren = '&sw'
 let g:pyindent_continue = '&sw'
