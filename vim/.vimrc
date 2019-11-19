@@ -21,6 +21,7 @@ set splitright
 set modeline
 set modelines=1
 set noesckeys
+set sw=2 sts=2 noexpandtab
 
 set wildignore+=*.o
 set wildignore+=*.a
@@ -43,7 +44,8 @@ Plugin 'VundleVim/Vundle.vim'
 
 Plugin 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
 Plugin 'junegunn/fzf.vim'
-
+Plugin 'rhysd/vim-clang-format'
+Plugin 'alx741/vim-hindent'
 Plugin 'editorconfig/editorconfig-vim'
 " Plugin 'mileszs/ack.vim'
 " Plugin 'tpope/vim-fireplace'
@@ -89,11 +91,11 @@ Plugin 'hdima/python-syntax'
 " Plugin 'leafgarden/typescript-vim'
 call vundle#end()
 
+let g:hindent_on_save = 0
 let g:hdevtools_stack = 1
 
 nnoremap <Leader>ht :GhcModType<cr>
 nnoremap <Leader>htc :GhcModTypeClear<cr>
-autocmd FileType haskell nnoremap <buffer> <leader>? :call ale#cursor#ShowCursorDetail()<CR>
 
 let g:gitgutter_max_signs = 2000
 
@@ -131,27 +133,32 @@ autocmd BufNewFile,BufReadPost *.coffee setl shiftwidth=2 expandtab
 " autocmd BufNewFile,BufReadPost *.jsx set autoindent noexpandtab ts=2 sw=2
 
 autocmd FileType gitcommit setlocal textwidth=71
-autocmd FileType go setlocal tabstop=4 shiftwidth=4
-autocmd FileType go nmap <Leader>s <Plug>(go-implements)
-autocmd FileType go nmap <Leader>i <Plug>(go-info)
-autocmd FileType go nmap <Leader>gd <Plug>(go-doc)
-autocmd FileType go nmap <Leader>gv <Plug>(go-doc-vertical)
-autocmd FileType go nmap <Leader>gb <Plug>(go-doc-browser)
-autocmd FileType go nmap <leader>r <Plug>(go-run)
-autocmd FileType go nmap <leader>b <Plug>(go-build)
-autocmd FileType go nmap <leader>t <Plug>(go-test)
-autocmd FileType go nmap <leader>c <Plug>(go-coverage)
-autocmd FileType go nmap <Leader>ds <Plug>(go-def-split)
-autocmd FileType go nmap <Leader>dv <Plug>(go-def-vertical)
-autocmd FileType go nmap <Leader>dt <Plug>(go-def-tab)
-autocmd FileType go nmap <Leader>e <Plug>(go-rename)
-autocmd FileType go nmap <C-]> :GoDef<CR>zz
 autocmd FileType config setlocal tabstop=2 softtabstop=0 expandtab shiftwidth=2 smarttab
 
+augroup Golang
+  autocmd FileType go setlocal tabstop=4 shiftwidth=4
+  autocmd FileType go nmap <Leader>s <Plug>(go-implements)
+  autocmd FileType go nmap <Leader>i <Plug>(go-info)
+  autocmd FileType go nmap <Leader>gd <Plug>(go-doc)
+  autocmd FileType go nmap <Leader>gv <Plug>(go-doc-vertical)
+  autocmd FileType go nmap <Leader>gb <Plug>(go-doc-browser)
+  autocmd FileType go nmap <leader>r <Plug>(go-run)
+  autocmd FileType go nmap <leader>b <Plug>(go-build)
+  autocmd FileType go nmap <leader>t <Plug>(go-test)
+  autocmd FileType go nmap <leader>c <Plug>(go-coverage)
+  autocmd FileType go nmap <Leader>ds <Plug>(go-def-split)
+  autocmd FileType go nmap <Leader>dv <Plug>(go-def-vertical)
+  autocmd FileType go nmap <Leader>dt <Plug>(go-def-tab)
+  autocmd FileType go nmap <Leader>e <Plug>(go-rename)
+  autocmd FileType go nmap <C-]> :GoDef<CR>zz
+augroup END
+
 augroup Haskell
-  autocmd FileType haskell nnoremap <buffer> <F1> :HdevtoolsType<CR>
-  autocmd FileType haskell nnoremap <buffer> <F2> :HdevtoolsInfo<CR>
-  autocmd FileType haskell nnoremap <buffer> <F3> :HdevtoolsClear<CR>
+  autocmd FileType haskell setlocal sw=2 sts=2 ts=8 expandtab shiftround
+  autocmd FileType haskell setlocal makeprg=stack\ build\ --fast
+  autocmd FileType haskell nnoremap <buffer> <F1> :HdevtoolsInfo<CR>
+  autocmd FileType haskell nnoremap <buffer> <F2> :HdevtoolsType<CR>
+  autocmd FileType haskell nnoremap <buffer> <Leader>` :!stack exec -- hasktags -c src<CR>
 augroup END
 
 nnoremap ; :
@@ -165,9 +172,12 @@ nnoremap n nzz
 nnoremap N Nzz
 nnoremap * *zz
 
-nnoremap <Leader>} mhv%='h
 nnoremap <Leader><Leader> mhva}='h
 autocmd Syntax cpp call EnhanceCppSyntax()
+autocmd FileType cpp nnoremap <F4> :wa<CR> :e %:p:s,.h$,.X123X,:s,.cpp$,.h,:s,.X123X$,.cpp,<CR>
+autocmd FileType cpp inoremap <F4> <Esc> <F4>
+autocmd FileType cpp vnoremap <F4> <Esc> <F4>
+
 
 " allow backspacing over everything in insert mode
 set backspace=indent,eol,start
@@ -176,10 +186,6 @@ set history=50		" keep 50 lines of command line history
 set ruler		" show the cursor position all the time
 set showcmd		" display incomplete commands
 set incsearch		" do incremental searching
-" :inoremap <expr> <CR> pumvisible() ? "\<C-y>" : "\<C-g>u\<CR>"
-
-" For Win32 GUI: remove 't' flag from 'guioptions': no tearoff menu entries
-" let &guioptions = substitute(&guioptions, "t", "", "g")
 
 " Don't use Ex mode, use Q for formatting
 vmap Q gq
@@ -191,8 +197,6 @@ nmap <CR><CR> :!<CR>
 
 " map home row to exit Insert mode
 inoremap jk <Esc>
-nmap <leader>' i'<CR>'<Esc>gqj
-nmap <leader>" i"<CR>"<Esc>gqj
 vnoremap . :norm.<CR>
 
 function! Peg()
@@ -210,14 +214,6 @@ function! FindPrompt()
 	endif
 
 	execute "Rg " . str
-endfunction
-
-function! DeleteAllLinesWithThisWord()
-	let str = expand("<cword>")
-	if str == ""
-		return
-	endif
-	:silent! execute "g/" . str . "/d"
 endfunction
 
 function! FindWordUnderCursor()
@@ -244,21 +240,15 @@ function! EnhanceCppSyntax()
   hi def link cppFuncDef Special
 endfunction
 
-nnoremap <leader>~ :!build-ctags<CR>
 nnoremap <leader>` :!build-ctags<CR>
 
 nnoremap <F3> :call FindWordUnderCursor()<CR>
-
-nmap <F4> :wa<CR> :e %:p:s,.h$,.X123X,:s,.cpp$,.h,:s,.X123X$,.cpp,<CR>
-inoremap <F4> <Esc> <F4>
-vnoremap <F4> <Esc> <F4>
 
 nnoremap F :wa<CR>:call FindPrompt()<CR>
 nnoremap T :Tags<CR>
 nnoremap g] :call FindTagUnderCursor()<CR>
 
 map <F5> :echo "hi<" . synIDattr(synID(line("."),col("."),1),"name") . '> trans<' . synIDattr(synID(line("."),col("."),0),"name") . "> lo<" . synIDattr(synIDtrans(synID(line("."),col("."),1)),"name") . ">"<CR>
-"nnoremap <leader>d :set modifiable<CR>:call DeleteAllLinesWithThisWord()<CR>:set nomodifiable<CR>
 nnoremap <leader>e :e `=expand('%:p:h')`<CR>
 nnoremap <leader>D :cd `=expand('%:p:h')`<CR>:pwd<CR>
 
@@ -362,16 +352,14 @@ autocmd FileType htmldjango setlocal sw=2 sts=2 ts=2 expandtab
 autocmd FileType html setlocal sw=2 sts=2 ts=2 expandtab
 autocmd FileType less setlocal sw=2 sts=2 ts=2 expandtab
 autocmd FileType css setlocal sw=2 sts=2 ts=2 expandtab
-autocmd FileType haskell setlocal sw=2 sts=2 ts=8 expandtab shiftround
-autocmd FileType haskell setlocal makeprg=stack\ build
 autocmd FileType markdown setlocal textwidth=80 expandtab nocindent noautoindent nosmartindent cino=
 autocmd FileType conf setlocal expandtab sw=2 sts=2 smartindent
 " autocmd FileType sh setlocal expandtab sw=2 sts=2 ts=2 expandtab smartindent
 
-augroup myvimrc
-	autocmd!
-	autocmd BufWritePost local.vimrc,.vimrc so $MYVIMRC
-augroup END
+"augroup myvimrc
+"  autocmd!
+"  autocmd BufWritePost local.vimrc,.vimrc so $MYVIMRC
+"augroup END
 
 augroup filetypedetect
     au! BufRead,BufNewFile *.bashrc setfiletype sh
@@ -383,7 +371,7 @@ set gdefault
 set visualbell
 set showmatch
 set nowrap
-set guifont=Menlo\ Regular:h10
+set guifont=Meslo\ LG\ M\ for\ Powerline
 set matchtime=0
 set hlsearch
 syntax on
