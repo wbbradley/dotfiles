@@ -68,6 +68,7 @@ Plugin 'tpope/vim-fugitive'
 " Plugin 'mxw/vim-jsx'
 Plugin 'scrooloose/syntastic'
 
+Plugin 'prabirshrestha/async.vim'
 Plugin 'prabirshrestha/vim-lsp'
 
 Plugin 'bitc/vim-hdevtools'
@@ -115,6 +116,22 @@ let g:pyindent_continue = '&sw'
 let g:go_version_warning = 0
 let g:go_highlight_build_constraints = 1
 let g:go_fmt_command = "goimports"
+let g:go_def_mode='gopls'
+let g:go_info_mode='gopls'
+
+augroup LspGo
+  au!
+  autocmd User lsp_setup call lsp#register_server({
+      \ 'name': 'go-lang',
+      \ 'cmd': {server_info->['gopls']},
+      \ 'whitelist': ['go'],
+      \ })
+  autocmd FileType go setlocal omnifunc=lsp#complete
+  autocmd FileType go nmap <buffer> gd <plug>(lsp-definition)
+  autocmd FileType go nmap <buffer> ,n <plug>(lsp-next-error)
+  autocmd FileType go nmap <buffer> ,p <plug>(lsp-previous-error)
+augroup END
+
 let g:vim_json_syntax_conceal = 0
 let g:jsx_ext_required = 0
 
@@ -275,7 +292,7 @@ nmap <F9> :setlocal autowrite<CR>:cprev<CR>:setlocal noautowrite<CR>zz
 nmap <F10> :setlocal autowrite<CR>:cnext<CR>:setlocal noautowrite<CR>zz
 
 " turning syntax on tends to redraw the screen nicely
-nnoremap <leader><space> :syn on<cr>:noh<cr>:match<cr>:set nopaste<CR>:set colorcolumn=0<CR>:HdevtoolsClear<CR>
+nnoremap <leader><space> :syn on<cr>:noh<cr>:match<cr>:set nopaste<CR>:set colorcolumn=0<CR>
 nnoremap <leader>t viwy:tabnew<CR>:e ~/vim-todo.txt<CR>ggPa<CR><Esc>:wq<CR>
 nnoremap <leader>T :tabnew<CR>:e ~/vim-todo.txt<CR>
 nnoremap <leader>q :conf qa<CR>
@@ -394,4 +411,5 @@ syn match Braces display '[<>{}()\[\]]'
 let c_no_curly_error=1
 
 silent! source ~/local.vimrc
+silent! source local.vimrc
 
