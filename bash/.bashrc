@@ -21,7 +21,7 @@ export PS1="\$(if [ \$? != 0 ]; then echo '\[\033[47;5;88;34;5;1m\] ERROR \[\033
 
 export SRC_ROOT=$HOME/src
 alias vi=vim
-alias uuid='python -c "import uuid;print(uuid.uuid4())" | tee | pbcopy'
+alias uuid="python -c \"import uuid;print(uuid.uuid4())\" | tr -d '\n' | pbcopy"
 HISTFILESIZE=15000
 
 shopt -s histappend

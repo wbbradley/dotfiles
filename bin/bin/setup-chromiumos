@@ -1,0 +1,39 @@
+#!/bin/bash
+
+directory="$1"
+shift
+branch="${1:-master}"
+shift
+
+if [ -d "$directory" ]; then
+  echo "Cannot install to $directory because it already exists. Remember to use cros_sdk --delete when you delete it!"
+  exit 1
+fi
+
+echo "Setting up branch $branch of ChromiumOS to $directory..."
+
+# release-R70-11021.B
+# release-R71-11151.B
+# release-R72-11316.B Good
+# release-R73-11647.B
+# release-R74-11895.B
+# release-R75-12105.B
+# release-R76-12239.B
+# release-R77-12371.B
+# release-R78-12499.B
+# release-R79-12607.B
+
+mkdir "$directory" || exit 1
+cd "$directory" || exit 1
+
+# repo init \
+#   -u https://chromium.googlesource.com/chromiumos/manifest.git \
+#   --repo-url https://chromium.googlesource.com/external/repo.git
+repo init \
+  -u https://chrome-internal.googlesource.com/chromeos/manifest-internal.git \
+  --repo-url https://chromium.googlesource.com/external/repo.git \
+  -b "${branch}"
+repo sync -qj 160
+# cros_sdk -- setup_board --board=amd64-generic
+# echo "Run (cd bsect && cros_sdk -- ./build_packages --board=amd64-generic vim)"
+# echo "When it\'s running, Ctrl-C, and if it quits, then mark ${branch} as good."

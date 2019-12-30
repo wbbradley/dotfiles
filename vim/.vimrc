@@ -4,6 +4,7 @@ set encoding=utf-8
 set ttyfast
 set undofile
 set undodir=~/.vim/undodir
+set noshowmode
 " set path=src,$HOME/src
 
 if has('win32')
@@ -19,7 +20,7 @@ set cpoptions+=n
 set splitbelow
 set splitright
 set modeline
-set modelines=1
+set modelines=2
 set noesckeys
 set sw=2 sts=2 noexpandtab
 
@@ -31,6 +32,7 @@ set wildignore+=toolchains
 let g:EditorConfig_max_line_indicator = 'none'
 
 set wildchar=<Tab> wildmenu wildmode=full
+set tabstop=2 softtabstop=2 expandtab shiftwidth=2 smarttab
 
 filetype off
 
@@ -68,15 +70,13 @@ Plugin 'tpope/vim-fugitive'
 " Plugin 'fweep/vim-tabber'
 " Plugin 'pangloss/vim-javascript'
 " Plugin 'mxw/vim-jsx'
-Plugin 'scrooloose/syntastic'
-
-Plugin 'prabirshrestha/vim-lsp'
+Plugin 'dense-analysis/ale'
 
 Plugin 'bitc/vim-hdevtools'
 Plugin 'hynek/vim-python-pep8-indent.git'
 Plugin 'christoomey/vim-tmux-navigator'
 " Plugin 'sjl/threesome.vim.git'
-Plugin 'bling/vim-airline'
+" Plugin 'bling/vim-airline'
 " Plugin 'toyamarinyon/vim-swift'
 " Plugin 'ryanss/vim-hackernews'
 Plugin 'fatih/vim-go', { 'do': ':GoUpdateBinaries' }
@@ -89,10 +89,36 @@ Plugin 'hdima/python-syntax'
 " Plugin 'Superbil/llvm.vim'
 " Plugin 'flowtype/vim-flow'
 " Plugin 'leafgarden/typescript-vim'
+Plugin 'itchyny/lightline.vim'
+Plugin 'maximbaz/lightline-ale'
 call vundle#end()
 
 let g:hindent_on_save = 0
 let g:hdevtools_stack = 1
+let g:lightline = {}
+
+let g:lightline.component_expand = {
+      \  'linter_checking': 'lightline#ale#checking',
+      \  'linter_warnings': 'lightline#ale#warnings',
+      \  'linter_errors': 'lightline#ale#errors',
+      \  'linter_ok': 'lightline#ale#ok',
+      \ }
+
+let g:lightline.component_type = {
+      \     'linter_checking': 'left',
+      \     'linter_warnings': 'warning',
+      \     'linter_errors': 'error',
+      \     'linter_ok': 'left',
+      \ }
+
+let g:lightline.active = { 'right': [[ 'linter_checking', 'linter_errors', 'linter_warnings', 'linter_ok' ]] }
+" let g:ale_open_list = 1
+
+let g:multi_cursor_exit_from_insert_mode=1
+let g:multi_cursor_exit_from_visual_mode=1
+
+" let g:airline#extensions#ale#enabled = 1
+let g:ale_python_auto_pipenv = 1
 
 nnoremap <Leader>ht :GhcModType<cr>
 nnoremap <Leader>htc :GhcModTypeClear<cr>
@@ -117,6 +143,10 @@ let g:pyindent_continue = '&sw'
 let g:go_version_warning = 0
 let g:go_highlight_build_constraints = 1
 let g:go_fmt_command = "goimports"
+let g:go_def_mode='gopls'
+let g:go_info_mode='gopls'
+let g:go_fmt_fail_silently = 0
+
 let g:vim_json_syntax_conceal = 0
 let g:jsx_ext_required = 0
 
@@ -167,7 +197,9 @@ nnoremap <C-o> <C-o>zz
 nnoremap <C-i> <C-i>zz
 nnoremap <leader>rm! :call delete(expand('%')) \| bdelete!<CR>
 nnoremap <leader>+ viwyo"""<Esc>pA."""<Esc>_wvU<Esc>V:s/_/ /<CR>:noh<CR>:match<CR>
-nnoremap <C-b> :echo "You're not in tmux!"<CR>
+nnoremap <Leader>1 :e ~/README.txt<CR>Go<Esc>:r!date<CR>o
+nnoremap <Leader>c :%s/\<<C-r><C-w>\>/
+nnoremap <C-b> <C-w>
 nnoremap n nzz
 nnoremap N Nzz
 nnoremap * *zz
@@ -182,16 +214,17 @@ autocmd FileType cpp vnoremap <F4> <Esc> <F4>
 " allow backspacing over everything in insert mode
 set backspace=indent,eol,start
 set lazyredraw
-set history=50		" keep 50 lines of command line history
-set ruler		" show the cursor position all the time
-set showcmd		" display incomplete commands
-set incsearch		" do incremental searching
+set history=50 " keep 50 lines of command line history
+set ruler      " show the cursor position all the time
+set showcmd    " display incomplete commands
+set incsearch  " do incremental searching
 
 " Don't use Ex mode, use Q for formatting
 vmap Q gq
 nmap Q VQ
 
 nmap <C-p> :Files<CR>
+nmap <Leader>z :Files ~/src/zion<CR>
 nmap M :History<CR>
 nmap <CR><CR> :!<CR>
 
@@ -265,15 +298,13 @@ nmap <F9> :setlocal autowrite<CR>:cprev<CR>:setlocal noautowrite<CR>zz
 nmap <F10> :setlocal autowrite<CR>:cnext<CR>:setlocal noautowrite<CR>zz
 
 " turning syntax on tends to redraw the screen nicely
-nnoremap <leader><space> :syn on<cr>:noh<cr>:match<cr>:set nopaste<CR>:set colorcolumn=0<CR>:HdevtoolsClear<CR>
+nnoremap <leader><space> :syn on<cr>:noh<cr>:match<cr>:set nopaste<CR>:set colorcolumn=0<CR>
 nnoremap <leader>t viwy:tabnew<CR>:e ~/vim-todo.txt<CR>ggPa<CR><Esc>:wq<CR>
 nnoremap <leader>T :tabnew<CR>:e ~/vim-todo.txt<CR>
 nnoremap <leader>q :conf qa<CR>
 nnoremap <leader>v <C-w>v<C-w>l<C-w>n<C-w>h
 
 nnoremap <leader>9t :e tests/test_basic.zion<CR>:make<CR>
-" nnoremap <leader>9w :cexpr system('wmake ' . shellescape(expand('%:r')))
-nnoremap <leader>9w :e .wmake<CR>
 nnoremap <leader>90 :e ~/.vimrc<CR>
 nnoremap <leader>91 :e ~/local.vimrc<CR>
 nnoremap <leader>92 :e ~/.bashrc<CR>
@@ -345,6 +376,7 @@ augroup END
 
 autocmd FileType * setlocal colorcolumn=0
 autocmd FileType ts setlocal sw=2 sts=2 ts=2 expandtab
+autocmd FileType txt setlocal smartindent
 autocmd FileType javascript setlocal sw=2 sts=2 ts=2 expandtab
 autocmd FileType yaml setlocal sw=2 sts=2 ts=2 expandtab
 autocmd FileType python setlocal sw=4 sts=4 ts=4 expandtab
@@ -355,11 +387,6 @@ autocmd FileType css setlocal sw=2 sts=2 ts=2 expandtab
 autocmd FileType markdown setlocal textwidth=80 expandtab nocindent noautoindent nosmartindent cino=
 autocmd FileType conf setlocal expandtab sw=2 sts=2 smartindent
 " autocmd FileType sh setlocal expandtab sw=2 sts=2 ts=2 expandtab smartindent
-
-"augroup myvimrc
-"  autocmd!
-"  autocmd BufWritePost local.vimrc,.vimrc so $MYVIMRC
-"augroup END
 
 augroup filetypedetect
     au! BufRead,BufNewFile *.bashrc setfiletype sh
@@ -382,4 +409,5 @@ syn match Braces display '[<>{}()\[\]]'
 let c_no_curly_error=1
 
 silent! source ~/local.vimrc
+silent! source local.vimrc
 
