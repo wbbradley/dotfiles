@@ -109,7 +109,7 @@ let g:lightline.component_type = {
       \ }
 
 let g:lightline.active = { 'right': [[ 'linter_checking', 'linter_errors', 'linter_warnings', 'linter_ok' ]] }
-let g:ale_open_list = 1
+" let g:ale_open_list = 1
 
 let g:multi_cursor_exit_from_insert_mode=1
 let g:multi_cursor_exit_from_visual_mode=1
