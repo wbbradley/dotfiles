@@ -111,13 +111,11 @@ let g:lightline.component_type = {
       \     'linter_ok': 'left',
       \ }
 
-let g:lightline = {
-      \ 'component_function': {
-      \   'filename': 'LightlineFilename',
-      \ }
-      \ }
+let g:lightline.component_function = get(g:lightline, 'component_function', {})
+let g:lightline.component_function.filename = 'LightlineFilename'
 
 function! LightlineFilename()
+  return expand('%')
   let root = fnamemodify(get(b:, 'git_dir'), ':h')
   let path = expand('%:p')
   if path[:len(root)-1] ==# root
@@ -416,6 +414,8 @@ set nowrap
 set guifont=Meslo\ LG\ M\ for\ Powerline
 set matchtime=0
 set hlsearch
+set signcolumn=yes
+
 syntax on
 colorscheme ir_black
 

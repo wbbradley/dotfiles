@@ -127,6 +127,7 @@ function list-files() {
 			-e '/protobuf/' \
 			-e '/rockchip/' \
 			-e '/safe_browsing/' \
+			-e '/pyasn1-modules/' \
 			-e '/shill/.*_test' \
 			-e '/shill/metrics.h' \
 			-e '/sqlite/' \
@@ -196,7 +197,7 @@ grep -E -v \
 	-e '^value\b' \
 	-e '^internal\b' \
 	tags \
-	| awk '$2 ~ /^\.\/.*/ {next} {if (length($1) >= 7 && (length($1) < 50)) print}' \
+	| awk '$2 ~ /^\.\/.*/ {next} {if (length($1) >= 3 && (length($1) < 50)) print}' \
 	> tags.clean
 rm tags
 mv tags.clean tags
