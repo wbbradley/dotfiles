@@ -46,10 +46,11 @@ export EDITOR="vim"
 export PATH=$PATH:$HOME/bin
 
 platform='unknown'
-unamestr=`uname`
+unamestr="$(uname)"
 
 if [ "$unamestr" = 'Linux' ]; then
 	platform='linux'
+  alias pbcopy="xclip -selection clipboard -i"
 elif [ "$unamestr" = 'FreeBSD' ]; then
 	platform='freebsd'
 elif [ "$unamestr" = 'Darwin' ]; then
@@ -62,7 +63,7 @@ alias venv='. env/bin/activate ; python --version ; pip --version'
 alias venvc='virtualenv -p python3 env && . env/bin/activate ; python --version ; pip --version'
 
 wvi () {
-	$EDITOR `which $@`;
+	"$EDITOR" "$(command -v "$@")"
 }
 
 if [ $platform == 'windows' ]; then
@@ -92,7 +93,9 @@ if [ $platform == 'linux' ]; then
 
 	# enable color support of ls and also add handy aliases
 	if [ -x /usr/bin/dircolors ]; then
-		test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)" || eval "$(dircolors -b)"
+		if test -r ~/.dircolors; then
+      eval "$(dircolors -b ~/.dircolors)" || eval "$(dircolors -b)"
+    fi
 
 		alias grep='grep --color=auto'
 		alias fgrep='fgrep --color=auto'
@@ -106,7 +109,7 @@ if [ $platform == 'linux' ]; then
 fi
 
 if [ -f "$HOME/local.bashrc" ]; then
-	. $HOME/local.bashrc
+	. "$HOME/local.bashrc"
 fi
 
 [ -f ~/.fzf.bash ] && source ~/.fzf.bash

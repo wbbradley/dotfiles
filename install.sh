@@ -50,7 +50,6 @@ stow -t $HOME bin
 # Set up my git defaults
 git config --global color.diff always
 git config --global --add color.ui true
-git config --global core.editor `which vim`
 git config --global push.default tracking
 git config --global branch.autosetuprebase always
 git config --global merge.ff only

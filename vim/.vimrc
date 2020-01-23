@@ -2,7 +2,7 @@
 set laststatus=2
 set encoding=utf-8
 set ttyfast
-set undofile
+" set undofile
 set undodir=~/.vim/undodir
 set noshowmode
 set exrc
@@ -50,6 +50,7 @@ Plugin 'junegunn/fzf.vim'
 Plugin 'rhysd/vim-clang-format'
 Plugin 'alx741/vim-hindent'
 Plugin 'editorconfig/editorconfig-vim'
+Plugin 'dense-analysis/ale'
 " Plugin 'mileszs/ack.vim'
 " Plugin 'tpope/vim-fireplace'
 " Plugin 'othree/html5.vim'
@@ -71,7 +72,7 @@ Plugin 'tpope/vim-fugitive'
 " Plugin 'fweep/vim-tabber'
 " Plugin 'pangloss/vim-javascript'
 " Plugin 'mxw/vim-jsx'
-Plugin 'dense-analysis/ale'
+" Plugin 'scrooloose/syntastic'
 
 Plugin 'bitc/vim-hdevtools'
 Plugin 'hynek/vim-python-pep8-indent.git'
@@ -136,6 +137,8 @@ let g:multi_cursor_exit_from_visual_mode=1
 nnoremap <Leader>ht :GhcModType<cr>
 nnoremap <Leader>htc :GhcModTypeClear<cr>
 
+let g:multi_cursor_exit_from_visual_mode=1
+let g:multi_cursor_exit_from_insert_mode=1
 let g:gitgutter_max_signs = 2000
 
 let g:airline#extensions#ale#enabled = 1
@@ -177,6 +180,7 @@ autocmd BufNewFile,BufReadPost *.coffee setl shiftwidth=2 expandtab
 
 autocmd FileType gitcommit setlocal textwidth=71
 autocmd FileType config setlocal tabstop=2 softtabstop=0 expandtab shiftwidth=2 smarttab
+autocmd FileType sql setlocal tabstop=2 softtabstop=0 expandtab shiftwidth=2 smarttab
 
 augroup Golang
   autocmd FileType go setlocal tabstop=4 shiftwidth=4
@@ -400,7 +404,7 @@ autocmd FileType less setlocal sw=2 sts=2 ts=2 expandtab
 autocmd FileType css setlocal sw=2 sts=2 ts=2 expandtab
 autocmd FileType markdown setlocal textwidth=80 expandtab nocindent noautoindent nosmartindent cino=
 autocmd FileType conf setlocal expandtab sw=2 sts=2 smartindent
-" autocmd FileType sh setlocal expandtab sw=2 sts=2 ts=2 expandtab smartindent
+autocmd FileType sh setlocal expandtab sw=2 sts=2 ts=2 expandtab smartindent
 
 augroup filetypedetect
     au! BufRead,BufNewFile *.bashrc setfiletype sh
