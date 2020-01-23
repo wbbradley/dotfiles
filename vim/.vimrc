@@ -5,7 +5,7 @@ set ttyfast
 set undofile
 set undodir=~/.vim/undodir
 set noshowmode
-" set path=src,$HOME/src
+set exrc
 
 if has('win32')
 elseif has('mac')
@@ -38,6 +38,7 @@ filetype off
 
 set rtp+=~/.vim/bundle/Vundle.vim
 set rtp+=~/src/vim-zion
+set rtp+=~/src/layer/vim
 
 call vundle#begin()
 
@@ -95,16 +96,17 @@ call vundle#end()
 
 let g:hindent_on_save = 0
 let g:hdevtools_stack = 1
-let g:lightline = {}
 
-let g:lightline.component_expand = {
-      \  'linter_checking': 'lightline#ale#checking',
-      \  'linter_warnings': 'lightline#ale#warnings',
-      \  'linter_errors': 'lightline#ale#errors',
-      \  'linter_ok': 'lightline#ale#ok',
-      \ }
+let g:lightline = get(g:, 'lightline', {})
+let g:lightline.component_expand = get(g:lightline, 'component_expand', {})
+let g:lightline.component_expand.linter_checking = 'lightline#ale#checking'
+let g:lightline.component_expand.linter_warnings = 'lightline#ale#warnings'
+let g:lightline.component_expand.linter_errors = 'lightline#ale#errors'
+let g:lightline.component_expand.linter_ok = 'lightline#ale#ok'
 
 let g:lightline.component_type = {
+      \     'tabs': 'tabsel',
+      \     'close': 'raw',
       \     'linter_checking': 'left',
       \     'linter_warnings': 'warning',
       \     'linter_errors': 'error',
@@ -116,22 +118,20 @@ let g:lightline.component_function.filename = 'LightlineFilename'
 
 function! LightlineFilename()
   return expand('%')
-  let root = fnamemodify(get(b:, 'git_dir'), ':h')
-  let path = expand('%:p')
-  if path[:len(root)-1] ==# root
-    return path[len(root)+1:]
-  endif
-  return expand('%')
 endfunction
 
-let g:lightline.active = { 'right': [[ 'linter_checking', 'linter_errors', 'linter_warnings', 'linter_ok' ]] }
+let g:lightline.active = get(g:lightline, 'active', {})
+let g:lightline.active.right = [
+      \   [ 'lineinfo' ],
+		  \   [ 'fileformat', 'fileencoding', 'filetype' ],
+      \   [ 'linter_checking', 'linter_errors', 'linter_warnings', 'linter_ok' ]
+      \ ]
 " let g:ale_open_list = 1
 
 let g:multi_cursor_exit_from_insert_mode=1
 let g:multi_cursor_exit_from_visual_mode=1
 
 " let g:airline#extensions#ale#enabled = 1
-let g:ale_python_auto_pipenv = 1
 
 nnoremap <Leader>ht :GhcModType<cr>
 nnoremap <Leader>htc :GhcModTypeClear<cr>
@@ -212,6 +212,7 @@ nnoremap <leader>rm! :call delete(expand('%')) \| bdelete!<CR>
 nnoremap <leader>+ viwyo"""<Esc>pA."""<Esc>_wvU<Esc>V:s/_/ /<CR>:noh<CR>:match<CR>
 nnoremap <Leader>1 :e ~/README.txt<CR>Go<Esc>:r!date<CR>o
 nnoremap <Leader>c :%s/\<<C-r><C-w>\>/
+vnoremap <Leader>c "hy:%s/<C-r>h/
 nnoremap <C-b> <C-w>
 nnoremap n nzz
 nnoremap N Nzz
@@ -219,9 +220,9 @@ nnoremap * *zz
 
 nnoremap <Leader><Leader> mhva}='h
 autocmd Syntax cpp call EnhanceCppSyntax()
-autocmd FileType cpp nnoremap <F4> :wa<CR> :e %:p:s,.h$,.X123X,:s,.cpp$,.h,:s,.X123X$,.cpp,<CR>
-autocmd FileType cpp inoremap <F4> <Esc> <F4>
-autocmd FileType cpp vnoremap <F4> <Esc> <F4>
+autocmd FileType c nnoremap <F4> :wa<CR> :e %:p:s,.h$,.X123X,:s,.c$,.h,:s,.X123X$,.c,<CR>
+autocmd FileType c inoremap <F4> <Esc> <F4>
+autocmd FileType c vnoremap <F4> <Esc> <F4>
 
 
 " allow backspacing over everything in insert mode
@@ -311,7 +312,7 @@ nmap <F9> :setlocal autowrite<CR>:cprev<CR>:setlocal noautowrite<CR>zz
 nmap <F10> :setlocal autowrite<CR>:cnext<CR>:setlocal noautowrite<CR>zz
 
 " turning syntax on tends to redraw the screen nicely
-nnoremap <leader><space> :syn on<cr>:noh<cr>:match<cr>:set nopaste<CR>:set colorcolumn=0<CR>
+nnoremap <leader><space> :syn on<cr>:noh<cr>:match<cr>:set nopaste<CR>:set colorcolumn=0<CR>:set iskeyword=@,48-57,_,192-255<CR>
 nnoremap <leader>t viwy:tabnew<CR>:e ~/vim-todo.txt<CR>ggPa<CR><Esc>:wq<CR>
 nnoremap <leader>T :tabnew<CR>:e ~/vim-todo.txt<CR>
 nnoremap <leader>q :conf qa<CR>
@@ -425,4 +426,5 @@ let c_no_curly_error=1
 
 silent! source ~/local.vimrc
 silent! source local.vimrc
+silent! source .vimrc
 
