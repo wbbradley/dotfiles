@@ -34,67 +34,7 @@ let g:EditorConfig_max_line_indicator = 'none'
 set wildchar=<Tab> wildmenu wildmode=full
 set tabstop=2 softtabstop=2 expandtab shiftwidth=2 smarttab
 
-filetype off
-
-set rtp+=~/.vim/bundle/Vundle.vim
-set rtp+=~/src/vim-zion
-set rtp+=~/src/layer/vim
-
-call vundle#begin()
-
-" let Vundle manage Vundle, required
-Plugin 'VundleVim/Vundle.vim'
-
-Plugin 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
-Plugin 'junegunn/fzf.vim'
-Plugin 'rhysd/vim-clang-format'
-Plugin 'alx741/vim-hindent'
-Plugin 'editorconfig/editorconfig-vim'
-Plugin 'dense-analysis/ale'
-" Plugin 'mileszs/ack.vim'
-" Plugin 'tpope/vim-fireplace'
-" Plugin 'othree/html5.vim'
-" Plugin 'vim-scripts/YankRing.vim'
-" Plugin 'maxbrunsfeld/vim-yankstack'
-" Plugin 'jmcantrell/vim-virtualenv'
-" Plugin 'vim-scripts/django.vim'
-Plugin 'nvie/vim-flake8'
-Plugin 'airblade/vim-gitgutter'
-Plugin 'tpope/vim-fugitive'
-" Plugin 'tpope/vim-dispatch'
-" Plugin 'tpope/vim-unimpaired'
-" Plugin 'kchmck/vim-coffee-script.git'
-" Plugin 'jimmyhchan/dustjs.vim.git'
-" Plugin 'juvenn/mustache.vim.git'
-" Plugin 'Lokaltog/vim-easymotion'
-" Plugin 'groenewege/vim-less'
-" Plugin 'rking/ag.vim'
-" Plugin 'fweep/vim-tabber'
-" Plugin 'pangloss/vim-javascript'
-" Plugin 'mxw/vim-jsx'
-" Plugin 'scrooloose/syntastic'
-
-" Plugin 'bitc/vim-hdevtools'
-Plugin 'hynek/vim-python-pep8-indent.git'
-Plugin 'christoomey/vim-tmux-navigator'
-" Plugin 'sjl/threesome.vim.git'
-" Plugin 'bling/vim-airline'
-" Plugin 'toyamarinyon/vim-swift'
-" Plugin 'ryanss/vim-hackernews'
-Plugin 'fatih/vim-go', { 'do': ':GoUpdateBinaries' }
-Plugin 'terryma/vim-expand-region'
-Plugin 'terryma/vim-multiple-cursors'
-" Plugin 'solarnz/thrift.vim'
-Plugin 'hdima/python-syntax'
-" Plugin 'IN3D/vim-raml'
-" Plugin 'elzr/vim-json'
-" Plugin 'Superbil/llvm.vim'
-" Plugin 'flowtype/vim-flow'
-" Plugin 'leafgarden/typescript-vim'
-Plugin 'itchyny/vim-haskell-indent'
-Plugin 'itchyny/lightline.vim'
-Plugin 'maximbaz/lightline-ale'
-call vundle#end()
+" set rtp+=~/src/vim-zion
 
 let g:hindent_on_save = 0
 " let g:hdevtools_stack = 1
@@ -372,7 +312,7 @@ inoremap <C-U> <C-G>u<C-U>
 " Use the default filetype settings, so that mail gets 'tw' set to 72,
 " 'cindent' is on in C files, etc.
 " Also load indent files, to automatically do language-dependent indenting.
-filetype plugin indent on
+" filetype plugin indent on
 
 " Put these in an autocmd group, so that we can delete them easily.
 augroup vimrcEx
@@ -423,7 +363,7 @@ set hlsearch
 set signcolumn=yes
 
 syntax on
-colorscheme ir_black
+" colorscheme ir_black
 
 syn match Braces display '[<>{}()\[\]]'
 
