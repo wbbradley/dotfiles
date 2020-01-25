@@ -74,7 +74,7 @@ Plugin 'tpope/vim-fugitive'
 " Plugin 'mxw/vim-jsx'
 " Plugin 'scrooloose/syntastic'
 
-Plugin 'bitc/vim-hdevtools'
+" Plugin 'bitc/vim-hdevtools'
 Plugin 'hynek/vim-python-pep8-indent.git'
 Plugin 'christoomey/vim-tmux-navigator'
 " Plugin 'sjl/threesome.vim.git'
@@ -91,12 +91,13 @@ Plugin 'hdima/python-syntax'
 " Plugin 'Superbil/llvm.vim'
 " Plugin 'flowtype/vim-flow'
 " Plugin 'leafgarden/typescript-vim'
+Plugin 'itchyny/vim-haskell-indent'
 Plugin 'itchyny/lightline.vim'
 Plugin 'maximbaz/lightline-ale'
 call vundle#end()
 
 let g:hindent_on_save = 0
-let g:hdevtools_stack = 1
+" let g:hdevtools_stack = 1
 
 let g:lightline = get(g:, 'lightline', {})
 let g:lightline.component_expand = get(g:lightline, 'component_expand', {})
@@ -203,8 +204,8 @@ augroup END
 augroup Haskell
   autocmd FileType haskell setlocal sw=2 sts=2 ts=8 expandtab shiftround
   autocmd FileType haskell setlocal makeprg=stack\ build\ --fast
-  autocmd FileType haskell nnoremap <buffer> <F1> :HdevtoolsInfo<CR>
-  autocmd FileType haskell nnoremap <buffer> <F2> :HdevtoolsType<CR>
+  " autocmd FileType haskell nnoremap <buffer> <F1> :HdevtoolsInfo<CR>
+  " autocmd FileType haskell nnoremap <buffer> <F2> :HdevtoolsType<CR>
   autocmd FileType haskell nnoremap <buffer> <Leader>` :!stack exec -- hasktags -c src<CR>
 augroup END
 
