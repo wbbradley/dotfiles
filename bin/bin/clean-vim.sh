@@ -8,7 +8,7 @@ plugin() {
   mkdir -p "$pack_dir" 2>/dev/null
   echo "Installing VIM plugin $package..."
   cd "$pack_dir" || exit
-  git clone --depth=1 "git@github.com:$package" || exit
+  git clone --depth=1 "https://github.com/$package" || exit
   echo "Installed VIM plugin $package."
 }
 
@@ -71,7 +71,7 @@ setup-vim-packages() {
 
 setup-fzf() {
   rm -rf "$HOME/.fzf"
-  git clone git@github.com:junegunn/fzf "$fzf_dir"
+  git clone https://github.com/junegunn/fzf "$fzf_dir"
   cd "$fzf_dir" || exit
   ./install --all --no-zsh --no-fish || exit
   ln -s "$fzf_dir" "$pack_dir/fzf"
