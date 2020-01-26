@@ -73,8 +73,9 @@ setup-fzf() {
   rm -rf "$HOME/.fzf"
   git clone git@github.com:junegunn/fzf "$fzf_dir"
   cd "$fzf_dir" || exit
-  ./install --all || exit
+  ./install --all --no-zsh --no-fish || exit
+  ln -s "$fzf_dir" "$pack_dir/fzf"
 }
 
-setup-fzf
 setup-vim-packages
+setup-fzf
