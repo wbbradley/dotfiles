@@ -38,6 +38,7 @@ set tabstop=2 softtabstop=2 expandtab shiftwidth=2 smarttab
 
 let g:hindent_on_save = 0
 " let g:hdevtools_stack = 1
+let g:python_pep8_indent_hang_indent = 4
 
 let g:lightline = get(g:, 'lightline', {})
 let g:lightline.component_expand = get(g:lightline, 'component_expand', {})
@@ -312,7 +313,7 @@ inoremap <C-U> <C-G>u<C-U>
 " Use the default filetype settings, so that mail gets 'tw' set to 72,
 " 'cindent' is on in C files, etc.
 " Also load indent files, to automatically do language-dependent indenting.
-" filetype plugin indent on
+filetype plugin indent on
 
 " Put these in an autocmd group, so that we can delete them easily.
 augroup vimrcEx
