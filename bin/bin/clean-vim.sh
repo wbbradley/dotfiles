@@ -65,6 +65,7 @@ setup-vim-packages() {
   plugin 'itchyny/vim-haskell-indent'
   plugin 'itchyny/lightline.vim'
   plugin 'maximbaz/lightline-ale'
+  plugin 'gentoo/gentoo-syntax'
 
   vim "+helptags ALL" "+q"
 }
