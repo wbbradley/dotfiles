@@ -66,7 +66,11 @@ setup-vim-packages() {
   plugin 'itchyny/lightline.vim'
   plugin 'maximbaz/lightline-ale'
   plugin 'gentoo/gentoo-syntax'
+  plugin 'bohlender/vim-smt2'
 
+  if [[ -d "$HOME/src/vim-zion" ]]; then
+    (cd "$pack_dir" && ln -s "$HOME/src/vim-zion" vim-zion)
+  fi
   vim "+helptags ALL" "+q"
 }
 

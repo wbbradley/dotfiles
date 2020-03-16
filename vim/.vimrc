@@ -154,7 +154,6 @@ nnoremap ; :
 nnoremap <C-]> <C-]>zz
 nnoremap <C-o> <C-o>zz
 nnoremap <C-i> <C-i>zz
-nnoremap <leader>rm! :call delete(expand('%')) \| bdelete!<CR>
 nnoremap <leader>+ viwyo"""<Esc>pA."""<Esc>_wvU<Esc>V:s/_/ /<CR>:noh<CR>:match<CR>
 nnoremap <Leader>1 :e ~/README.txt<CR>Go<Esc>:r!date<CR>o
 nnoremap <Leader>c :%s/\<<C-r><C-w>\>/
@@ -233,7 +232,7 @@ function! EnhanceCppSyntax()
   hi def link cppFuncDef Special
 endfunction
 
-nnoremap <leader>` :!build-ctags<CR>
+nnoremap <leader>` :!ctags -R<CR>
 
 nnoremap <F3> :call FindWordUnderCursor()<CR>
 
@@ -273,7 +272,6 @@ nnoremap <leader>9z :e ~/src/vim-zion/syntax/zion.vim<CR>
 nnoremap <leader>d Odbg();<Esc>_
 nnoremap <leader>i Oimport ipdb<CR>ipdb.set_trace()<Esc>j_
 nnoremap <leader>p Oimport pdb<CR>pdb.set_trace()<Esc>j_
-nnoremap <leader>r Ofrom celery.contrib import rdb<CR>rdb.set_trace()<Esc>j_
 
 " F7 & F8 - incremental build
 nmap <F7> :wa<CR> :!clear <CR><CR> :make<CR><CR>zz
@@ -313,7 +311,6 @@ inoremap <C-U> <C-G>u<C-U>
 " Use the default filetype settings, so that mail gets 'tw' set to 72,
 " 'cindent' is on in C files, etc.
 " Also load indent files, to automatically do language-dependent indenting.
-filetype plugin indent on
 
 " Put these in an autocmd group, so that we can delete them easily.
 augroup vimrcEx
@@ -364,6 +361,9 @@ set hlsearch
 set signcolumn=yes
 
 syntax on
+filetype plugin on
+filetype indent on
+
 " colorscheme ir_black
 
 syn match Braces display '[<>{}()\[\]]'

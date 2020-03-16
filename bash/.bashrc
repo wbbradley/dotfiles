@@ -112,4 +112,12 @@ if [ -f "$HOME/local.bashrc" ]; then
 	. "$HOME/local.bashrc"
 fi
 
+alias chase='pass chase.com -c && open https://www.chase.com/'
+alias amex='pass Amex-Personal -c && open https://www.americanexpress.com/'
+alias wells='pass Wells-Fargo -c && open https://www.wellsfargo.com/'
+alias fidelity='pass Fidelity -c && open https://www.fidelity.com/'
+alias stockplanconnect='pass stockplanconnect.com-morganstanley -c && open https://www.stockplanconnect.morganstanley.com/'
+alias retirementplans='pass retirementplans.vanguard.com -c && open https://retirementplans.vanguard.com/'
+alias my.vanguardplan.com='pass my.vanguardplan.com -c && open https://my.vanguardplan.com/'
+
 [ -f ~/.fzf.bash ] && source ~/.fzf.bash
