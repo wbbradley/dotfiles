@@ -112,12 +112,20 @@ if [ -f "$HOME/local.bashrc" ]; then
 	. "$HOME/local.bashrc"
 fi
 
-alias chase='pass chase.com -c && open https://www.chase.com/'
-alias amex='pass Amex-Personal -c && open https://www.americanexpress.com/'
-alias wells='pass Wells-Fargo -c && open https://www.wellsfargo.com/'
-alias fidelity='pass Fidelity -c && open https://www.fidelity.com/'
-alias stockplanconnect='pass stockplanconnect.com-morganstanley -c && open https://www.stockplanconnect.morganstanley.com/'
-alias retirementplans='pass retirementplans.vanguard.com -c && open https://retirementplans.vanguard.com/'
-alias my.vanguardplan.com='pass my.vanguardplan.com -c && open https://my.vanguardplan.com/'
+function explore-to() {
+  if [ "$unamestr" = 'Linux' ]; then
+    xdg-open "$@"
+  elif [ "$unamestr" = 'Darwin' ]; then
+    open "$@"
+  fi
+}
+
+alias chase='pass chase.com -c && explore-to https://www.chase.com/'
+alias amex='pass Amex-Personal -c && explore-to https://www.americanexpress.com/'
+alias wells='pass Wells-Fargo -c && explore-to https://www.wellsfargo.com/'
+alias fidelity='pass Fidelity -c && explore-to https://www.fidelity.com/'
+alias stockplanconnect='pass stockplanconnect.com-morganstanley -c && explore-to https://stockplanconnect.morganstanley.com/'
+alias retirementplans='pass retirementplans.vanguard.com -c && explore-to https://retirementplans.vanguard.com/'
+alias my.vanguardplan.com='pass my.vanguardplan.com -c && explore-to https://my.vanguardplan.com/'
 
 [ -f ~/.fzf.bash ] && source ~/.fzf.bash
