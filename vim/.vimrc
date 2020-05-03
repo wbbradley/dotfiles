@@ -163,11 +163,28 @@ nnoremap n nzz
 nnoremap N Nzz
 nnoremap * *zz
 
-nnoremap <Leader><Leader> mhva}='h
+nmap <F9> :setlocal autowrite<CR>:cprev<CR>:setlocal noautowrite<CR>zz
+nmap <F10> :setlocal autowrite<CR>:cnext<CR>:setlocal noautowrite<CR>zz
+
 autocmd Syntax cpp call EnhanceCppSyntax()
 autocmd FileType c nnoremap <F4> :wa<CR> :e %:p:s,.h$,.X123X,:s,.c$,.h,:s,.X123X$,.c,<CR>
 autocmd FileType c inoremap <F4> <Esc> <F4>
 autocmd FileType c vnoremap <F4> <Esc> <F4>
+
+function SetCOptions()
+  nmap <Leader><Leader> va}:ClangFormat<CR>
+  nmap == V:ClangFormat<CR>
+  vmap = :'<,'>ClangFormat<CR>
+  nmap Q :ClangFormat<CR>
+  nmap <F9> :lprev<CR>
+  nmap <F10> :lnext<CR>
+endfunction
+
+augroup cstuff
+  autocmd!
+  autocmd FileType cpp call SetCOptions()
+  autocmd FileType c call SetCOptions()
+augroup END
 
 
 " allow backspacing over everything in insert mode
@@ -253,8 +270,6 @@ vmap <C-v> <Plug>(expand_region_shrink)
 :set nowritebackup
 :endif
 
-nmap <F9> :setlocal autowrite<CR>:cprev<CR>:setlocal noautowrite<CR>zz
-nmap <F10> :setlocal autowrite<CR>:cnext<CR>:setlocal noautowrite<CR>zz
 
 " turning syntax on tends to redraw the screen nicely
 nnoremap <leader><space> :syn on<cr>:noh<cr>:match<cr>:set nopaste<CR>:set colorcolumn=0<CR>:set iskeyword=@,48-57,_,192-255<CR>
