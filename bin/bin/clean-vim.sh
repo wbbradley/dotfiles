@@ -51,8 +51,6 @@ setup-vim-packages() {
   # plugin 'ryanss/vim-hackernews'
 
   plugin 'fatih/vim-go'
-  vim +GoUpdateBinaries +q
-
   plugin 'terryma/vim-expand-region'
   plugin 'terryma/vim-multiple-cursors'
   # plugin 'solarnz/thrift.vim'
@@ -67,6 +65,9 @@ setup-vim-packages() {
   plugin 'maximbaz/lightline-ale'
   plugin 'gentoo/gentoo-syntax'
   plugin 'bohlender/vim-smt2'
+  plugin 'vim-ruby/vim-ruby'
+  plugin 'tpope/vim-rails'
+  plugin 'tpope/vim-commentary'
 
   if [[ -d "$HOME/src/vim-zion" ]]; then
     (cd "$pack_dir" && ln -s "$HOME/src/vim-zion" vim-zion)

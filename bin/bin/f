@@ -2,9 +2,13 @@
 
 anded_terms=""
 ored_terms=""
+negation=""
+negation_delim=" | "
 
 for r in "${@}"; do
-	if [ "$anded_terms" = "" ]; then
+  if [ "${r:0:1}" = "-" ]; then
+    negation="${negation}${negation_delim}rg -v '${r:1}'"
+  elif [ "$anded_terms" = "" ]; then
 		anded_terms="rg -e \"$r\""
 		ored_terms="-e \"$r\""
 	else
@@ -13,4 +17,4 @@ for r in "${@}"; do
 	fi
 done
 
-eval "rg -uuu --files | ${anded_terms} | rg $ored_terms" 2>/dev/null
+eval "rg -uuu --files ${negation} | ${anded_terms} | rg $ored_terms" 2>/dev/null

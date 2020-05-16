@@ -70,6 +70,7 @@ let g:lightline.active.right = [
       \   [ 'linter_checking', 'linter_errors', 'linter_warnings', 'linter_ok' ]
       \ ]
 " let g:ale_open_list = 1
+let g:ale_c_gcc_executable=''
 
 let g:multi_cursor_exit_from_insert_mode=1
 let g:multi_cursor_exit_from_visual_mode=1
@@ -94,16 +95,26 @@ let g:gitgutter_eager = 0
 let g:pyindent_open_paren = '&sw'
 let g:pyindent_continue = '&sw'
 
-" let g:go_highlight_functions = 1
-" let g:go_highlight_methods = 1
-" let g:go_highlight_structs = 1
-" let g:go_highlight_operators = 1
-let g:go_version_warning = 0
-let g:go_highlight_build_constraints = 1
+" let g:go_version_warning = 0
+" let g:go_highlight_build_constraints = 1
 let g:go_fmt_command = "goimports"
-let g:go_def_mode='gopls'
-let g:go_info_mode='gopls'
-let g:go_fmt_fail_silently = 0
+" let g:go_def_mode='gopls'
+" let g:go_info_mode='gopls'
+" let g:go_fmt_fail_silently = 0
+
+let g:go_decls_mode = 'fzf'
+" let g:go_def_mapping_enabled = 1
+" let g:go_doc_keywordprg_enabled = 0
+" let g:go_fmt_command = 'goimports'
+" let g:go_fmt_fail_silently = 1
+" let g:go_code_completion_enabled = 1
+let g:go_list_type = 'quickfix'
+" let g:go_highlight_build_constraints = 1
+" let g:go_highlight_generate_tags = 1
+" let g:go_highlight_functions = 1
+" let g:go_highlight_function_calls = 1
+" let g:go_highlight_operators = 1
+" let g:go_statusline_duration = 10000
 
 let g:vim_json_syntax_conceal = 0
 let g:jsx_ext_required = 0
@@ -119,6 +130,14 @@ autocmd FileType qf wincmd J
 autocmd BufNewFile,BufReadPost *.coffee setl shiftwidth=2 expandtab
 " autocmd BufNewFile,BufReadPost *.js set autoindent noexpandtab ts=2 sw=2
 " autocmd BufNewFile,BufReadPost *.jsx set autoindent noexpandtab ts=2 sw=2
+
+augroup Ruby
+  au!
+  autocmd FileType ruby setlocal expandtab shiftwidth=2 tabstop=2
+  autocmd FileType eruby setlocal expandtab shiftwidth=2 tabstop=2
+  autocmd FileType ruby setlocal commentstring=#\ %s
+  autocmd FileType eruby setlocal commentstring=#\ %s
+augroup END
 
 autocmd FileType gitcommit setlocal textwidth=71
 autocmd FileType config setlocal tabstop=2 softtabstop=0 expandtab shiftwidth=2 smarttab
@@ -140,6 +159,7 @@ augroup Golang
   autocmd FileType go nmap <Leader>dt <Plug>(go-def-tab)
   autocmd FileType go nmap <Leader>e <Plug>(go-rename)
   autocmd FileType go nmap <C-]> :GoDef<CR>zz
+  autocmd FileType go nmap <F7> :GoBuild<CR>
 augroup END
 
 augroup Haskell
@@ -156,15 +176,22 @@ nnoremap <C-o> <C-o>zz
 nnoremap <C-i> <C-i>zz
 nnoremap <leader>+ viwyo"""<Esc>pA."""<Esc>_wvU<Esc>V:s/_/ /<CR>:noh<CR>:match<CR>
 nnoremap <Leader>1 :e ~/README.txt<CR>Go<Esc>:r!date<CR>o
+nnoremap <Leader>2 :e ~/github.txt<CR>Go<Esc>:r!date<CR>o
 nnoremap <Leader>c :%s/\<<C-r><C-w>\>/
 vnoremap <Leader>c "hy:%s/<C-r>h/
+vnoremap <Leader>/ :Commentary<CR>
 nnoremap <C-b> <C-w>
 nnoremap n nzz
 nnoremap N Nzz
 nnoremap * *zz
 
-nmap <F9> :setlocal autowrite<CR>:cprev<CR>:setlocal noautowrite<CR>zz
-nmap <F10> :setlocal autowrite<CR>:cnext<CR>:setlocal noautowrite<CR>zz
+" TODO: find the correct way to pick the right list to iterate through. Having muliple lists is
+" more pain than gain.
+" nmap <F9> :setlocal autowrite<CR>:cprev<CR>:setlocal noautowrite<CR>zz
+" nmap <F10> :setlocal autowrite<CR>:cnext<CR>:setlocal noautowrite<CR>zz
+nmap <F9> :setlocal autowrite<CR>:lprev<CR>:setlocal noautowrite<CR>zz
+nmap <F10> :setlocal autowrite<CR>:lnext<CR>:setlocal noautowrite<CR>zz
+
 
 autocmd Syntax cpp call EnhanceCppSyntax()
 autocmd FileType c nnoremap <F4> :wa<CR> :e %:p:s,.h$,.X123X,:s,.c$,.h,:s,.X123X$,.c,<CR>
@@ -249,7 +276,7 @@ function! EnhanceCppSyntax()
   hi def link cppFuncDef Special
 endfunction
 
-nnoremap <leader>` :!ctags -R<CR>
+nnoremap <leader>` :!ctags -R . ~/src/raylib/src<CR>
 
 nnoremap <F3> :call FindWordUnderCursor()<CR>
 
@@ -269,7 +296,6 @@ vmap <C-v> <Plug>(expand_region_shrink)
 :set nobackup
 :set nowritebackup
 :endif
-
 
 " turning syntax on tends to redraw the screen nicely
 nnoremap <leader><space> :syn on<cr>:noh<cr>:match<cr>:set nopaste<CR>:set colorcolumn=0<CR>:set iskeyword=@,48-57,_,192-255<CR>
