@@ -187,8 +187,6 @@ nnoremap * *zz
 
 " TODO: find the correct way to pick the right list to iterate through. Having muliple lists is
 " more pain than gain.
-" nmap <F9> :setlocal autowrite<CR>:cprev<CR>:setlocal noautowrite<CR>zz
-" nmap <F10> :setlocal autowrite<CR>:cnext<CR>:setlocal noautowrite<CR>zz
 nmap <F9> :setlocal autowrite<CR>:lprev<CR>:setlocal noautowrite<CR>zz
 nmap <F10> :setlocal autowrite<CR>:lnext<CR>:setlocal noautowrite<CR>zz
 
@@ -211,6 +209,12 @@ augroup cstuff
   autocmd!
   autocmd FileType cpp call SetCOptions()
   autocmd FileType c call SetCOptions()
+augroup END
+
+augroup pythonstuff
+  autocmd!
+  autocmd FileType python nmap <F9> :setlocal autowrite<CR>:cprev<CR>:setlocal noautowrite<CR>zz
+  autocmd FileType python nmap <F10> :setlocal autowrite<CR>:cnext<CR>:setlocal noautowrite<CR>zz
 augroup END
 
 
