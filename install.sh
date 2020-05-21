@@ -1,6 +1,6 @@
 #!/bin/bash
 # curl https://raw.githubusercontent.com/wbbradley/dotfiles/master/install.sh | bash
-set -ex
+set -x
 
 if [ $(uname) == 'Darwin' ]; then
     echo "Checking that homebrew is installed..."
@@ -17,7 +17,7 @@ if [ $(uname) == 'Darwin' ]; then
     brew install ctags-exuberant reattach-to-user-namespace go git vim bash tmux stow
 fi
 
-if [ $(uname) == 'Linux' ]; then
+if [ "$(uname)" == 'Linux' ]; then
     sudo apt-get update
     sudo apt-get install -y exuberant-ctags stow git vim bash tmux
     sudo apt-get upgrade -y exuberant-ctags stow git vim bash tmux
@@ -29,23 +29,26 @@ curl --version > /dev/null
 vim --version > /dev/null
 stow --version > /dev/null
 
-cd $HOME
-mkdir -p $HOME/src
-cd $HOME/src
+cd "$HOME" || exit
+mkdir -p "$HOME/src"
+cd "$HOME/src" || exit
 rm -rf dotfiles
 git clone git@github.com:wbbradley/dotfiles
-cd $HOME/src/dotfiles
+cd "$HOME/src/dotfiles" || exit
 git submodule init
 git submodule update
 
-if [ -f $HOME/.bashrc ]; then
-    mv $HOME/.bashrc $HOME/.bashrc.bak
+if [ -f "$HOME/.bashrc" ]; then
+    mv "$HOME/.bashrc" "$HOME/.bashrc.bak"
 fi
 
-stow -t $HOME bash
-stow -t $HOME vim
-(cd tmux && stow -t $HOME `uname`)
-stow -t $HOME bin
+stow -t "$HOME" bash || exit
+stow -t "$HOME" vim || exit
+(
+  cd tmux || exit
+  stow -t "$HOME" "$(uname)"
+)
+stow -t "$HOME" bin
 
 # Set up my git defaults
 git config --global color.diff always
@@ -54,6 +57,5 @@ git config --global push.default tracking
 git config --global branch.autosetuprebase always
 git config --global merge.ff only
 
-vim +BundleInstall +qa
-
 echo "Dotfiles installation was successful, please logout of your shell, and log back in."
+echo "Run clean-vim.sh at any time to set up vim, or to reset it."
