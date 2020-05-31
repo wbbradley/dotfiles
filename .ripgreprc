@@ -1,0 +1,8 @@
+--glob=!*.map
+--glob=!vendor/
+--glob=!node_modules
+--glob=!**/git/examples/
+--glob=!*deadbeef.js
+--max-columns=80
+--max-columns-preview
+--smart-case

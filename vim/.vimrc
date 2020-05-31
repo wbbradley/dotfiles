@@ -70,7 +70,17 @@ let g:lightline.active.right = [
       \   [ 'linter_checking', 'linter_errors', 'linter_warnings', 'linter_ok' ]
       \ ]
 " let g:ale_open_list = 1
-let g:ale_c_gcc_executable=''
+" let g:ale_c_gcc_executable=''
+" let g:ale_c_ccls_executable=''
+" let g:ale_c_clang_executable=''
+" let g:ale_cpp_clangcheck_executable = ''
+" let g:ale_cpp_clangtidy_executable = ''
+
+let g:ale_linters = {
+      \ 'cpp': ['clang'],
+      \ 'c': ['clang'],
+      \ 'zion': ['zion'],
+      \ }
 
 let g:multi_cursor_exit_from_insert_mode=1
 let g:multi_cursor_exit_from_visual_mode=1
@@ -187,8 +197,8 @@ nnoremap * *zz
 
 " TODO: find the correct way to pick the right list to iterate through. Having muliple lists is
 " more pain than gain.
-nmap <F9> :setlocal autowrite<CR>:lprev<CR>:setlocal noautowrite<CR>zz
-nmap <F10> :setlocal autowrite<CR>:lnext<CR>:setlocal noautowrite<CR>zz
+nmap <F9> :setlocal autowrite<CR>:cprev<CR>:setlocal noautowrite<CR>zz
+nmap <F10> :setlocal autowrite<CR>:cnext<CR>:setlocal noautowrite<CR>zz
 
 
 autocmd Syntax cpp call EnhanceCppSyntax()
@@ -280,7 +290,7 @@ function! EnhanceCppSyntax()
   hi def link cppFuncDef Special
 endfunction
 
-nnoremap <leader>` :!ctags -R . ~/src/raylib/src<CR>
+nnoremap <leader>` :!ctags -R .<CR>
 
 nnoremap <F3> :call FindWordUnderCursor()<CR>
 
@@ -416,6 +426,6 @@ syn match Braces display '[<>{}()\[\]]'
 let c_no_curly_error=1
 
 silent! source ~/local.vimrc
-silent! source local.vimrc
 silent! source .vimrc
+silent! source local.vimrc
 

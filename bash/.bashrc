@@ -1,3 +1,4 @@
+# vim: ft=sh.bash
 # enable bash completion in interactive shells
 if ! shopt -oq posix; then
 	if [ -f /usr/share/bash-completion/bash_completion ]; then
@@ -127,5 +128,10 @@ alias fidelity='pass Fidelity -c && explore-to https://www.fidelity.com/'
 alias stockplanconnect='pass stockplanconnect.com-morganstanley -c && explore-to https://stockplanconnect.morganstanley.com/'
 alias retirementplans='pass retirementplans.vanguard.com -c && explore-to https://retirementplans.vanguard.com/'
 alias my.vanguardplan.com='pass my.vanguardplan.com -c && explore-to https://my.vanguardplan.com/'
+
+path() {
+  echo "$PATH" \
+    | awk -F : '{ for (i=1;i<=NF;i++) {print $i}}'
+}
 
 [ -f ~/.fzf.bash ] && source ~/.fzf.bash
