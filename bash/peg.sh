@@ -1,4 +1,11 @@
-function fzf-or-grep() {
+#!/bin/bash
+# This file should be sourced, not called as a script.
+
+realpath() {
+    [[ $1 = /* ]] && echo "$1" || echo "$PWD/${1#./}"
+}
+
+fzf-or-grep() {
 	if [[ -z "$1" ]] ; then
 		fzf
 	else
@@ -6,7 +13,7 @@ function fzf-or-grep() {
 	fi
 }
 
-function peg() {
+peg() {
 	# Usage:
 	# peg 
 	#   Called with no parameters, it will list the contents of the $HOME/pegged.txt.
@@ -16,14 +23,15 @@ function peg() {
 	#   pegged.txt file.
 	#
 	local PEGFILE="$HOME/pegged.txt"
+  touch "$PEGFILE"
 	if [ $# -eq 0 ]; then
 		cat "$PEGFILE"
 	else
-		for f in $@; do
+		for f in "$@"; do
 			fullpath=$(realpath "$f")
 			if [[ -e "${fullpath}" ]]; then
 				if ! grep "$fullpath" "$PEGFILE"; then
-					echo $(realpath "$f") >> "$PEGFILE"
+					realpath "$f" >> "$PEGFILE"
 				fi
 			else
 				echo "File ${fullpath} does not seem to exist... ignoring..."
@@ -33,14 +41,14 @@ function peg() {
 	fi
 }
 
-function pegd() {
+pegd() {
 	# Go to the directory where one of your pegged files lives.
 	# Usage
-	# peg
+	# pegd
 	#   Called with no parameters, it will invoke fzf on your pegged.txt
 	#   file and allow you to choose a file. It will then `cd` to that
 	#   directory.
-	# peg params...
+	# pegd params...
 	#   Called with params, it will pass them along to grep to filter down
 	#   your list of pegged files, and choose the top 1. It will then `cd`
 	#   to that directory.
@@ -51,14 +59,14 @@ function pegd() {
 	fi
 }
 
-function pegvi() {
+pegvi() {
 	# Go to the directory where one of your pegged files lives, and open it in vim.
 	# Usage
-	# peg
+	# pegvi
 	#   Called with no parameters, it will invoke fzf on your pegged.txt
 	#   file and allow you to choose a file. It will then `cd` to that
 	#   directory, then open it. Your shell directory will not change.
-	# peg params...
+	# pegvi params...
 	#   Called with params, it will pass them along to grep to filter down
 	#   your list of pegged files, and choose the top 1. It will then `cd`
 	#   to that directory and open it. Your shell directory will not

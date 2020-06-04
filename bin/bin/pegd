@@ -1,0 +1,3 @@
+#!/bin/bash
+. ~/peg.sh
+pegd "$@"

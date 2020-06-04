@@ -75,11 +75,15 @@ let g:lightline.active.right = [
 " let g:ale_c_clang_executable=''
 " let g:ale_cpp_clangcheck_executable = ''
 " let g:ale_cpp_clangtidy_executable = ''
+let g:ale_markdown_markdownlint_executable = './node_modules/.bin/markdownlint'
+let g:ale_ruby_rubocop_executable = './bin/rubocop'
 
 let g:ale_linters = {
+      \ 'markdown': ['markdownlint'],
       \ 'cpp': ['clang'],
       \ 'c': ['clang'],
       \ 'zion': ['zion'],
+      \ 'ruby': ['rubocop'],
       \ }
 
 let g:multi_cursor_exit_from_insert_mode=1
@@ -254,7 +258,7 @@ function! Peg()
 	execute "!peg " . filename
 endfunction
 
-nmap <leader>P :call Peg()<CR>
+nmap <leader>P :call Peg()<CR><CR>
 nmap <leader>9P :e ~/pegged.txt<CR>
 
 function! FindPrompt()

@@ -1,13 +1,16 @@
 # vim: ft=sh.bash
 # enable bash completion in interactive shells
 if ! shopt -oq posix; then
-	if [ -f /usr/share/bash-completion/bash_completion ]; then
-		. /usr/share/bash-completion/bash_completion
-	elif [ -f /etc/bash_completion ]; then
-		. /etc/bash_completion
-	elif [ -d /usr/local/etc/bash_completion.d ]; then
-		for f in /usr/local/etc/bash_completion.d/*; do source $f; done
-	fi
+  if [ -f /usr/share/bash-completion/bash_completion ]; then
+    # shellcheck disable=SC1090,SC1091
+    . /usr/share/bash-completion/bash_completion
+  elif [ -f /etc/bash_completion ]; then
+    # shellcheck disable=SC1090,SC1091
+    . /etc/bash_completion
+  elif [ -d /usr/local/etc/bash_completion.d ]; then
+    # shellcheck disable=SC1090,SC1091
+    for f in /usr/local/etc/bash_completion.d/*; do . "$f"; done
+  fi
 fi
 
 parse_git_branch() {
@@ -15,7 +18,8 @@ parse_git_branch() {
 }
 
 parse_working_dir() {
-	echo `pwd` | sed s%`echo $HOME`%~%
+  # shellcheck disable=SC2001
+  pwd | sed "s%$HOME%~%"
 }
 
 export PS1="\$(if [ \$? != 0 ]; then echo '\[\033[47;5;88;34;5;1m\] ERROR \[\033[0m\]'; fi) \[\033[48;5;95;38;5;214m\] \u \[\033[0;38;5;31;48;5;240;22m\] \[\033[0;38;5;252;48;5;240;1m\] \$(parse_git_branch) \$(parse_working_dir) \[\033[0;38;5;240;49;22m\]\[\033[0m\] "
@@ -26,17 +30,6 @@ alias uuid="python -c \"import uuid;print(uuid.uuid4())\" | tr -d '\n' | pbcopy"
 HISTFILESIZE=15000
 
 shopt -s histappend
-man() {
-	env \
-		LESS_TERMCAP_mb=$(printf "\e[1;31m") \
-		LESS_TERMCAP_md=$(printf "\e[1;31m") \
-		LESS_TERMCAP_me=$(printf "\e[0m") \
-		LESS_TERMCAP_se=$(printf "\e[0m") \
-		LESS_TERMCAP_so=$(printf "\e[1;44;33m") \
-		LESS_TERMCAP_ue=$(printf "\e[0m") \
-		LESS_TERMCAP_us=$(printf "\e[1;32m") \
-		man "$@"
-}
 
 dbg() {
 	echo Running LLDB debugger...
@@ -110,7 +103,8 @@ if [ $platform == 'linux' ]; then
 fi
 
 if [ -f "$HOME/local.bashrc" ]; then
-	. "$HOME/local.bashrc"
+  # shellcheck disable=SC1090
+  . "$HOME/local.bashrc"
 fi
 
 function explore-to() {
@@ -134,4 +128,5 @@ path() {
     | awk -F : '{ for (i=1;i<=NF;i++) {print $i}}'
 }
 
-[ -f ~/.fzf.bash ] && source ~/.fzf.bash
+# shellcheck disable=SC1090
+[ -f ~/.fzf.bash ] && . ~/.fzf.bash
