@@ -1,8 +1,13 @@
+-uu
 --glob=!*.map
+--glob=!tmp/
+--glob=!tags
+--glob=!_site/
 --glob=!vendor/
---glob=!node_modules
+#--glob=!node_modules
+--glob=!\.git/
 --glob=!**/git/examples/
 --glob=!*deadbeef.js
---max-columns=180
+--max-columns=280
 --max-columns-preview
 --smart-case

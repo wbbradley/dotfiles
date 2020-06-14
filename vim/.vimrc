@@ -199,12 +199,6 @@ nnoremap n nzz
 nnoremap N Nzz
 nnoremap * *zz
 
-" TODO: find the correct way to pick the right list to iterate through. Having muliple lists is
-" more pain than gain.
-nmap <F9> :setlocal autowrite<CR>:cprev<CR>:setlocal noautowrite<CR>zz
-nmap <F10> :setlocal autowrite<CR>:cnext<CR>:setlocal noautowrite<CR>zz
-
-
 autocmd Syntax cpp call EnhanceCppSyntax()
 autocmd FileType c nnoremap <F4> :wa<CR> :e %:p:s,.h$,.X123X,:s,.c$,.h,:s,.X123X$,.c,<CR>
 autocmd FileType c inoremap <F4> <Esc> <F4>
@@ -215,8 +209,6 @@ function SetCOptions()
   nmap == V:ClangFormat<CR>
   vmap = :'<,'>ClangFormat<CR>
   nmap Q :ClangFormat<CR>
-  nmap <F9> :lprev<CR>
-  nmap <F10> :lnext<CR>
 endfunction
 
 augroup cstuff
@@ -224,13 +216,6 @@ augroup cstuff
   autocmd FileType cpp call SetCOptions()
   autocmd FileType c call SetCOptions()
 augroup END
-
-augroup pythonstuff
-  autocmd!
-  autocmd FileType python nmap <F9> :setlocal autowrite<CR>:cprev<CR>:setlocal noautowrite<CR>zz
-  autocmd FileType python nmap <F10> :setlocal autowrite<CR>:cnext<CR>:setlocal noautowrite<CR>zz
-augroup END
-
 
 " allow backspacing over everything in insert mode
 set backspace=indent,eol,start
@@ -328,7 +313,7 @@ nnoremap <leader>91 :e ~/local.vimrc<CR>
 nnoremap <leader>92 :e ~/.bashrc<CR>
 nnoremap <leader>93 :e ~/local.bashrc<CR>
 nnoremap <leader>9z :e ~/src/vim-zion/syntax/zion.vim<CR>
-nnoremap <leader>d Odbg();<Esc>_
+nnoremap <leader>d Odebugger<Esc>_
 nnoremap <leader>i Oimport ipdb<CR>ipdb.set_trace()<Esc>j_
 nnoremap <leader>p Oimport pdb<CR>pdb.set_trace()<Esc>j_
 
@@ -423,7 +408,7 @@ syntax on
 filetype plugin on
 filetype indent on
 
-" colorscheme ir_black
+colorscheme zion
 
 syn match Braces display '[<>{}()\[\]]'
 
@@ -433,3 +418,24 @@ silent! source ~/local.vimrc
 silent! source .vimrc
 silent! source local.vimrc
 
+nnoremap <silent><F9> :call <SID>qfnext(v:false)<CR>
+nnoremap <silent><F10> :call <SID>qfnext(v:true)<CR>
+
+function! s:qfnext(next) abort
+  " find all 'quickfix'-type windows on the current tab
+  let qfwin = filter(getwininfo(), {_, v -> v.quickfix && v.tabnr == tabpagenr()})
+  if !empty(qfwin)
+    " using the first one found
+    if qfwin[0].winid == getqflist({'nr': 0, 'winid': 0}).winid
+      " it's quickfix
+      execute a:next ? 'cnext' : 'cprev'
+      return
+    else
+      " assume it's loclist
+      " must execute it in the host window or in loclist itself
+      call win_execute(qfwin[0].winid, a:next ? 'lnext' : 'lprev', '')
+      return
+    endif
+  endif
+  execute a:next ? 'lnext' : 'lprev'
+endfunction
