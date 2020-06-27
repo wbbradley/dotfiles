@@ -19,6 +19,7 @@ setup-vim-packages() {
   plugin 'alx741/vim-hindent'
   plugin 'editorconfig/editorconfig-vim'
   plugin 'dense-analysis/ale'
+  plugin 'metakirby5/codi.vim'
   # plugin 'mileszs/ack.vim'
   # plugin 'tpope/vim-fireplace'
   # plugin 'othree/html5.vim'

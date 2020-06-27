@@ -6,6 +6,7 @@ set ttyfast
 set undodir=~/.vim/undodir
 set noshowmode
 set exrc
+set number
 
 if has('win32')
 elseif has('mac')
@@ -14,8 +15,7 @@ elseif has('unix')
 	set clipboard=unnamedplus
 endif
 
-set t_Co=256
-set nonumber
+" set t_Co=256
 set cpoptions+=n
 set splitbelow
 set splitright
@@ -69,12 +69,6 @@ let g:lightline.active.right = [
 		  \   [ 'fileformat', 'fileencoding', 'filetype' ],
       \   [ 'linter_checking', 'linter_errors', 'linter_warnings', 'linter_ok' ]
       \ ]
-" let g:ale_open_list = 1
-" let g:ale_c_gcc_executable=''
-" let g:ale_c_ccls_executable=''
-" let g:ale_c_clang_executable=''
-" let g:ale_cpp_clangcheck_executable = ''
-" let g:ale_cpp_clangtidy_executable = ''
 let g:ale_markdown_markdownlint_executable = './node_modules/.bin/markdownlint'
 let g:ale_ruby_rubocop_executable = './bin/rubocop'
 
@@ -89,10 +83,11 @@ let g:ale_linters = {
 let g:multi_cursor_exit_from_insert_mode=1
 let g:multi_cursor_exit_from_visual_mode=1
 
-" let g:airline#extensions#ale#enabled = 1
-
-nnoremap <Leader>ht :GhcModType<cr>
-nnoremap <Leader>htc :GhcModTypeClear<cr>
+augroup Haskell
+  autocmd!
+  autocmd FileType haskell nnoremap <buffer> <Leader>ht :GhcModType<cr>
+  autocmd FileType haskell nnoremap <buffer> <Leader>htc :GhcModTypeClear<cr>
+augroup END
 
 let g:multi_cursor_exit_from_visual_mode=1
 let g:multi_cursor_exit_from_insert_mode=1
@@ -158,22 +153,23 @@ autocmd FileType config setlocal tabstop=2 softtabstop=0 expandtab shiftwidth=2 
 autocmd FileType sql setlocal tabstop=2 softtabstop=0 expandtab shiftwidth=2 smarttab
 
 augroup Golang
+  autocmd!
   autocmd FileType go setlocal tabstop=4 shiftwidth=4
-  autocmd FileType go nmap <Leader>s <Plug>(go-implements)
-  autocmd FileType go nmap <Leader>i <Plug>(go-info)
-  autocmd FileType go nmap <Leader>gd <Plug>(go-doc)
-  autocmd FileType go nmap <Leader>gv <Plug>(go-doc-vertical)
-  autocmd FileType go nmap <Leader>gb <Plug>(go-doc-browser)
-  autocmd FileType go nmap <leader>r <Plug>(go-run)
-  autocmd FileType go nmap <leader>b <Plug>(go-build)
-  autocmd FileType go nmap <leader>t <Plug>(go-test)
-  autocmd FileType go nmap <leader>c <Plug>(go-coverage)
-  autocmd FileType go nmap <Leader>ds <Plug>(go-def-split)
-  autocmd FileType go nmap <Leader>dv <Plug>(go-def-vertical)
-  autocmd FileType go nmap <Leader>dt <Plug>(go-def-tab)
-  autocmd FileType go nmap <Leader>e <Plug>(go-rename)
-  autocmd FileType go nmap <C-]> :GoDef<CR>zz
-  autocmd FileType go nmap <F7> :GoBuild<CR>
+  autocmd FileType go nmap <buffer> <Leader>s <Plug>(go-implements)
+  autocmd FileType go nmap <buffer> <Leader>i <Plug>(go-info)
+  autocmd FileType go nmap <buffer> <Leader>gd <Plug>(go-doc)
+  autocmd FileType go nmap <buffer> <Leader>gv <Plug>(go-doc-vertical)
+  autocmd FileType go nmap <buffer> <Leader>gb <Plug>(go-doc-browser)
+  autocmd FileType go nmap <buffer> <leader>r <Plug>(go-run)
+  autocmd FileType go nmap <buffer> <leader>b <Plug>(go-build)
+  autocmd FileType go nmap <buffer> <leader>t <Plug>(go-test)
+  " autocmd FileType go nmap <leader>c <Plug>(go-coverage)
+  autocmd FileType go nmap <buffer> <Leader>ds <Plug>(go-def-split)
+  autocmd FileType go nmap <buffer> <Leader>dv <Plug>(go-def-vertical)
+  autocmd FileType go nmap <buffer> <Leader>dt <Plug>(go-def-tab)
+  autocmd FileType go nmap <buffer> <Leader>e <Plug>(go-rename)
+  autocmd FileType go nmap <buffer> <C-]> :GoDef<CR>zz
+  autocmd FileType go nmap <buffer> <F7> :GoBuild<CR>
 augroup END
 
 augroup Haskell
@@ -189,6 +185,7 @@ nnoremap <C-]> <C-]>zz
 nnoremap <C-o> <C-o>zz
 nnoremap <C-i> <C-i>zz
 nnoremap <leader>+ viwyo"""<Esc>pA."""<Esc>_wvU<Esc>V:s/_/ /<CR>:noh<CR>:match<CR>
+nnoremap <Leader>! :view ~/README.txt<CR>
 nnoremap <Leader>1 :e ~/README.txt<CR>Go<Esc>:r!date<CR>o
 nnoremap <Leader>2 :e ~/github.txt<CR>Go<Esc>:r!date<CR>o
 nnoremap <Leader>c :%s/\<<C-r><C-w>\>/
@@ -200,15 +197,15 @@ nnoremap N Nzz
 nnoremap * *zz
 
 autocmd Syntax cpp call EnhanceCppSyntax()
-autocmd FileType c nnoremap <F4> :wa<CR> :e %:p:s,.h$,.X123X,:s,.c$,.h,:s,.X123X$,.c,<CR>
-autocmd FileType c inoremap <F4> <Esc> <F4>
-autocmd FileType c vnoremap <F4> <Esc> <F4>
+autocmd FileType c nnoremap <buffer> <F4> :wa<CR> :e %:p:s,.h$,.X123X,:s,.c$,.h,:s,.X123X$,.c,<CR>
+autocmd FileType c inoremap <buffer> <F4> <Esc> <F4>
+autocmd FileType c vnoremap <buffer> <F4> <Esc> <F4>
 
 function SetCOptions()
-  nmap <Leader><Leader> va}:ClangFormat<CR>
-  nmap == V:ClangFormat<CR>
-  vmap = :'<,'>ClangFormat<CR>
-  nmap Q :ClangFormat<CR>
+  nmap <buffer> <Leader><Leader> va}:ClangFormat<CR>
+  nmap <buffer> == V:ClangFormat<CR>
+  vmap <buffer> = :'<,'>ClangFormat<CR>
+  nmap <buffer> Q :ClangFormat<CR>
 endfunction
 
 augroup cstuff

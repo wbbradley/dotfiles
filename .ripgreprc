@@ -1,4 +1,5 @@
 -uu
+--glob=!log/
 --glob=!*.map
 --glob=!tmp/
 --glob=!tags

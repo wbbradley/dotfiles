@@ -123,6 +123,14 @@ alias stockplanconnect='pass stockplanconnect.com-morganstanley -c && explore-to
 alias retirementplans='pass retirementplans.vanguard.com -c && explore-to https://retirementplans.vanguard.com/'
 alias my.vanguardplan.com='pass my.vanguardplan.com -c && explore-to https://my.vanguardplan.com/'
 
+git-delete-merged() {
+  git fetch
+  git checkout -B master origin/master
+  git branch --merged master \
+    | grep -v "\* master" \
+    | xargs -n 1 git branch -D
+}
+
 path() {
   echo "$PATH" \
     | awk -F : '{ for (i=1;i<=NF;i++) {print $i}}'
