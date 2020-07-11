@@ -79,5 +79,9 @@ setup-fzf() {
   ln -s "$fzf_dir" "$pack_dir/fzf"
 }
 
+if [ "$(uname)" = "Darwin" ]; then
+  brew upgrade vim
+fi
+
 setup-vim-packages
 setup-fzf
