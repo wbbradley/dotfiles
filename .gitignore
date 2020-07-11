@@ -4,3 +4,4 @@
 /env/
 vim/.vim/bundle
 .netrwhist
+bin/bin/ngrok

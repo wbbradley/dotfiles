@@ -1,0 +1,6 @@
+#!/bin/bash
+cd /usr/local/share/zion
+rm -rf runtime
+rm -rf lib
+ln -s "$HOME/src/zion/runtime" .
+ln -s "$HOME/src/zion/lib" .

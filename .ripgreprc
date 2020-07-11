@@ -5,7 +5,9 @@
 --glob=!tags
 --glob=!_site/
 --glob=!vendor/
-#--glob=!node_modules
+--glob=!node_modules
+--glob=!.stack-work/
+--glob=!.*\.swp
 --glob=!\.git/
 --glob=!**/git/examples/
 --glob=!*deadbeef.js

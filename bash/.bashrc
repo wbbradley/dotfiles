@@ -13,31 +13,18 @@ if ! shopt -oq posix; then
   fi
 fi
 
-parse_git_branch() {
-	git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/\1/'
-}
-
-parse_working_dir() {
-  # shellcheck disable=SC2001
-  pwd | sed "s%$HOME%~%"
-}
+. "$HOME/bin/utils.sh"
 
 export PS1="\$(if [ \$? != 0 ]; then echo '\[\033[47;5;88;34;5;1m\] ERROR \[\033[0m\]'; fi) \[\033[48;5;95;38;5;214m\] \u \[\033[0;38;5;31;48;5;240;22m\] \[\033[0;38;5;252;48;5;240;1m\] \$(parse_git_branch) \$(parse_working_dir) \[\033[0;38;5;240;49;22m\]\[\033[0m\] "
 
-export SRC_ROOT=$HOME/src
+# export SRC_ROOT=$HOME/src
 alias vi=vim
 alias uuid="python -c \"import uuid;print(uuid.uuid4())\" | tr -d '\n' | pbcopy"
 HISTFILESIZE=15000
 
 shopt -s histappend
 
-dbg() {
-	echo Running LLDB debugger...
-	lldb -o run -- "$@"
-}
-
 export EDITOR="vim"
-export PATH=$PATH:$HOME/bin
 
 platform='unknown'
 unamestr="$(uname)"
@@ -56,16 +43,12 @@ fi
 alias venv='. env/bin/activate ; python --version ; pip --version'
 alias venvc='virtualenv -p python3 env && . env/bin/activate ; python --version ; pip --version'
 
-wvi () {
-	"$EDITOR" "$(command -v "$@")"
-}
-
 if [ $platform == 'windows' ]; then
 	alias ls='ls -G -a -l -tr --color'
 fi
 
-if [ $platform == 'freebsd' ]; then
-	export PATH="/usr/local/sbin:/usr/local/bin:$PATH"
+if [ $platform = 'freebsd' ]; then
+  add_path_to PATH /usr/local/bin /usr/local/sbin
 	bind "set completion-ignore-case on"
 	shopt -s cdspell
 
@@ -79,9 +62,7 @@ if [ $platform == 'freebsd' ]; then
 	alias stopify='pkill -STOP Spotify\ Helper'
 	alias startify='pkill -CONT Spotify\ Helper'
 	alias grep='grep --color'
-fi
-
-if [ $platform == 'linux' ]; then
+elif [ $platform == 'linux' ]; then
 	alias ls='ls -G -a -l -tr --color'
 	shopt -s checkwinsize
 
@@ -107,14 +88,6 @@ if [ -f "$HOME/local.bashrc" ]; then
   . "$HOME/local.bashrc"
 fi
 
-function explore-to() {
-  if [ "$unamestr" = 'Linux' ]; then
-    xdg-open "$@"
-  elif [ "$unamestr" = 'Darwin' ]; then
-    open "$@"
-  fi
-}
-
 alias chase='pass chase.com -c && explore-to https://www.chase.com/'
 alias amex='pass Amex-Personal -c && explore-to https://www.americanexpress.com/'
 alias wells='pass Wells-Fargo -c && explore-to https://www.wellsfargo.com/'
@@ -122,19 +95,6 @@ alias fidelity='pass Fidelity -c && explore-to https://www.fidelity.com/'
 alias stockplanconnect='pass stockplanconnect.com-morganstanley -c && explore-to https://stockplanconnect.morganstanley.com/'
 alias retirementplans='pass retirementplans.vanguard.com -c && explore-to https://retirementplans.vanguard.com/'
 alias my.vanguardplan.com='pass my.vanguardplan.com -c && explore-to https://my.vanguardplan.com/'
-
-git-delete-merged() {
-  git fetch
-  git checkout -B master origin/master
-  git branch --merged master \
-    | grep -v "\* master" \
-    | xargs -n 1 git branch -D
-}
-
-path() {
-  echo "$PATH" \
-    | awk -F : '{ for (i=1;i<=NF;i++) {print $i}}'
-}
 
 # shellcheck disable=SC1090
 [ -f ~/.fzf.bash ] && . ~/.fzf.bash

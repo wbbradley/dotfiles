@@ -31,6 +31,10 @@ set wildignore+=toolchains
 
 let g:EditorConfig_max_line_indicator = 'none'
 
+" Turn on case-insensitive feature for EasyMotion
+let g:EasyMotion_smartcase = 1
+nmap , <Plug>(easymotion-overwin-f)
+
 set wildchar=<Tab> wildmenu wildmode=full
 set tabstop=2 softtabstop=2 expandtab shiftwidth=2 smarttab
 
@@ -74,6 +78,7 @@ let g:ale_ruby_rubocop_executable = './bin/rubocop'
 
 let g:ale_linters = {
       \ 'markdown': ['markdownlint'],
+      \ 'haskell': ['stack-build'],
       \ 'cpp': ['clang'],
       \ 'c': ['clang'],
       \ 'zion': ['zion'],
@@ -85,8 +90,9 @@ let g:multi_cursor_exit_from_visual_mode=1
 
 augroup Haskell
   autocmd!
-  autocmd FileType haskell nnoremap <buffer> <Leader>ht :GhcModType<cr>
-  autocmd FileType haskell nnoremap <buffer> <Leader>htc :GhcModTypeClear<cr>
+  autocmd FileType haskell nnoremap <buffer> <leader>? :call ale#cursor#ShowCursorDetail()<cr>
+  " autocmd FileType haskell nnoremap <buffer> <Leader>ht :GhcModType<cr>
+  " autocmd FileType haskell nnoremap <buffer> <Leader>htc :GhcModTypeClear<cr>
 augroup END
 
 let g:multi_cursor_exit_from_visual_mode=1
@@ -143,9 +149,13 @@ autocmd BufNewFile,BufReadPost *.coffee setl shiftwidth=2 expandtab
 augroup Ruby
   au!
   autocmd FileType ruby setlocal expandtab shiftwidth=2 tabstop=2
-  autocmd FileType eruby setlocal expandtab shiftwidth=2 tabstop=2
   autocmd FileType ruby setlocal commentstring=#\ %s
+  autocmd FileType ruby setlocal iskeyword+=!
+  autocmd FileType ruby setlocal iskeyword+=:
+  autocmd FileType ruby setlocal iskeyword+=?
+  autocmd FileType eruby setlocal expandtab shiftwidth=2 tabstop=2
   autocmd FileType eruby setlocal commentstring=#\ %s
+  autocmd FileType eruby setlocal iskeyword+=?
 augroup END
 
 autocmd FileType gitcommit setlocal textwidth=71
