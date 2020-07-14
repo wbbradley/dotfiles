@@ -10,10 +10,10 @@ inserting_values = OrderedDict((s.strip(), None)
                                if s)
 
 new_values = []
-for key, _ in inserting_values.items():
-    new_values.append(key)
 for key, _ in existing_values.items():
     if key not in inserting_values:
         new_values.append(key)
+for key, _ in inserting_values.items():
+    new_values.append(key)
 
 print(":".join(new_values), end="")

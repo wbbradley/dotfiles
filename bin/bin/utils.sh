@@ -21,10 +21,21 @@ insert_at_head() {
   python3 "$HOME/bin/insert_at_head.py" "$@"
 }
 
-add_path_to () {
+append_path() {
+  python3 "$HOME/bin/append_to_set.py" "$@"
+}
+
+prepend_path_to () {
   var=$1
   shift
   new_value="$(insert_at_head "$var" :"$(eval "echo -n \"\$$var\"")" "$@")"
+  eval "export $var=\"$new_value\""
+}
+
+append_path_to () {
+  var=$1
+  shift
+  new_value="$(append_path "$var" :"$(eval "echo -n \"\$$var\"")" "$@")"
   eval "export $var=\"$new_value\""
 }
 
