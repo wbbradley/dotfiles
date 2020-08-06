@@ -171,6 +171,7 @@ $CTAGS \
 	$CPP_KINDS \
 	$EXCLUDES \
 	$I_FLAGS \
+  $(maybe-dir $(llvm-config --cppflags | xargs -n 1 echo | grep '^-I' | cut -c3-)) \
 	$(maybe-dir $(find /build/{grunt,*}/usr/include/base-* 2> /dev/null | head -n 1)) \
 	$(maybe-dir $(find /build/{grunt,*}/usr/include/brillo 2> /dev/null | head -n 1)) \
 	$(maybe-dir $(find /build/{grunt,*}/usr/include/gmock 2> /dev/null | head -n 1)) \
@@ -202,4 +203,9 @@ grep -E -v \
 rm tags
 mv tags.clean tags
 wc -l tags
+if command -v zion-tags 1>/dev/null 2>/dev/null; then
+  TAGS_FILE=ztags zion-tags
+  <ztags <tags sort > sorted.tags
+  mv sorted.tags tags
+fi
 echo "Tags are complete."

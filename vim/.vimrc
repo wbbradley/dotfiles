@@ -30,10 +30,12 @@ set wildignore+=experimental
 set wildignore+=toolchains
 
 let g:EditorConfig_max_line_indicator = 'none'
-
+let g:ruby_indent_assignment_style = 'variable'
 " Turn on case-insensitive feature for EasyMotion
 let g:EasyMotion_smartcase = 1
 nmap , <Plug>(easymotion-overwin-f)
+
+let g:vim_markdown_folding_disabled = 1
 
 set wildchar=<Tab> wildmenu wildmode=full
 set tabstop=2 softtabstop=2 expandtab shiftwidth=2 smarttab
@@ -148,14 +150,12 @@ autocmd BufNewFile,BufReadPost *.coffee setl shiftwidth=2 expandtab
 
 augroup Ruby
   au!
-  autocmd FileType ruby setlocal expandtab shiftwidth=2 tabstop=2
+  autocmd FileType ruby,eruby setlocal expandtab shiftwidth=2 tabstop=2
   autocmd FileType ruby setlocal commentstring=#\ %s
   autocmd FileType ruby setlocal iskeyword+=!
-  autocmd FileType ruby setlocal iskeyword+=:
-  autocmd FileType ruby setlocal iskeyword+=?
-  autocmd FileType eruby setlocal expandtab shiftwidth=2 tabstop=2
-  autocmd FileType eruby setlocal commentstring=#\ %s
-  autocmd FileType eruby setlocal iskeyword+=?
+  autocmd FileType ruby,eruby setlocal iskeyword+=?
+  autocmd FileType ruby nnoremap <leader>d Odebugger<Esc>_
+  autocmd FileType eruby nnoremap <leader>d O<% debugger %><Esc>_
 augroup END
 
 autocmd FileType gitcommit setlocal textwidth=71
@@ -195,8 +195,8 @@ nnoremap <C-]> <C-]>zz
 nnoremap <C-o> <C-o>zz
 nnoremap <C-i> <C-i>zz
 nnoremap <leader>+ viwyo"""<Esc>pA."""<Esc>_wvU<Esc>V:s/_/ /<CR>:noh<CR>:match<CR>
-nnoremap <Leader>! :view ~/README.txt<CR>
-nnoremap <Leader>1 :e ~/README.txt<CR>Go<Esc>:r!date<CR>o
+nnoremap <Leader>! :view ~/README.md<CR>
+nnoremap <Leader>1 :e ~/README.md<CR>Go<Esc>:r!date<CR>:set paste<CR>o
 nnoremap <Leader>2 :e ~/github.txt<CR>Go<Esc>:r!date<CR>o
 nnoremap <Leader>c :%s/\<<C-r><C-w>\>/
 vnoremap <Leader>c "hy:%s/<C-r>h/
@@ -220,8 +220,8 @@ endfunction
 
 augroup cstuff
   autocmd!
-  autocmd FileType cpp call SetCOptions()
-  autocmd FileType c call SetCOptions()
+  autocmd FileType c,cpp call SetCOptions()
+  autocmd FileType c,cpp nnoremap <leader>d Odbg();<Esc>_
 augroup END
 
 " allow backspacing over everything in insert mode
@@ -286,7 +286,7 @@ function! EnhanceCppSyntax()
   hi def link cppFuncDef Special
 endfunction
 
-nnoremap <leader>` :!ctags -R .<CR>
+" nnoremap <leader>` :!ctags -R .<CR>
 
 nnoremap <F3> :call FindWordUnderCursor()<CR>
 
@@ -320,7 +320,6 @@ nnoremap <leader>91 :e ~/local.vimrc<CR>
 nnoremap <leader>92 :e ~/.bashrc<CR>
 nnoremap <leader>93 :e ~/local.bashrc<CR>
 nnoremap <leader>9z :e ~/src/vim-zion/syntax/zion.vim<CR>
-nnoremap <leader>d Odebugger<Esc>_
 nnoremap <leader>i Oimport ipdb<CR>ipdb.set_trace()<Esc>j_
 nnoremap <leader>p Oimport pdb<CR>pdb.set_trace()<Esc>j_
 
@@ -353,6 +352,7 @@ set tags=tags
 nnoremap s :exec "normal i".nr2char(getchar())."\el"<CR>
 nnoremap S :exec "normal a".nr2char(getchar())."\el"<CR>
 
+nnoremap <silent> "" :registers "0123456789abcdefghijklmnopqrstuvwxyz*+.<CR>
 
 " CTRL-U in insert mode deletes a lot.  Use CTRL-G u to first break undo,
 " so that you can undo CTRL-U after inserting a line break.
@@ -425,8 +425,8 @@ silent! source ~/local.vimrc
 silent! source .vimrc
 silent! source local.vimrc
 
-nnoremap <silent><F9> :call <SID>qfnext(v:false)<CR>
-nnoremap <silent><F10> :call <SID>qfnext(v:true)<CR>
+nnoremap <silent><F9> :silent! call <SID>qfnext(v:false)<CR>
+nnoremap <silent><F10> :silent! call <SID>qfnext(v:true)<CR>
 
 function! s:qfnext(next) abort
   " find all 'quickfix'-type windows on the current tab

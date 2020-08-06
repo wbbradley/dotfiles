@@ -1,4 +1,6 @@
 # vim: ft=sh.bash
+[[ $- != *i* ]] && return
+
 # enable bash completion in interactive shells
 if ! shopt -oq posix; then
   if [ -f /usr/share/bash-completion/bash_completion ]; then
@@ -13,6 +15,7 @@ if ! shopt -oq posix; then
   fi
 fi
 
+# shellcheck disable=SC1090
 . "$HOME/bin/utils.sh"
 
 export PS1="\$(if [ \$? != 0 ]; then echo '\[\033[47;5;88;34;5;1m\] ERROR \[\033[0m\]'; fi) \[\033[48;5;95;38;5;214m\] \u \[\033[0;38;5;31;48;5;240;22m\] \[\033[0;38;5;252;48;5;240;1m\] \$(parse_git_branch) \$(parse_working_dir) \[\033[0;38;5;240;49;22m\]\[\033[0m\] "
@@ -20,6 +23,10 @@ export PS1="\$(if [ \$? != 0 ]; then echo '\[\033[47;5;88;34;5;1m\] ERROR \[\033
 # export SRC_ROOT=$HOME/src
 alias vi=vim
 alias uuid="python -c \"import uuid;print(uuid.uuid4())\" | tr -d '\n' | pbcopy"
+function mydot() {
+  dot "$1" -Tpng -Gdpi=300 -o "$1.png" && open "$1.png"
+}
+
 HISTFILESIZE=15000
 
 shopt -s histappend
@@ -98,3 +105,83 @@ alias my.vanguardplan.com='pass my.vanguardplan.com -c && explore-to https://my.
 
 # shellcheck disable=SC1090
 [ -f ~/.fzf.bash ] && . ~/.fzf.bash
+
+[[ -f "${HOME}/xmodmap.file" ]] && xmodmap -v "${HOME}/xmodmap.file"
+
+# shellcheck disable=SC2155
+export RUBY_CONFIGURE_OPTS="--with-openssl-dir=$(brew --prefix openssl@1.1)"
+(command -v rbenv 1>/dev/null 2>/dev/null) && eval "$(rbenv init -)"
+export NVM_DIR="$HOME/.nvm"
+
+# Maybe enable for LLVM fun.
+function llvm-mode() {
+  llvm_dir="/usr/local/opt/llvm"
+  [ -x "$llvm_dir/bin/clang" ] || {
+    echo "Looks like LLVM is not installed..."
+    return 1
+  }
+  prepend_path_to PATH "$llvm_dir/bin"
+  hash -r
+  export LDFLAGS="-L$llvm_dir/lib"
+  export CPPFLAGS="-L$llvm_dir/include"
+  if [ "$(command -v clang)" != "$llvm_dir/bin/clang" ]; then
+    echo "WARNING: You are in .llvm-mode but clang was not found in $llvm_dir/bin!"
+  else
+    clang --version
+  fi
+}
+
+function brew-test() {
+  . "$HOME/bin/brew.sh"
+  brewtest
+}
+
+function brew-tags() {
+  . "$HOME/bin/brew.sh"
+  brewtags
+}
+
+function ctags-ruby() {
+  # check that ctags version is correct
+  ctags --version >/dev/null 2>&1 || {
+    echo "ctags not found or too old." 1>&2
+    return 1
+  }
+
+  ctags -R \
+    --tag-relative=yes \
+    --totals=yes \
+    --extra=+f \
+    --fields=+iaS \
+    --exclude=*.md \
+    --exclude=db \
+    --exclude=docs \
+    --exclude=log \
+    --exclude=node_modules \
+    --exclude=public \
+    --exclude=tmp \
+    --exclude=vendor \
+    --langdef=coffee \
+    --langmap=coffee:.coffee \
+    --regex-coffee='/[ \t]*class ([A-Za-z.]+)( extends [A-Za-z.]+)?$/\1/c,class/' \
+    --regex-coffee='/[ \t]*@?([A-Za-z.]+):.*[-=]>.*$/\1/f,function/' \
+    --regex-coffee='/[ \t]*([A-Za-z.]+)[ \t]+=.*[-=]>.*$/\1/f,function/' \
+    --langdef=js \
+    --langmap=js:.js \
+    --regex-js='/(,|(;|^)[ \t]*(var|let|([A-Za-z_$][A-Za-z0-9_$.]+\.)*))[ \t]*([A-Za-z0-9_$]+)[ \t]*=[ \t]*\{/\5/,object/' \
+    --regex-js='/(,|(;|^)[ \t]*(var|let|([A-Za-z_$][A-Za-z0-9_$.]+\.)*))[ \t]*([A-Za-z0-9_$]+)[ \t]*=[ \t]*function[ \t]*\(/\5/,function/' \
+    --regex-js='/function[ \t]+([A-Za-z0-9_$]+)[ \t]*\([^)]*\)/\1/,function/' \
+    --regex-js='/(,|^)[ \t]*([A-Za-z_$][A-Za-z0-9_$]+)[ \t]*:[ \t]*\{/\2/,object/' \
+    --regex-js='/(,|^)[ \t]*([A-Za-z_$][A-Za-z0-9_$]+)[ \t]*:[ \t]*function[ \t]*\(/\2/,function/' \
+    --regex-ruby='/^[ \t]*scope[ \t]*:([a-zA-Z0-9_]+)/\1/s,scopes/' \
+    --regex-ruby='/^[ \t]*has_many[ \t]*:([a-zA-Z0-9_]+)/\1/s,scopes/' \
+    --regex-ruby='/^[ \t]*has_and_belongs_to_many[ \t]*:([a-zA-Z0-9_]+)/\1/s,scopes/' \
+    --regex-ruby='/^[ \t]*belongs_to[ \t]*:([a-zA-Z0-9_]+)/\1/s,scopes/' \
+    --regex-ruby='/^[ \t]*attr_reader[[:space:]]*:([a-zA-Z0-9_]+)/\1/s,function/' \
+    --regex-ruby='/^[ \t]*([A-Z_]+)/\1/N,constants/' \
+    --regex-ruby='/.*alias(_method)?[[:space:]]+:([[:alnum:]_=!?]+),?[[:space:]]+:([[:alnum:]_=!]+)/\2/,function/' \
+    --regex-ruby='/^[ \t]*class[ \t]*([A-Za-z:_]+).*$/\1/c,class/' \
+    "$@"
+}
+
+prepend_path_to PATH "/usr/local/bin"
