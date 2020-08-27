@@ -4,7 +4,6 @@
 --glob=!tmp/
 --glob=!tags
 --glob=!_site/
---glob=!vendor/
 --glob=!node_modules
 --glob=!.stack-work/
 --glob=!.*\.swp
