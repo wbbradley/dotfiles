@@ -1,6 +1,9 @@
 #!/bin/bash
-cd /usr/local/share/zion
+cd /usr/local/share/zion || exit 1
 rm -rf runtime
 rm -rf lib
 ln -s "$HOME/src/zion/runtime" .
 ln -s "$HOME/src/zion/lib" .
+cd /usr/local/bin || exit 1
+rm zion-tags
+ln -s "$HOME/src/zion/zion-tags" .

@@ -20,10 +20,13 @@ setup-vim-packages() {
   plugin 'editorconfig/editorconfig-vim'
   plugin 'dense-analysis/ale'
   plugin 'metakirby5/codi.vim'
+  plugin 'ap/vim-css-color'
   plugin 'tpope/vim-rails'
   plugin 'tpope/vim-commentary'
   plugin 'tpope/vim-surround'
+  plugin 'sainnhe/sonokai'
   plugin 'tpope/vim-fugitive'
+  plugin 'sakibmoon/vim-colors-notepad-plus-plus'
   # plugin 'tpope/vim-fireplace'
   # plugin 'othree/html5.vim'
   plugin 'nvie/vim-flake8'
@@ -67,6 +70,13 @@ setup-vim-packages() {
 
   if [[ -d "$HOME/src/vim-zion" ]]; then
     (cd "$pack_dir" && ln -s "$HOME/src/vim-zion" vim-zion)
+  else
+    plugin 'zionlang/vim-zion'
+  fi
+  if [[ -d "$HOME/src/miramare" ]]; then
+    (cd "$pack_dir" && ln -s "$HOME/src/miramare" miramare)
+  else
+    plugin 'wbbradley/miramare'
   fi
   vim "+helptags ALL" "+q"
 }

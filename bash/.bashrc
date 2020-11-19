@@ -22,12 +22,13 @@ export PS1="\$(if [ \$? != 0 ]; then echo '\[\033[47;5;88;34;5;1m\] ERROR \[\033
 
 # export SRC_ROOT=$HOME/src
 alias vi=vim
+alias weather='weather -l "Boulder, CO" || echo "Install `brew install darksky-weather`"'
 alias uuid="python -c \"import uuid;print(uuid.uuid4())\" | tr -d '\n' | pbcopy"
 function mydot() {
   dot "$1" -Tpng -Gdpi=300 -o "$1.png" && open "$1.png"
 }
 
-HISTFILESIZE=15000
+HISTSIZE=15000
 
 shopt -s histappend
 
@@ -185,3 +186,4 @@ function ctags-ruby() {
 }
 
 prepend_path_to PATH "/usr/local/bin"
+[ -f "/Users/wbbradley/.ghcup/env" ] && source "/Users/wbbradley/.ghcup/env" # ghcup-env

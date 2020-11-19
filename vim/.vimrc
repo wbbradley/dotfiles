@@ -23,6 +23,7 @@ set modeline
 set modelines=2
 set noesckeys
 set sw=2 sts=2 noexpandtab
+set timeoutlen=1000 ttimeoutlen=0
 
 set wildignore+=*.o
 set wildignore+=*.a
@@ -154,8 +155,8 @@ augroup Ruby
   autocmd FileType ruby setlocal commentstring=#\ %s
   autocmd FileType ruby setlocal iskeyword+=!
   autocmd FileType ruby,eruby setlocal iskeyword+=?
-  autocmd FileType ruby nnoremap <leader>d Odebugger<Esc>_
-  autocmd FileType eruby nnoremap <leader>d O<% debugger %><Esc>_
+  autocmd FileType ruby nnoremap <leader>d Obinding.pry<Esc>_
+  autocmd FileType eruby nnoremap <leader>d O<% binding.pry %><Esc>_
 augroup END
 
 autocmd FileType gitcommit setlocal textwidth=71
@@ -206,6 +207,7 @@ nnoremap n nzz
 nnoremap N Nzz
 nnoremap * *zz
 
+hi Comment          guifg=#7C7C7C     guibg=NONE        gui=NONE      ctermfg=darkgray    ctermbg=NONE        cterm=NONE
 autocmd Syntax cpp call EnhanceCppSyntax()
 autocmd FileType c nnoremap <buffer> <F4> :wa<CR> :e %:p:s,.h$,.X123X,:s,.c$,.h,:s,.X123X$,.c,<CR>
 autocmd FileType c inoremap <buffer> <F4> <Esc> <F4>
@@ -238,11 +240,12 @@ nmap Q VQ
 
 nmap <C-p> :Files<CR>
 nmap <Leader>z :Files ~/src/zion<CR>
+nmap B :Buffers<CR>
 nmap M :History<CR>
 nmap <CR><CR> :!<CR>
 
 " map home row to exit Insert mode
-inoremap jk <Esc>
+imap jk <Esc>
 vnoremap . :norm.<CR>
 
 function! Peg()
@@ -252,9 +255,12 @@ endfunction
 
 nmap <leader>P :call Peg()<CR><CR>
 nmap <leader>9P :e ~/pegged.txt<CR>
+nmap <leader>N :let @a=1<Bar>%s/\<\d\+\>/\=(@a+setreg('a',@a+1))/<CR>
 
 function! FindPrompt()
-	let str = input("Search: ", "")
+  let i = input("Search: ", "")
+  let j = substitute(i, "_", ".", "g")
+	let str = substitute(j, "test_", ".*", "g")
 	if str == ""
 		return
 	endif
@@ -322,6 +328,14 @@ nnoremap <leader>93 :e ~/local.bashrc<CR>
 nnoremap <leader>9z :e ~/src/vim-zion/syntax/zion.vim<CR>
 nnoremap <leader>i Oimport ipdb<CR>ipdb.set_trace()<Esc>j_
 nnoremap <leader>p Oimport pdb<CR>pdb.set_trace()<Esc>j_
+
+function! CleanupPaste()
+  set nopaste
+endfunction
+
+augroup nopasty
+  autocmd InsertLeave * call CleanupPaste()
+augroup END
 
 " F7 & F8 - incremental build
 nmap <F7> :wa<CR> :!clear <CR><CR> :make<CR><CR>zz
