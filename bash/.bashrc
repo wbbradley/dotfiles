@@ -143,6 +143,20 @@ function brew-tags() {
 }
 
 function ctags-ruby() {
+  gems_tags=gems.tags
+  if [ Gemfile -nt "$gems_tags" ] || [ Gemfile.lock -nt "$gems_tags" ]; then
+    # Rebuild tags for gems
+    echo "Rebuilding tags for Gems..."
+    ctags-ruby-core \
+      -f "$gems_tags" \
+      "$(gem environment gemdir)"/gems/*/lib
+  fi
+  echo "Rebuilding tags for $PWD..."
+  ctags-ruby-core -f local.tags .
+  sort tags.gems local.tags > tags
+}
+
+function ctags-ruby-core() {
   # check that ctags version is correct
   ctags --version >/dev/null 2>&1 || {
     echo "ctags not found or too old." 1>&2
@@ -182,8 +196,7 @@ function ctags-ruby() {
     --regex-ruby='/^[ \t]*([A-Z_]+)/\1/N,constants/' \
     --regex-ruby='/.*alias(_method)?[[:space:]]+:([[:alnum:]_=!?]+),?[[:space:]]+:([[:alnum:]_=!]+)/\2/,function/' \
     --regex-ruby='/^[ \t]*class[ \t]*([A-Za-z:_]+).*$/\1/c,class/' \
-    "$@" \
-    "$(gem environment gemdir)"/gems/*/lib
+    "$@"
 }
 
 prepend_path_to PATH "/usr/local/bin"
