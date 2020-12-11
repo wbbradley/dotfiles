@@ -35,6 +35,10 @@ let g:ruby_indent_assignment_style = 'variable'
 " Turn on case-insensitive feature for EasyMotion
 let g:EasyMotion_smartcase = 1
 nmap , <Plug>(easymotion-overwin-f)
+nnoremap <C-h> <C-w>h
+nnoremap <C-j> <C-w>j
+nnoremap <C-k> <C-w>k
+nnoremap <C-l> <C-w>l
 
 let g:vim_markdown_folding_disabled = 1
 
@@ -116,7 +120,7 @@ let g:pyindent_continue = '&sw'
 " let g:go_version_warning = 0
 " let g:go_highlight_build_constraints = 1
 let g:go_fmt_command = "goimports"
-" let g:go_def_mode='gopls'
+let g:go_def_mode='gopls'
 " let g:go_info_mode='gopls'
 " let g:go_fmt_fail_silently = 0
 

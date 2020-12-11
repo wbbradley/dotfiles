@@ -182,7 +182,8 @@ function ctags-ruby() {
     --regex-ruby='/^[ \t]*([A-Z_]+)/\1/N,constants/' \
     --regex-ruby='/.*alias(_method)?[[:space:]]+:([[:alnum:]_=!?]+),?[[:space:]]+:([[:alnum:]_=!]+)/\2/,function/' \
     --regex-ruby='/^[ \t]*class[ \t]*([A-Za-z:_]+).*$/\1/c,class/' \
-    "$@"
+    "$@" \
+    "$(gem environment gemdir)"/gems/*/lib
 }
 
 prepend_path_to PATH "/usr/local/bin"

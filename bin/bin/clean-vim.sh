@@ -16,6 +16,7 @@ setup-vim-packages() {
   rm -rf "$HOME/.vim"
   plugin 'junegunn/fzf.vim'
   plugin 'rhysd/vim-clang-format'
+  plugin 'dylon/vim-antlr'
   plugin 'alx741/vim-hindent'
   plugin 'editorconfig/editorconfig-vim'
   plugin 'dense-analysis/ale'
@@ -45,7 +46,7 @@ setup-vim-packages() {
 
   # plugin 'bitc/vim-hdevtools'
   plugin 'hynek/vim-python-pep8-indent.git'
-  plugin 'christoomey/vim-tmux-navigator'
+  # plugin 'christoomey/vim-tmux-navigator'
   # plugin 'sjl/threesome.vim.git'
   # plugin 'bling/vim-airline'
   # plugin 'toyamarinyon/vim-swift'
