@@ -81,7 +81,7 @@ let g:lightline.active.right = [
       \   [ 'linter_checking', 'linter_errors', 'linter_warnings', 'linter_ok' ]
       \ ]
 let g:ale_markdown_markdownlint_executable = './node_modules/.bin/markdownlint'
-let g:ale_ruby_rubocop_executable = './bin/rubocop'
+let g:ale_ruby_rubocop_executable = 'rubocop'
 
 let g:ale_linters = {
       \ 'markdown': ['markdownlint'],
@@ -159,8 +159,8 @@ augroup Ruby
   autocmd FileType ruby setlocal commentstring=#\ %s
   autocmd FileType ruby setlocal iskeyword+=!
   autocmd FileType ruby,eruby setlocal iskeyword+=?
-  autocmd FileType ruby nnoremap <leader>d Obinding.pry<Esc>_
-  autocmd FileType eruby nnoremap <leader>d O<% binding.pry %><Esc>_
+  autocmd FileType ruby nnoremap <leader>d Odebugger<Esc>_
+  autocmd FileType eruby nnoremap <leader>d O<% debugger %><Esc>_
 augroup END
 
 autocmd FileType gitcommit setlocal textwidth=71

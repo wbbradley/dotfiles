@@ -33,6 +33,7 @@ setup-vim-packages() {
   plugin 'nvie/vim-flake8'
   plugin 'airblade/vim-gitgutter'
   plugin 'easymotion/vim-easymotion'
+  plugin 'vim-crystal/vim-crystal'
   # plugin 'kchmck/vim-coffee-script.git'
   # plugin 'jimmyhchan/dustjs.vim.git'
   # plugin 'juvenn/mustache.vim.git'

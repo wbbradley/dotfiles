@@ -144,6 +144,7 @@ function brew-tags() {
 
 function ctags-ruby() {
   gems_tags=gems.tags
+  local_tags=local.tags
   if [ Gemfile -nt "$gems_tags" ] || [ Gemfile.lock -nt "$gems_tags" ]; then
     # Rebuild tags for gems
     echo "Rebuilding tags for Gems..."
@@ -153,7 +154,8 @@ function ctags-ruby() {
   fi
   echo "Rebuilding tags for $PWD..."
   ctags-ruby-core -f local.tags .
-  sort tags.gems local.tags > tags
+  sort "$gems_tags" "$local_tags" \
+    > tags
 }
 
 function ctags-ruby-core() {
