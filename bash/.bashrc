@@ -15,6 +15,20 @@ if ! shopt -oq posix; then
   fi
 fi
 
+
+_ssh() 
+{
+    local cur prev opts
+    COMPREPLY=()
+    cur="${COMP_WORDS[COMP_CWORD]}"
+    prev="${COMP_WORDS[COMP_CWORD-1]}"
+    opts=$(grep '^Host' ~/.ssh/config ~/.ssh/config.d/* 2>/dev/null | grep -v '[?*]' | cut -d ' ' -f 2-)
+
+    COMPREPLY=( $(compgen -W "$opts" -- ${cur}) )
+    return 0
+}
+complete -F _ssh ssh
+
 # shellcheck disable=SC1090
 . "$HOME/bin/utils.sh"
 
@@ -69,7 +83,6 @@ if [ $platform = 'freebsd' ]; then
 	# alias mails='sudo python -m smtpd -n -c DebuggingServer localhost:25'
 	alias stopify='pkill -STOP Spotify\ Helper'
 	alias startify='pkill -CONT Spotify\ Helper'
-	alias grep='grep --color'
 elif [ $platform == 'linux' ]; then
 	alias ls='ls -G -a -l -tr --color'
 	shopt -s checkwinsize
@@ -79,10 +92,6 @@ elif [ $platform == 'linux' ]; then
 		if test -r ~/.dircolors; then
       eval "$(dircolors -b ~/.dircolors)" || eval "$(dircolors -b)"
     fi
-
-		alias grep='grep --color=auto'
-		alias fgrep='fgrep --color=auto'
-		alias egrep='egrep --color=auto'
 	fi
 
 	# colored GCC warnings and errors
@@ -96,7 +105,7 @@ if [ -f "$HOME/local.bashrc" ]; then
   . "$HOME/local.bashrc"
 fi
 
-alias chase='pass chase.com -c && explore-to https://www.chase.com/'
+alias chase='pass chase -c && explore-to https://www.chase.com/'
 alias amex='pass Amex-Personal -c && explore-to https://www.americanexpress.com/'
 alias wells='pass Wells-Fargo -c && explore-to https://www.wellsfargo.com/'
 alias fidelity='pass Fidelity -c && explore-to https://www.fidelity.com/'
@@ -201,5 +210,22 @@ function ctags-ruby-core() {
     "$@"
 }
 
+function newest() {
+  unset -v latest
+  for file in "$@"; do
+    [[ $file -nt $latest ]] && latest=$file
+  done
+  echo "$latest"
+}
+
+function after() {
+   awk '/'"$1"'/ { seen=1 } { if (seen) print; }'
+}
+
+function before() {
+   awk '/'"$1"'/ { seen=1 } { if (!seen) print; }'
+}
+
 prepend_path_to PATH "/usr/local/bin"
-[ -f "/Users/wbbradley/.ghcup/env" ] && source "/Users/wbbradley/.ghcup/env" # ghcup-env
+[ -f "$HOME/.ghcup/env" ] && . "$HOME/.ghcup/env" # ghcup-env
+[ -f "$HOME/.cargo/env" ] && . "$HOME/.cargo/env"

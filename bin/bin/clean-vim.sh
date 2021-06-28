@@ -5,10 +5,15 @@ fzf_dir="$HOME/.fzf"
 
 plugin() {
   package=$1
+  branch=$2
   mkdir -p "$pack_dir" 2>/dev/null
   echo "Installing VIM plugin $package..."
   cd "$pack_dir" || exit
   git clone --depth=1 "https://github.com/$package" || exit
+  if [ "$branch" != "" ]; then
+    cd "$(basename "$package")" || exit
+    git checkout "$branch"
+  fi
   echo "Installed VIM plugin $package."
 }
 
@@ -16,11 +21,19 @@ setup-vim-packages() {
   rm -rf "$HOME/.vim"
   plugin 'junegunn/fzf.vim'
   plugin 'rhysd/vim-clang-format'
+  plugin 'jbmorgado/vim-pine-script'
   plugin 'dylon/vim-antlr'
   plugin 'alx741/vim-hindent'
   plugin 'editorconfig/editorconfig-vim'
+
+  # IDE features
+
   plugin 'dense-analysis/ale'
-  plugin 'metakirby5/codi.vim'
+  # plugin 'neoclide/coc.nvim' release
+  # plugin 'neoclide/coc-rls'
+  plugin 'neoclide/vim-jsx-improve'
+  # plugin 'rust-lang/rust.vim'
+  # plugin 'metakirby5/codi.vim'
   plugin 'ap/vim-css-color'
   plugin 'tpope/vim-rails'
   plugin 'tpope/vim-commentary'
@@ -62,7 +75,9 @@ setup-vim-packages() {
   # plugin 'elzr/vim-json'
   # plugin 'Superbil/llvm.vim'
   # plugin 'flowtype/vim-flow'
-  # plugin 'leafgarden/typescript-vim'
+  # plugin 'leafgarland/typescript-vim'
+  # plugin 'wbbradley/typescript-vim'
+  plugin 'Quramy/tsuquyomi'
   plugin 'itchyny/vim-haskell-indent'
   plugin 'itchyny/lightline.vim'
   plugin 'maximbaz/lightline-ale'

@@ -34,6 +34,7 @@ let g:EditorConfig_max_line_indicator = 'none'
 let g:ruby_indent_assignment_style = 'variable'
 " Turn on case-insensitive feature for EasyMotion
 let g:EasyMotion_smartcase = 1
+nmap ] <Plug>(easymotion-prefix)
 nmap , <Plug>(easymotion-overwin-f)
 nnoremap <C-h> <C-w>h
 nnoremap <C-j> <C-w>j

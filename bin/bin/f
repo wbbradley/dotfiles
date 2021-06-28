@@ -17,4 +17,4 @@ for r in "${@}"; do
 	fi
 done
 
-eval "rg -uuu --files ${negation} | ${anded_terms} | rg $ored_terms" 2>/dev/null
+eval "rg -uuu --files ${negation} | grep -v node_modules | ${anded_terms} | rg $ored_terms" 2>/dev/null

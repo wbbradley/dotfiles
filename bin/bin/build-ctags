@@ -171,13 +171,9 @@ $CTAGS \
 	$CPP_KINDS \
 	$EXCLUDES \
 	$I_FLAGS \
-  $(maybe-dir $(llvm-config --cppflags | xargs -n 1 echo | grep '^-I' | cut -c3-)) \
-	$(maybe-dir $(find /build/{grunt,*}/usr/include/base-* 2> /dev/null | head -n 1)) \
-	$(maybe-dir $(find /build/{grunt,*}/usr/include/brillo 2> /dev/null | head -n 1)) \
-	$(maybe-dir $(find /build/{grunt,*}/usr/include/gmock 2> /dev/null | head -n 1)) \
-	$(maybe-dir $(find /build/{grunt,*}/usr/include/debugd-client 2> /dev/null | head -n 1)) \
-	$(maybe-dir $(find /build/{grunt,*}/usr/include/gtest 2> /dev/null | head -n 1)) \
-	$(maybe-dir $(find /build/{grunt,*}/var/cache/portage/chromeos-base/diagnostics/out/Default/gen/include 2> /dev/null | head -n 1))
+  "$(maybe-dir $(pkg-config --cflags-only-I raylib | cut -c3-) 2>/dev/null)"
+
+#  $(maybe-dir $(llvm-config --cppflags | xargs -n 1 echo | grep '^-I' | cut -c3-) 2>/dev/null)
 
 grep -E -v \
 	-e '^~.*' \
