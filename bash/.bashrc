@@ -119,7 +119,7 @@ alias my.vanguardplan.com='pass my.vanguardplan.com -c && explore-to https://my.
 [[ -f "${HOME}/xmodmap.file" ]] && xmodmap -v "${HOME}/xmodmap.file"
 
 # shellcheck disable=SC2155
-export RUBY_CONFIGURE_OPTS="--with-openssl-dir=$(brew --prefix openssl@1.1)"
+# export RUBY_CONFIGURE_OPTS="--with-openssl-dir=$(brew --prefix openssl@1.1)"
 (command -v rbenv 1>/dev/null 2>/dev/null) && eval "$(rbenv init -)"
 export NVM_DIR="$HOME/.nvm"
 
