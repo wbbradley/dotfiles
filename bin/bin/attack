@@ -1,0 +1,30 @@
+#!/bin/bash
+host=$1
+port=$2
+path=$3
+max_attack=${4:-100}
+i=0
+
+epoch_nanos() {
+  date +%s%N
+}
+print_count() {
+  end_time=$(epoch_nanos)
+  echo
+  echo "$start_time $end_time $i" | awk '{
+    start_time=$1;
+    end_time=$2;
+    count=$3;
+    printf("%0.3f reqs/sec %d total reqs over %0.3fs\n",
+      (1000000000.0*count)/(end_time-start_time),
+      count,
+      (end_time-start_time)/1000000000.0);
+  }'
+}
+
+trap print_count EXIT
+
+start_time=$(epoch_nanos)
+for (( i=1; i<max_attack; i++ )); do
+  printf "GET %s HTTP/1.0\r\n\r\n" "$path" | nc "$host" "$port" > /dev/null
+done

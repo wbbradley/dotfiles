@@ -11,7 +11,7 @@ set number
 if has('win32')
 elseif has('mac')
 	set clipboard=unnamed
-elseif has('unix')
+else
 	set clipboard=unnamedplus
 endif
 
@@ -201,8 +201,8 @@ nnoremap <C-]> <C-]>zz
 nnoremap <C-o> <C-o>zz
 nnoremap <C-i> <C-i>zz
 nnoremap <leader>+ viwyo"""<Esc>pA."""<Esc>_wvU<Esc>V:s/_/ /<CR>:noh<CR>:match<CR>
-nnoremap <Leader>! :view ~/README.md<CR>
-nnoremap <Leader>1 :e ~/README.md<CR>Go<Esc>:r!date<CR>:set paste<CR>o
+nnoremap <Leader>! :view ~/README.txt<CR>
+nnoremap <Leader>1 :e ~/README.txt<CR>Go<Esc>:r!date<CR>:set paste<CR>o
 nnoremap <Leader>2 :e ~/github.txt<CR>Go<Esc>:r!date<CR>o
 nnoremap <Leader>c :%s/\<<C-r><C-w>\>/
 vnoremap <Leader>c "hy:%s/<C-r>h/
@@ -330,6 +330,7 @@ nnoremap <leader>90 :e ~/.vimrc<CR>
 nnoremap <leader>91 :e ~/local.vimrc<CR>
 nnoremap <leader>92 :e ~/.bashrc<CR>
 nnoremap <leader>93 :e ~/local.bashrc<CR>
+nnoremap <leader>9x :e ~/.xmonad/xmonad.hs<CR>:vsplit<CR>:e ~/.config/xmobar/xmobar.config<CR>:set ft=haskell<CR>
 nnoremap <leader>9z :e ~/src/vim-zion/syntax/zion.vim<CR>
 nnoremap <leader>i Oimport ipdb<CR>ipdb.set_trace()<Esc>j_
 nnoremap <leader>p Oimport pdb<CR>pdb.set_trace()<Esc>j_

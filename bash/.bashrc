@@ -28,6 +28,7 @@ _ssh()
     return 0
 }
 complete -F _ssh ssh
+alias new-master='git fetch && git checkout -B master origin/master'
 
 # shellcheck disable=SC1090
 . "$HOME/bin/utils.sh"
