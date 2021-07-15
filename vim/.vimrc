@@ -86,6 +86,7 @@ let g:ale_ruby_rubocop_executable = 'rubocop'
 
 let g:ale_linters = {
       \ 'markdown': ['markdownlint'],
+      \ 'python': ['pylint'],
       \ 'haskell': ['stack-build'],
       \ 'cpp': ['clang'],
       \ 'c': ['clang'],

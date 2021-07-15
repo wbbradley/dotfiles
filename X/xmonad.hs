@@ -8,6 +8,7 @@ import XMonad.Hooks.ManageDocks
 import XMonad.Util.Run
 import XMonad.Util.SpawnOnce
 import XMonad.Layout.ThreeColumns
+import XMonad.Layout.Grid
 
 import qualified XMonad.StackSet as W
 import qualified Data.Map        as M
@@ -155,7 +156,7 @@ myKeys conf@(XConfig {XMonad.modMask = modm}) = M.fromList $
     -- mod-shift-[1..9], Move client to workspace N
     --
     [((m .|. modm, k), windows $ f i)
-        | (i, k) <- zip (XMonad.workspaces conf) [xK_1 .. xK_9]
+        | (i, k) <- zip (XMonad.workspaces conf) [xK_1 .. xK_4]
         , (f, m) <- [(W.greedyView, 0), (W.shift, shiftMask)]]
     -- ++
 
@@ -199,7 +200,7 @@ myMouseBindings (XConfig {XMonad.modMask = modm}) = M.fromList $
 -- which denotes layout choice.
 --
 myLayout = avoidStruts (tiled ||| 
-                       -- Mirror tiled |||
+                       Grid |||
                        Full)
   where
      -- threeCol = ThreeCol nmaster delta ratio
