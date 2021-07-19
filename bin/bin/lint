@@ -28,17 +28,24 @@ install-pylint() {
 run-lint() {
   if [ $# -ne 0 ]; then
     set -v
-    pylint --rcfile=<(printf "
-      [MASTER]
-      enable=E,W
-      disable=
-        import-error,
-        no-absolute-import,
-        no-name-in-module,
-        missing-class-docstring,
-        missing-function-docstring,
-        invalid-name,
-    ") -j 7 "$@"
+
+    if [ -f .pylintrc ]; then
+      pylint -j 7 "$@"
+    else
+      pylint --rcfile=<(printf "
+        [MASTER]
+        enable=E,W
+        disable=
+          import-error,
+          no-absolute-import,
+          no-name-in-module,
+          missing-class-docstring,
+          missing-module-docstring,
+          too-many-arguments,
+          missing-function-docstring,
+          invalid-name,
+      ") -j 7 "$@"
+    fi
   else
     pylint -j 7 $(find . -iname '*.py' | grep -v -e site-packages)
   fi

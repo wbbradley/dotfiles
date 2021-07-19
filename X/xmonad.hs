@@ -65,6 +65,9 @@ myKeys conf@(XConfig {XMonad.modMask = modm}) = M.fromList $
     , ((modm,               xK_space ), spawn "dmenu_run")
     -- launch gmrun
     , ((modm .|. shiftMask, xK_p     ), spawn "gmrun")
+
+    , ((modm, xK_p     ),   spawn "load-password")
+
     -- launch gnome-screenshot
     , ((0, xK_Print     ), spawn "gnome-screenshot && xdg-open ~/Pictures &")
 
