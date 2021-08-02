@@ -28,7 +28,15 @@ _ssh()
     return 0
 }
 complete -F _ssh ssh
-alias new-master='git fetch && git checkout -B master origin/master'
+
+new-main() {
+  git fetch
+  main="$(git symbolic-ref refs/remotes/origin/HEAD | sed 's@^refs/remotes/origin/@@')"
+  git checkout -B "$main" "origin/$main"
+  if [ -n "$1" ]; then
+    git checkout -B "$1"
+  fi
+}
 
 # shellcheck disable=SC1090
 . "$HOME/bin/utils.sh"
@@ -37,6 +45,7 @@ export PS1="\$(if [ \$? != 0 ]; then echo '\[\033[47;5;88;34;5;1m\] ERROR \[\033
 
 # export SRC_ROOT=$HOME/src
 alias vi=vim
+alias rgm='rg --multiline-dotall -U'
 alias weather='weather -l "Boulder, CO" || echo "Install `brew install darksky-weather`"'
 alias uuid="python -c \"import uuid;print(uuid.uuid4())\" | tr -d '\n' | pbcopy"
 function mydot() {

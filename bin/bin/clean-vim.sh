@@ -25,7 +25,7 @@ setup-vim-packages() {
   plugin 'dylon/vim-antlr'
   plugin 'alx741/vim-hindent'
   plugin 'editorconfig/editorconfig-vim'
-
+  plugin 'luochen1990/rainbow'
   # IDE features
 
   plugin 'dense-analysis/ale'

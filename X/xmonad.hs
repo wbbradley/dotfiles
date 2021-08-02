@@ -203,7 +203,6 @@ myMouseBindings (XConfig {XMonad.modMask = modm}) = M.fromList $
 -- which denotes layout choice.
 --
 myLayout = avoidStruts (tiled ||| 
-                       Grid |||
                        Full)
   where
      -- threeCol = ThreeCol nmaster delta ratio

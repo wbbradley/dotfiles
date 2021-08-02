@@ -437,6 +437,8 @@ set matchtime=0
 set hlsearch
 set signcolumn=yes
 
+let g:rainbow_active = 1
+
 syntax on
 filetype plugin on
 filetype indent on
