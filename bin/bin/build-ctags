@@ -75,80 +75,15 @@ EXCLUDES=$(echo \
 	--exclude=node_modules \
 	--exclude=bower_components)
 
-CPP_KINDS="--c-kinds=+p --c++-kinds=+p"
+CPP_KINDS=( --c-kinds=+p --c++-kinds=+p )
 
 function list-files() {
-	find $(realpath $HOME/src/googletest/googlemock/include/gmock) \
-		| grep -E -e '\.cc$|\.h$|\.proto$'
-	find $(realpath .) \
-		| grep -E -e '\.cc$|\.h$|\.proto$' \
-		| grep -E -e '/third_party/cros_system_api/'
-	find $(realpath .) \
-		| grep -E '\.cc$|\.h$|\.proto$' \
-		| grep -E -v \
-			-e '/GLES2/' \
-			-e '/Release[^/]+/' \
-			-e '/android_ndk/' \
-			-e '/android_tools/' \
-			-e '/angle/' \
-			-e '/assistant/' \
-			-e '/base/win/' \
-			-e '/breakpad/' \
-			-e '/build/' \
-			-e '/buildtools/' \
-			-e '/camera_metadata_tags.h' \
-			-e '/chrome/grit/' \
-			-e '/chromeos/components/' \
-			-e '/cicerone/' \
-			-e '/compiler/' \
-			-e '/dawn/' \
-			-e '/device_management_backend.pb.h' \
-			-e '/ffmpeg/' \
-			-e '/gen/components/' \
-			-e '/gen/media/' \
-			-e '/gl/' \
-			-e '/glfw/' \
-			-e '/gpu/' \
-			-e '/grpc/src/' \
-			-e '/ia_imaging/' \
-			-e '/icu/' \
-			-e '/input_devices' \
-			-e '/khronos' \
-			-e '/libassistant/' \
-			-e '/libxml/' \
-			-e '/llvm-build/' \
-			-e '/mesa_headers' \
-			-e '/nasm/' \
-			-e '/native_client/' \
-			-e '/net/spdy' \
-			-e '/node/' \
-			-e '/openssl/' \
-			-e '/pkcs11t.h' \
-			-e '/protobuf/' \
-			-e '/rockchip/' \
-			-e '/safe_browsing/' \
-			-e '/pyasn1-modules/' \
-			-e '/shill/.*_test' \
-			-e '/shill/metrics.h' \
-			-e '/sqlite/' \
-			-e '/src/media/' \
-			-e '/swiftshader/' \
-			-e '/third_party/' \
-			-e '/toolchain.?/' \
-			-e '/tpm_generated' \
-			-e '/v8/' \
-			-e '/vulkan[^/]*/' \
-			-e '/web_contents/' \
-			-e '/wifi_test.cc' \
-			-e '\.patch$' \
-			-e '_browsertest\.' \
-			-e '_unittest\.cc' \
-			-e 'extension_function_histogram_value'
+	find $(realpath .) | grep -Ee '\.cpp$|\.cc$|\.h$|\.proto$|\.py$'
 }
 
 if [[ "$1" == "list-files" ]]; then
 	if [[ "$2" != "" ]]; then
-		cd $2
+		cd "$2" || exit 1
 	fi
 	list-files 2>/dev/null
 	exit 0
@@ -157,21 +92,21 @@ fi
 # First index the local directory
 list-files 2>/dev/null \
 	| $CTAGS \
-		$CPP_KINDS \
-		-L - \
-		$I_FLAGS
+      "${CPP_KINDS[@]}" \
+      -L - \
+      $I_FLAGS
 
 # Now index any other interesting includes that I may want to peruse.
-$CTAGS \
+: $CTAGS \
 	-R \
 	-a \
 	--exclude="*.cc" \
 	--exclude="*.cpp" \
 	--exclude="*.c" \
-	$CPP_KINDS \
+  "${CPP_KINDS[@]}" \
 	$EXCLUDES \
-	$I_FLAGS \
-  "$(maybe-dir $(pkg-config --cflags-only-I raylib | cut -c3-) 2>/dev/null)"
+	$I_FLAGS
+# "$(maybe-dir $(pkg-config --cflags-only-I raylib | cut -c3-) 2>/dev/null)"
 
 #  $(maybe-dir $(llvm-config --cppflags | xargs -n 1 echo | grep '^-I' | cut -c3-) 2>/dev/null)
 

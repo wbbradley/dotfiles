@@ -21,14 +21,14 @@ set splitbelow
 set splitright
 set modeline
 set modelines=2
-set noesckeys
-set sw=2 sts=2 noexpandtab
+" set noesckeys
+set sw=2 sts=2
 set timeoutlen=1000 ttimeoutlen=0
 
 set wildignore+=*.o
 set wildignore+=*.a
-set wildignore+=experimental
-set wildignore+=toolchains
+
+:autocmd VimResized * wincmd =
 
 let g:EditorConfig_max_line_indicator = 'none'
 let g:ruby_indent_assignment_style = 'variable'
@@ -88,7 +88,7 @@ let g:ale_ruby_rubocop_executable = 'rubocop'
 let g:ale_python_pylint_executable = 'lint'
 let g:ale_python_pylint_change_directory = 0
 let g:ale_python_pylint_use_global = 1
-
+let g:ale_cpp_cc_executable='clang'
 let g:ale_linters = {
       \ 'markdown': ['markdownlint'],
       \ 'python': ['pylint'],
@@ -99,8 +99,10 @@ let g:ale_linters = {
       \ 'ruby': ['rubocop'],
       \ }
 
-let g:multi_cursor_exit_from_insert_mode=1
-let g:multi_cursor_exit_from_visual_mode=1
+augroup dot
+  autocmd!
+  autocmd FileType dot set cindent cinkeys="
+augroup END
 
 augroup Haskell
   autocmd!
@@ -109,8 +111,8 @@ augroup Haskell
   " autocmd FileType haskell nnoremap <buffer> <Leader>htc :GhcModTypeClear<cr>
 augroup END
 
-let g:multi_cursor_exit_from_visual_mode=1
 let g:multi_cursor_exit_from_insert_mode=1
+let g:multi_cursor_exit_from_visual_mode=1
 let g:gitgutter_max_signs = 2000
 
 let g:airline#extensions#ale#enabled = 1
@@ -220,9 +222,10 @@ nnoremap * *zz
 
 hi Comment          guifg=#7C7C7C     guibg=NONE        gui=NONE      ctermfg=darkgray    ctermbg=NONE        cterm=NONE
 autocmd Syntax cpp call EnhanceCppSyntax()
-autocmd FileType c nnoremap <buffer> <F4> :wa<CR> :e %:p:s,.h$,.X123X,:s,.c$,.h,:s,.X123X$,.c,<CR>
-autocmd FileType c inoremap <buffer> <F4> <Esc> <F4>
-autocmd FileType c vnoremap <buffer> <F4> <Esc> <F4>
+autocmd FileType c nnoremap <buffer> <F2> :call FlipHeader()<CR>
+autocmd FileType c nnoremap <buffer> <F4> :call FlipHeader()<CR>
+autocmd FileType cpp nnoremap <buffer> <F2> :call FlipHeader()<CR>
+autocmd FileType cpp nnoremap <buffer> <F4> :call FlipHeader()<CR>
 
 function SetCOptions()
   nmap <buffer> <Leader><Leader> va}:ClangFormat<CR>
@@ -303,6 +306,31 @@ function! EnhanceCppSyntax()
   hi def link cppFuncDef Special
 endfunction
 
+function! FlipHeader()
+  :wa
+  if (&ft == 'c')
+    if expand('%:e') == 'c'
+      :e %:r.h
+    else
+      if filereadable(expand('%:r') . '.c')
+        :e %:r.c
+      else
+        :e %:r.c
+      endif
+    endif
+  else
+    if expand('%:e') == 'hpp' || expand('%:e') == 'h'
+      :e %:r.cpp
+    else
+      if filereadable(expand('%:r') . '.hpp')
+        :e %:r.hpp
+      else
+        :e %:r.h
+      endif
+    endif
+  endif
+endfunction
+
 " nnoremap <leader>` :!ctags -R .<CR>
 
 nnoremap <F3> :call FindWordUnderCursor()<CR>
@@ -349,12 +377,13 @@ augroup nopasty
   autocmd InsertLeave * call CleanupPaste()
 augroup END
 
-" F7 & F8 - incremental build
-nmap <F7> :wa<CR> :!clear <CR><CR> :make<CR><CR>zz
+" F7 & F8 - incremental build (build is so important it gets a two keys for
+" redundancy).
+nmap <F7> :wa<CR> :!clear <CR><CR> :make<CR><CR>
 imap <F7> <Esc> <F7>
 vmap <F7> <Esc> <F7>
 
-nmap <F8> :wa<CR> :!clear <CR><CR> :make<CR><CR>zz
+nmap <F8> :wa<CR> :!clear <CR><CR> :make<CR><CR>
 imap <F8> <Esc> <F7>
 vmap <F8> <Esc> <F7>
 
@@ -453,8 +482,8 @@ silent! source ~/local.vimrc
 silent! source .vimrc
 silent! source local.vimrc
 
-nnoremap <silent><F9> :silent! call <SID>qfnext(v:false)<CR>
-nnoremap <silent><F10> :silent! call <SID>qfnext(v:true)<CR>
+nnoremap <silent><F9> :w<CR>:silent! call <SID>qfnext(v:false)<CR>
+nnoremap <silent><F10> :w<CR>:silent! call <SID>qfnext(v:true)<CR>
 
 function! s:qfnext(next) abort
   " find all 'quickfix'-type windows on the current tab
