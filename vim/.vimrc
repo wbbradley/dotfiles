@@ -485,6 +485,10 @@ silent! source local.vimrc
 nnoremap <silent><F9> :w<CR>:silent! call <SID>qfnext(v:false)<CR>
 nnoremap <silent><F10> :w<CR>:silent! call <SID>qfnext(v:true)<CR>
 
+if &diff
+  syntax off
+endif
+
 function! s:qfnext(next) abort
   " find all 'quickfix'-type windows on the current tab
   let qfwin = filter(getwininfo(), {_, v -> v.quickfix && v.tabnr == tabpagenr()})
