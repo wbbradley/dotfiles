@@ -248,10 +248,6 @@ fzf-down() {
   fzf --height 50% --min-height 20 --border --bind ctrl-/:toggle-preview "$@"
 }
 
-clean-docker() {
-  docker ps -a | awk '!/CONTA/ { print $1 }' | xargs -n 1 docker rm -f
-}
-
 _gf() {
   is_in_git_repo || return
   git -c color.status=always status --short |
@@ -310,5 +306,6 @@ if [[ $- =~ i ]]; then
 fi
 
 prepend_path_to PATH "/usr/local/bin"
+prepend_path_to PATH "$HOME/bin"
 [ -f "$HOME/.ghcup/env" ] && . "$HOME/.ghcup/env" # ghcup-env
 [ -f "$HOME/.cargo/env" ] && . "$HOME/.cargo/env"
