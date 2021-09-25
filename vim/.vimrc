@@ -83,8 +83,6 @@ let g:lightline.active.right = [
       \ ]
 let g:ale_markdown_markdownlint_executable = './node_modules/.bin/markdownlint'
 let g:ale_ruby_rubocop_executable = 'rubocop'
-
-" ln -s "$HOME/src/dotfiles/bin/bin/lint" "$HOME/bin/lint"
 let g:ale_python_pylint_executable = 'lint'
 let g:ale_python_pylint_change_directory = 0
 let g:ale_python_pylint_use_global = 1
