@@ -32,7 +32,7 @@ setup-vim-packages() {
   # plugin 'neoclide/coc.nvim' release
   # plugin 'neoclide/coc-rls'
   plugin 'neoclide/vim-jsx-improve'
-  # plugin 'rust-lang/rust.vim'
+  plugin 'rust-lang/rust.vim'
   # plugin 'metakirby5/codi.vim'
   plugin 'ap/vim-css-color'
   plugin 'tpope/vim-rails'
