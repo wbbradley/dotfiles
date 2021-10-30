@@ -30,6 +30,7 @@ _ssh()
 complete -F _ssh ssh
 
 new-main() {
+  local main
   git fetch
   main="$(git symbolic-ref refs/remotes/origin/HEAD | sed 's@^refs/remotes/origin/@@')"
   git checkout -B "$main" "origin/$main"
@@ -58,15 +59,14 @@ export PS1="\$(if [ \$? != 0 ]; then echo '\[\033[47;5;88;34;5;1m\] ERROR \[\033
 # export SRC_ROOT=$HOME/src
 alias vi=vim
 alias rgm='rg --multiline-dotall -U'
-alias weather='weather -l "Boulder, CO" || echo "Install `brew install darksky-weather`"'
 alias uuid="python -c \"import uuid;print(uuid.uuid4())\" | tr -d '\n' | pbcopy"
 function mydot() {
   dot "$1" -Tpng -Gdpi=300 -o "$1.png" && open "$1.png"
 }
 
-HISTSIZE=15000
-
+HISTSIZE=50000
 shopt -s histappend
+export HISTCONTROL=ignoreboth:erasedups
 
 export EDITOR="vim"
 

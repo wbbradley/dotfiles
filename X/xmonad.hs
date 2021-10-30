@@ -65,6 +65,7 @@ myKeys conf@(XConfig {XMonad.modMask = modm}) = M.fromList $
     , ((modm,               xK_space ), spawn "dmenu_run")
     -- launch gmrun
     , ((modm .|. shiftMask, xK_p     ), spawn "gmrun")
+    , ((modm .|. shiftMask, xK_m     ), spawn "sleep 1; xset dpms force off")
 
     , ((modm, xK_p     ),   spawn "load-password")
 
@@ -73,6 +74,8 @@ myKeys conf@(XConfig {XMonad.modMask = modm}) = M.fromList $
 
     -- close focused window
     , ((modm, xK_w     ), kill)
+
+    , ((modm,               xK_equal ),  spawn "'='")
 
      -- Rotate through the available layout algorithms
     , ((modm,               xK_z ),  sendMessage NextLayout)

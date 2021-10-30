@@ -36,6 +36,7 @@ let g:ruby_indent_assignment_style = 'variable'
 let g:EasyMotion_smartcase = 1
 nmap ] <Plug>(easymotion-prefix)
 nmap , <Plug>(easymotion-overwin-f)
+nmap <Space> :let @+=@0<CR>
 nnoremap <C-h> <C-w>h
 nnoremap <C-j> <C-w>j
 nnoremap <C-k> <C-w>k
@@ -478,7 +479,9 @@ syn match Braces display '[<>{}()\[\]]'
 let c_no_curly_error=1
 
 silent! source ~/local.vimrc
-silent! source .vimrc
+if resolve(expand("~/.vimrc")) != resolve(expand("$PWD/.vimrc"))
+  silent! source .vimrc
+endif
 silent! source local.vimrc
 
 nnoremap <silent><F9> :w<CR><Esc>:silent! call <SID>qfnext(v:false)<CR>
