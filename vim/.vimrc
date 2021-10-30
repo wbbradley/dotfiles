@@ -81,23 +81,22 @@ let g:lightline.active.right = [
 		  \   [ 'fileformat', 'fileencoding', 'filetype' ],
       \   [ 'linter_checking', 'linter_errors', 'linter_warnings', 'linter_ok' ]
       \ ]
-let g:ale_markdown_markdownlint_executable = './node_modules/.bin/markdownlint'
-let g:ale_ruby_rubocop_executable = 'rubocop'
 
-" ln -s "$HOME/src/dotfiles/bin/bin/lint" "$HOME/bin/lint"
-let g:ale_python_pylint_executable = 'lint'
-let g:ale_python_pylint_change_directory = 0
-let g:ale_python_pylint_use_global = 1
-let g:ale_cpp_cc_executable='clang'
-let g:ale_linters = {
-      \ 'markdown': ['markdownlint'],
-      \ 'python': ['pylint'],
-      \ 'haskell': ['stack-build'],
-      \ 'cpp': ['clang'],
-      \ 'c': ['clang'],
-      \ 'zion': ['zion'],
-      \ 'ruby': ['rubocop'],
+" let g:ale_python_pylint_executable = 'lint'
+" let g:ale_python_pylint_change_directory = 0
+" let g:ale_python_pylint_use_global = 1
+let g:ale_fixers = {
+      \   'cpp': ['clang-format']
+      \ , 'rust': ['rustfmt', 'trim_whitespace', 'remove_trailing_lines']
       \ }
+let g:ale_fix_on_save = 1
+let g:ale_linters = {'rust': ['analyzer']}
+augroup rust
+  autocmd!
+  autocmd FileType rust setlocal completeopt=menu,menuone,preview,noselect,noinsert
+  autocmd FileType rust let b:ale_completion_enabled = 1
+  autocmd FileType rust nnoremap <C-]> :ALEGoToDefinition<CR>
+augroup END
 
 augroup dot
   autocmd!
@@ -482,8 +481,8 @@ silent! source ~/local.vimrc
 silent! source .vimrc
 silent! source local.vimrc
 
-nnoremap <silent><F9> :w<CR>:silent! call <SID>qfnext(v:false)<CR>
-nnoremap <silent><F10> :w<CR>:silent! call <SID>qfnext(v:true)<CR>
+nnoremap <silent><F9> :w<CR><Esc>:silent! call <SID>qfnext(v:false)<CR>
+nnoremap <silent><F10> :w<CR><Esc>:silent! call <SID>qfnext(v:true)<CR>
 
 if &diff
   syntax off

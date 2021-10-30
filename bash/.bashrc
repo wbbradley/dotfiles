@@ -41,7 +41,19 @@ new-main() {
 # shellcheck disable=SC1090
 . "$HOME/bin/utils.sh"
 
-export PS1="\$(if [ \$? != 0 ]; then echo '\[\033[47;5;88;34;5;1m\] ERROR \[\033[0m\]'; fi) \[\033[48;5;95;38;5;214m\] \u \[\033[0;38;5;31;48;5;240;22m\] \[\033[0;38;5;252;48;5;240;1m\] \$(parse_git_branch) \$(parse_working_dir) \[\033[0;38;5;240;49;22m\]\[\033[0m\] "
+bgfg() {
+  printf "\033[48;2;$1;$2;$3;38;2;$4;$5;$6m"
+}
+
+host_color() {
+  if [[ "$HOSTNAME" == "blade" ]]; then
+    bgfg 219 182 50 181 53 3
+  else
+    bgfg 219 98 50 14 55 13
+  fi
+}
+# shellcheck disable=SC2155
+export PS1="\$(if [ \$? != 0 ]; then echo '\[\033[47;5;88;34;5;1m\] ERROR \[\033[0m\]'; fi) \[$(host_color)\] \u \[\033[0;38;5;31;48;5;240;22m\] \[\033[0;38;5;252;48;5;240;1m\] \$(parse_git_branch) \$(parse_working_dir) \[\033[0;38;5;240;49;22m\]\[\033[0m\] "
 
 # export SRC_ROOT=$HOME/src
 alias vi=vim
@@ -293,6 +305,14 @@ _gs() {
   is_in_git_repo || return
   git stash list | fzf-down --reverse -d: --preview 'git show --color=always {1}' |
   cut -d: -f1
+}
+
+video-driver() {
+  grep "X Driver" /var/log/Xorg.0.log
+}
+
+console-setup() {
+  sudo dpkg-reconfigure console-setup
 }
 
 if [[ $- =~ i ]]; then
