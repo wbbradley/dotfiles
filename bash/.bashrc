@@ -48,7 +48,7 @@ bgfg() {
 
 host_color() {
   if [[ "$HOSTNAME" == "blade" ]]; then
-    bgfg 219 182 50 181 53 3
+    bgfg 219 182 50 121 43 3
   else
     bgfg 219 98 50 14 55 13
   fi
