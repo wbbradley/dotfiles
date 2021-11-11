@@ -49,7 +49,7 @@ set tabstop=2 softtabstop=2 expandtab shiftwidth=2 smarttab
 
 " set rtp+=~/src/vim-zion
 
-let g:hindent_on_save = 0
+let g:hindent_on_save = 1
 " let g:hdevtools_stack = 1
 let g:python_pep8_indent_hang_indent = 4
 

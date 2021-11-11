@@ -3,22 +3,31 @@
 pack_dir="$HOME/.vim/pack/plugins/start/"
 fzf_dir="$HOME/.fzf"
 
-plugin() {
+plugin_precise() (
   package=$1
-  branch=$2
+  url=$2
+  branch=$3
   mkdir -p "$pack_dir" 2>/dev/null
   echo "Installing VIM plugin $package..."
   cd "$pack_dir" || exit
-  git clone --depth=1 "https://github.com/$package" || exit
-  if [ "$branch" != "" ]; then
+  git clone --depth=1 "$url" || exit
+  if [[ -n "$branch" ]]; then
     cd "$(basename "$package")" || exit
     git checkout "$branch"
   fi
   echo "Installed VIM plugin $package."
+)
+
+plugin() {
+  package=$1
+  branch=$2
+  mkdir -p "$pack_dir" 2>/dev/null
+  plugin_precise "$package" "https://github.com/$package" "$branch"
 }
 
 setup-vim-packages() {
   rm -rf "$HOME/.vim"
+  plugin_precise 'soliman/prolog-vim' 'https://gitlab.inria.fr/soliman/prolog-vim'
   plugin 'junegunn/fzf.vim'
   plugin 'rhysd/vim-clang-format'
   plugin 'jbmorgado/vim-pine-script'
