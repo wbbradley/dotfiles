@@ -117,6 +117,9 @@ setup-fzf() {
 
 if [ "$(uname)" = "Darwin" ]; then
   brew upgrade vim
+else
+  # Some persistent settings...
+  gsettings set org.gnome.Terminal.Legacy.Settings headerbar false
 fi
 
 setup-vim-packages

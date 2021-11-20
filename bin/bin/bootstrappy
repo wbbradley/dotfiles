@@ -28,7 +28,7 @@ if ! [[ -f "$activate" ]]; then
   fi
   # shellcheck disable=SC1090
   . "$activate" || die "python env is not set up [envdir=$envdir]"
-  if [[ -n "${!toolname}" ]]; then
+  if ( [ -n "${!toolname}" ] ); then
     # User has defined an override for this toolname's installation package.
     install "${!toolname}"
   else

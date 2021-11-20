@@ -42,19 +42,13 @@ new-main() {
 # shellcheck disable=SC1090
 . "$HOME/bin/utils.sh"
 
-bgfg() {
-  printf "\033[48;2;$1;$2;$3;38;2;$4;$5;$6m"
-}
-
-host_color() {
-  if [[ "$HOSTNAME" == "blade" ]]; then
-    bgfg 219 182 50 121 43 3
-  else
-    bgfg 219 98 50 14 55 13
-  fi
-}
 # shellcheck disable=SC2155
-export PS1="\$(if [ \$? != 0 ]; then echo '\[\033[47;5;88;34;5;1m\] ERROR \[\033[0m\]'; fi) \[$(host_color)\] \u \[\033[0;38;5;31;48;5;240;22m\] \[\033[0;38;5;252;48;5;240;1m\] \$(parse_git_branch) \$(parse_working_dir) \[\033[0;38;5;240;49;22m\]\[\033[0m\] "
+export PS1="\$(
+  if [ \$? != 0 ]; then
+    bgfgx6 e6 39 46 e9 c4 6a
+    echo ' ERROR \[\033[0m\]'
+  fi
+  )\$(show-env-vars)$(host_color) \u \[\033[0;38;5;31;48;5;240;22m\] \[\033[0;38;5;252;48;5;240;1m\] \$(parse_git_branch) \$(parse_working_dir) \[\033[0;38;5;240;49;22m\]\[\033[0m\] "
 
 # export SRC_ROOT=$HOME/src
 alias vi=vim

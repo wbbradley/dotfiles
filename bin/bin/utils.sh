@@ -1,6 +1,57 @@
 #!/bin/bash
+bgfg() {
+  printf "\033[48;2;$1;$2;$3;38;2;$4;$5;$6m"
+}
+
+bgfgx() {
+  # HEX
+  printf "\033[48;2;$(( 0x"$1" ));$(( 0x"$2" ));$(( 0x"$3" ));38;2;$(( 0x"$4" ));$(( 0x"$5" ));$(( 0x"$6" ))m"
+}
+
+reset-color() {
+  printf "\033[0m"
+}
+
+bgfgx6() {
+  # Convert 2 24-bit Hexadecimal colors into 6-cube colors.
+  # Returns ANSI escape code for the given bg/fg combo.
+  bg_r="$(( 0x"$1"*6/255 ))"
+  bg_g="$(( 0x"$2"*6/255 ))"
+  bg_b="$(( 0x"$3"*6/255 ))"
+  fg_r="$(( 0x"$4"*6/255 ))"
+  fg_g="$(( 0x"$5"*6/255 ))"
+  fg_b="$(( 0x"$6"*6/255 ))"
+  bg_color="$(( 16 + bg_r * 36 + bg_g * 6 + bg_b ))"
+  fg_color="$(( 16 + fg_r * 36 + fg_g * 6 + fg_b ))"
+  printf "\033[48;5;$bg_color;38;5;${fg_color}m"
+}
+
+host_color() {
+  if [[ "$HOSTNAME" == "blade" ]]; then
+    bgfg 219 98 50 14 55 13
+  else
+    bgfgx6 e9 c4 6a 26 46 53
+  fi
+}
+
 parse_git_branch() {
 	git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/\1/'
+}
+
+show-env-vars() {
+  declare -a vars
+  vars=( VIRTUAL_ENV DEBUG )
+  i=0
+  wrote=0
+  delim='\n'
+  for var in "${vars[@]}"; do
+    (( i+=2 ))
+    if [[ -n "${!var}" ]]; then
+      printf "$delim$(bgfgx6 a0 50 "$(( 30 * i ))" 15 15 0) $var=%s \n$(reset-color)" ${!var}
+      delim=''
+      (( wrote=1 ))
+    fi  
+  done
 }
 
 parse_working_dir() {
