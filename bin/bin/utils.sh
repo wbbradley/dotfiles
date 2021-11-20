@@ -47,7 +47,7 @@ show-env-vars() {
   for var in "${vars[@]}"; do
     (( i+=2 ))
     if [[ -n "${!var}" ]]; then
-      printf "$delim$(bgfgx6 a0 50 "$(( 30 * i ))" 15 15 0) $var=%s \n$(reset-color)" ${!var}
+      printf "$delim$(bgfgx6 a0 50 "$(( 80 * i ))" 15 15 0) $var=%s $(reset-color)\n$(reset-color)" ${!var}
       delim=''
       (( wrote=1 ))
     fi  
