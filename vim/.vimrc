@@ -48,7 +48,7 @@ set wildchar=<Tab> wildmenu wildmode=full
 set tabstop=2 softtabstop=2 expandtab shiftwidth=2 smarttab
 
 " set rtp+=~/src/vim-zion
-
+let g:qf_modifiable = 1
 let g:hindent_on_save = 1
 " let g:hdevtools_stack = 1
 let g:python_pep8_indent_hang_indent = 4
@@ -132,6 +132,8 @@ let g:go_fmt_command = "goimports"
 let g:go_def_mode='gopls'
 " let g:go_info_mode='gopls'
 " let g:go_fmt_fail_silently = 0
+
+let g:fzf_preview_window = ['up:50%', 'ctrl-/']
 
 let g:go_decls_mode = 'fzf'
 " let g:go_def_mapping_enabled = 1
@@ -484,8 +486,9 @@ if resolve(expand("~/.vimrc")) != resolve(expand("$PWD/.vimrc"))
 endif
 silent! source local.vimrc
 
-nnoremap <silent><F9> :w<CR><Esc>:silent! call <SID>qfnext(v:false)<CR>
-nnoremap <silent><F10> :w<CR><Esc>:silent! call <SID>qfnext(v:true)<CR>
+nnoremap - _
+nnoremap H :w<CR><Esc>:silent! call <SID>qfnext(v:false)<CR>
+nnoremap L :w<CR><Esc>:silent! call <SID>qfnext(v:true)<CR>
 
 if &diff
   syntax off

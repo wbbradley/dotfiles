@@ -1,15 +1,15 @@
 #!/bin/bash
 bgfg() {
-  printf "\033[48;2;$1;$2;$3;38;2;$4;$5;$6m"
+  printf "\001\033[48;2;$1;$2;$3;38;2;$4;$5;$6m\002"
 }
 
 bgfgx() {
   # HEX
-  printf "\033[48;2;$(( 0x"$1" ));$(( 0x"$2" ));$(( 0x"$3" ));38;2;$(( 0x"$4" ));$(( 0x"$5" ));$(( 0x"$6" ))m"
+  printf "\001\033[48;2;$(( 0x"$1" ));$(( 0x"$2" ));$(( 0x"$3" ));38;2;$(( 0x"$4" ));$(( 0x"$5" ));$(( 0x"$6" ))m\002"
 }
 
 reset-color() {
-  printf "\033[0m"
+  printf "\001\033[0m\002"
 }
 
 bgfgx6() {
@@ -23,12 +23,14 @@ bgfgx6() {
   fg_b="$(( 0x"$6"*6/255 ))"
   bg_color="$(( 16 + bg_r * 36 + bg_g * 6 + bg_b ))"
   fg_color="$(( 16 + fg_r * 36 + fg_g * 6 + fg_b ))"
-  printf "\033[48;5;$bg_color;38;5;${fg_color}m"
+  printf "\001\033[48;5;$bg_color;38;5;${fg_color}m\002"
 }
 
 host_color() {
-  if [[ "$HOSTNAME" == "blade" ]]; then
+  if [[ "$HOSTNAME" = "blade" ]]; then
     bgfg 219 98 50 14 55 13
+  elif [[ "$HOSTNAME" = "fennario" ]]; then
+    bgfgx6 6a 6a 6a f5 f5 f5
   else
     bgfgx6 e9 c4 6a 26 46 53
   fi

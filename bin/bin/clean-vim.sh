@@ -36,6 +36,7 @@ setup-vim-packages() {
   plugin 'editorconfig/editorconfig-vim'
   plugin 'luochen1990/rainbow'
   # IDE features
+  plugin 'stefandtw/quickfix-reflector.vim'
 
   plugin 'dense-analysis/ale'
   # plugin 'neoclide/coc.nvim' release
