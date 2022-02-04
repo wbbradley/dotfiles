@@ -1,0 +1,12 @@
+#!/bin/bash
+grep \
+  -Rn \
+  -Ee "$(<"$HOME"/vim-todo.txt sed -e :a -e ';$!N;s/\n/|/;ta')" ./ \
+  | grep -Ev \
+    -e 'Binary file .*matches$' \
+    -e '\.egg-info/' \
+    -e '\.js\b' \
+    -e '\bmigrations\b' \
+    -e '^\./\.git\b' \
+    -e '^\./tags:'
+
