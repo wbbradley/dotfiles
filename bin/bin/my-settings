@@ -6,6 +6,8 @@ die() {
   exit 1
 }
 
+DCONF_INI="$HOME/src/dotfiles/X/dconf.ini"
+
 
 dump-settings() {
   gsettings list-recursively | grep -i desktop.interface | grep -v font
@@ -22,17 +24,15 @@ dump-settings() {
 }
 
 cmd-save() {
-  dump-settings | sort -u > "$HOME/src/dotfiles/X/gsettings"
+  dconf dump /org/gnome/ \
+    | grep -v > "$DCONF_INI"
 }
 
 cmd-load() {
-  settings_file="$HOME/src/dotfiles/X/gsettings"
-  if ! [[ -f "$settings_file" ]]; then
-    die "could not find settings file [settings_file=$settings_file]"
+  if ! [[ -f "$DCONF_INI" ]]; then
+    die "could not find settings file [settings_file=$DCONF_INI]"
   fi
-  while read line; do
-    printf 'eval "gsettings set %s"\n' "$line"
-  done < "$settings_file"
+  dconf load /org/gnome/ < "$DCONF_INI"
 }
 
 cmd=$1
