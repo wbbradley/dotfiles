@@ -1,11 +1,11 @@
 #!/bin/bash
 declare -a args
+# "white_balance_temperature=2500"
 args=(
-  "white_balance_temperature_auto=0"
-  "white_balance_temperature=3400"
+  "white_balance_temperature_auto=1"
   "zoom_absolute=110"
-  "brightness=140"
-  "sharpness=140"
+  "brightness=130"
+  "sharpness=100"
   "saturation=100"
 )
 for arg in "${args[@]}"; do

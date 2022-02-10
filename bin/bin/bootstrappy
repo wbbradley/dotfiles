@@ -3,8 +3,9 @@
 # shellcheck disable=SC1090
 . "$HOME/.bootstrappyrc"
 
-toolname="$(basename "$0")"
-progname="bootstrappy-$toolname"
+raw_toolname="$(basename "$0")"
+toolname="${raw_toolname//-/_}"
+progname="bootstrappy[$raw_toolname]"
 
 die() {
   printf "\033[0;38;2;200;15;15m%s\033[0m: error: " "$progname" >&2
@@ -14,11 +15,11 @@ die() {
 }
 
 install() {
-  package=$1
+  package="${1//-/_}"
   echo "$0: installing $package"
   ( pip install "$package" >&2 ) || die "failed to install $package"
 }
-envdir="$HOME/.bootstrappy/$toolname"
+envdir="$HOME/.bootstrappy/$raw_toolname"
 activate="$envdir/bin/activate"
 
 if ! [[ -f "$activate" ]]; then
@@ -28,19 +29,19 @@ if ! [[ -f "$activate" ]]; then
   fi
   # shellcheck disable=SC1090
   . "$activate" || die "python env is not set up [envdir=$envdir]"
-  if ( [ -n "${!toolname}" ] ); then
+  if [[ -n "${!toolname}" ]]; then
     # User has defined an override for this toolname's installation package.
     install "${!toolname}"
   else
-    # Use the toolname itself as an installation package.
-    install "$toolname"
+    # Use the raw toolname itself as an installation package.
+    install "$raw_toolname"
   fi
 else
   # shellcheck disable=SC1090
   . "$activate" || die "python env is not set up [envdir=$envdir]"
 fi
 
-if [[ "$(realpath "$(command -v "$toolname")")" == "$(realpath "$0")" ]]; then
-  die "tool resolves back to bootstrappy [toolname=$toolname]"
+if [[ "$(realpath "$(command -v "$raw_toolname")")" == "$(realpath "$0")" ]]; then
+  die "tool resolves back to bootstrappy [toolname=$raw_toolname]"
 fi
-exec "$toolname" "$@"
+exec "$raw_toolname" "$@"

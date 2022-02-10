@@ -37,12 +37,16 @@ host_color() {
 }
 
 parse_git_branch() {
-	git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/\1/'
+  (
+    printf "%s:%s" \
+      "$(git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/\1/')" \
+      "$(git reflog -1 | cut -d ' ' -f1)"
+  ) 2>/dev/null
 }
 
 show-env-vars() {
   declare -a vars
-  vars=( VIRTUAL_ENV DEBUG )
+  vars=( VIRTUAL_ENV DEBUG AWS_PROFILE )
   i=0
   wrote=0
   delim='\n'

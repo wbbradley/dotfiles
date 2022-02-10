@@ -37,10 +37,13 @@ let g:EasyMotion_smartcase = 1
 nmap ] <Plug>(easymotion-prefix)
 nmap , <Plug>(easymotion-overwin-f)
 nmap <Space> :let @+=@0<CR>
+nmap gd #
 nnoremap <C-h> <C-w>h
 nnoremap <C-j> <C-w>j
 nnoremap <C-k> <C-w>k
 nnoremap <C-l> <C-w>l
+set grepprg=todos
+nmap <F1> :grep<CR>:cw<CR><CR>
 
 let g:vim_markdown_folding_disabled = 1
 
@@ -91,12 +94,12 @@ let g:ale_fixers = {
       \ , 'rust': ['rustfmt', 'trim_whitespace', 'remove_trailing_lines']
       \ }
 let g:ale_fix_on_save = 1
-let g:ale_linters = {'rust': ['analyzer']}
+let g:ale_linters = {'rust': ['analyzer'], 'python': ['pylint', 'mypy'], 'javascript': []}
 augroup rust
   autocmd!
   autocmd FileType rust setlocal completeopt=menu,menuone,preview,noselect,noinsert
   autocmd FileType rust let b:ale_completion_enabled = 1
-  autocmd FileType rust nnoremap <C-]> :ALEGoToDefinition<CR>
+" autocmd FileType rust nnoremap <C-]> :ALEGoToDefinition<CR>
 augroup END
 
 augroup dot
@@ -476,6 +479,7 @@ filetype indent on
 
 colorscheme zion
 
+hi! MatchParen cterm=NONE,bold gui=NONE,bold guibg=#eee8d5 guifg=NONE
 syn match Braces display '[<>{}()\[\]]'
 
 let c_no_curly_error=1

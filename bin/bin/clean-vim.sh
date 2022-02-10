@@ -41,7 +41,9 @@ setup-vim-packages() {
   plugin 'dense-analysis/ale'
   # plugin 'neoclide/coc.nvim' release
   # plugin 'neoclide/coc-rls'
-  plugin 'neoclide/vim-jsx-improve'
+  # plugin 'neoclide/vim-jsx-improve'
+  plugin 'yuezk/vim-js'
+  plugin 'maxmellon/vim-jsx-pretty'
   plugin 'rust-lang/rust.vim'
   # plugin 'metakirby5/codi.vim'
   plugin 'ap/vim-css-color'
@@ -121,6 +123,7 @@ if [ "$(uname)" = "Darwin" ]; then
 else
   # Some persistent settings...
   gsettings set org.gnome.Terminal.Legacy.Settings headerbar false
+  gsettings set org.gnome.desktop.interface enable-animations false
 fi
 
 setup-vim-packages
