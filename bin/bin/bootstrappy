@@ -1,6 +1,17 @@
 #!/bin/bash
 
-# shellcheck disable=SC1090
+# MacOS does not come with realpath.
+case "$(uname)" in
+  Darwin)
+    # MacOS lacks realpath. Use Perl.
+    realpath() {
+      dirname="$(perl -e 'use Cwd "abs_path"; print abs_path(shift)' "$1")"
+      echo "$dirname"
+    }
+    ;;
+esac
+
+# shellcheck disable=SC1091
 . "$HOME/.bootstrappyrc"
 
 raw_toolname="$(basename "$0")"
@@ -8,28 +19,32 @@ toolname="${raw_toolname//-/_}"
 progname="bootstrappy[$raw_toolname]"
 
 die() {
-  printf "\033[0;38;2;200;15;15m%s\033[0m: error: " "$progname" >&2
-  printf "%s" "$@" >&2
+  printf "\001\033[0;38;2;200;15;15m%s\033[0m\002: error: " "$progname" >&2
+  printf "%s" "$*" >&2
   printf "\n" >&2
   exit 1
 }
 
 install() {
-  package="${1//-/_}"
-  echo "$0: installing $package"
+  package="$1"
+  echo "$0: installing $package" >&2
   ( pip install "$package" >&2 ) || die "failed to install $package"
 }
 envdir="$HOME/.bootstrappy/$raw_toolname"
 activate="$envdir/bin/activate"
 
+command -v pyenv >/dev/null || die "you need to install pyenv"
+
 if ! [[ -f "$activate" ]]; then
-  ( python3 -mvenv "$envdir" >&2 ) || die "unable to make a virtualenv [envdir=$envdir]"
+  mkdir -p "$(dirname "$envdir")"
+  ( cd "$HOME"; pyenv exec python -mvenv "$envdir" >&2 ) || die "unable to make a virtualenv [envdir=$envdir]"
   if ! [[ -f "$activate" ]]; then
     die "could not create virtual env"
   fi
   # shellcheck disable=SC1090
   . "$activate" || die "python env is not set up [envdir=$envdir]"
   if [[ -n "${!toolname}" ]]; then
+    echo "using .bootstrappyrc override for $toolname=${!toolname}" >&2
     # User has defined an override for this toolname's installation package.
     install "${!toolname}"
   else
@@ -42,6 +57,7 @@ else
 fi
 
 if [[ "$(realpath "$(command -v "$raw_toolname")")" == "$(realpath "$0")" ]]; then
-  die "tool resolves back to bootstrappy [toolname=$raw_toolname]"
+  rm -rf "$envdir"
+  die "tool resolved back to bootstrappy [toolname=$raw_toolname]. maybe you need to add its real package name to ~/.bootstrappyrc?"
 fi
 exec "$raw_toolname" "$@"

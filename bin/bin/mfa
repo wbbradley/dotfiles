@@ -1,5 +1,13 @@
-#!/bin/bash
-set -e
+#!/bin/bash -e
+
+copy-to-clipboard() {
+  if [[ "$(uname)" = 'Darwin' ]]; then
+      pbcopy
+  else
+      xclip -sel clip
+  fi
+}
+
 ykman oath accounts code "$(ykman oath accounts list)" \
   | awk '{ num = $2 } END { printf("%s\n", num) }' \
-  | xclip -sel clip
+  | copy-to-clipboard
