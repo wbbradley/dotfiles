@@ -75,13 +75,5 @@ done
 rm -rf "${HOME:?}/bin"
 ln -sf "$dotfiles_dir/bin/bin" "$HOME/bin" || die "failed to link bin dir"
 
-# Set up my git defaults
-git config --global color.diff always
-git config --global --add color.ui true
-git config --global push.default simple
-git config --global branch.autosetuprebase always
-git config --global merge.ff only
-git config --global merge.tool vimdiff
-
 echo "Dotfiles installation was successful, please logout of your shell, and log back in."
 echo "Run clean-vim.sh at any time to set up vim, or to reset it."

@@ -1,0 +1,33 @@
+[user]
+  email = williambbradley@gmail.com
+  name = Will Bradley
+[color]
+  diff = always
+  ui = true
+[core]
+  editor = vim
+  excludesfile = /Users/wbbradley/.gitignore
+[push]
+  default = simple
+[pull]
+  rebase = true
+[branch]
+  autosetuprebase = always
+[merge]
+  ff = only
+  tool = vimdiff
+[alias]
+  tagcommit = rev-list -n 1
+  ls-ignored = ls-files . --ignored --exclude-standard --others
+  ls-untracked = ls-files . --exclude-standard --others
+[showbranch]
+  default = --topo-order
+  default = heads/*
+[difftool "sourcetree"]
+  cmd = opendiff \"$LOCAL\" \"$REMOTE\"
+  path = 
+[mergetool "sourcetree"]
+  cmd = "vimdiff "
+  trustExitCode = true
+[commit]
+  template = /Users/wbbradley/.stCommitMsg

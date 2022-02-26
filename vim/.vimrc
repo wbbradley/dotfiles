@@ -94,12 +94,15 @@ let g:ale_fixers = {
       \ , 'rust': ['rustfmt', 'trim_whitespace', 'remove_trailing_lines']
       \ }
 let g:ale_fix_on_save = 1
-let g:ale_linters = {'rust': ['analyzer'], 'python': ['pylint', 'mypy'], 'javascript': []}
+let g:ale_linters = {'python': ['pylint', 'mypy'], 'javascript': []}
+let g:ale_linters.rust = ['cargo', 'rls']
+let g:ale_rust_rls_toolchain = 'stable'
 augroup rust
   autocmd!
   autocmd FileType rust setlocal completeopt=menu,menuone,preview,noselect,noinsert
   autocmd FileType rust let b:ale_completion_enabled = 1
-" autocmd FileType rust nnoremap <C-]> :ALEGoToDefinition<CR>
+  autocmd FileType rust nnoremap <buffer> <C-]> :ALEGoToDefinition<CR>
+  autocmd FileType rust nnoremap <buffer> <C-/> :ALEFindReferences<CR>
 augroup END
 
 augroup dot
@@ -173,8 +176,8 @@ augroup Ruby
   autocmd FileType ruby setlocal commentstring=#\ %s
   autocmd FileType ruby setlocal iskeyword+=!
   autocmd FileType ruby,eruby setlocal iskeyword+=?
-  autocmd FileType ruby nnoremap <leader>d Odebugger<Esc>_
-  autocmd FileType eruby nnoremap <leader>d O<% debugger %><Esc>_
+  autocmd FileType ruby nnoremap <buffer> <leader>d Odebugger<Esc>_
+  autocmd FileType eruby nnoremap <buffer> <leader>d O<% debugger %><Esc>_
 augroup END
 
 autocmd FileType gitcommit setlocal textwidth=71

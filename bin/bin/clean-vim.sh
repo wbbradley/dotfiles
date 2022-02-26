@@ -45,6 +45,7 @@ setup-vim-packages() {
   plugin 'yuezk/vim-js'
   plugin 'maxmellon/vim-jsx-pretty'
   plugin 'rust-lang/rust.vim'
+  plugin 'preservim/tagbar'
   # plugin 'metakirby5/codi.vim'
   plugin 'ap/vim-css-color'
   plugin 'tpope/vim-rails'
