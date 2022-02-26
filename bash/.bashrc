@@ -1,16 +1,14 @@
 # vim: ft=sh.bash
+# shellcheck disable=SC1090,SC1091,SC2207
 [[ $- != *i* ]] && return
 
 # enable bash completion in interactive shells
 if ! shopt -oq posix; then
   if [ -f /usr/share/bash-completion/bash_completion ]; then
-    # shellcheck disable=SC1090,SC1091
     . /usr/share/bash-completion/bash_completion
   elif [ -f /etc/bash_completion ]; then
-    # shellcheck disable=SC1090,SC1091
     . /etc/bash_completion
   elif [ -d /usr/local/etc/bash_completion.d ]; then
-    # shellcheck disable=SC1090,SC1091
     for f in /usr/local/etc/bash_completion.d/*; do . "$f"; done
   fi
 fi
@@ -24,7 +22,7 @@ _ssh()
     prev="${COMP_WORDS[COMP_CWORD-1]}"
     opts=$(grep '^Host' ~/.ssh/config ~/.ssh/config.d/* 2>/dev/null | grep -v '[?*]' | cut -d ' ' -f 2-)
 
-    COMPREPLY=( $(compgen -W "$opts" -- ${cur}) )
+    COMPREPLY=( $(compgen -W "$opts" -- "${cur}") )
     return 0
 }
 complete -F _ssh ssh
@@ -39,14 +37,13 @@ new-main() {
   fi
 }
 
-# shellcheck disable=SC1090
 . "$HOME/bin/utils.sh"
 
 # shellcheck disable=SC2155
 export PS1="\$(
   if [ \$? != 0 ]; then
     bgfgx6 e6 39 46 e9 c4 6a
-    echo ' ERROR \001\033[0m\002'
+    echo ' ERROR \[\033[0m\]'
   fi
   )\$(show-env-vars)$(host_color) \h \[\033[0;38;5;31;48;5;240;22m\] \[\033[0;38;5;252;48;5;240;1m\] \$(parse_git_branch) \$(parse_working_dir) \[\033[0;38;5;240;49;22m\033[0m\] "
 
@@ -117,7 +114,6 @@ elif [ $platform == 'linux' ]; then
 fi
 
 if [ -f "$HOME/local.bashrc" ]; then
-  # shellcheck disable=SC1090
   . "$HOME/local.bashrc"
 fi
 
@@ -129,7 +125,6 @@ alias stockplanconnect='pass stockplanconnect.com-morganstanley -c && explore-to
 alias retirementplans='pass retirementplans.vanguard.com -c && explore-to https://retirementplans.vanguard.com/'
 alias my.vanguardplan.com='pass my.vanguardplan.com -c && explore-to https://my.vanguardplan.com/'
 
-# shellcheck disable=SC1090
 [ -f ~/.fzf.bash ] && . ~/.fzf.bash
 
 [[ -f "${HOME}/xmodmap.file" ]] && xmodmap -v "${HOME}/xmodmap.file"
@@ -137,7 +132,6 @@ alias my.vanguardplan.com='pass my.vanguardplan.com -c && explore-to https://my.
 # shellcheck disable=SC2155
 # export RUBY_CONFIGURE_OPTS="--with-openssl-dir=$(brew --prefix openssl@1.1)"
 (command -v rbenv 1>/dev/null 2>/dev/null) && eval "$(rbenv init -)"
-export NVM_DIR="$HOME/.nvm"
 
 # Maybe enable for LLVM fun.
 function llvm-mode() {
@@ -323,3 +317,9 @@ prepend_path_to PATH "/usr/local/bin"
 prepend_path_to PATH "$HOME/bin"
 [ -f "$HOME/.ghcup/env" ] && . "$HOME/.ghcup/env" # ghcup-env
 [ -f "$HOME/.cargo/env" ] && . "$HOME/.cargo/env"
+
+[[ -s "$NVM_DIR/nvm.sh" ]] && {
+  export NVM_DIR="$HOME/.nvm"
+  \. "$NVM_DIR/nvm.sh"  # This loads nvm
+}
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
