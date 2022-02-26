@@ -48,9 +48,14 @@ host_color() {
 
 parse_git_branch() {
   (
-    printf "%s:%s" \
-      "$(git branch --color=never 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/\1/')" \
-      "$(git reflog -1 --color=never | cut -d ' ' -f1)"
+    branch="$(git branch --color=never 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/\1/')"
+    ref="$(git reflog -1 --color=never | cut -d ' ' -f1)"
+
+    if [[ -n "$branch" ]]; then
+      printf "%s:%s " "$branch" "$ref"
+    else
+      :
+    fi
   ) 2>/dev/null
 }
 
