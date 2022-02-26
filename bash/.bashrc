@@ -48,7 +48,7 @@ export PS1="\$(
     bgfgx6 e6 39 46 e9 c4 6a
     echo ' ERROR \001\033[0m\002'
   fi
-  )\$(show-env-vars)$(host_color) \u \[\033[0;38;5;31;48;5;240;22m\] \[\033[0;38;5;252;48;5;240;1m\] \$(parse_git_branch) \$(parse_working_dir) \[\033[0;38;5;240;49;22m\033[0m\] "
+  )\$(show-env-vars)$(host_color) \h \[\033[0;38;5;31;48;5;240;22m\] \[\033[0;38;5;252;48;5;240;1m\] \$(parse_git_branch) \$(parse_working_dir) \[\033[0;38;5;240;49;22m\033[0m\] "
 
 # export SRC_ROOT=$HOME/src
 alias vi=vim
