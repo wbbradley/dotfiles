@@ -7,6 +7,7 @@ die() {
 
 BREW_DEPS=(
   bash
+  cmake
   ctags-exuberant
   exa
   git
