@@ -5,6 +5,14 @@ die() {
   exit 1
 }
 
+on-macos() {
+  [[ "$(uname)" = "Darwin" ]]
+}
+
+on-linux() {
+  [[ "$(uname)" = "Linux" ]]
+}
+
 BREW_DEPS=(
   bash
   cmake
@@ -19,7 +27,7 @@ BREW_DEPS=(
   vim
 )
 
-if [[ $(uname) == 'Darwin' ]]; then
+if on-macos; then
     echo "Checking that homebrew is installed..."
     brew --version
 
@@ -32,9 +40,7 @@ if [[ $(uname) == 'Darwin' ]]; then
 
     echo "Getting Exuberant-Ctags..."
     brew install "${BREW_DEPS[@]}"
-fi
-
-if [[ "$(uname)" == 'Linux' ]]; then
+elif on-linux; then
   if command -v apt 2>/dev/null; then
     sudo apt-get update
     sudo apt-get install -y exuberant-ctags stow git vim bash tmux
@@ -44,6 +50,8 @@ if [[ "$(uname)" == 'Linux' ]]; then
     sudo yum install -y exuberant-ctags git vim bash tmux
     sudo yum upgrade -y exuberant-ctags git vim bash tmux
   fi
+else
+  die "unsupported platform [uname=$(uname)]"
 fi
 
 # Make sure needed tools are available
@@ -55,7 +63,7 @@ vim --version > /dev/null || die "vim not installed"
 dotfiles_dir="$HOME/src/dotfiles"
 
 for file in "$dotfiles_dir"/bash/.* "$dotfiles_dir"/vim/.* "$dotfiles_dir/tmux/$(uname)/".*; do
-  homedir_filename="$HOME/$(basename "$file")"
+  homedir_filename="${HOME:?}/$(basename "$file")"
   if [[ -f "$homedir_filename" ]]; then
       mv "$homedir_filename" "$homedir_filename.bak"
   fi
@@ -64,7 +72,8 @@ for file in "$dotfiles_dir"/bash/.* "$dotfiles_dir"/vim/.* "$dotfiles_dir/tmux/$
   ln -sf "$file" "$homedir_filename"
 done
 
-ln -s "$dotfiles_dir/bin/bin" "$HOME/bin" || die "failed to link bin dir"
+rm -rf "${HOME:?}/bin"
+ln -sf "$dotfiles_dir/bin/bin" "$HOME/bin" || die "failed to link bin dir"
 
 # Set up my git defaults
 git config --global color.diff always

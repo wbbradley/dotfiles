@@ -27,13 +27,23 @@ bgfgx6() {
 }
 
 host_color() {
-  if [[ "$HOSTNAME" = "blade" ]]; then
-    bgfg 219 98 50 14 55 13
-  elif [[ "$HOSTNAME" = "fennario" ]]; then
-    bgfgx6 6a 6a 6a f5 f5 f5
-  else
-    bgfgx6 e9 c4 6a 26 46 53
-  fi
+  case "${HOSTNAME:0:1}" in
+    b)
+      bgfg 219 98 50 14 55 13
+      ;;
+    f)
+      bgfgx6 6a 6a 6a f5 f5 f5
+      ;;
+    m)
+      bgfgx6 0a 1a aa a5 a5 f5
+      ;;
+    w)
+      bgfgx6 0a aa 1a a5 f5 a5
+      ;;
+    *)
+      bgfgx6 e9 c4 6a 26 46 53
+      ;;
+  esac
 }
 
 parse_git_branch() {
