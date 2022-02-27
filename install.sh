@@ -31,14 +31,10 @@ if on-macos; then
     echo "Checking that homebrew is installed..."
     brew --version
 
-    echo "Making the keyboard not slow..."
     defaults write -g InitialKeyRepeat -int 15
     defaults write -g KeyRepeat -int 0
-
-    echo "Making Finder show more files..."
     defaults write com.apple.finder AppleShowAllFiles true
 
-    echo "Getting Exuberant-Ctags..."
     brew install "${BREW_DEPS[@]}"
 elif on-linux; then
   if command -v apt 2>/dev/null; then
