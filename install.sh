@@ -58,15 +58,19 @@ vim --version > /dev/null || die "vim not installed"
 
 dotfiles_dir="$HOME/src/dotfiles"
 
-for file in "$dotfiles_dir"/bash/.* "$dotfiles_dir"/vim/.* "$dotfiles_dir/tmux/$(uname)/".*; do
-  homedir_filename="${HOME:?}/$(basename "$file")"
-  if [[ -f "$homedir_filename" ]]; then
-      mv "$homedir_filename" "$homedir_filename.bak"
-  fi
+(
+  # Don't try to link . and ..
+  GLOBIGNORE="$dotfiles_dir/*/.:$dotfiles_dir/*/.."
+  for file in "$dotfiles_dir"/bash/.* "$dotfiles_dir"/vim/.* "$dotfiles_dir/tmux/$(uname)/".*; do
+    homedir_filename="${HOME:?}/$(basename "$file")"
+    if [[ -f "$homedir_filename" ]]; then
+        mv "$homedir_filename" "$homedir_filename.bak"
+    fi
 
-  echo "linking '$homedir_filename' -> '$file'"
-  ln -sf "$file" "$homedir_filename"
-done
+    echo "linking '$homedir_filename' -> '$file'"
+    ln -sf "$file" "$homedir_filename"
+  done
+)
 
 rm -rf "${HOME:?}/bin"
 ln -sf "$dotfiles_dir/bin/bin" "$HOME/bin" || die "failed to link bin dir"
