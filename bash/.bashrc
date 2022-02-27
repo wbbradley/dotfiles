@@ -2,6 +2,10 @@
 # shellcheck disable=SC1090,SC1091,SC2207
 [[ $- != *i* ]] && return
 
+export RIPGREP_CONFIG_PATH="$HOME/.ripgreprc"
+export FZF_DEFAULT_COMMAND="rg --files --iglob '*' --iglob '!*.swp' --iglob '.*' --iglob '!.*.swp' --iglob '!*.pyc' --iglob '!.git' --iglob '!node_modules' --iglob '!.*env/'"
+export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
+
 # enable bash completion in interactive shells
 if ! shopt -oq posix; then
   if [ -f /usr/share/bash-completion/bash_completion ]; then
@@ -14,8 +18,7 @@ if ! shopt -oq posix; then
 fi
 
 
-_ssh() 
-{
+_ssh() {
     local cur prev opts
     COMPREPLY=()
     cur="${COMP_WORDS[COMP_CWORD]}"
