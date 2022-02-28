@@ -321,6 +321,7 @@ prepend_path_to PATH "$HOME/bin"
 [ -f "$HOME/.ghcup/env" ] && . "$HOME/.ghcup/env" # ghcup-env
 [ -f "$HOME/.cargo/env" ] && . "$HOME/.cargo/env"
 
+NVM_DIR="$HOME/.nvm"
 [[ -s "$NVM_DIR/nvm.sh" ]] && {
   export NVM_DIR="$HOME/.nvm"
   \. "$NVM_DIR/nvm.sh"  # This loads nvm
