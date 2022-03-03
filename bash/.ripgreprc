@@ -1,0 +1,12 @@
+-uuu
+--glob=!.git/
+--glob=!*.swp
+--glob=!*.swo
+--glob=!*.so
+--glob=!__pycache__
+--glob=!.mypy_cache/
+--glob=!docs/
+--glob=!node_modules/
+--glob=!honnef.co/
+--glob=!tags
+--glob=!.pylint-env/

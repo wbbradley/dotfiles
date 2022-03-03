@@ -31,12 +31,12 @@ _ssh() {
 complete -F _ssh ssh
 
 new-main() {
-  local main
   git fetch
   main="$(git symbolic-ref refs/remotes/origin/HEAD | sed 's@^refs/remotes/origin/@@')"
-  git checkout -B "$main" "origin/$main"
-  if [ -n "$1" ]; then
-    git checkout -B "$1"
+  if [[ -n "$1" ]] && [[ -n "$main" ]]; then
+    git checkout -B "$1" "origin/$main"
+  else
+    git checkout -B "$main" "origin/$main"
   fi
 }
 
@@ -327,3 +327,4 @@ NVM_DIR="$HOME/.nvm"
   \. "$NVM_DIR/nvm.sh"  # This loads nvm
 }
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+printf ''

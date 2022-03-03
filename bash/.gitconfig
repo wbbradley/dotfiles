@@ -1,12 +1,12 @@
 [user]
-  email = williambbradley@gmail.com
-  name = Will Bradley
+	email = williambbradley@gmail.com
+	name = Will Bradley
 [color]
   diff = always
   ui = true
 [core]
   editor = vim
-  excludesfile = /Users/wbbradley/.gitignore
+	excludesfile = ~/.gitignore
 [push]
   default = simple
 [pull]
@@ -24,10 +24,10 @@
   default = --topo-order
   default = heads/*
 [difftool "sourcetree"]
-  cmd = opendiff \"$LOCAL\" \"$REMOTE\"
-  path = 
+	cmd = opendiff \"$LOCAL\" \"$REMOTE\"
+	path = 
 [mergetool "sourcetree"]
-  cmd = "vimdiff "
-  trustExitCode = true
+	cmd = "vimdiff "
+	trustExitCode = true
 [commit]
-  template = /Users/wbbradley/.stCommitMsg
+	template = /Users/wbbradley/.stCommitMsg
