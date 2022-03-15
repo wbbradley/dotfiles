@@ -1,84 +1,104 @@
 #!/bin/bash
 
+# MacOS does not come with realpath.
+case "$(uname)" in
+  Darwin)
+    # MacOS lacks realpath. Use Perl.
+    realpath() {
+      dirname="$(perl -e 'use Cwd "abs_path"; print abs_path(shift)' "$1")"
+      echo "$dirname"
+    }
+    ;;
+esac
+
 function maybe-dir {
 	[[ -d $1 ]] && echo $1
 }
 
 CTAGS=$([[ -f $HOME/bin/ctags ]] && echo $HOME/bin/ctags || echo ctags)
 
-I_FLAGS=$(echo \
-	-I DECLSPEC \
-	-I SDLCALL \
-	-I BASE_EXPORT \
-	-I SDL_PRINTF_VARARG_FUNC+ \
-	-I SDL_PRINTF_FORMAT_STRING \
-	-I TEST_F+ \
-	-I TEST_P+ \
-	-I DISALLOW_COPY_AND_ASSIGN+ \
-	-I FRIEND_TEST \
-	-I operator+ \
-	-I TEST+ \
-	-I shill \
-	-I EXPECT_EQ+ \
-	-I ASSERT_TRUE+ \
-	-I PROTOBUF_EXPORT \
-	-I MOCK_CONST_METHOD+ \
-	-I MOCK_CONST_METHOD0+ \
-	-I MOCK_CONST_METHOD1+ \
-	-I MOCK_CONST_METHOD2+ \
-	-I MOCK_CONST_METHOD3+ \
-	-I MOCK_CONST_METHOD4+ \
-	-I EXPECT_CALL+ \
-	-I EXPECT_TRUE+ \
-	-I BRILLO_EXPORT \
-	-I EXPECT_FALSE+ \
-	-I MOCK_METHOD0+ \
-	-I MOCK_METHOD1+ \
-	-I MOCK_METHOD2+ \
-	-I MOCK_METHOD3+ \
-	-I MOCK_METHOD4+ \
-	-I MOCK_METHOD5+)
+I_FLAGS=(
+  -I DECLSPEC
+  -I RLAPI
+  -I SDLCALL
+  -I BASE_EXPORT
+  -I SDL_PRINTF_VARARG_FUNC+
+  -I SDL_PRINTF_FORMAT_STRING
+  -I TEST_F+
+  -I TEST_P+
+  -I DISALLOW_COPY_AND_ASSIGN+
+  -I FRIEND_TEST
+  -I operator+
+  -I TEST+
+  -I shill
+  -I EXPECT_EQ+
+  -I ASSERT_TRUE+
+  -I PROTOBUF_EXPORT
+  -I MOCK_CONST_METHOD+
+  -I MOCK_CONST_METHOD0+
+  -I MOCK_CONST_METHOD1+
+  -I MOCK_CONST_METHOD2+
+  -I MOCK_CONST_METHOD3+
+  -I MOCK_CONST_METHOD4+
+  -I EXPECT_CALL+
+  -I EXPECT_TRUE+
+  -I BRILLO_EXPORT
+  -I EXPECT_FALSE+
+  -I MOCK_METHOD0+
+  -I MOCK_METHOD1+
+  -I MOCK_METHOD2+
+  -I MOCK_METHOD3+
+  -I MOCK_METHOD4+
+  -I MOCK_METHOD5+
+)
 
-EXCLUDES=$(echo \
-	'--exclude=*.java' \
-	'--exclude=*.patch' \
-	'--exclude=toolchains' \
-	'--exclude=toolchain' \
-	'--exclude=libassistant' \
-	'--exclude=*.json' \
-	'--exclude=*.xml' \
-	'--exclude=*.yaml' \
-	'--exclude=*.md' \
-	'--exclude=*.mk' \
-	'--exclude=*.pb' \
-	'--exclude=*.sh' \
-	'--exclude=*.css' \
-	'--exclude=gtest-filepath.h' \
-	--exclude=build \
-	--exclude=rkisp1_regs.h \
-	--exclude=gtest-type-util.h \
-	--exclude=camera_metadata_tags.h \
-	--exclude=shill \
-	--exclude=hal \
-	'--exclude=pkcs11t.h' \
-	'--exclude=*.js' \
-	--exclude=makefile \
-	--exclude=TableGen \
-	--exclude=Target \
-	--exclude=Analysis \
-	--exclude=CodeGen \
-	--exclude=static \
-	--exclude=generated \
-	'--exclude=*generated.*' \
-	--exclude=env \
-	--exclude=assets \
-	--exclude=node_modules \
-	--exclude=bower_components)
+EXCLUDES=(
+  '--exclude=*.java'
+  '--exclude=*.patch'
+  '--exclude=toolchains'
+  '--exclude=toolchain'
+  '--exclude=libassistant'
+  '--exclude=*.json'
+  '--exclude=*.xml'
+  '--exclude=*.yaml'
+  '--exclude=*.md'
+  '--exclude=*.mk'
+  '--exclude=*.pb'
+  '--exclude=*.sh'
+  '--exclude=*.css'
+  '--exclude=gtest-filepath.h'
+  --exclude=build
+  --exclude=rkisp1_regs.h
+  --exclude=gtest-type-util.h
+  --exclude=camera_metadata_tags.h
+  --exclude=shill
+  --exclude=hal
+  '--exclude=pkcs11t.h'
+  '--exclude=*.js'
+  --exclude=makefile
+  --exclude=TableGen
+  --exclude=Target
+  --exclude=Analysis
+  --exclude=CodeGen
+  --exclude=static
+  --exclude=generated
+  '--exclude=*generated.*'
+  --exclude=env
+  --exclude=assets
+  --exclude=node_modules
+  --exclude=bower_components
+)
 
 CPP_KINDS=( --c-kinds=+p --c++-kinds=+p )
 
 function list-files() {
-	find $(realpath .) | grep -Ee '\.cpp$|\.cc$|\.h$|\.proto$|\.py$'
+  if (( $# != 0 )); then
+    for location in "$@"; do
+      find "$(realpath "$location")" | grep -Ee '\.cpp$|\.cc$|\.h$|\.proto$|\.py$'
+    done
+  else
+    find "$(realpath .)" | grep -Ee '\.cpp$|\.cc$|\.h$|\.proto$|\.py$'
+  fi
 }
 
 if [[ "$1" == "list-files" ]]; then
@@ -90,11 +110,11 @@ if [[ "$1" == "list-files" ]]; then
 fi
 
 # First index the local directory
-list-files 2>/dev/null \
+list-files "$@" 2>/dev/null \
 	| $CTAGS \
       "${CPP_KINDS[@]}" \
       -L - \
-      $I_FLAGS
+      "${I_FLAGS[@]}"
 
 # Now index any other interesting includes that I may want to peruse.
 : $CTAGS \
@@ -104,8 +124,8 @@ list-files 2>/dev/null \
 	--exclude="*.cpp" \
 	--exclude="*.c" \
   "${CPP_KINDS[@]}" \
-	$EXCLUDES \
-	$I_FLAGS
+	"${EXCLUDES[@]}" \
+	"${I_FLAGS[@]}"
 # "$(maybe-dir $(pkg-config --cflags-only-I raylib | cut -c3-) 2>/dev/null)"
 
 #  $(maybe-dir $(llvm-config --cppflags | xargs -n 1 echo | grep '^-I' | cut -c3-) 2>/dev/null)

@@ -51,10 +51,11 @@ export PS1="\$(
   )\$(show-env-vars)$(host_color) \h \[\033[0;38;5;31;48;5;240;22m\] \[\033[0;38;5;252;48;5;240;1m\] \$(parse_git_branch)\$(parse_working_dir) \[\033[0;38;5;240;49;22m\033[0m\] "
 
 # export SRC_ROOT=$HOME/src
+alias gar='git fetch && git rebase'
 alias vi=vim
 alias rgm='rg --multiline-dotall -U'
 alias uuid="python -c \"import uuid;print(uuid.uuid4())\" | tr -d '\n' | pbcopy"
-function mydot() {
+mydot() {
   dot "$1" -Tpng -Gdpi=300 -o "$1.png" && open "$1.png"
 }
 
@@ -133,11 +134,10 @@ alias my.vanguardplan.com='pass my.vanguardplan.com -c && explore-to https://my.
 [[ -f "${HOME}/xmodmap.file" ]] && xmodmap -v "${HOME}/xmodmap.file"
 
 # shellcheck disable=SC2155
-# export RUBY_CONFIGURE_OPTS="--with-openssl-dir=$(brew --prefix openssl@1.1)"
 (command -v rbenv 1>/dev/null 2>/dev/null) && eval "$(rbenv init -)"
 
 # Maybe enable for LLVM fun.
-function llvm-mode() {
+llvm-mode() {
   llvm_dir="/usr/local/opt/llvm"
   [ -x "$llvm_dir/bin/clang" ] || {
     echo "Looks like LLVM is not installed..."
@@ -154,17 +154,17 @@ function llvm-mode() {
   fi
 }
 
-function brew-test() {
+brew-test() {
   . "$HOME/bin/brew.sh"
   brewtest
 }
 
-function brew-tags() {
+brew-tags() {
   . "$HOME/bin/brew.sh"
   brewtags
 }
 
-function ctags-ruby() {
+ctags-ruby() {
   gems_tags=gems.tags
   local_tags=local.tags
   if [ Gemfile -nt "$gems_tags" ] || [ Gemfile.lock -nt "$gems_tags" ]; then
@@ -180,7 +180,7 @@ function ctags-ruby() {
     > tags
 }
 
-function ctags-ruby-core() {
+ctags-ruby-core() {
   # check that ctags version is correct
   ctags --version >/dev/null 2>&1 || {
     echo "ctags not found or too old." 1>&2
@@ -223,7 +223,7 @@ function ctags-ruby-core() {
     "$@"
 }
 
-function newest() {
+newest() {
   unset -v latest
   for file in "$@"; do
     [[ $file -nt $latest ]] && latest=$file
@@ -231,11 +231,11 @@ function newest() {
   echo "$latest"
 }
 
-function after() {
+after() {
    awk '/'"$1"'/ { seen=1 } { if (seen) print; }'
 }
 
-function before() {
+before() {
    awk '/'"$1"'/ { seen=1 } { if (!seen) print; }'
 }
 
@@ -306,15 +306,21 @@ console-setup() {
   sudo dpkg-reconfigure console-setup
 }
 
-if [[ $- =~ i ]]; then
-  bind '"\er": redraw-current-line'
-  bind '"\C-g\C-f": "$(_gf)\e\C-e\er"'
-  bind '"\C-g\C-g": "$(_gb)\e\C-e\er"'
-  bind '"\C-g\C-t": "$(_gt)\e\C-e\er"'
-  bind '"\C-g\C-h": "$(_gh)\e\C-e\er"'
-  bind '"\C-g\C-r": "$(_gr)\e\C-e\er"'
-  bind '"\C-g\C-s": "$(_gs)\e\C-e\er"'
-fi
+text-mode() {
+  if [[ "$(uname)" == "Linux" ]]; then
+    sudo systemctl isolate multi-user.target
+  else
+    echo "text-mode only works on Linux" >&2
+  fi
+}
+
+graphical-mode() {
+  if [[ "$(uname)" == "Linux" ]]; then
+    sudo systemctl isolate graphical.target
+  else
+    echo "graphical-mode only works on Linux" >&2
+  fi
+}
 
 prepend_path_to PATH "/usr/local/bin"
 prepend_path_to PATH "$HOME/bin"

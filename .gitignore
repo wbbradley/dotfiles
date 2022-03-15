@@ -5,3 +5,4 @@
 vim/.vim/bundle
 .netrwhist
 bin/bin/ngrok
+bin/bin/mkg

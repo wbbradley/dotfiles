@@ -248,6 +248,10 @@ augroup cstuff
   autocmd FileType c,cpp nnoremap <leader>d Odbg();<Esc>_
 augroup END
 
+nnoremap <F10> :echo "hi<" . synIDattr(synID(line("."),col("."),1),"name") . '> trans<'
+\ . synIDattr(synID(line("."),col("."),0),"name") . "> lo<"
+\ . synIDattr(synIDtrans(synID(line("."),col("."),1)),"name") . ">"<CR>
+
 " allow backspacing over everything in insert mode
 set backspace=indent,eol,start
 set lazyredraw
