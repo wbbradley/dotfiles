@@ -43,12 +43,16 @@ new-main() {
 . "$HOME/bin/utils.sh"
 
 # shellcheck disable=SC2155
-export PS1="\$(
-  if [ \$? != 0 ]; then
-    bgfgx6 e6 39 46 e9 c4 6a
-    echo ' ERROR \[\033[0m\]'
-  fi
-  )\$(show-env-vars)$(host_color) \h \[\033[0;38;5;31;48;5;240;22m\] \[\033[0;38;5;252;48;5;240;1m\] \$(parse_git_branch)\$(parse_working_dir) \[\033[0;38;5;240;49;22m\033[0m\] "
+if command -v yum >/dev/null; then
+  export PS1="\h \u \w "
+else
+  export PS1="\$(
+    if [ \$? != 0 ]; then
+      bgfgx6 e6 39 46 e9 c4 6a
+      echo ' ERROR \[\033[0m\]'
+    fi
+    )\$(show-env-vars)$(host_color) \h \[\033[0;38;5;31;48;5;240;22m\] \[\033[0;38;5;252;48;5;240;1m\] \$(parse_git_branch)\$(parse_working_dir) \[\033[0;38;5;240;49;22m\033[0m\] "
+fi
 
 # export SRC_ROOT=$HOME/src
 alias gar='git fetch && git rebase'

@@ -43,8 +43,8 @@ elif on-linux; then
     sudo apt-get upgrade -y exuberant-ctags stow git vim bash tmux
   else
     sudo yum update -y
-    sudo yum install -y exuberant-ctags git vim bash tmux
-    sudo yum upgrade -y exuberant-ctags git vim bash tmux
+    sudo yum install -y ctags git vim bash tmux
+    sudo yum upgrade -y ctags git vim bash tmux
   fi
 else
   die "unsupported platform [uname=$(uname)]"
