@@ -45,6 +45,13 @@ elif on-linux; then
     sudo yum update -y
     sudo yum install -y ctags git vim bash tmux
     sudo yum upgrade -y ctags git vim bash tmux
+    (
+      cd /var/tmp
+      trap EXIT "rm -rf ripgrep-13.0.0-*"
+      curl -LO https://github.com/BurntSushi/ripgrep/releases/download/13.0.0/ripgrep-13.0.0-x86_64-unknown-linux-musl.tar.gz
+      tar xf ripgrep-*-linux-musl.tar.gz
+      cp ripgrep-*/rg "$HOME/bin/rg"
+    )
   fi
 else
   die "unsupported platform [uname=$(uname)]"
