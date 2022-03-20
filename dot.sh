@@ -45,3 +45,4 @@ mkdir -p "$HOME/src"
 git clone git@github.com:wbbradley/dotfiles.git "$HOME/src/dotfiles"
 "$HOME/src/dotfiles/install.sh"
 clean-vim.sh
+exec -l bash
