@@ -2,7 +2,7 @@
 	email = williambbradley@gmail.com
 	name = Will Bradley
 [color]
-  diff = never
+  diff = always
   ui = true
 [core]
   editor = vim

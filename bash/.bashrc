@@ -1,4 +1,4 @@
-# vim: ft=sh.bash
+# vim: ft=bash
 # shellcheck disable=SC1090,SC1091,SC2207
 [[ $- != *i* ]] && return
 
@@ -54,8 +54,7 @@ else
     )\$(show-env-vars)$(host_color) \h \[\033[0;38;5;31;48;5;240;22m\] \[\033[0;38;5;252;48;5;240;1m\] \$(parse_git_branch)\$(parse_working_dir) \[\033[0;38;5;240;49;22m\033[0m\] "
 fi
 
-# export SRC_ROOT=$HOME/src
-alias gar='git fetch && git rebase'
+alias gar='git fetch && git rebase origin/master'
 alias vi=vim
 alias rgm='rg --multiline-dotall -U'
 alias uuid="python -c \"import uuid;print(uuid.uuid4())\" | tr -d '\n' | pbcopy"
@@ -69,30 +68,19 @@ export HISTCONTROL=ignoreboth:erasedups
 
 export EDITOR="vim"
 
-platform='unknown'
-unamestr="$(uname)"
+on-macos() {
+  [[ "$(uname)" = "Darwin" ]]
+}
 
-if [ "$unamestr" = 'Linux' ]; then
-	platform='linux'
-  alias pbcopy="xclip -selection clipboard -i"
-elif [ "$unamestr" = 'FreeBSD' ]; then
-	platform='freebsd'
-elif [ "$unamestr" = 'Darwin' ]; then
-	platform='freebsd'
-elif [ -d "/c/Windows" ]; then
-	platform='windows'
-fi
+on-linux() {
+  [[ "$(uname)" = "Linux" ]]
+}
 
 alias venv='. env/bin/activate ; python --version ; pip --version'
-alias venvc='virtualenv -p python3 env && . env/bin/activate ; python --version ; pip --version'
 
-if [ $platform == 'windows' ]; then
-	alias ls='ls -G -a -l -tr --color'
-fi
-
-if [ $platform = 'freebsd' ]; then
+if on-macos; then
   append_path_to PATH /usr/local/bin /usr/local/sbin
-	bind "set completion-ignore-case on"
+	# bind "set completion-ignore-case on"
 	shopt -s cdspell
 
 	# Mac OS
@@ -104,7 +92,8 @@ if [ $platform = 'freebsd' ]; then
 	# alias mails='sudo python -m smtpd -n -c DebuggingServer localhost:25'
 	alias stopify='pkill -STOP Spotify\ Helper'
 	alias startify='pkill -CONT Spotify\ Helper'
-elif [ $platform == 'linux' ]; then
+elif on-linux; then
+  alias pbcopy="xclip -selection clipboard -i"
 	alias ls='ls -G -a -l -tr --color'
 	shopt -s checkwinsize
 
@@ -121,7 +110,7 @@ elif [ $platform == 'linux' ]; then
 	alias netmon='strace -f -e trace=network -s 10000'
 fi
 
-if [ -f "$HOME/local.bashrc" ]; then
+if [[ -f "$HOME/local.bashrc" ]]; then
   . "$HOME/local.bashrc"
 fi
 
@@ -133,12 +122,12 @@ alias stockplanconnect='pass stockplanconnect.com-morganstanley -c && explore-to
 alias retirementplans='pass retirementplans.vanguard.com -c && explore-to https://retirementplans.vanguard.com/'
 alias my.vanguardplan.com='pass my.vanguardplan.com -c && explore-to https://my.vanguardplan.com/'
 
-[ -f ~/.fzf.bash ] && . ~/.fzf.bash
+[[ -f "$HOME/.fzf.bash" ]] && . "$HOME/.fzf.bash"
 
-[[ -f "${HOME}/xmodmap.file" ]] && xmodmap -v "${HOME}/xmodmap.file"
+[[ -f "$HOME/xmodmap.file" ]] && xmodmap -v "$HOME/xmodmap.file"
 
 # shellcheck disable=SC2155
-(command -v rbenv 1>/dev/null 2>/dev/null) && eval "$(rbenv init -)"
+command -v rbenv >/dev/null 2>/dev/null && eval "$(rbenv init -)"
 
 # Maybe enable for LLVM fun.
 llvm-mode() {
