@@ -1,2 +1,0 @@
-#!/bin/bash
-exec /usr/local/google/home/wbbradley/bin/badger authproto
