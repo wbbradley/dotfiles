@@ -5,7 +5,7 @@ bgfg() {
 
 bgfgx() {
   # HEX
-  printf "\001\033[48;2;$(( 0x"$1" ));$(( 0x"$2" ));$(( 0x"$3" ));38;2;$(( 0x"$4" ));$(( 0x"$5" ));$(( 0x"$6" ))m\002"
+  printf "\001\033[48;2;$(( 0x$1 ));$(( 0x$2 ));$(( 0x$3 ));38;2;$(( 0x$4 ));$(( 0x$5 ));$(( 0x$6 ))m\002"
 }
 
 reset-color() {
@@ -15,12 +15,12 @@ reset-color() {
 bgfgx6() {
   # Convert 2 24-bit Hexadecimal colors into 6-cube colors.
   # Returns ANSI escape code for the given bg/fg combo.
-  bg_r="$(( 0x"$1"*6/255 ))"
-  bg_g="$(( 0x"$2"*6/255 ))"
-  bg_b="$(( 0x"$3"*6/255 ))"
-  fg_r="$(( 0x"$4"*6/255 ))"
-  fg_g="$(( 0x"$5"*6/255 ))"
-  fg_b="$(( 0x"$6"*6/255 ))"
+  bg_r="$(( 0x$1*6/255 ))"
+  bg_g="$(( 0x$2*6/255 ))"
+  bg_b="$(( 0x$3*6/255 ))"
+  fg_r="$(( 0x$4*6/255 ))"
+  fg_g="$(( 0x$5*6/255 ))"
+  fg_b="$(( 0x$6*6/255 ))"
   bg_color="$(( 16 + bg_r * 36 + bg_g * 6 + bg_b ))"
   fg_color="$(( 16 + fg_r * 36 + fg_g * 6 + fg_b ))"
   printf "\001\033[48;5;$bg_color;38;5;${fg_color}m\002"
