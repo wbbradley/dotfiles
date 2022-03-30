@@ -1,5 +1,6 @@
 -uuu
 --glob=!.git/
+--glob=!translations/
 --glob=!*.swp
 --glob=!*.swo
 --glob=!*.so
