@@ -30,6 +30,16 @@ set wildignore+=*.a
 
 :autocmd VimResized * wincmd =
 
+augroup python
+  autocmd FileType python nmap <buffer> <F8> :Autoformat<CR>
+augroup END
+
+
+let g:autoformat_verbosemode=1
+let g:autoformat_autoindent = 0
+let g:autoformat_retab = 0
+let g:autoformat_remove_trailing_spaces = 1
+
 let g:EditorConfig_max_line_indicator = 'none'
 let g:ruby_indent_assignment_style = 'variable'
 " Turn on case-insensitive feature for EasyMotion

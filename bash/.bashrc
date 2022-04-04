@@ -122,8 +122,6 @@ alias stockplanconnect='pass stockplanconnect.com-morganstanley -c && explore-to
 alias retirementplans='pass retirementplans.vanguard.com -c && explore-to https://retirementplans.vanguard.com/'
 alias my.vanguardplan.com='pass my.vanguardplan.com -c && explore-to https://my.vanguardplan.com/'
 
-[[ -f "$HOME/.fzf.bash" ]] && . "$HOME/.fzf.bash"
-
 [[ -f "$HOME/xmodmap.file" ]] && xmodmap -v "$HOME/xmodmap.file"
 
 # shellcheck disable=SC2155
@@ -325,5 +323,7 @@ NVM_DIR="$HOME/.nvm"
   export NVM_DIR="$HOME/.nvm"
   \. "$NVM_DIR/nvm.sh"  # This loads nvm
 }
+
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+[[ -f ~/.fzf.bash ]] && source ~/.fzf.bash
 printf ''

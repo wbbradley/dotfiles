@@ -28,6 +28,7 @@ plugin() {
 setup-vim-packages() {
   rm -rf "$HOME/.vim"
   plugin_precise 'soliman/prolog-vim' 'https://gitlab.inria.fr/soliman/prolog-vim'
+  plugin 'vim-autoformat/vim-autoformat'
   plugin 'junegunn/fzf.vim'
   plugin 'rhysd/vim-clang-format'
   plugin 'jbmorgado/vim-pine-script'
