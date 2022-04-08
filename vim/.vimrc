@@ -150,8 +150,11 @@ let g:go_def_mode='gopls'
 " let g:go_fmt_fail_silently = 0
 
 let g:fzf_preview_window = ['up:50%', 'ctrl-/']
+imap <c-n> <plug>(fzf-complete-word)
+imap <c-l> <plug>(fzf-complete-line)
 
 let g:go_decls_mode = 'fzf'
+
 " let g:go_def_mapping_enabled = 1
 " let g:go_doc_keywordprg_enabled = 0
 " let g:go_fmt_command = 'goimports'
