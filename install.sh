@@ -77,7 +77,7 @@ dotfiles_dir="$HOME/src/dotfiles"
 if ! rg >/dev/null 2>/dev/null && on-linux; then
   (
     cd /var/tmp
-    trap EXIT "rm -rf ripgrep-13.0.0-*"
+    trap "rm -rf ripgrep-13.0.0-*" EXIT
     curl -LO https://github.com/BurntSushi/ripgrep/releases/download/13.0.0/ripgrep-13.0.0-x86_64-unknown-linux-musl.tar.gz
     tar xf ripgrep-*-linux-musl.tar.gz
     cp ripgrep-*/rg "$HOME/bin/rg"
