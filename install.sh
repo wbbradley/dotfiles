@@ -15,6 +15,7 @@ on-linux() {
 
 BREW_DEPS=(
   bash
+  bat
   cmake
   ctags-exuberant
   exa
