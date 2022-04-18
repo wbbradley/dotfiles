@@ -150,7 +150,7 @@ let g:go_def_mode='gopls'
 " let g:go_fmt_fail_silently = 0
 
 let g:fzf_preview_window = ['up:50%', 'ctrl-/']
-imap <c-n> <plug>(fzf-complete-word)
+" imap <c-n> <plug>(fzf-complete-word)
 imap <c-l> <plug>(fzf-complete-line)
 
 let g:go_decls_mode = 'fzf'
@@ -182,6 +182,11 @@ autocmd FileType qf wincmd J
 autocmd BufNewFile,BufReadPost *.coffee setl shiftwidth=2 expandtab
 " autocmd BufNewFile,BufReadPost *.js set autoindent noexpandtab ts=2 sw=2
 " autocmd BufNewFile,BufReadPost *.jsx set autoindent noexpandtab ts=2 sw=2
+
+augroup Bash
+  au!
+  autocmd FileType bash,sh setlocal iskeyword+=45
+augroup END
 
 augroup Ruby
   au!
@@ -378,7 +383,7 @@ vmap <C-v> <Plug>(expand_region_shrink)
 :endif
 
 " turning syntax on tends to redraw the screen nicely
-nnoremap <leader><space> :syn on<cr>:noh<cr>:match<cr>:set nopaste<CR>:set colorcolumn=0<CR>:set iskeyword=@,48-57,_,192-255<CR>
+nnoremap <leader><space> :syn on<cr>:noh<cr>:match<cr>:set nopaste<CR>:set colorcolumn=0<CR>
 nnoremap <leader>t viwy:tabnew<CR>:e ~/vim-todo.txt<CR>ggPa<CR><Esc>:wq<CR>
 nnoremap <leader>T :tabnew<CR>:e ~/vim-todo.txt<CR>
 nnoremap <leader>q :conf qa<CR>

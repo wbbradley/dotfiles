@@ -37,7 +37,7 @@ command -v pyenv >/dev/null || die "you need to install pyenv"
 
 if ! [[ -f "$activate" ]]; then
   mkdir -p "$(dirname "$envdir")"
-  ( cd "$HOME"; pyenv exec python -mvenv "$envdir" >&2 ) || die "unable to make a virtualenv [envdir=$envdir]"
+  ( cd "$HOME"; pyenv exec python3 -mvenv "$envdir" >&2 ) || die "unable to make a virtualenv [envdir=$envdir]"
   if ! [[ -f "$activate" ]]; then
     die "could not create virtual env"
   fi

@@ -80,7 +80,7 @@ alias venv='. env/bin/activate ; python --version ; pip --version'
 
 if on-macos; then
   append_path_to PATH /usr/local/bin /usr/local/sbin
-	# bind "set completion-ignore-case on"
+	bind "set completion-ignore-case on"
 	shopt -s cdspell
 
 	# Mac OS

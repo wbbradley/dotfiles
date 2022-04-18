@@ -15,7 +15,6 @@
   autosetuprebase = always
 [merge]
   ff = only
-  tool = vimdiff
 [alias]
   tagcommit = rev-list -n 1
   ls-ignored = ls-files . --ignored --exclude-standard --others
@@ -26,8 +25,8 @@
 [difftool "sourcetree"]
 	cmd = opendiff \"$LOCAL\" \"$REMOTE\"
 	path = 
+[init]
+	defaultBranch = main
 [mergetool "sourcetree"]
 	cmd = "vimdiff "
 	trustExitCode = true
-[commit]
-	template = /Users/wbbradley/.stCommitMsg

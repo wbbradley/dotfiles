@@ -18,11 +18,13 @@ BREW_DEPS=(
   bat
   cmake
   ctags-exuberant
+  graphviz
   exa
   git
   go
   pass
   reattach-to-user-namespace
+  pstree
   ripgrep
   swig
   tmux
