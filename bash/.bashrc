@@ -77,6 +77,7 @@ on-linux() {
 }
 
 alias venv='. env/bin/activate ; python --version ; pip --version'
+alias p='pstree -s'
 
 if on-macos; then
   append_path_to PATH /usr/local/bin /usr/local/sbin

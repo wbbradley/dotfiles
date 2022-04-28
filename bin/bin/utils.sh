@@ -104,6 +104,14 @@ prepend_path_to () {
   eval "export $var=\"$new_value\""
 }
 
+huh() {
+  if [[ "$(uname)" = "Darwin" ]]; then
+    pstree -g 3 -s tmux
+  else
+    pstree
+  fi
+}
+
 append_path_to () {
   var=$1
   shift
