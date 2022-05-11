@@ -54,6 +54,16 @@ else
     )\$(show-env-vars)$(host_color) \h \[\033[0;38;5;31;48;5;240;22m\] \[\033[0;38;5;252;48;5;240;1m\] \$(parse_git_branch)\$(parse_working_dir) \[\033[0;38;5;240;49;22m\033[0m\] "
 fi
 
+e() {
+  if [[ -d env/bin ]]; then
+    if [[ $PATH != *"$PWD"/env/bin* ]]; then
+      export PATH="$PATH:$PWD/env/bin"
+    fi
+  else
+    echo "env/bin dir does not exist"
+  fi
+}
+
 alias gar='git fetch && git rebase origin/master'
 alias vi=vim
 alias rgm='rg --multiline-dotall -U'
