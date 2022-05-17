@@ -100,16 +100,19 @@ let g:ale_python_autoflake_executable = 'env/bin/autoflake'
 let g:ale_python_mypy_executable = 'env/bin/mypy'
 let g:ale_python_isort_executable = 'env/bin/isort'
 let g:ale_python_pylint_executable = 'env/bin/pylint'
+let g:ale_python_autopep8_executable = 'env/bin/autopep8'
 let g:ale_python_pylint_change_directory = 0
 let g:ale_python_pylint_use_global = 0
 let g:ale_fixers = {
-      \   'python': ['isort', 'autoflake']
+      \   'python': ['isort', 'autoflake', 'autopep8']
       \ , 'cpp': ['clang-format']
       \ , 'rust': ['rustfmt', 'trim_whitespace', 'remove_trailing_lines']
       \ }
 let g:ale_fix_on_save = 1
-let g:ale_linters = {'python': ['pylint', 'mypy'], 'javascript': []}
-let g:ale_linters.rust = ['cargo', 'rls']
+let g:ale_linters = {
+      \   'python': ['pylint', 'mypy'], 'javascript': []
+      \ , 'rust': ['cargo', 'rls']
+      \ }
 let g:ale_rust_rls_toolchain = 'stable'
 augroup rust
   autocmd!
