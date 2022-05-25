@@ -64,7 +64,12 @@ e() {
   fi
 }
 
-alias gar='git fetch && git rebase origin/master'
+gar() {
+  git fetch
+  main="$(git symbolic-ref refs/remotes/origin/HEAD | sed 's@^refs/remotes/origin/@@')"
+  git rebase $main
+}
+
 alias vi=vim
 alias rgm='rg --multiline-dotall -U'
 alias uuid="python -c \"import uuid;print(uuid.uuid4())\" | tr -d '\n' | pbcopy"
