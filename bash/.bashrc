@@ -67,7 +67,7 @@ e() {
 gar() {
   git fetch
   main="$(git symbolic-ref refs/remotes/origin/HEAD | sed 's@^refs/remotes/origin/@@')"
-  git rebase $main
+  git rebase origin/$main
 }
 
 alias vi=vim

@@ -98,7 +98,7 @@ let g:lightline.active.right = [
 
 let g:ale_python_autoflake_executable = 'env/bin/autoflake'
 let g:ale_python_mypy_executable = 'env/bin/mypy'
-let g:ale_python_mypy_options = system('printf "%s" "$LOCAL_MYPY_FLAGS"')
+" let g:ale_python_mypy_options = system('printf "%s" "$LOCAL_MYPY_FLAGS"')
 let g:ale_python_isort_executable = 'env/bin/isort'
 " let g:ale_python_pylint_executable = 'env/bin/pylint'
 let g:ale_python_autopep8_executable = 'env/bin/autopep8'
@@ -111,10 +111,12 @@ let g:ale_fixers = {
       \ }
 let g:ale_fix_on_save = 1
 let g:ale_linters = {
-      \   'python': ['pylint', 'mypy'], 'javascript': []
+      \   'python': ['pylint', 'mypy']
+      \ , 'javascript': []
       \ , 'rust': ['cargo', 'rls']
       \ }
-let g:ale_rust_rls_toolchain = 'stable'
+let g:ale_rust_rls_toolchain = 'nightly'
+
 augroup rust
   autocmd!
   autocmd FileType rust setlocal completeopt=menu,menuone,preview,noselect,noinsert
