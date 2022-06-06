@@ -104,16 +104,19 @@ let g:ale_python_mypy_executable = 'env/bin/mypy'
 let g:ale_python_isort_executable = 'env/bin/isort'
 " let g:ale_python_pylint_executable = 'env/bin/pylint'
 let g:ale_python_autopep8_executable = 'env/bin/autopep8'
+let g:ale_haskell_hls_executable = 'haskell-language-server-wrapper-1.7.0.0'
 let g:ale_python_pylint_change_directory = 0
 let g:ale_python_pylint_use_global = 0
 let g:ale_fixers = {
       \   'python': ['isort', 'autoflake', 'autopep8']
       \ , 'cpp': ['clang-format']
       \ , 'rust': ['rustfmt', 'trim_whitespace', 'remove_trailing_lines']
+      \ , 'haskell': ['hfmt']
       \ }
 let g:ale_fix_on_save = 1
 let g:ale_linters = {
-      \   'python': ['pylint', 'mypy']
+      \   'haskell': ['hls']
+      \ , 'python': ['pylint', 'mypy']
       \ , 'javascript': []
       \ , 'rust': ['cargo', 'rls']
       \ }
@@ -135,6 +138,7 @@ augroup END
 augroup Haskell
   autocmd!
   autocmd FileType haskell nnoremap <buffer> <leader>? :call ale#cursor#ShowCursorDetail()<cr>
+  autocmd FileType haskell nnoremap <buffer> <C-]> :ALEGoToDefinition<CR>
   " autocmd FileType haskell nnoremap <buffer> <Leader>ht :GhcModType<cr>
   " autocmd FileType haskell nnoremap <buffer> <Leader>htc :GhcModTypeClear<cr>
 augroup END
@@ -236,10 +240,10 @@ augroup END
 
 augroup Haskell
   autocmd FileType haskell setlocal sw=2 sts=2 ts=8 expandtab shiftround
-  autocmd FileType haskell setlocal makeprg=stack\ build\ --fast
+  " autocmd FileType haskell setlocal makeprg=stack\ build\ --fast
   " autocmd FileType haskell nnoremap <buffer> <F1> :HdevtoolsInfo<CR>
   " autocmd FileType haskell nnoremap <buffer> <F2> :HdevtoolsType<CR>
-  autocmd FileType haskell nnoremap <buffer> <Leader>` :!stack exec -- hasktags -c src<CR>
+  " autocmd FileType haskell nnoremap <buffer> <Leader>` :!stack exec -- hasktags -c src<CR>
 augroup END
 
 nnoremap ; :

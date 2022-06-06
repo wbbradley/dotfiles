@@ -38,7 +38,8 @@ setup-vim-packages() {
   plugin 'luochen1990/rainbow'
   # IDE features
   plugin 'stefandtw/quickfix-reflector.vim'
-
+  plugin 'prabirshrestha/vim-lsp'
+  plugin 'mattn/vim-lsp-settings'
   plugin 'dense-analysis/ale'
   # plugin 'neoclide/coc.nvim' release
   # plugin 'neoclide/coc-rls'
@@ -128,5 +129,12 @@ else
   gsettings set org.gnome.desktop.interface enable-animations false
 fi
 
+if [[ -n $1 ]]; then
+  while [[ -n $1 ]]; do
+    plugin "$1"
+    shift
+  done
+  exit 0
+fi
 setup-vim-packages
 setup-fzf
