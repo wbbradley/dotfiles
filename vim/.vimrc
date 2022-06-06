@@ -32,6 +32,7 @@ set wildignore+=*.a
 
 augroup python
   autocmd FileType python nmap <buffer> <F8> :Autoformat<CR>
+  autocmd FileType python setlocal textwidth=100
 augroup END
 
 
@@ -62,7 +63,7 @@ set tabstop=2 softtabstop=2 expandtab shiftwidth=2 smarttab
 
 " set rtp+=~/src/vim-zion
 let g:qf_modifiable = 1
-let g:hindent_on_save = 1
+let g:hindent_on_save = 0
 " let g:hdevtools_stack = 1
 let g:python_pep8_indent_hang_indent = 4
 
@@ -97,6 +98,7 @@ let g:lightline.active.right = [
       \ ]
 
 let g:ale_python_autoflake_executable = 'env/bin/autoflake'
+let g:ale_python_autoflake_options = '--remove-all-unused-imports'
 let g:ale_python_mypy_executable = 'env/bin/mypy'
 " let g:ale_python_mypy_options = system('printf "%s" "$LOCAL_MYPY_FLAGS"')
 let g:ale_python_isort_executable = 'env/bin/isort'

@@ -64,6 +64,25 @@ e() {
   fi
 }
 
+pass-file() {
+  filename="$1"
+  if ! [[ -f "$filename" ]]; then
+    echo "pass-file: $filename does not exist" >&2
+    return 1
+  fi
+
+  shift
+
+  if ! cd "$(dirname "$filename")"; then
+    echo "pass-file: failed to cd to $(dirname "$filename")" >&2
+    return 1
+  fi
+
+  leaf_name="$(basename "$filename")"
+  echo "pass-file: Writing file $leaf_name to password-store."
+  pass insert -mf "$leaf_name" <"$leaf_name"
+}
+
 gar() {
   git fetch
   main="$(git symbolic-ref refs/remotes/origin/HEAD | sed 's@^refs/remotes/origin/@@')"
@@ -91,7 +110,7 @@ on-linux() {
   [[ "$(uname)" = "Linux" ]]
 }
 
-alias venv='. env/bin/activate ; python --version ; pip --version'
+alias venv='if [[ -f env/bin/activate ]]; then . env/bin/activate; else python3 -mvenv env; . env/bin/activate; fi'
 alias p='pstree -s'
 
 if on-macos; then
