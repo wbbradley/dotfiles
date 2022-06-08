@@ -42,7 +42,7 @@ if on-macos; then
     brew install "${BREW_DEPS[@]}"
 elif on-linux; then
   if command -v apt 2>/dev/null; then
-    sudo apt-get update
+    # sudo apt-get update
     sudo apt-get install -y exuberant-ctags pass stow git vim tmux
     sudo apt-get upgrade -y exuberant-ctags pass stow git vim tmux
   else
@@ -64,8 +64,8 @@ dotfiles_dir="$HOME/src/dotfiles"
 
 (
   # Don't try to link . and ..
-  GLOBIGNORE="$dotfiles_dir/*/.:$dotfiles_dir/*/.."
-  for file in "$dotfiles_dir"/bash/.* "$dotfiles_dir"/vim/.* "$dotfiles_dir/tmux/$(uname)/".*; do
+  find "$dotfiles_dir/bash" "$dotfiles_dir/vim" "$dotfiles_dir/tmux/$(uname)" -maxdepth 1 -type f -print0 -name '.*' | \
+    while IFS= read -r -d '' file; do
     homedir_filename="${HOME:?}/$(basename "$file")"
     if [[ -f "$homedir_filename" ]]; then
         mv "$homedir_filename" "$homedir_filename.bak"
@@ -78,7 +78,7 @@ dotfiles_dir="$HOME/src/dotfiles"
 
 if ! rg >/dev/null 2>/dev/null && on-linux; then
   (
-    cd /var/tmp
+    cd /var/tmp || die "failed to cd to /var/tmp"
     trap "rm -rf ripgrep-13.0.0-*" EXIT
     curl -LO https://github.com/BurntSushi/ripgrep/releases/download/13.0.0/ripgrep-13.0.0-x86_64-unknown-linux-musl.tar.gz
     tar xf ripgrep-*-linux-musl.tar.gz
