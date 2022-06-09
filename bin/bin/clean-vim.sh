@@ -38,8 +38,8 @@ setup-vim-packages() {
   plugin 'luochen1990/rainbow'
   # IDE features
   plugin 'stefandtw/quickfix-reflector.vim'
-  plugin 'prabirshrestha/vim-lsp'
-  plugin 'mattn/vim-lsp-settings'
+  # plugin 'prabirshrestha/vim-lsp'
+  # plugin 'mattn/vim-lsp-settings'
   plugin 'dense-analysis/ale'
   # plugin 'neoclide/coc.nvim' release
   # plugin 'neoclide/coc-rls'

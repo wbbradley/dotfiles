@@ -97,18 +97,20 @@ let g:lightline.active.right = [
       \   [ 'linter_checking', 'linter_errors', 'linter_warnings', 'linter_ok' ]
       \ ]
 
-let g:ale_python_autoflake_executable = 'env/bin/autoflake'
+let g:ale_python_autoflake_executable = $PWD . '/env/bin/autoflake'
 let g:ale_python_autoflake_options = '--remove-all-unused-imports'
-let g:ale_python_mypy_executable = 'env/bin/mypy'
+let g:ale_python_mypy_executable = $PWD . '/env/bin/mypy'
 " let g:ale_python_mypy_options = system('printf "%s" "$LOCAL_MYPY_FLAGS"')
-let g:ale_python_isort_executable = 'env/bin/isort'
-" let g:ale_python_pylint_executable = 'env/bin/pylint'
-let g:ale_python_autopep8_executable = 'env/bin/autopep8'
+let g:ale_python_isort_executable = $PWD . '/env/bin/isort'
+let g:ale_python_isort_options = '-l 100'
+let g:ale_python_pylint_executable = $PWD . '/env/bin/pylint'
+let g:ale_python_autopep8_executable = $PWD . '/env/bin/autopep8'
+let g:ale_python_autopep8_options = '--max-line-length 100'
 let g:ale_haskell_hls_executable = 'haskell-language-server-wrapper-1.7.0.0'
 let g:ale_python_pylint_change_directory = 0
 let g:ale_python_pylint_use_global = 0
 let g:ale_fixers = {
-      \   'python': ['isort', 'autoflake', 'autopep8']
+      \   'python': ['isort', 'autoflake', 'autopep8', 'trim_whitespace']
       \ , 'cpp': ['clang-format']
       \ , 'rust': ['rustfmt', 'trim_whitespace', 'remove_trailing_lines']
       \ , 'haskell': ['hfmt']
@@ -316,6 +318,8 @@ endfunction
 nmap <leader>P :call Peg()<CR><CR>
 nmap <leader>9P :e ~/pegged.txt<CR>
 nmap <leader>N :let @a=1<Bar>%s/\<\d\+\>/\=(@a+setreg('a',@a+1))/<CR>
+nmap <leader>l /\%>100v.\+
+nmap <leader>a :ALEInfoToFile /var/tmp/ale.txt<CR>:e /var/tmp/ale.txt<CR>
 
 function! FindPrompt()
   let i = input("Search: ", "")
