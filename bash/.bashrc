@@ -110,7 +110,7 @@ on-linux() {
   [[ "$(uname)" = "Linux" ]]
 }
 
-alias venv='if [[ -f env/bin/activate ]]; then . env/bin/activate; else python3 -mvenv env; . env/bin/activate; fi'
+alias venv='if [[ -f env/bin/activate ]]; then echo "venv already exists in env."; else python3 -mvenv env; fi'
 alias p='pstree -s'
 
 if on-macos; then
