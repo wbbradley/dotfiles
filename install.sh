@@ -14,21 +14,23 @@ on-linux() {
 }
 
 BREW_DEPS=(
+  awscli
   bash
   bat
   cmake
   ctags-exuberant
-  graphviz
   exa
   git
   go
+  graphviz
   pass
-  reattach-to-user-namespace
   pstree
+  reattach-to-user-namespace
   ripgrep
   swig
   tmux
   vim
+  ykman
 )
 
 if on-macos; then

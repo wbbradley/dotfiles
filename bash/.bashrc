@@ -114,7 +114,11 @@ alias venv='if [[ -f env/bin/activate ]]; then echo "venv already exists in env.
 alias p='pstree -s'
 
 if on-macos; then
-  append_path_to PATH /usr/local/bin /usr/local/sbin
+  if [[ -d /opt/homebrew/bin ]]; then
+    append_path_to PATH /opt/homebrew/bin /opt/homebrew/sbin
+  elif [[ -d /usr/local/bin ]]; then
+    append_path_to PATH /usr/local/bin /usr/local/sbin
+  fi
 	bind "set completion-ignore-case on"
 	shopt -s cdspell
 
@@ -157,7 +161,7 @@ alias stockplanconnect='pass stockplanconnect.com-morganstanley -c && explore-to
 alias retirementplans='pass retirementplans.vanguard.com -c && explore-to https://retirementplans.vanguard.com/'
 alias my.vanguardplan.com='pass my.vanguardplan.com -c && explore-to https://my.vanguardplan.com/'
 
-[[ -f "$HOME/xmodmap.file" ]] && xmodmap -v "$HOME/xmodmap.file"
+command -v xmodmap >/dev/null 2>/dev/null && [[ -f "$HOME/xmodmap.file" ]] && xmodmap -v "$HOME/xmodmap.file"
 
 # shellcheck disable=SC2155
 command -v rbenv >/dev/null 2>/dev/null && eval "$(rbenv init -)"
@@ -349,6 +353,7 @@ graphical-mode() {
 }
 
 prepend_path_to PATH "/usr/local/bin"
+prepend_path_to PATH "/opt/homebrew/bin" "/opt/homebrew/sbin"
 prepend_path_to PATH "$HOME/bin"
 [ -f "$HOME/.ghcup/env" ] && . "$HOME/.ghcup/env" # ghcup-env
 [ -f "$HOME/.cargo/env" ] && . "$HOME/.cargo/env"
