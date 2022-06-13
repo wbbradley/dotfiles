@@ -403,7 +403,7 @@ vmap <C-v> <Plug>(expand_region_shrink)
 :endif
 
 " turning syntax on tends to redraw the screen nicely
-nnoremap <leader><space> :syn on<cr>:noh<cr>:match<cr>:set nopaste<CR>:set colorcolumn=0<CR>
+nnoremap <leader><space> :syn on<cr>:noh<cr>:match<cr>:set nopaste<CR>
 nnoremap <leader>t viwy:tabnew<CR>:e ~/vim-todo.txt<CR>ggPa<CR><Esc>:wq<CR>
 nnoremap <leader>T :tabnew<CR>:e ~/vim-todo.txt<CR>
 nnoremap <leader>q :conf qa<CR>
@@ -487,7 +487,7 @@ augroup vimrcEx
 
 augroup END
 
-autocmd FileType * setlocal colorcolumn=0
+" autocmd FileType * setlocal colorcolumn=0
 autocmd FileType ts setlocal sw=2 sts=2 ts=2 expandtab
 autocmd FileType txt setlocal smartindent
 autocmd FileType javascript setlocal sw=2 sts=2 ts=2 expandtab
