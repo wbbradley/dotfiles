@@ -27,6 +27,7 @@ BREW_DEPS=(
   pstree
   reattach-to-user-namespace
   ripgrep
+  session-manager-plugin
   swig
   tmux
   vim
