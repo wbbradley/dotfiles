@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 bgfg() {
   printf "\001\033[48;2;$1;$2;$3;38;2;$4;$5;$6m\002"
 }
@@ -63,14 +63,12 @@ show-env-vars() {
   declare -a vars
   vars=( VIRTUAL_ENV DEBUG AWS_PROFILE )
   i=0
-  wrote=0
   delim='\n'
   for var in "${vars[@]}"; do
     (( i+=2 ))
     if [[ -n "${!var}" ]]; then
-      printf "$delim$(bgfgx6 a0 50 "$(( 80 * i ))" 15 15 0) $var=%s $(reset-color)\n$(reset-color)" ${!var}
+      printf "$delim$(bgfgx6 a0 50 "$(( 80 * i ))" 15 15 0) $var=%s $(reset-color)\n$(reset-color)" "${!var}"
       delim=''
-      (( wrote=1 ))
     fi  
   done
 }
