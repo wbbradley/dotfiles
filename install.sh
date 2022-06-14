@@ -23,6 +23,7 @@ BREW_DEPS=(
   git
   go
   graphviz
+  htop
   pass
   pstree
   reattach-to-user-namespace
