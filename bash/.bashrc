@@ -44,9 +44,11 @@ new-main() {
 
 # shellcheck disable=SC2155
 if command -v yum >/dev/null; then
-  export PS1="\h \u \w "
+  export PS1="\$(parse_git_branch)\$(parse_working_dir) "
 else
-  export PS1="\$(
+  export PS1="\$(parse_git_branch)\$(parse_working_dir) $ "
+
+  : export PS1="\$(
     if [ \$? != 0 ]; then
       bgfgx6 e6 39 46 e9 c4 6a
       echo ' ERROR \[\033[0m\]'
