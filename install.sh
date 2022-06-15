@@ -41,6 +41,7 @@ if on-macos; then
 
     defaults write -g InitialKeyRepeat -int 15
     defaults write -g KeyRepeat -int 0
+    defaults write com.apple.CrashReporter DialogType none
     defaults write com.apple.finder AppleShowAllFiles true
 
     brew install "${BREW_DEPS[@]}"

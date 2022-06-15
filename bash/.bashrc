@@ -13,7 +13,18 @@ if ! shopt -oq posix; then
   elif [ -f /etc/bash_completion ]; then
     . /etc/bash_completion
   elif [ -d /usr/local/etc/bash_completion.d ]; then
-    for f in /usr/local/etc/bash_completion.d/*; do . "$f"; done
+    for f in /usr/local/etc/bash_completion.d/*; do
+      . "$f"
+    done
+  elif [ -d /opt/homebrew/etc/bash_completion.d ]; then
+    for f in /opt/homebrew/etc/bash_completion.d/*; do
+      . "$f"
+    done
+  elif [ -d /opt/homebrew/share/bash-completion/completions ]; then
+    for f in /opt/homebrew/share/bash-completion/completions/*
+      do
+        . "$f"
+      done
   fi
 fi
 
