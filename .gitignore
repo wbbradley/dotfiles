@@ -4,6 +4,7 @@
 /env/
 vim/.vim/bundle
 .netrwhist
+bin/bin/lx-old
 bin/bin/ngrok
 bin/bin/mkg
 bin/bin/rg
