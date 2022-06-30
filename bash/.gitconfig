@@ -13,8 +13,6 @@
   rebase = true
 [branch]
   autosetuprebase = always
-[merge]
-  ff = only
 [alias]
   tagcommit = rev-list -n 1
   ls-ignored = ls-files . --ignored --exclude-standard --others

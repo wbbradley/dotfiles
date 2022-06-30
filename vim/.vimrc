@@ -267,9 +267,7 @@ nnoremap * *zz
 hi Comment          guifg=#7C7C7C     guibg=NONE        gui=NONE      ctermfg=darkgray    ctermbg=NONE        cterm=NONE
 autocmd Syntax cpp call EnhanceCppSyntax()
 autocmd FileType c nnoremap <buffer> <F2> :call FlipHeader()<CR>
-autocmd FileType c nnoremap <buffer> <F4> :call FlipHeader()<CR>
 autocmd FileType cpp nnoremap <buffer> <F2> :call FlipHeader()<CR>
-autocmd FileType cpp nnoremap <buffer> <F4> :call FlipHeader()<CR>
 
 function SetCOptions()
   nmap <buffer> <Leader><Leader> va}:ClangFormat<CR>
@@ -333,21 +331,32 @@ function! FindPrompt()
 endfunction
 
 function! FindWordUnderCursor()
-	let str = expand("<cword>")
-	if str == ""
-		return
-	endif
+  let str = expand("<cword>")
+  if str == ""
+    return
+  endif
 
-	execute "Rg " . str
+  " Note this depends on junegunn/fzf
+  execute "Rg " . str
 endfunction
 
 function! FindTagUnderCursor()
-	let str = expand("<cword>")
-	if str == ""
-		return
-	endif
+  let str = expand("<cword>")
+  if str == ""
+    return
+  endif
 
-	execute "Tags " . str
+  execute "Tags " . str
+endfunction
+
+function! FindWordUnderCursorNoUI()
+  let str = expand("<cword>")
+  if str == ""
+    return
+  endif
+
+  " Note this depends on wbbradley/vim-ripgrep
+  execute "RipGrep " . str
 endfunction
 
 " Add highlighting for function definition in C++
@@ -384,6 +393,7 @@ endfunction
 " nnoremap <leader>` :!ctags -R .<CR>
 
 nnoremap <F3> :call FindWordUnderCursor()<CR>
+nnoremap <F4> :call FindWordUnderCursorNoUI()<CR>
 
 nnoremap F :wa<CR>:call FindPrompt()<CR>
 nnoremap T :Tags<CR>

@@ -130,14 +130,6 @@ function explore-to() {
   fi
 }
 
-git-delete-merged() {
-  git fetch
-  git checkout -B master origin/master
-  git branch --merged master \
-    | grep -v "\* master" \
-    | xargs -n 1 git branch -D
-}
-
 path() {
   echo "$PATH" \
     | awk -F : '{ for (i=1;i<=NF;i++) {print $i}}'

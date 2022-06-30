@@ -34,6 +34,7 @@ setup-vim-packages() {
   plugin 'jbmorgado/vim-pine-script'
   plugin 'dylon/vim-antlr'
   plugin 'alx741/vim-hindent'
+  plugin 'wbbradley/vim-ripgrep'
   plugin 'editorconfig/editorconfig-vim'
   plugin 'luochen1990/rainbow'
   # IDE features
