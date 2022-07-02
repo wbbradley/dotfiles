@@ -71,14 +71,14 @@ dotfiles_dir="$HOME/src/dotfiles"
   # Don't try to link . and ..
   find "$dotfiles_dir/bash" "$dotfiles_dir/vim" "$dotfiles_dir/tmux/$(uname)" -maxdepth 1 -type f -print0 -name '.*' | \
     while IFS= read -r -d '' file; do
-    homedir_filename="${HOME:?}/$(basename "$file")"
-    if [[ -f "$homedir_filename" ]]; then
-        mv "$homedir_filename" "$homedir_filename.bak"
-    fi
+      homedir_filename="${HOME:?}/$(basename "$file")"
+      if [[ -f "$homedir_filename" ]]; then
+          mv "$homedir_filename" "$homedir_filename.bak"
+      fi
 
-    echo "linking '$homedir_filename' -> '$file'"
-    ln -sf "$file" "$homedir_filename"
-  done
+      echo "linking '$homedir_filename' -> '$file'"
+      ln -sf "$file" "$homedir_filename"
+    done
 )
 
 if ! rg >/dev/null 2>/dev/null && on-linux; then
