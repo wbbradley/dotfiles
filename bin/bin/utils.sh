@@ -1,15 +1,15 @@
 #!/usr/bin/env bash
 bgfg() {
-  printf "\001\033[48;2;$1;$2;$3;38;2;$4;$5;$6m\002"
+  printf "\[\033[48;2;$1;$2;$3;38;2;$4;$5;$6m\]"
 }
 
 bgfgx() {
   # HEX
-  printf "\001\033[48;2;$(( 0x$1 ));$(( 0x$2 ));$(( 0x$3 ));38;2;$(( 0x$4 ));$(( 0x$5 ));$(( 0x$6 ))m\002"
+  printf "\[\033[48;2;$(( 0x$1 ));$(( 0x$2 ));$(( 0x$3 ));38;2;$(( 0x$4 ));$(( 0x$5 ));$(( 0x$6 ))m\]"
 }
 
 reset-color() {
-  printf "\001\033[0m\002"
+  printf "\[\033[0m\]"
 }
 
 bgfgx6() {
@@ -23,7 +23,7 @@ bgfgx6() {
   fg_b="$(( 0x$6*6/255 ))"
   bg_color="$(( 16 + bg_r * 36 + bg_g * 6 + bg_b ))"
   fg_color="$(( 16 + fg_r * 36 + fg_g * 6 + fg_b ))"
-  printf "\001\033[48;5;$bg_color;38;5;${fg_color}m\002"
+  printf "\001\033[48;5;%d;38;5;%dm\002" "$bg_color" "$fg_color"
 }
 
 host_color() {
@@ -53,6 +53,10 @@ parse_git_branch() {
 
     if [[ -n "$branch" ]]; then
       printf "%s:%s " "$branch" "$ref"
+    elif [[ "$HOME" = "$PWD" ]]; then
+      printf "%s " "🏡 "
+    elif [[ "$HOME/.ssh" = "$PWD" ]]; then
+      printf "%s " "🔒 "
     else
       :
     fi
