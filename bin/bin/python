@@ -1,4 +1,5 @@
 #!/bin/bash
+echo "$0 $*" >> "$HOME"/python.log
 if [[ -x env/bin/python ]]; then
   exec env/bin/python "$@"
 else

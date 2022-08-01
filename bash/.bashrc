@@ -3,24 +3,30 @@
 [[ $- != *i* ]] && return
 
 export RIPGREP_CONFIG_PATH="$HOME/.ripgreprc"
-export FZF_DEFAULT_COMMAND="rg --files --iglob '*' --iglob '!*.swp' --iglob '.*' --iglob '!.*.swp' --iglob '!*.pyc' --iglob '!.git' --iglob '!node_modules' --iglob '!.*env/'"
+export FZF_DEFAULT_COMMAND="rg --files"
+# --iglob '*' --iglob '.*' --iglob '!*.swp' --iglob '!.*.swp' --iglob '!*.pyc' --iglob '!.git/' --iglob '!env/bin' --iglob '!node_modules' --iglob '!.*env/'"
 export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
 
 # enable bash completion in interactive shells
 if ! shopt -oq posix; then
   if [ -f /usr/share/bash-completion/bash_completion ]; then
     . /usr/share/bash-completion/bash_completion
-  elif [ -f /etc/bash_completion ]; then
+  fi
+  if [ -f /etc/bash_completion ]; then
     . /etc/bash_completion
-  elif [ -d /usr/local/etc/bash_completion.d ]; then
+  fi
+  if [ -d /usr/local/etc/bash_completion.d ]; then
     for f in /usr/local/etc/bash_completion.d/*; do
       . "$f"
     done
-  elif [ -d /opt/homebrew/etc/bash_completion.d ]; then
+  fi
+  if [ -d /opt/homebrew/etc/bash_completion.d ]; then
+    PATH=$PATH:/opt/homebrew/bin
     for f in /opt/homebrew/etc/bash_completion.d/*; do
       . "$f"
     done
-  elif [ -d /opt/homebrew/share/bash-completion/completions ]; then
+  fi
+  if [ -d /opt/homebrew/share/bash-completion/completions ]; then
     for f in /opt/homebrew/share/bash-completion/completions/*
       do
         . "$f"
@@ -41,6 +47,13 @@ _ssh() {
 }
 complete -F _ssh ssh
 
+hr() {
+  for ((i=0;i<$(( (COLUMNS - 1) ));++i)); do
+    printf '▒'
+  done
+  printf '\n'
+}
+
 new-main() {
   git fetch
   main="$(git symbolic-ref refs/remotes/origin/HEAD | sed 's@^refs/remotes/origin/@@')"
@@ -57,7 +70,7 @@ new-main() {
 if command -v yum >/dev/null; then
   export PS1="\$(parse_git_branch)\$(parse_working_dir) "
 else
-  export PS1="\$(parse_git_branch)\$(parse_working_dir) $ "
+  export PS1="\[\e[0;\$(( ( \$? ) ? 31 : 32 ))m\]\$(parse_git_branch)\e[m\$(parse_working_dir) $ "
 
   : export PS1="\$(
     if [ \$? != 0 ]; then
@@ -160,6 +173,12 @@ elif on-linux; then
 	export GCC_COLORS='error=01;31:warning=01;35:note=01;36:caret=01;32:locus=01:quote=01'
 
 	alias netmon='strace -f -e trace=network -s 10000'
+  alias open='xdg-open'
+fi
+
+if command -v exa >/dev/null; then
+  # exa trumps other ls settings
+  alias ls='exa -la -s modified'
 fi
 
 if [[ -f "$HOME/local.bashrc" ]]; then
@@ -364,6 +383,9 @@ graphical-mode() {
     echo "graphical-mode only works on Linux" >&2
   fi
 }
+
+GPG_TTY="$(tty)"
+export GPG_TTY
 
 prepend_path_to PATH "/usr/local/bin"
 prepend_path_to PATH "/opt/homebrew/bin" "/opt/homebrew/sbin"

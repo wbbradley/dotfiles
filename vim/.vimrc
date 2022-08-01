@@ -33,13 +33,14 @@ set wildignore+=*.a
 augroup python
   autocmd FileType python nmap <buffer> <F8> :Autoformat<CR>
   autocmd FileType python setlocal textwidth=100
+  autocmd FileType python vmap <buffer> <leader>r creveal_type(<Esc>pa)<Esc>
 augroup END
 
 
-let g:autoformat_verbosemode=1
-let g:autoformat_autoindent = 0
-let g:autoformat_retab = 0
-let g:autoformat_remove_trailing_spaces = 1
+" let g:autoformat_verbosemode=1
+" let g:autoformat_autoindent = 0
+" let g:autoformat_retab = 0
+" let g:autoformat_remove_trailing_spaces = 1
 
 let g:EditorConfig_max_line_indicator = 'none'
 let g:ruby_indent_assignment_style = 'variable'
@@ -62,7 +63,7 @@ set wildchar=<Tab> wildmenu wildmode=full
 set tabstop=2 softtabstop=2 expandtab shiftwidth=2 smarttab
 
 " set rtp+=~/src/vim-zion
-let g:qf_modifiable = 1
+" let g:qf_modifiable = 1
 let g:hindent_on_save = 0
 " let g:hdevtools_stack = 1
 let g:python_pep8_indent_hang_indent = 4
@@ -100,6 +101,7 @@ let g:lightline.active.right = [
 let g:ale_python_autoflake_executable = $PWD . '/env/bin/autoflake'
 let g:ale_python_autoflake_options = '--remove-all-unused-imports'
 let g:ale_python_mypy_executable = $PWD . '/env/bin/mypy'
+let b:ale_python_mypy_options = '--ignore-missing-imports'
 " let g:ale_python_mypy_options = system('printf "%s" "$LOCAL_MYPY_FLAGS"')
 let g:ale_python_isort_executable = $PWD . '/env/bin/isort'
 let g:ale_python_isort_options = '-l 100 --skip __init__.py --skip ipython.py'
@@ -112,6 +114,7 @@ let g:ale_python_pylint_use_global = 0
 let g:ale_fixers = {
       \   'python': ['isort', 'autoflake', 'autopep8', 'trim_whitespace']
       \ , 'cpp': ['clang-format']
+      \ , 'proto': ['clang-format', 'protolint', 'buf-format']
       \ , 'rust': ['rustfmt', 'trim_whitespace', 'remove_trailing_lines']
       \ , 'haskell': ['hfmt']
       \ }
@@ -120,9 +123,9 @@ let g:ale_linters = {
       \   'haskell': ['hls']
       \ , 'python': ['pylint', 'mypy']
       \ , 'javascript': []
-      \ , 'rust': ['cargo', 'rls']
+      \ , 'rust': []
       \ }
-let g:ale_rust_rls_toolchain = 'nightly'
+" let g:ale_rust_rls_toolchain = 'nightly'
 
 augroup rust
   autocmd!
@@ -220,6 +223,11 @@ autocmd FileType gitcommit setlocal textwidth=71
 autocmd FileType config setlocal tabstop=2 softtabstop=0 expandtab shiftwidth=2 smarttab
 autocmd FileType sql setlocal tabstop=2 softtabstop=0 expandtab shiftwidth=2 smarttab
 
+augroup ProtoBuf
+  autocmd!
+  autocmd FileType proto nmap <buffer> <Leader>n :!protonum %<CR>L
+augroup END
+
 augroup Golang
   autocmd!
   autocmd FileType go setlocal tabstop=4 shiftwidth=4
@@ -264,7 +272,6 @@ nnoremap n nzz
 nnoremap N Nzz
 nnoremap * *zz
 
-hi Comment          guifg=#7C7C7C     guibg=NONE        gui=NONE      ctermfg=darkgray    ctermbg=NONE        cterm=NONE
 autocmd Syntax cpp call EnhanceCppSyntax()
 autocmd FileType c nnoremap <buffer> <F2> :call FlipHeader()<CR>
 autocmd FileType cpp nnoremap <buffer> <F2> :call FlipHeader()<CR>
@@ -534,7 +541,7 @@ filetype indent on
 
 colorscheme zion
 
-hi! MatchParen cterm=NONE,bold gui=NONE,bold guibg=#eee8d5 guifg=NONE
+" hi! MatchParen cterm=NONE,bold gui=NONE,bold guibg=#eee8d5 guifg=NONE
 syn match Braces display '[<>{}()\[\]]'
 
 let c_no_curly_error=1
@@ -550,7 +557,10 @@ nnoremap H :w<CR><Esc>:silent! call <SID>qfnext(v:false)<CR>
 nnoremap L :w<CR><Esc>:silent! call <SID>qfnext(v:true)<CR>
 
 if &diff
-  syntax off
+  syntax on
+  let g:ale_fixers = {}
+  let g:ale_linters = {}
+  let g:ale_fix_on_save = 0
 endif
 
 function! s:qfnext(next) abort

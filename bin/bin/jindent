@@ -1,0 +1,11 @@
+#!/bin/bash
+
+json-indent() {
+  python -c 'import json, sys; print(json.dumps(json.load(sys.stdin), indent=2))'
+}
+
+if [[ -z $1 ]]; then
+  json-indent
+else
+  <"$1" json-indent
+fi
