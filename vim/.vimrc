@@ -123,17 +123,9 @@ let g:ale_linters = {
       \   'haskell': ['hls']
       \ , 'python': ['pylint', 'mypy']
       \ , 'javascript': []
-      \ , 'rust': []
+      \ , 'rust': ['cargo']
       \ }
 " let g:ale_rust_rls_toolchain = 'nightly'
-
-augroup rust
-  autocmd!
-  autocmd FileType rust setlocal completeopt=menu,menuone,preview,noselect,noinsert
-  autocmd FileType rust let b:ale_completion_enabled = 1
-  autocmd FileType rust nnoremap <buffer> <C-]> :ALEGoToDefinition<CR>
-  autocmd FileType rust nnoremap <buffer> <C-/> :ALEFindReferences<CR>
-augroup END
 
 augroup dot
   autocmd!
@@ -268,9 +260,6 @@ nnoremap <Leader>c :%s/\<<C-r><C-w>\>/
 vnoremap <Leader>c "hy:%s/<C-r>h/
 vnoremap <Leader>/ :Commentary<CR>
 nnoremap <C-b> <C-w>
-nnoremap n nzz
-nnoremap N Nzz
-nnoremap * *zz
 
 autocmd Syntax cpp call EnhanceCppSyntax()
 autocmd FileType c nnoremap <buffer> <F2> :call FlipHeader()<CR>
@@ -517,7 +506,7 @@ autocmd FileType css setlocal sw=2 sts=2 ts=2 expandtab
 autocmd FileType markdown setlocal textwidth=80 expandtab nocindent noautoindent nosmartindent cino=
 autocmd FileType conf setlocal expandtab sw=2 sts=2 smartindent
 autocmd FileType sh setlocal expandtab sw=2 sts=2 ts=2 expandtab smartindent
-
+autocmd FileType qf nmap <buffer> <Esc> :cclose<CR>
 augroup filetypedetect
     au! BufRead,BufNewFile *.bashrc setfiletype sh
 augroup END

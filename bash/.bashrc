@@ -73,11 +73,16 @@ else
   : export PS1="\[\e[0;\$(( ( \$? ) ? 31 : 32 ))m\]\$(parse_git_branch)\e[m\$(parse_working_dir) $ "
 
   export PS1="\$(
-    if [ \$? != 0 ]; then
-      bgfgx6 e6 39 46 e9 c4 6a
-      echo ' ERROR \[\033[0m\]'
-    fi
-    )\$(show-env-vars)$(host_color) \h \[\033[0;38;5;31;48;5;240;22m\] \[\033[0;38;5;252;48;5;240;1m\] \$(parse_git_branch)\$(parse_working_dir) \[\033[0;38;5;240;49;22m\033[0m\] "
+      if [[ \$? != 0 ]]; then
+        echo ' ❌  '
+      fi
+    )\$(show-env-vars) \$(
+      if [[ "$(uname)" = "Darwin" ]]; then
+        printf '🍏 '
+      else
+        printf '🐧 ' # \\h
+      fi
+    ) \[\033[0;38;5;31;48;5;240;22m\] \[\033[0;38;5;252;48;5;240;1m\] \$(parse_git_branch)\$(parse_working_dir) \[\033[0;38;5;240;49;22m\033[0m\] "
 fi
 
 e() {
@@ -136,7 +141,7 @@ on-linux() {
   [[ "$(uname)" = "Linux" ]]
 }
 
-alias venv='if [[ -f env/bin/activate ]]; then echo "venv already exists in env."; else python3 -mvenv env; fi'
+alias venv='if [[ -f env/bin/activate ]]; then echo "venv already exists in env."; else python3 -mvenv env && env/bin/pip install -U pip && env/bin/pip install wheel pip-tools; fi'
 alias p='pstree -s'
 
 if on-macos; then
