@@ -115,7 +115,7 @@ pass-file() {
 }
 
 gar() {
-  git fetch
+  git fetch --tags --prune origin
   main="$(git symbolic-ref refs/remotes/origin/HEAD | sed 's@^refs/remotes/origin/@@')"
   git rebase origin/$main
 }

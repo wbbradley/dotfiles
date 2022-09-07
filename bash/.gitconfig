@@ -29,6 +29,8 @@
 	cmd = opendiff \"$LOCAL\" \"$REMOTE\"
 [init]
 	defaultBranch = main
+[merge]
+  ff = only
 [mergetool "sourcetree"]
 	cmd = "vimdiff "
 	trustExitCode = true
