@@ -1,0 +1,9 @@
+#!/bin/bash
+progname="$(basename "$0")"
+if [[ -x env/bin/"$progname" ]]; then
+  echo "$progname $*  # from $PWD $(date '+%D %r %Z')" >> "$HOME"/"$progname".log
+  exec env/bin/"$progname" "$@"
+else
+  echo "env-bin: $progname does not exist" >&2
+  exit 1
+fi

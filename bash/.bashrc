@@ -70,9 +70,10 @@ new-main() {
 if command -v yum >/dev/null; then
   export PS1="\$(parse_git_branch)\$(parse_working_dir) "
 else
+  export PS1="\$(parse_git_branch)\$(parse_working_dir) "
   : export PS1="\[\e[0;\$(( ( \$? ) ? 31 : 32 ))m\]\$(parse_git_branch)\e[m\$(parse_working_dir) $ "
 
-  export PS1="\$(
+  : export PS1="\$(
       if [[ \$? != 0 ]]; then
         echo ' ❌  '
       fi
@@ -120,9 +121,19 @@ gar() {
   git rebase origin/$main
 }
 
+garp() {
+  git fetch --tags --prune origin || return 1
+  main="$(git symbolic-ref refs/remotes/origin/HEAD | sed 's@^refs/remotes/origin/@@')"
+  git rebase origin/"$main" || return 1
+  git push -f || return 1
+  git checkout -B "$main" origin/"$main" || return
+  git merge --ff-only - || return
+  echo now run git push
+}
+
 alias vi=vim
 alias rgm='rg --multiline-dotall -U'
-alias uuid="python -c \"import uuid;print(uuid.uuid4())\" | tr -d '\n' | pbcopy"
+alias uuid="python -c \"import uuid;print(uuid.uuid4())\" | tr -d '\n'"
 mydot() {
   dot "$1" -Tpng -Gdpi=300 -o "$1.png" && open "$1.png"
 }

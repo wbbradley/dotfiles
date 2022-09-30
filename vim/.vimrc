@@ -27,6 +27,8 @@ set timeoutlen=1000 ttimeoutlen=0
 
 set wildignore+=*.o
 set wildignore+=*.a
+set hidden
+set confirm
 
 :autocmd VimResized * wincmd =
 
@@ -236,7 +238,7 @@ augroup Golang
   autocmd FileType go nmap <buffer> <Leader>dv <Plug>(go-def-vertical)
   autocmd FileType go nmap <buffer> <Leader>dt <Plug>(go-def-tab)
   autocmd FileType go nmap <buffer> <Leader>e <Plug>(go-rename)
-  autocmd FileType go nmap <buffer> <C-]> :GoDef<CR>zz
+  autocmd FileType go nmap <buffer> <C-]> :GoDef<CR>
   autocmd FileType go nmap <buffer> <F7> :GoBuild<CR>
 augroup END
 
@@ -249,9 +251,9 @@ augroup Haskell
 augroup END
 
 nnoremap ; :
-nnoremap <C-]> <C-]>zz
-nnoremap <C-o> <C-o>zz
-nnoremap <C-i> <C-i>zz
+" nnoremap <C-]> <C-]>zz
+" nnoremap <C-o> <C-o>zz
+" nnoremap <C-i> <C-i>zz
 nnoremap <leader>+ viwyo"""<Esc>pA."""<Esc>_wvU<Esc>V:s/_/ /<CR>:noh<CR>:match<CR>
 nnoremap <Leader>! :view ~/README.txt<CR>
 nnoremap <Leader>1 :e ~/README.txt<CR>Go<Esc>:r!date<CR>:set paste<CR>o
@@ -278,7 +280,7 @@ augroup cstuff
   autocmd FileType c,cpp nnoremap <leader>d Odbg();<Esc>_
 augroup END
 
-nnoremap <F10> :echo "hi<" . synIDattr(synID(line("."),col("."),1),"name") . '> trans<'
+nnoremap <F2> :echo "hi<" . synIDattr(synID(line("."),col("."),1),"name") . '> trans<'
 \ . synIDattr(synID(line("."),col("."),0),"name") . "> lo<"
 \ . synIDattr(synIDtrans(synID(line("."),col("."),1)),"name") . ">"<CR>
 
@@ -324,6 +326,17 @@ function! FindPrompt()
 	endif
 
 	execute "Rg " . str
+endfunction
+
+function! FindPromptDirect()
+  let i = input("Search: ", "")
+  let j = substitute(i, "_", ".", "g")
+	let str = substitute(j, "test_", ".*", "g")
+	if str == ""
+		return
+	endif
+
+	execute "RipGrep '" . str . "'"
 endfunction
 
 function! FindWordUnderCursor()
@@ -391,11 +404,13 @@ endfunction
 nnoremap <F3> :call FindWordUnderCursor()<CR>
 nnoremap <F4> :call FindWordUnderCursorNoUI()<CR>
 
-nnoremap F :wa<CR>:call FindPrompt()<CR>
+nnoremap F :call FindPrompt()<CR>
+nnoremap E :call FindPromptDirect()<CR>
 nnoremap T :Tags<CR>
 nnoremap g] :call FindTagUnderCursor()<CR>
 
 map <F5> :echo "hi<" . synIDattr(synID(line("."),col("."),1),"name") . '> trans<' . synIDattr(synID(line("."),col("."),0),"name") . "> lo<" . synIDattr(synIDtrans(synID(line("."),col("."),1)),"name") . ">"<CR>
+nnoremap <leader>b :Buffers<CR>
 nnoremap <leader>e :e `=expand('%:p:h')`<CR>
 nnoremap <leader>D :cd `=expand('%:p:h')`<CR>:pwd<CR>
 
@@ -413,6 +428,7 @@ nnoremap <leader><space> :syn on<cr>:noh<cr>:match<cr>:set nopaste<CR>
 nnoremap <leader>t viwy:tabnew<CR>:e ~/vim-todo.txt<CR>ggPa<CR><Esc>:wq<CR>
 nnoremap <leader>T :tabnew<CR>:e ~/vim-todo.txt<CR>
 nnoremap <leader>q :conf qa<CR>
+nnoremap <leader>w :wa<CR>
 nnoremap <leader>v <C-w>v<C-w>l<C-w>n<C-w>h
 
 nnoremap <leader>9t :e tests/test_basic.zion<CR>:make<CR>
@@ -542,8 +558,10 @@ endif
 silent! source local.vimrc
 
 nnoremap - _
-nnoremap H :w<CR><Esc>:silent! call <SID>qfnext(v:false)<CR>
-nnoremap L :w<CR><Esc>:silent! call <SID>qfnext(v:true)<CR>
+nnoremap H :silent! call <SID>qfnext(v:false)<CR>
+nnoremap L :silent! call <SID>qfnext(v:true)<CR>
+nnoremap <F9> :silent! call <SID>qfnext(v:false)<CR>
+nnoremap <F10> :silent! call <SID>qfnext(v:true)<CR>
 
 if &diff
   syntax on

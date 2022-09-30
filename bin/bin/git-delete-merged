@@ -7,7 +7,7 @@ die() {
 
 main="$(git symbolic-ref refs/remotes/origin/HEAD | sed 's@^refs/remotes/origin/@@')"
 
-git fetch || die "failed to fetch from remote"
+git fetch --tags --prune origin || die "failed to fetch from remote"
 git checkout -B "$main" "origin/$main" || die "failed to checkout $main"
 git branch --merged "$main" \
   | grep -v "\* $main" \

@@ -31,6 +31,7 @@ setup-vim-packages() {
   # plugin 'vim-autoformat/vim-autoformat'
   plugin 'junegunn/fzf.vim'
   plugin 'rhysd/vim-clang-format'
+  plugin 'raimon49/requirements.txt.vim'
   # plugin 'jbmorgado/vim-pine-script'
   # plugin 'dylon/vim-antlr'
   plugin 'alx741/vim-hindent'
