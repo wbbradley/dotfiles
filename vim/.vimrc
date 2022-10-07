@@ -297,6 +297,7 @@ vmap Q gq
 nmap Q VQ
 
 nmap <C-p> :Files<CR>
+nmap <C-P> :GitFiles<CR>
 nmap <Leader>z :Files ~/src/zion<CR>
 nmap B :Buffers<CR>
 nmap M :History<CR>
@@ -325,7 +326,7 @@ function! FindPrompt()
 		return
 	endif
 
-	execute "Rg " . str
+	execute "Ggrep " . str
 endfunction
 
 function! FindPromptDirect()
@@ -337,6 +338,21 @@ function! FindPromptDirect()
 	endif
 
 	execute "RipGrep '" . str . "'"
+  cw
+  redraw!
+endfunction
+
+function! FindPromptDirectGit()
+  let i = input("Search: ", "")
+  let j = substitute(i, "_", ".", "g")
+	let str = substitute(j, "test_", ".*", "g")
+	if str == ""
+		return
+	endif
+
+	execute "Ggrep '" . str . "'"
+  cw
+  redraw!
 endfunction
 
 function! FindWordUnderCursor()
@@ -346,7 +362,7 @@ function! FindWordUnderCursor()
   endif
 
   " Note this depends on junegunn/fzf
-  execute "Rg " . str
+  execute "Ggrep " . str
 endfunction
 
 function! FindTagUnderCursor()
@@ -365,7 +381,7 @@ function! FindWordUnderCursorNoUI()
   endif
 
   " Note this depends on wbbradley/vim-ripgrep
-  execute "RipGrep " . str
+  execute "Ggrep " . str
 endfunction
 
 " Add highlighting for function definition in C++
@@ -406,6 +422,7 @@ nnoremap <F4> :call FindWordUnderCursorNoUI()<CR>
 
 nnoremap F :call FindPrompt()<CR>
 nnoremap E :call FindPromptDirect()<CR>
+nnoremap <leader>g :call FindPromptDirectGit()<CR>
 nnoremap T :Tags<CR>
 nnoremap g] :call FindTagUnderCursor()<CR>
 
@@ -424,7 +441,7 @@ vmap <C-v> <Plug>(expand_region_shrink)
 :endif
 
 " turning syntax on tends to redraw the screen nicely
-nnoremap <leader><space> :syn on<cr>:noh<cr>:match<cr>:set nopaste<CR>
+nnoremap <leader><space> :noh<cr>:match<cr>:set nopaste<CR>
 nnoremap <leader>t viwy:tabnew<CR>:e ~/vim-todo.txt<CR>ggPa<CR><Esc>:wq<CR>
 nnoremap <leader>T :tabnew<CR>:e ~/vim-todo.txt<CR>
 nnoremap <leader>q :conf qa<CR>

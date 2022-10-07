@@ -68,22 +68,9 @@ new-main() {
 
 # shellcheck disable=SC2155
 if command -v yum >/dev/null; then
-  export PS1="\$(parse_git_branch)\$(parse_working_dir) "
+  export PS1="[\h] \$(parse_git_branch)\$(parse_working_dir) "
 else
-  export PS1="\$(parse_git_branch)\$(parse_working_dir) "
-  : export PS1="\[\e[0;\$(( ( \$? ) ? 31 : 32 ))m\]\$(parse_git_branch)\e[m\$(parse_working_dir) $ "
-
-  : export PS1="\$(
-      if [[ \$? != 0 ]]; then
-        echo ' ❌  '
-      fi
-    )\$(show-env-vars) \$(
-      if [[ "$(uname)" = "Darwin" ]]; then
-        printf '🍏 '
-      else
-        printf '🐧 ' # \\h
-      fi
-    ) \[\033[0;38;5;31;48;5;240;22m\] \[\033[0;38;5;252;48;5;240;1m\] \$(parse_git_branch)\$(parse_working_dir) \[\033[0;38;5;240;49;22m\033[0m\] "
+  export PS1="[\h] \$(parse_git_branch)\$(parse_working_dir) "
 fi
 
 e() {
@@ -129,6 +116,10 @@ garp() {
   git checkout -B "$main" origin/"$main" || return
   git merge --ff-only - || return
   echo now run git push
+}
+
+gs() {
+  git status
 }
 
 alias vi=vim
