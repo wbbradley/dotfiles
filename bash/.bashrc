@@ -67,11 +67,7 @@ new-main() {
 . "$HOME/bin/utils.sh"
 
 # shellcheck disable=SC2155
-if command -v yum >/dev/null; then
-  export PS1="[\h] \$(parse_git_branch)\$(parse_working_dir) "
-else
-  export PS1="[\h] \$(parse_git_branch)\$(parse_working_dir) "
-fi
+export PS1="\$(if (( \$? )); then printf 'ERROR '; fi)[\h] \$(parse_git_branch)\$(parse_working_dir) "
 
 e() {
   if [[ -d env/bin ]]; then

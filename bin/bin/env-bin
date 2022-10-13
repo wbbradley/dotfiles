@@ -1,8 +1,17 @@
 #!/bin/bash
 progname="$(basename "$0")"
-if [[ -x env/bin/"$progname" ]]; then
+root_dir="$(git rev-parse --show-toplevel 2>/dev/null)"
+if [[ -n "$root_dir" ]]; then
+  progpath="$root_dir/env/bin/$progname"
+else
+  progpath="env/bin/$progname"
+fi
+
+unset -v root_dir
+
+if [[ -x "$progpath" ]]; then
   echo "$progname $*  # from $PWD $(date '+%D %r %Z')" >> "$HOME"/"$progname".log
-  exec env/bin/"$progname" "$@"
+  exec "$progpath" "$@"
 else
   echo "env-bin: $progname does not exist" >&2
   exit 1

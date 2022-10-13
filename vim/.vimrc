@@ -142,6 +142,11 @@ augroup Haskell
   " autocmd FileType haskell nnoremap <buffer> <Leader>htc :GhcModTypeClear<cr>
 augroup END
 
+command! -bang -nargs=* GGrep
+  \ call fzf#vim#grep(
+  \   'git grep --line-number -- '.shellescape(<q-args>), 0,
+  \   fzf#vim#with_preview({'dir': systemlist('git rev-parse --show-toplevel')[0]}), <bang>0)
+
 let g:multi_cursor_exit_from_insert_mode=1
 let g:multi_cursor_exit_from_visual_mode=1
 let g:gitgutter_max_signs = 2000
@@ -326,7 +331,7 @@ function! FindPrompt()
 		return
 	endif
 
-	execute "Ggrep " . str
+	execute "Ggrep -q '" . str . "'"
 endfunction
 
 function! FindPromptDirect()
@@ -350,7 +355,7 @@ function! FindPromptDirectGit()
 		return
 	endif
 
-	execute "Ggrep '" . str . "'"
+	execute "Ggrep -q '" . str . "'"
   cw
   redraw!
 endfunction
@@ -361,8 +366,7 @@ function! FindWordUnderCursor()
     return
   endif
 
-  " Note this depends on junegunn/fzf
-  execute "Ggrep " . str
+  execute "Rg " . str
 endfunction
 
 function! FindTagUnderCursor()
@@ -380,8 +384,7 @@ function! FindWordUnderCursorNoUI()
     return
   endif
 
-  " Note this depends on wbbradley/vim-ripgrep
-  execute "Ggrep " . str
+  execute "Ggrep -q '" . str . "'"
 endfunction
 
 " Add highlighting for function definition in C++

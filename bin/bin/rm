@@ -1,3 +1,3 @@
 #!/bin/bash
-echo "$0 $*  # from $PWD" >> "$HOME"/rm.log
+echo "$0 $*  # from $PWD $(date '+%D %r %Z')" >> "$HOME"/rm.log
 exec /bin/rm "$@"
