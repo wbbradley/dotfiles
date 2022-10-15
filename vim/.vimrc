@@ -323,7 +323,7 @@ nmap <leader>N :let @a=1<Bar>%s/\<\d\+\>/\=(@a+setreg('a',@a+1))/<CR>
 nmap <leader>l /\%>100v.\+
 nmap <leader>a :ALEInfoToFile /var/tmp/ale.txt<CR>:e /var/tmp/ale.txt<CR>
 
-function! FindPrompt()
+function! FindPromptFzf()
   let i = input("Search: ", "")
   let j = substitute(i, "_", ".", "g")
 	let str = substitute(j, "test_", ".*", "g")
@@ -331,7 +331,7 @@ function! FindPrompt()
 		return
 	endif
 
-	execute "Ggrep -q '" . str . "'"
+	execute "GGrep " . str
 endfunction
 
 function! FindPromptDirect()
@@ -366,7 +366,7 @@ function! FindWordUnderCursor()
     return
   endif
 
-  execute "Rg " . str
+  execute "GGrep " . str
 endfunction
 
 function! FindTagUnderCursor()
@@ -423,7 +423,7 @@ endfunction
 nnoremap <F3> :call FindWordUnderCursor()<CR>
 nnoremap <F4> :call FindWordUnderCursorNoUI()<CR>
 
-nnoremap F :call FindPrompt()<CR>
+nnoremap F :call FindPromptFzf()<CR>
 nnoremap E :call FindPromptDirect()<CR>
 nnoremap <leader>g :call FindPromptDirectGit()<CR>
 nnoremap T :Tags<CR>
