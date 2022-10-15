@@ -142,9 +142,10 @@ augroup Haskell
   " autocmd FileType haskell nnoremap <buffer> <Leader>htc :GhcModTypeClear<cr>
 augroup END
 
+" FZF UI version of search.
 command! -bang -nargs=* GGrep
   \ call fzf#vim#grep(
-  \   'git grep --line-number -- '.shellescape(<q-args>), 0,
+  \   'git grep --line-number -- '.shellescape(<q-args>).' | grep -v -e dist/ -e static/ -e ".bundle:" -e "mobile/assets/.*\.js"', 0,
   \   fzf#vim#with_preview({'dir': systemlist('git rev-parse --show-toplevel')[0]}), <bang>0)
 
 let g:multi_cursor_exit_from_insert_mode=1
