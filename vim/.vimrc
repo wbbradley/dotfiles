@@ -100,6 +100,7 @@ let g:lightline.active.right = [
       \   [ 'linter_checking', 'linter_errors', 'linter_warnings', 'linter_ok' ]
       \ ]
 
+let g:ale_completion_enabled = 1
 let g:ale_python_autoflake_executable = $PWD . '/env/bin/autoflake'
 let g:ale_python_autoflake_options = '--remove-all-unused-imports'
 let g:ale_python_mypy_executable = $PWD . '/env/bin/mypy'
@@ -116,10 +117,13 @@ let g:ale_python_pylint_use_global = 0
 let g:ale_fixers = {
       \   'python': ['isort', 'autoflake', 'autopep8', 'trim_whitespace']
       \ , 'cpp': ['clang-format']
+      \ , 'c': ['clang-format']
       \ , 'proto': ['clang-format', 'protolint', 'buf-format']
       \ , 'rust': ['rustfmt', 'trim_whitespace', 'remove_trailing_lines']
       \ , 'haskell': ['hfmt']
       \ }
+let g:ale_rust_cargo_use_clippy = 1
+let g:ale_rust_rustfmt_options = '--edition 2021'
 let g:ale_fix_on_save = 1
 let g:ale_linters = {
       \   'haskell': ['hls']
@@ -270,7 +274,7 @@ vnoremap <Leader>/ :Commentary<CR>
 nnoremap <C-b> <C-w>
 
 autocmd Syntax cpp call EnhanceCppSyntax()
-autocmd FileType c nnoremap <buffer> <F2> :call FlipHeader()<CR>
+autocmd FileType c nnoremap <buffer> <F2> :call FlipCHeader()<CR>
 autocmd FileType cpp nnoremap <buffer> <F2> :call FlipHeader()<CR>
 
 function SetCOptions()
@@ -394,6 +398,19 @@ function! EnhanceCppSyntax()
   hi def link cppFuncDef Special
 endfunction
 
+function! FlipCHeader()
+  :wa
+  if expand('%:e') == 'c'
+    :e %:r.h
+  else
+    if filereadable(expand('%:r') . '.c')
+      :e %:r.c
+    else
+      :e %:r.c
+    endif
+  endif
+endfunction
+
 function! FlipHeader()
   :wa
   if (&ft == 'c')
@@ -421,8 +438,8 @@ endfunction
 
 " nnoremap <leader>` :!ctags -R .<CR>
 
-nnoremap <F3> :call FindWordUnderCursor()<CR>
-nnoremap <F4> :call FindWordUnderCursorNoUI()<CR>
+nnoremap <F3> :call FindWordUnderCursorNoUI()<CR>
+nnoremap <F4> :call FindWordUnderCursor()<CR>
 
 nnoremap F :call FindPromptFzf()<CR>
 nnoremap E :call FindPromptDirect()<CR>
@@ -546,6 +563,12 @@ autocmd FileType sh setlocal expandtab sw=2 sts=2 ts=2 expandtab smartindent
 autocmd FileType qf nmap <buffer> <Esc> :cclose<CR>
 augroup filetypedetect
     au! BufRead,BufNewFile *.bashrc setfiletype sh
+augroup END
+
+augroup Rust
+  autocmd FileType rust setlocal makeprg=cargo\ build
+  autocmd BufRead *.rs :setlocal tags=./rusty-tags.vi;/
+  autocmd BufWritePost *.rs :silent! exec "!rusty-tags vi --quiet --start-dir=" . expand('%:p:h') . "&" | redraw!
 augroup END
 
 set ignorecase

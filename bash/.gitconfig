@@ -31,6 +31,9 @@
 	defaultBranch = main
 [merge]
   ff = only
+  tool = vimdiff
+[mergetool]
+  keepBackup = false
 [mergetool "sourcetree"]
 	cmd = "vimdiff "
 	trustExitCode = true

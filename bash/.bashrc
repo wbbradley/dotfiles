@@ -98,20 +98,45 @@ pass-file() {
   pass insert -mf "$leaf_name" <"$leaf_name"
 }
 
+afzf() {
+  ansifilter | fzf
+}
+
+gpu() {
+  git push -u origin HEAD
+}
+
 gar() {
   git fetch --tags --prune origin
   main="$(git symbolic-ref refs/remotes/origin/HEAD | sed 's@^refs/remotes/origin/@@')"
   git rebase origin/$main
 }
 
+on-main-branch() {
+  local_branch="$(basename "$(git symbolic-ref HEAD)")"
+  remote_main_branch="$(basename "$(git symbolic-ref refs/remotes/origin/HEAD)")"
+  if [[ -z "$local_branch" ]] || [[ -z "$remote_main_branch" ]]; then
+    echo "on-main-branch: failed to get local and remote branch names!" >&2
+    exit 1
+  fi
+
+  [[ "$local_branch" == "$remote_main_branch" ]]
+}
+
 garp() {
   git fetch --tags --prune origin || return 1
+
+  if on-main-branch; then
+    echo "garp: illegal to use garp on main branch!" >&2
+    return 1
+  fi
+
   main="$(git symbolic-ref refs/remotes/origin/HEAD | sed 's@^refs/remotes/origin/@@')"
   git rebase origin/"$main" || return 1
   git push -f || return 1
-  git checkout -B "$main" origin/"$main" || return
-  git merge --ff-only - || return
-  echo now run git push
+  git checkout -B "$main" origin/"$main" || return 1
+  git merge --ff-only - || return 1
+  echo "now run git push"
 }
 
 gs() {
@@ -121,7 +146,8 @@ gs() {
 alias vi=vim
 alias rgm='rg --multiline-dotall -U'
 alias uuid="python -c \"import uuid;print(uuid.uuid4())\" | tr -d '\n'"
-mydot() {
+
+dot-ez() {
   dot "$1" -Tpng -Gdpi=300 -o "$1.png" && open "$1.png"
 }
 

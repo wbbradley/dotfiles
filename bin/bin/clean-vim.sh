@@ -63,6 +63,7 @@ setup-vim-packages() {
   # plugin 'othree/html5.vim'
   plugin 'airblade/vim-gitgutter'
   plugin 'easymotion/vim-easymotion'
+  plugin 'Nymphium/vim-koka'
   # plugin 'vim-crystal/vim-crystal'
   # plugin 'kchmck/vim-coffee-script.git'
   # plugin 'jimmyhchan/dustjs.vim.git'
