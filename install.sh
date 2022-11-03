@@ -81,6 +81,7 @@ dotfiles_dir="$HOME/src/dotfiles"
     done
 )
 
+# Install ripgrep.
 if ! rg >/dev/null 2>/dev/null && on-linux; then
   (
     cd /var/tmp || die "failed to cd to /var/tmp"
