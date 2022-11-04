@@ -165,7 +165,19 @@ on-linux() {
   [[ "$(uname)" = "Linux" ]]
 }
 
-alias venv='if [[ -f env/bin/activate ]]; then echo "venv already exists in env."; else python3 -mvenv env && env/bin/pip install -U pip && env/bin/pip install wheel pip-tools; fi'
+venv() {
+  if [[ -f env/bin/activate ]]; then
+    echo "venv already exists in env."
+  else
+    python3 -mvenv env || return 1
+    if [[ "$(uname)" = "Darwin" ]]; then
+      rm env/bin/Activate.ps1 env/bin/activate.{fi,c}sh
+    fi
+    env/bin/pip install -U pip || return 1
+    env/bin/pip install wheel pip-tools || return 1
+  fi
+}
+
 alias p='pstree -s'
 
 if on-macos; then
