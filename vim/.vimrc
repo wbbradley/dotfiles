@@ -589,6 +589,7 @@ filetype plugin on
 filetype indent on
 
 colorscheme zion
+hi ColorColumn ctermfg=blue ctermbg=black cterm=NONE
 
 " hi! MatchParen cterm=NONE,bold gui=NONE,bold guibg=#eee8d5 guifg=NONE
 syn match Braces display '[<>{}()\[\]]'
