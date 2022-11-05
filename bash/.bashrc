@@ -165,6 +165,10 @@ on-linux() {
   [[ "$(uname)" = "Linux" ]]
 }
 
+ptree() {
+  pgrep $1 | xargs -I {} pstree -ZUhunpst {}
+}
+
 venv() {
   if [[ -f env/bin/activate ]]; then
     echo "venv already exists in env."
