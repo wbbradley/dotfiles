@@ -428,8 +428,11 @@ graphical-mode() {
 GPG_TTY="$(tty)"
 export GPG_TTY
 
+
 prepend_path_to PATH "/usr/local/bin"
-prepend_path_to PATH "/opt/homebrew/bin" "/opt/homebrew/sbin"
+if on-macos; then
+  prepend_path_to PATH "/opt/homebrew/bin" "/opt/homebrew/sbin"
+fi
 prepend_path_to PATH "$HOME/bin"
 [ -f "$HOME/.ghcup/env" ] && . "$HOME/.ghcup/env" # ghcup-env
 [ -f "$HOME/.cargo/env" ] && . "$HOME/.cargo/env"
