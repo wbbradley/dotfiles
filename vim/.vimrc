@@ -15,7 +15,7 @@ else
 	set clipboard=unnamedplus
 endif
 
-" set t_Co=256
+set termguicolors
 set cpoptions+=n
 set splitbelow
 set splitright
@@ -588,8 +588,11 @@ syntax on
 filetype plugin on
 filetype indent on
 
-colorscheme zion
-hi ColorColumn ctermfg=blue ctermbg=black cterm=NONE
+colorscheme slate
+augroup python
+  autocmd FileType python setlocal textwidth=100
+  autocmd FileType python setlocal colorcolumn=100,101,102,103
+augroup END
 
 " hi! MatchParen cterm=NONE,bold gui=NONE,bold guibg=#eee8d5 guifg=NONE
 syn match Braces display '[<>{}()\[\]]'
