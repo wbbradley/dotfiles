@@ -18,6 +18,9 @@
   rebase = true
 [branch]
   autosetuprebase = always
+[merge]
+  ff = only
+  tool = vimdiff
 [alias]
   tagcommit = rev-list -n 1
   ls-ignored = ls-files . --ignored --exclude-standard --others
@@ -35,7 +38,7 @@
 [mergetool]
   keepBackup = false
 [mergetool "sourcetree"]
-	cmd = "vimdiff "
+	cmd = /Applications/Sourcetree.app/Contents/Resources/opendiff-w.sh \"$LOCAL\" \"$REMOTE\" -ancestor \"$BASE\" -merge \"$MERGED\"
 	trustExitCode = true
 [credential]
 	helper = store
