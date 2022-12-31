@@ -67,7 +67,7 @@ new-main() {
 . "$HOME/bin/utils.sh"
 
 # shellcheck disable=SC2155
-export PS1="\$(if (( \$? )); then printf 'ERROR '; fi)[\h] \$(parse_git_branch)\$(parse_working_dir) "
+export PS1="\$(if (( \$? )); then printf 'ERROR '; fi)[\h] \$(parse_git_branch)\n◐ \$(parse_working_dir) ◑ "
 
 e() {
   if [[ -d env/bin ]]; then
@@ -123,6 +123,21 @@ on-main-branch() {
   [[ "$local_branch" == "$remote_main_branch" ]]
 }
 
+gap() {
+  if repo-is-dirty; then
+    git status -s \
+    && git commit -am updates \
+    && git push -u origin HEAD \
+    && git status -s
+  else
+    git status
+    echo
+    echo "gap: Did nothing!"
+    echo
+  fi
+}
+
+
 garp() {
   git fetch --tags --prune origin || return 1
 
@@ -144,7 +159,6 @@ gs() {
 }
 
 alias vi=vim
-alias rgm='rg --multiline-dotall -U'
 alias uuid="python -c \"import uuid;print(uuid.uuid4())\" | tr -d '\n'"
 
 dot-ez() {
@@ -179,6 +193,9 @@ venv() {
     fi
     env/bin/pip install -U pip || return 1
     env/bin/pip install wheel pip-tools || return 1
+    if (( $# )); then
+      env/bin/pip install "$@"
+    fi
   fi
 }
 
@@ -432,7 +449,6 @@ graphical-mode() {
 GPG_TTY="$(tty)"
 export GPG_TTY
 
-
 prepend_path_to PATH "/usr/local/bin"
 if on-macos; then
   prepend_path_to PATH "/opt/homebrew/bin" "/opt/homebrew/sbin"
@@ -441,12 +457,5 @@ prepend_path_to PATH "$HOME/bin"
 [ -f "$HOME/.ghcup/env" ] && . "$HOME/.ghcup/env" # ghcup-env
 [ -f "$HOME/.cargo/env" ] && . "$HOME/.cargo/env"
 
-NVM_DIR="$HOME/.nvm"
-[[ -s "$NVM_DIR/nvm.sh" ]] && {
-  export NVM_DIR="$HOME/.nvm"
-  \. "$NVM_DIR/nvm.sh"  # This loads nvm
-}
-
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 [[ -f ~/.fzf.bash ]] && source ~/.fzf.bash
 printf ''
