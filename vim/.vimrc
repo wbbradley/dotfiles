@@ -591,7 +591,7 @@ syntax on
 filetype plugin on
 filetype indent on
 
-colorscheme miramare
+colorscheme slate
 augroup python
   autocmd FileType python setlocal textwidth=100
   autocmd FileType python setlocal colorcolumn=100,101,102,103

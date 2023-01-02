@@ -30,6 +30,7 @@
   default = heads/*
 [difftool "sourcetree"]
 	cmd = opendiff \"$LOCAL\" \"$REMOTE\"
+	path = 
 [init]
 	defaultBranch = main
 [merge]
