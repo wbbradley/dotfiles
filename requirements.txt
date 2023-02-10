@@ -1,6 +1,6 @@
 flake8==2.1.0
 ipdb==0.8
-ipython==7.16.3
+ipython==8.10.0
 mccabe==0.2.1
 pep8==1.4.6
 pyflakes==0.7.3
