@@ -227,6 +227,7 @@ local null_ls = require("null-ls")
 null_ls.setup({
   sources = {
     require("autoimport"),
+    require("shellcheck"),
     null_ls.builtins.formatting.isort,
   }
 })
