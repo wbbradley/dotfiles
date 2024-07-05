@@ -1,0 +1,13 @@
+#!/bin/bash
+host=$1
+port=$2
+region=$3
+printf '%s [ssh-hook] host=%s port=%d region=%s\n' "$(date -u +"%Y-%m-%dT%H:%M:%SZ")" "$host" "$port" "$region" >> ~/ssh-hook.log
+exec aws \
+  --profile session-manager \
+  --region "$region" \
+  ssm \
+  start-session \
+  --target "$host" \
+  --document-name AWS-StartSSHSession \
+  --parameters 'portNumber='"$port"
