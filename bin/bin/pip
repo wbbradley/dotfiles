@@ -1,0 +1,7 @@
+#!/bin/bash
+if [[ -x env/bin/pip ]]; then
+  exec env/bin/pip "$@"
+else
+  echo "pseudo-pip: could not find env/bin/pip. you probably need to create your venv" >&2
+  exit 1
+fi

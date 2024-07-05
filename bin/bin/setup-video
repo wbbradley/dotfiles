@@ -1,0 +1,13 @@
+#!/bin/bash
+declare -a args
+# "white_balance_temperature=2500"
+args=(
+  "white_balance_temperature_auto=1"
+  "zoom_absolute=110"
+  "brightness=130"
+  "sharpness=100"
+  "saturation=100"
+)
+for arg in "${args[@]}"; do
+  v4l2-ctl --set-ctrl="$arg"
+done

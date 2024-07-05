@@ -1,0 +1,11 @@
+#!/bin/bash
+if [[ -x env/bin/ipython ]]; then
+  exec env/bin/ipython "$@"
+else
+  if command -v ipython3 >/dev/null 2>&1; then
+    exec ipython3 "$@"
+  fi
+
+  echo "pseudo-python: could not find env/bin/python. you probably need to create your venv" >&2
+  exit 1
+fi

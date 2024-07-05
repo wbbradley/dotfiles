@@ -1,0 +1,2 @@
+#!/bin/bash
+ffmpeg -i "$1" -pix_fmt rgb8 "${1//mov/gif}"

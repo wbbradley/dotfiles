@@ -1,0 +1,45 @@
+[user]
+	email = williambbradley@gmail.com
+	name = Will Bradley
+	signingKey = 6AD47A807E525EF1!
+[commit]
+  gpgsign = true
+[log]
+  showSignature = false
+[color]
+  diff = always
+  ui = true
+[core]
+  editor = vim
+	excludesfile = ~/.gitignore
+[push]
+  default = simple
+[pull]
+  rebase = true
+[branch]
+  autosetuprebase = always
+[merge]
+  ff = only
+  tool = vimdiff
+[alias]
+  tagcommit = rev-list -n 1
+  ls-ignored = ls-files . --ignored --exclude-standard --others
+  ls-untracked = ls-files . --exclude-standard --others
+[showbranch]
+  default = --topo-order
+  default = heads/*
+[difftool "sourcetree"]
+	cmd = opendiff \"$LOCAL\" \"$REMOTE\"
+	path = 
+[init]
+	defaultBranch = main
+[merge]
+  ff = only
+  tool = vimdiff
+[mergetool]
+  keepBackup = false
+[mergetool "sourcetree"]
+	cmd = /Applications/Sourcetree.app/Contents/Resources/opendiff-w.sh \"$LOCAL\" \"$REMOTE\" -ancestor \"$BASE\" -merge \"$MERGED\"
+	trustExitCode = true
+[credential]
+	helper = store

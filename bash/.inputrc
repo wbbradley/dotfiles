@@ -1,0 +1,23 @@
+Tab: menu-complete
+set revert-all-at-newline
+set show-all-if-ambiguous on
+set colored-stats on
+set visible-stats on
+set completion-ignore-case On
+
+"\e[A": history-search-backward
+"\e[B": history-search-forward
+"\e\e": "\C-a\C-k"
+
+# Turn smart quotes into normal quotes.
+"\xE2\x80\x9C": "\""
+"\xE2\x80\x9D": "\""
+"\xE2\x80\x98": "'"
+"\xE2\x80\x99": "'"
+# Turn non-breaking space into a normal space.
+"\xC2\xA0": " "
+# Minus and em-dash into plain dashes.
+"\xE2\x80\x93": "-"
+"\xE2\x80\x94": "--"
+# Ellipsis...
+"\xE2\x80\xA6": "..."

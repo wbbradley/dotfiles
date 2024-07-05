@@ -1,0 +1,15 @@
+-uu
+--glob=!log/
+--glob=!*.map
+--glob=!tmp/
+--glob=!tags
+--glob=!_site/
+--glob=!node_modules
+--glob=!.stack-work/
+--glob=!.*\.swp
+--glob=!\.git/
+--glob=!**/git/examples/
+--glob=!*deadbeef.js
+--max-columns=280
+--max-columns-preview
+--smart-case
