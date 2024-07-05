@@ -19,6 +19,19 @@ vim.opt.rtp:prepend(lazypath)
 local lazy_plugins = {
   "folke/trouble.nvim",
   "jremmen/vim-ripgrep",
+  {
+    "ibhagwan/fzf-lua",
+    config = function()
+      -- calling `setup` is optional for customization
+      require("fzf-lua").setup({
+        preview_opts = 'hidden', -- NB: Toggle the preview with <F4>.
+        fzf_opts = {
+          ['--layout'] = 'default',
+        }
+       -- cmd = "git grep --line-number --column --color=always",
+     })
+    end
+  },
   "nvimtools/none-ls.nvim",
   "neovim/nvim-lspconfig",
   {
@@ -26,30 +39,6 @@ local lazy_plugins = {
     dir = "~/src/vim-ai-lolmax",
   },
   "nvim-lua/plenary.nvim",
-  {
-    "nvim-telescope/telescope-fzf-native.nvim",
-    build = "make",
-  },
-  {
-    "nvim-telescope/telescope.nvim",
-    dependencies = {
-      "nvim-lua/plenary.nvim",
-      "nvim-telescope/telescope-fzf-native.nvim",
-    },
-  },
-  "davvid/telescope-git-grep.nvim",
-  "nvim-telescope/telescope-ui-select.nvim",
-  {
-    "nvim-telescope/telescope-fzf-native.nvim",
-    build = "make",
-  },
-  {
-    "nvim-telescope/telescope.nvim",
-    dependencies = {
-      "nvim-lua/plenary.nvim",
-      "nvim-telescope/telescope-fzf-native.nvim",
-    },
-  },
   "nvim-treesitter/nvim-treesitter",
   "nvim-treesitter/nvim-treesitter-context",
   { "ellisonleao/gruvbox.nvim", priority = 1000 , config = true},
@@ -66,72 +55,6 @@ vim.cmd("colorscheme gruvbox")
 require('lspconfig').ruff.setup {
   cmd = { ".venv/bin/ruff", "server", "--preview" },
 }
-
-local actions = require("telescope.actions")
-local action_state = require("telescope.actions.state")
-
-local function fzf_multi_select(prompt_bufnr)
-    local picker = action_state.get_current_picker(prompt_bufnr)
-    local num_selections = #picker:get_multi_selection()
-
-    if num_selections > 1 then
-        -- actions.file_edit throws - context of picker seems to change
-        -- actions.file_edit(prompt_bufnr)
-        actions.send_selected_to_qflist(prompt_bufnr)
-        actions.open_qflist()
-    else
-        actions.file_edit(prompt_bufnr)
-    end
-end
-
-local function send_telescope_sel_to_qflist_and_open_qflist(prompt_bufnr)
-    local picker = action_state.get_current_picker(prompt_bufnr)
-    local num_selections = #picker:get_multi_selection()
-
-      -- actions.file_edit throws - context of picker seems to change
-      -- actions.file_edit(prompt_bufnr)
-      actions.send_selected_to_qflist(prompt_bufnr)
-      actions.open_qflist()
-end
-
-require("telescope").setup({
-  defaults = {
-    mappings = {
-      i = {
-        -- Disable the default item up/down mappings
-        ["<C-N>"] = false,
-        ["<C-P>"] = false,
-        -- ...and climb aboard the HJKL train
-        ["<C-J>"] = actions.move_selection_next,
-        ["<C-K>"] = actions.move_selection_previous,
-        ["<C-w>"] = send_telescope_sel_to_qflist_and_open_qflist,
-        ["<esc>"] = actions.close,
-        ["<cr>"] = fzf_multi_select,
-
-      },
-    },
-    file_ignore_patterns = {
-      "tags",
-      "tags.temp",
-      "tags.lock",
-    },
-  },
-  pickers = {
-    colorscheme = {
-      enable_preview = true,
-    },
-    buffers = {
-      sort_lastused = true
-    },
-  },
-  -- Format path as "file.txt (path\to\file\)"
-  path_display = function(opts, path)
-    local tail = require("telescope.utils").path_tail(path)
-    return string.format("%s (%s)", tail, path), { { { 1, #tail }, "Constant" } }
-  end,
-})
-require("telescope").load_extension("fzf")
-require('telescope').load_extension("git_grep")
 
 local function keymap(mode, shortcut, command)
   vim.keymap.set(mode, shortcut, command, { noremap = true, silent = true })
@@ -154,9 +77,8 @@ nmap("<Leader>ne", ":edit" .. nvim_lua_init_path .. "<CR>")
 nmap("<Leader>nr", ":luafile" .. nvim_lua_init_path .. "<CR>")
 -- nmap("<C-o>", ":Telescope buffers<CR>")
 nmap('M', '<cmd>Telescope oldfiles<CR>')
-nmap("<C-p>", ":Telescope git_files<CR>")
--- nmap("F", ':lua require("telescope.builtin").grep_string({search = ""})<CR>')
-nmap("E", "Telescope live_grep<CR>")
+nmap("<C-p>", ":FzfLua git_files<CR>")
+nmap("E", ':lua require("fzf-lua").live_grep()')
 nmap("<C-x>", function() print("hello") end)
 nmap("vv", "viw")
 
@@ -241,14 +163,15 @@ null_ls.setup({
   }
 })
 
--- Search for the current word and fuzzy-search over the result using git_grep.grep().
-vim.keymap.set({'n', 'v'}, '<F3>', function()
-    require('git_grep').grep()
+vim.keymap.set('n', "F", function()
+  require("fzf-lua").live_grep({
+    cmd = "git grep --line-number --column --color=always"
+  })
 end)
-
--- Interactively search for a pattern using git_grep.live_grep().
-vim.keymap.set('n', 'F', function()
-    require('git_grep').live_grep()
+vim.keymap.set('n', "<F3>", function()
+  require("fzf-lua").grep_cword({
+    cmd = "git grep --line-number --column --color=always"
+  })
 end)
 vim.cmd [[
 set encoding=utf-8
