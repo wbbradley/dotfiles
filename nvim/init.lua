@@ -17,6 +17,7 @@ end
 vim.opt.rtp:prepend(lazypath)
 
 local lazy_plugins = {
+  "folke/trouble.nvim",
   "jremmen/vim-ripgrep",
   "nvimtools/none-ls.nvim",
   "neovim/nvim-lspconfig",
@@ -36,6 +37,7 @@ local lazy_plugins = {
       "nvim-telescope/telescope-fzf-native.nvim",
     },
   },
+  "davvid/telescope-git-grep.nvim",
   "nvim-telescope/telescope-ui-select.nvim",
   {
     "nvim-telescope/telescope-fzf-native.nvim",
@@ -129,6 +131,7 @@ require("telescope").setup({
   end,
 })
 require("telescope").load_extension("fzf")
+require('telescope').load_extension("git_grep")
 
 local function keymap(mode, shortcut, command)
   vim.keymap.set(mode, shortcut, command, { noremap = true, silent = true })
@@ -152,7 +155,8 @@ nmap("<Leader>nr", ":luafile" .. nvim_lua_init_path .. "<CR>")
 -- nmap("<C-o>", ":Telescope buffers<CR>")
 nmap('M', '<cmd>Telescope oldfiles<CR>')
 nmap("<C-p>", ":Telescope git_files<CR>")
-nmap("F", ":Telescope live_grep<CR>")
+-- nmap("F", ':lua require("telescope.builtin").grep_string({search = ""})<CR>')
+nmap("E", "Telescope live_grep<CR>")
 nmap("<C-x>", function() print("hello") end)
 nmap("vv", "viw")
 
@@ -228,10 +232,24 @@ null_ls.setup({
   sources = {
     require("autoimport"),
     require("shellcheck"),
-    null_ls.builtins.formatting.isort,
+    null_ls.builtins.formatting.isort.with {
+      command = ".venv/bin/isort",
+    },
+    null_ls.builtins.diagnostics.mypy.with {
+      command = ".venv/bin/mypy",
+    },
   }
 })
 
+-- Search for the current word and fuzzy-search over the result using git_grep.grep().
+vim.keymap.set({'n', 'v'}, '<F3>', function()
+    require('git_grep').grep()
+end)
+
+-- Interactively search for a pattern using git_grep.live_grep().
+vim.keymap.set('n', 'F', function()
+    require('git_grep').live_grep()
+end)
 vim.cmd [[
 set encoding=utf-8
 " set undofile
@@ -585,7 +603,6 @@ nmap <C-w>1 :%bd\|e#<CR>
 nmap <leader>N :let @a=1<Bar>%s/\<\d\+\>/\=(@a+setreg('a',@a+1))/<CR>
 " nmap <leader>l /\%>100v.\+
 nmap <leader>l iimport logging<CR>logger = logging.getLogger(__name__)<CR><Esc>
-nmap <leader>a :ALEInfoToFile /var/tmp/ale.txt<CR>:e /var/tmp/ale.txt<CR>
 
 function! FindPromptFzf()
   let i = input("Search: ", "")
@@ -712,7 +729,7 @@ endfunction
 
 nnoremap <leader>` :!ctags -R .<CR>
 
-nnoremap <F3> :call FindWordUnderCursor()<CR>
+" nnoremap <F3> :call FindWordUnderCursor()<CR>
 " :execute 'grep! ' . expand('<cword>') . ' *'<CR>
 
 nnoremap <F4> :call FindWordUnderCursorNoUI()<CR>
