@@ -1,0 +1,7 @@
+#!/bin/bash
+cd "$HOME/src/dotfiles" || {
+  echo "$0: could not find your dotfiles dir!"
+  exit 1
+}
+
+git pull

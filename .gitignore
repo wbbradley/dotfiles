@@ -1,0 +1,14 @@
+*.pyc
+*.o
+*.swp
+/env/
+vim/.vim/bundle
+.netrwhist
+bin/bin/lx-old
+bin/bin/ngrok
+bin/bin/mkg
+bin/bin/rg
+bin/bin/fak
+bin/bin/protonum
+bin/bin/wim
+bin/bin/wim-key

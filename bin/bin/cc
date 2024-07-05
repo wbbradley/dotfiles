@@ -1,0 +1,7 @@
+#!/bin/bash
+ccache_bin="$(command -v ccache 2>/dev/null)"
+if [[ -x "$ccache_bin" ]]; then
+  exec "$ccache_bin" /usr/bin/cc "$@"
+else
+  exec /usr/bin/cc "$@"
+fi

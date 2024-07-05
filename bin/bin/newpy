@@ -1,0 +1,51 @@
+#!/bin/bash
+die() {
+  echo "$0: $*" >&2
+  exit 1
+}
+
+dir=$1
+temp_dir="$(mktemp -d)"
+if [[ -z "$dir" ]]; then
+  die "usage: newpy [dirname]"
+fi
+! [[ -d "$dir" ]] || die "$0: dir '$dir' already exists."
+[[ -d "$temp_dir" ]] || die "$0: dir '$temp_dir' was not created?"
+python3 -mvenv "$temp_dir"/env || die "failed to venv in $temp_dir/env"
+"$temp_dir"/env/bin/pip install -U pip || die "failed to upgrade pip"
+deps=(
+  ipython
+  black
+  pylint
+  mypy
+)
+"$temp_dir"/env/bin/pip install "${deps[@]}" || die "could not install deps"
+"$temp_dir"/env/bin/pip freeze >> "$temp_dir"/requirements.txt
+git -C "$temp_dir" init
+gitignores=(
+  env/
+  data/
+  .mypy_cache/
+)
+printf '%s\n' "${gitignores[@]}" > "$temp_dir"/.gitignore
+
+echo '
+[tool.mypy]
+disable_error_code = ["import-untyped"]
+
+[tool.autopep8]
+max_line_length = 100
+
+[tool.black]
+line_length = 100
+' > "$temp_dir"/pyproject.toml
+echo '
+[MASTER]
+disable=C,R,W
+' > "$temp_dir"/.pylintrc
+git -C "$temp_dir" add "$temp_dir"/{.gitignore,requirements.txt,.pylintrc,pyproject.toml}
+mv "$temp_dir" "$dir" || die "failed to emplace $dir"
+rm -rf "$dir"/env
+python3 -mvenv "$dir"/env || die "failed to venv in $dir/env"
+"$dir"/env/bin/pip install -U pip || die "failed to upgrade pip"
+"$dir"/env/bin/pip install -r "$dir"/requirements.txt

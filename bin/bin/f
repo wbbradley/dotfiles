@@ -1,0 +1,20 @@
+#!/bin/bash
+
+anded_terms=""
+ored_terms=""
+negation=""
+negation_delim=" | "
+
+for r in "${@}"; do
+  if [ "${r:0:1}" = "-" ]; then
+    negation="${negation}${negation_delim}rg -v '${r:1}'"
+  elif [ "$anded_terms" = "" ]; then
+		anded_terms="rg -e \"$r\""
+		ored_terms="-e \"$r\""
+	else
+		anded_terms="${anded_terms} | rg -e \"${r}\""
+		ored_terms="${ored_terms} -e \"$r\""
+	fi
+done
+
+eval "rg -uuu --files ${negation} | grep -v node_modules | ${anded_terms} | rg $ored_terms" 2>/dev/null

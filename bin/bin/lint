@@ -1,0 +1,55 @@
+#!/bin/bash
+set -e
+
+local_env=/var/tmp/.pylint-env
+pylint_spec=pylint==2.9.3
+
+install-pylint() {
+  if [ -n "$GITLAB_CI" ]; then
+    echo "$0: Installing pylint globally..."
+    pip3 install "$pylint_spec" >/dev/null
+  else
+    # Attempt to manage a pylint installation locally idempotently.
+    if ! [ -f "$local_env/bin/activate" ]; then
+      echo "$0: Setting up local virtualenv in $local_env..."
+      virtualenv -p python3 $local_env
+    fi
+
+    # shellcheck disable=SC1090
+    . "$local_env/bin/activate"
+
+    if ! command -v pylint 2>/dev/null 1>/dev/null; then
+      echo "$0: Installing pylint in $local_env..."
+      pip3 install "$pylint_spec"
+    fi
+  fi
+}
+
+run-lint() {
+  if [ $# -ne 0 ]; then
+    set -v
+
+    if [ -f .pylintrc ]; then
+      pylint -j 7 "$@"
+    else
+      pylint --rcfile=<(printf "
+        [MASTER]
+        enable=E,W
+        disable=
+          import-error,
+          no-absolute-import,
+          no-name-in-module,
+          missing-class-docstring,
+          missing-module-docstring,
+          too-many-arguments,
+          missing-function-docstring,
+          invalid-name,
+      ") -j 7 "$@"
+    fi
+  else
+    pylint -j 7 $(find . -iname '*.py' | grep -v -e site-packages)
+  fi
+}
+
+install-pylint
+run-lint "$@"

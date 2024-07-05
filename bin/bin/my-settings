@@ -1,0 +1,47 @@
+#!/bin/bash
+
+die() {
+  echo "$0: $1" >&2
+  echo "$0: quitting..." >&2
+  exit 1
+}
+
+DCONF_INI="$HOME/src/dotfiles/X/dconf.ini"
+
+
+dump-settings() {
+  gsettings list-recursively | grep -i desktop.interface | grep -v font
+  gsettings list-recursively | grep -i desktop.privacy
+  gsettings list-recursively | grep -i desktop.search.providers
+  gsettings list-recursively | grep -i desktop.wm.preferences
+  gsettings list-recursively | grep -i extensions.dash-to-dock
+  gsettings list-recursively | grep -i keybindings
+  gsettings list-recursively | grep -i media-keys
+  gsettings list-recursively | grep -i peripherals | grep -i keyboard | grep -iE 'delay|interval'
+  gsettings list-recursively | grep -i peripherals | grep -i mouse | grep -iE 'accel|speed'
+  gsettings list-recursively | grep -i terminal.legacy.profiles
+  gsettings list-recursively | grep -i terminal.legacy.settings
+}
+
+cmd-save() {
+  dconf dump /org/gnome/ \
+    | grep -v > "$DCONF_INI"
+}
+
+cmd-load() {
+  if ! [[ -f "$DCONF_INI" ]]; then
+    die "could not find settings file [settings_file=$DCONF_INI]"
+  fi
+  dconf load /org/gnome/ < "$DCONF_INI"
+}
+
+cmd=$1
+shift
+
+if [[ "$( declare -F | grep -oe "\bcmd-$cmd$" )" = "cmd-$cmd" ]] 2>/dev/null; then
+  eval "cmd-$cmd $*"
+else
+  printf "usage:\n"
+  declare -F | grep -e '\bcmd-' | awk '{ printf("\t%s %s\n", "'"$(basename "$0")"'", substr($3, 5)); }'
+  exit 1
+fi

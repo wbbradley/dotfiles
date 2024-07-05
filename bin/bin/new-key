@@ -1,0 +1,3 @@
+#!/bin/bash
+today="$(date '+%Y-%m-%d')"
+ssh-keygen -t ed25519 -f "$today-ed25519" -C 'wbbradley '"$today"' ed25519' -f ~/.ssh/"$today-ed25519"

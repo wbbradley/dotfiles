@@ -1,0 +1,28 @@
+#!/bin/bash
+die() {
+  echo "$0: '$*' failed" >&2
+  exit 1
+}
+
+# Define your repository URL
+repo_url="https://github.com/wbbradley/py-boiler.git"
+
+# Define your destination directory
+destination_dir="$1"
+if [[ -z "$destination_dir" ]]; then
+  die "missing new project dir"
+fi
+
+# Clone the repository without .git directory
+git clone --depth 1 --branch main "$repo_url" "$destination_dir"
+
+# Remove the .git directory
+rm -rf "$destination_dir/.git"
+
+echo "py-boiler cloned without .git directory into $destination_dir"
+cd "$destination_dir" || die "cd"
+git init . || die "git init"
+git add . || die "git add"
+git commit -am 'initial commit' || die "git commit"
+./setup-env
+echo "$0: created project in '$destination_dir'"

@@ -1,0 +1,11 @@
+#!/bin/bash
+root_dir="$HOME"/src/ai
+
+# shellcheck disable=SC1091
+. "$root_dir"/.env
+
+if command -v rlwrap 2>/dev/null >/dev/null; then
+  exec rlwrap "$root_dir"/.venv/bin/python "$root_dir"/main.py "$@"
+else
+  exec "$root_dir"/.venv/bin/python "$root_dir"/main.py "$@"
+fi
