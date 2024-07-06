@@ -53,7 +53,7 @@ end
 vim.cmd("colorscheme gruvbox")
 
 require('lspconfig').ruff.setup {
-  cmd = { ".venv/bin/ruff", "server", "--preview" },
+  cmd = { "ruff", "server", "--preview" },
 }
 
 local function keymap(mode, shortcut, command)
@@ -154,12 +154,9 @@ null_ls.setup({
   sources = {
     require("autoimport"),
     require("shellcheck"),
-    null_ls.builtins.formatting.isort.with {
-      command = ".venv/bin/isort",
-    },
-    null_ls.builtins.diagnostics.mypy.with {
-      command = ".venv/bin/mypy",
-    },
+    require("jsoncheck"),
+    null_ls.builtins.formatting.isort,
+    null_ls.builtins.diagnostics.mypy,
   }
 })
 
@@ -176,7 +173,7 @@ end)
 vim.cmd [[
 set encoding=utf-8
 " set undofile
-set undodir=~/.vim/undodir
+set undodir=~/.local/share/nvim/undodir
 set encoding=utf-8
 set number
 set noshowmode
@@ -206,7 +203,7 @@ set wildignore+=*.o
 set wildignore+=*.a
 set hidden
 set confirm
-set nocursorline
+set cursorline
 
 :autocmd VimResized * wincmd =
 
@@ -221,11 +218,6 @@ augroup python
 augroup END
 
 
-" let g:autoformat_verbosemode=1
-" let g:autoformat_autoindent = 0
-" let g:autoformat_retab = 0
-" let g:autoformat_remove_trailing_spaces = 1
-
 let g:EditorConfig_max_line_indicator = 'none'
 let g:ruby_indent_assignment_style = 'variable'
 " Turn on case-insensitive feature for EasyMotion
@@ -233,7 +225,7 @@ let g:EasyMotion_smartcase = 1
 nmap ] <Plug>(easymotion-prefix)
 nmap , <Plug>(easymotion-overwin-f)
 nmap <Space> :let @+=@0<CR>
-nmap gd #
+" nmap gd #
 " nnoremap <Esc> :helpclose<CR>:cclose<CR>:pclose<CR>:lclose<CR><Esc>
 nnoremap <C-h> <C-w>h
 nnoremap <C-j> <C-w>j
@@ -248,78 +240,7 @@ let g:vim_markdown_folding_disabled = 1
 set wildchar=<Tab> wildmenu wildmode=full
 set tabstop=2 softtabstop=2 expandtab shiftwidth=2 smarttab
 
-" let g:qf_modifiable = 1
-let g:hindent_on_save = 0
-" let g:hdevtools_stack = 1
-let g:python_pep8_indent_hang_indent = 4
-
-let g:lightline = get(g:, 'lightline', {})
-let g:lightline.component_expand = get(g:lightline, 'component_expand', {})
-let g:lightline.component_expand.linter_checking = 'lightline#ale#checking'
-let g:lightline.component_expand.linter_warnings = 'lightline#ale#warnings'
-let g:lightline.component_expand.linter_errors = 'lightline#ale#errors'
-let g:lightline.component_expand.linter_ok = 'lightline#ale#ok'
-
-let g:lightline.component_type = {
-      \     'tabs': 'tabsel',
-      \     'close': 'raw',
-      \     'linter_checking': 'left',
-      \     'linter_warnings': 'warning',
-      \     'linter_errors': 'error',
-      \     'linter_ok': 'left',
-      \ }
-
-let g:lightline.component_function = get(g:lightline, 'component_function', {})
-let g:lightline.component_function.filename = 'LightlineFilename'
-
-function! LightlineFilename()
-  return expand('%')
-endfunction
-
-let g:lightline.active = get(g:lightline, 'active', {})
-let g:lightline.active.right = [
-      \   [ 'lineinfo' ],
-		  \   [ 'fileformat', 'fileencoding', 'filetype' ],
-      \   [ 'linter_checking', 'linter_errors', 'linter_warnings', 'linter_ok' ]
-      \ ]
 let g:vimsyn_noerror = 1
-let g:ale_virtualenv_dir_names = ['.venv']
-let g:ale_completion_enabled = 0
-let g:ale_virtualtext_cursor = 2
-let g:ale_python_autoflake_executable = $PWD . '/env/bin/autoflake'
-let g:ale_python_autoflake_options = '--remove-all-unused-imports'
-let g:ale_python_mypy_executable = $PWD . '/env/bin/mypy'
-let b:ale_python_mypy_options = '--ignore-missing-imports'
-" let g:ale_python_mypy_options = system('printf "%s" "$LOCAL_MYPY_FLAGS"')
-let g:ale_python_isort_executable = $PWD . '/env/bin/isort'
-let g:ale_python_isort_options = '-l 100 --skip __init__.py --skip ipython.py'
-let g:ale_python_pylint_executable = $PWD . '/env/bin/pylint'
-let g:ale_python_black_executable = $PWD . '/env/bin/autopep8'
-let g:ale_python_autopep8_executable = $PWD . '/env/bin/autopep8'
-let g:ale_python_autopep8_options = '--max-line-length 100 --experimental -a'
-let g:ale_haskell_hls_executable = 'haskell-language-server-wrapper-1.7.0.0'
-let g:ale_python_pylint_change_directory = 0
-let g:ale_python_pylint_use_global = 0
-"  " 'isort', 'autoflake', 'autopep8', 'trim_whitespace']
-
-"let g:ale_fixers = {
-"      \   'python': ['autoimport', 'isort', 'ruff_format', 'ruff', 'trim_whitespace']
-"      \ , 'cpp': ['clang-format']
-"      \ , 'c': ['clang-format']
-"      \ , 'proto': ['clang-format', 'protolint', 'buf-format']
-"      \ , 'rust': ['rustfmt', 'trim_whitespace', 'remove_trailing_lines']
-"      \ , 'haskell': ['hfmt']
-"      \ }
-"let g:ale_rust_cargo_use_clippy = 1
-"let g:ale_rust_rustfmt_options = '--edition 2021'
-"let g:ale_fix_on_save = 1
-"let g:ale_linters = {
-"      \   'haskell': ['hls']
-"      \ , 'python': ['ruff', 'mypy']
-"      \ , 'javascript': []
-"      \ , 'rust': ['cargo']
-"      \ }
-" let g:ale_rust_rls_toolchain = 'nightly'
 
 augroup dot
   autocmd!
@@ -337,23 +258,9 @@ augroup END
 " FZF UI version of search.
 command! -bang -nargs=* GGrep
   \ call fzf#vim#grep(
-  \   'git grep --line-number -- '.shellescape(<q-args>).' | grep -v -e dist/ -e static/ -e ".bundle:" -e "mobile/assets/.*\.js"', 0,
+  \   'git grep --line-number -- '.shellescape(<q-args>).' | grep -v -e dist/ -e static/ -e ".bundle:" -e "mobile/assets/.*\.js"',
+  \   0,
   \   fzf#vim#with_preview({'dir': systemlist('git rev-parse --show-toplevel')[0]}), <bang>0)
-
-let g:multi_cursor_exit_from_insert_mode=1
-let g:multi_cursor_exit_from_visual_mode=1
-let g:gitgutter_max_signs = 2000
-
-let g:airline#extensions#ale#enabled = 1
-let g:airline_powerline_fonts = 0
-" let g:airline_section_z = ''
-" let g:airline_section_warning = ''
-
-let g:gitgutter_escape_grep = 1
-let g:gitgutter_eager = 0
-
-let g:pyindent_open_paren = '&sw'
-let g:pyindent_continue = '&sw'
 
 " let g:go_version_warning = 0
 " let g:go_highlight_build_constraints = 1
@@ -361,12 +268,6 @@ let g:go_fmt_command = "goimports"
 let g:go_def_mode='gopls'
 " let g:go_info_mode='gopls'
 " let g:go_fmt_fail_silently = 0
-
-let g:fzf_preview_window = ['up:50%', 'ctrl-/']
-" imap <c-n> <plug>(fzf-complete-word)
-imap <c-l> <plug>(fzf-complete-line)
-
-let g:go_decls_mode = 'fzf'
 
 " let g:go_def_mapping_enabled = 1
 " let g:go_doc_keywordprg_enabled = 0
@@ -788,6 +689,7 @@ augroup filetypedetect
 augroup END
 
 augroup Python
+  autocmd FileType python setlocal sw=4 sts=4 ts=4 expandtab
   autocmd FileType python setlocal sw=4 sts=4 ts=4 expandtab
   autocmd BufWritePre *.py lua vim.lsp.buf.format()
 augroup END
