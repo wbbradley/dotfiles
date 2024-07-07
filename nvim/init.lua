@@ -16,8 +16,10 @@ if not (vim.uv or vim.loop).fs_stat(lazypath) then
 end
 vim.opt.rtp:prepend(lazypath)
 
+-- packages
 local lazy_plugins = {
   "folke/trouble.nvim",
+  "nvim-lualine/lualine.nvim",
   "jremmen/vim-ripgrep",
   {
     "ibhagwan/fzf-lua",
@@ -28,8 +30,8 @@ local lazy_plugins = {
         fzf_opts = {
           ['--layout'] = 'default',
         }
-       -- cmd = "git grep --line-number --column --color=always",
-     })
+        -- cmd = "git grep --line-number --column --color=always",
+      })
     end
   },
   "nvimtools/none-ls.nvim",
@@ -48,13 +50,33 @@ local lazy_plugins = {
 if vim.g.lazy_loaded == nil then
   require("lazy").setup(lazy_plugins, {})
   vim.g.lazy_loaded = true
-end 
+end
 
 vim.cmd("colorscheme gruvbox")
+local dead_code = [[
+local lsp_status = require('lsp-status')
+lsp_status.register_progress()
 
-require('lspconfig').ruff.setup {
+local lspconfig = require('lspconfig')
+lspconfig.ruff.setup {
   cmd = { "ruff", "server", "--preview" },
+  on_attach = lsp_status.on_attach,
+  capabilities = lsp_status.capabilities,
 }
+lspconfig.rust_analyzer.setup {
+  on_attach = lsp_status.on_attach,
+  capabilities = lsp_status.capabilities,
+}
+
+vim.cmd [[
+  function! LspStatus() abort
+    if luaeval('#vim.lsp.bug_get_clients() > 0')
+      return luaeval("require('lsp-status').status()")
+    endif
+    return ''
+  endfunction
+\]\]
+]]
 
 local function keymap(mode, shortcut, command)
   vim.keymap.set(mode, shortcut, command, { noremap = true, silent = true })
@@ -72,14 +94,9 @@ local function imap(shortcut, command)
   keymap("i", shortcut, command)
 end
 
-local nvim_lua_init_path = "${HOME}/.config/home-manager/nvim/init.lua"
-nmap("<Leader>ne", ":edit" .. nvim_lua_init_path .. "<CR>")
-nmap("<Leader>nr", ":luafile" .. nvim_lua_init_path .. "<CR>")
--- nmap("<C-o>", ":Telescope buffers<CR>")
-nmap('M', '<cmd>Telescope oldfiles<CR>')
+nmap('M', ':FzfLua oldfiles<CR>')
 nmap("<C-p>", ":FzfLua git_files<CR>")
 nmap("E", ':lua require("fzf-lua").live_grep()')
-nmap("<C-x>", function() print("hello") end)
 nmap("vv", "viw")
 
 -- AI setup
@@ -92,8 +109,8 @@ vmap("<M-k>", ":AI<CR>")
 
 -- Treesitter
 require("treesitter-context").setup {
-  -- mode = 'cursor'
-  mode = 'topline',
+  mode = 'cursor'
+  -- mode = 'topline',
 }
 vim.cmd [[
   hi TreesitterContextBottom gui=underline guisp=Grey
@@ -262,29 +279,6 @@ command! -bang -nargs=* GGrep
   \   0,
   \   fzf#vim#with_preview({'dir': systemlist('git rev-parse --show-toplevel')[0]}), <bang>0)
 
-" let g:go_version_warning = 0
-" let g:go_highlight_build_constraints = 1
-let g:go_fmt_command = "goimports"
-let g:go_def_mode='gopls'
-" let g:go_info_mode='gopls'
-" let g:go_fmt_fail_silently = 0
-
-" let g:go_def_mapping_enabled = 1
-" let g:go_doc_keywordprg_enabled = 0
-" let g:go_fmt_command = 'goimports'
-" let g:go_fmt_fail_silently = 1
-" let g:go_code_completion_enabled = 1
-let g:go_list_type = 'quickfix'
-" let g:go_highlight_build_constraints = 1
-" let g:go_highlight_generate_tags = 1
-" let g:go_highlight_functions = 1
-" let g:go_highlight_function_calls = 1
-" let g:go_highlight_operators = 1
-" let g:go_statusline_duration = 10000
-
-let g:vim_json_syntax_conceal = 0
-let g:jsx_ext_required = 0
-
 " Make the quickfix window take up the entirety of the bottom of the window
 " when it opens
 autocmd FileType qf wincmd J
@@ -327,6 +321,16 @@ endfunction
 
 command! Bclosehidden call CloseCleanHiddenBuffers()
 autocmd BufWritePost * :Bclosehidden
+
+function! s:trim_trailing_whitespace() abort
+  let l:view = winsaveview()
+  keeppatterns %substitute/\m\s\+$//e
+  call winrestview(l:view)
+endfunction
+augroup trim_spaces
+  autocmd!
+  autocmd BufWritePre * call <SID>trim_trailing_whitespace()
+augroup END
 
 autocmd FileType gitcommit setlocal textwidth=71
 autocmd FileType config setlocal tabstop=2 softtabstop=0 expandtab shiftwidth=2 smarttab
@@ -415,7 +419,7 @@ nmap Q VQ
 
 nmap <Leader><Leader> va}=
 " nnoremap <expr> <C-p> (len(system('git -C ' . expand('%:p:h') . ' rev-parse' )) ? (':Files ' . expand('%:p:h')) : ':GFiles')."\<cr>"
-nmap B :Buffers<CR>
+nmap B :FzfLua buffers<CR>
 " nmap M :History<CR>
 nmap <CR><CR> :!<CR>
 
@@ -494,11 +498,6 @@ function! FindTagUnderCursor()
   execute "Tags " . str
 endfunction
 
-command! -nargs=1 LiveGrep lua require('telescope.builtin').live_grep({ default_text = <f-args> })
-command! -nargs=1 Tags lua require('telescope.builtin').tags({ default_text = <f-args> })
-command! AllTags lua require('telescope.builtin').tags()
-command! Buffers lua require('telescope.builtin').buffers()
-
 function! FindWordUnderCursorNoUI()
   let str = expand("<cword>")
   if str == ""
@@ -562,7 +561,7 @@ nnoremap <leader>f :call FindPromptRaw()<CR>
 " nnoremap F :call FindPromptFzf()<CR>
 nnoremap E :call FindPromptDirect()<CR>
 nnoremap <leader>g :w<CR>:!git add %<CR>
-nnoremap T :AllTags<CR>
+nnoremap T :FzfLua tags<CR>
 nnoremap g] :call FindTagUnderCursor()<CR>
 
 map <F5> :echo "hi<" . synIDattr(synID(line("."),col("."),1),"name") . '> trans<' . synIDattr(synID(line("."),col("."),0),"name") . "> lo<" . synIDattr(synIDtrans(synID(line("."),col("."),1)),"name") . ">"<CR>
@@ -762,7 +761,12 @@ let g:context_add_mappings = 0
 " hi Search guifg=#090819 guibg=#047943
 " hi SpellBad guifg=NONE guibg=#660a0a guisp=NONE gui=NONE cterm=NONE
 " hi SpellCap guibg=#a58545 guifg=NONE guisp=NONE gui=NONE cterm=NONE
-" hi MatchParen guifg=#ccccc1 guibg=#5555cc 
+" hi MatchParen guifg=#ccccc1 guibg=#5555cc
 " hi markdownItalic term=bold cterm=bold ctermfg=220 gui=bold guifg=#ffd700
 " hi rustCommentLine guifg=#555555
 ]]
+
+require('lualine').setup({
+  extenstion = { 'fzf', 'lazy', 'quickfix' }
+})
+require('editorconfig').properties.trim_trailing_whitespace = true
