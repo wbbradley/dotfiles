@@ -53,30 +53,6 @@ if vim.g.lazy_loaded == nil then
 end
 
 vim.cmd("colorscheme gruvbox")
-local dead_code = [[
-local lsp_status = require('lsp-status')
-lsp_status.register_progress()
-
-local lspconfig = require('lspconfig')
-lspconfig.ruff.setup {
-  cmd = { "ruff", "server", "--preview" },
-  on_attach = lsp_status.on_attach,
-  capabilities = lsp_status.capabilities,
-}
-lspconfig.rust_analyzer.setup {
-  on_attach = lsp_status.on_attach,
-  capabilities = lsp_status.capabilities,
-}
-
-vim.cmd [[
-  function! LspStatus() abort
-    if luaeval('#vim.lsp.bug_get_clients() > 0')
-      return luaeval("require('lsp-status').status()")
-    endif
-    return ''
-  endfunction
-\]\]
-]]
 
 local function keymap(mode, shortcut, command)
   vim.keymap.set(mode, shortcut, command, { noremap = true, silent = true })
@@ -177,6 +153,14 @@ null_ls.setup({
   }
 })
 
+-- Put ruff after isort and autoimport to ensure proper formatting.
+local lspconfig = require('lspconfig')
+lspconfig.ruff.setup {
+  cmd = { "ruff", "server", "--preview" },
+}
+lspconfig.rust_analyzer.setup {
+}
+
 vim.keymap.set('n', "F", function()
   require("fzf-lua").live_grep({
     cmd = "git grep --line-number --column --color=always"
@@ -228,19 +212,6 @@ augroup sql
   autocmd FileType sql setlocal makeprg=pgsanity\ %
 augroup END
 
-augroup python
-  autocmd FileType python nmap <buffer> <F8> :Autoformat<CR>
-  autocmd FileType python setlocal textwidth=100
-  autocmd FileType python vmap <buffer> <leader>r creveal_type(<Esc>pa)<Esc>
-augroup END
-
-
-let g:EditorConfig_max_line_indicator = 'none'
-let g:ruby_indent_assignment_style = 'variable'
-" Turn on case-insensitive feature for EasyMotion
-let g:EasyMotion_smartcase = 1
-nmap ] <Plug>(easymotion-prefix)
-nmap , <Plug>(easymotion-overwin-f)
 nmap <Space> :let @+=@0<CR>
 " nmap gd #
 " nnoremap <Esc> :helpclose<CR>:cclose<CR>:pclose<CR>:lclose<CR><Esc>
@@ -587,11 +558,8 @@ nnoremap <leader>w :wa<CR>
 nnoremap <leader>v <C-w>v<C-w>l<C-w>n<C-w>h
 
 nnoremap <leader>90 :e ~/.config/nvim/init.lua<CR>
-nnoremap <leader>9o :e ~/.vimrc<CR>
-nnoremap <leader>91 :e ~/local.vimrc<CR>
 nnoremap <leader>92 :e ~/.bashrc<CR>
 nnoremap <leader>93 :e ~/local.bashrc<CR>
-nnoremap <leader>9x :e ~/.xmonad/xmonad.hs<CR>:vsplit<CR>:e ~/.config/xmobar/xmobar.config<CR>:set ft=haskell<CR>
 nnoremap <leader>i Oimport ipdb<CR>ipdb.set_trace()<Esc>j_
 nnoremap <leader>p Oimport pdb<CR>pdb.set_trace()<Esc>j_
 
@@ -723,8 +691,8 @@ filetype indent on
 
 " hi ColorColumn ctermfg=blue ctermbg=darkgray guibg=#333333 guifg=#1111bb cterm=NONE
 augroup python
-  autocmd FileType python setlocal textwidth=100
-  autocmd FileType python setlocal colorcolumn=100,101,102,103
+  autocmd FileType python setlocal textwidth=110
+  autocmd FileType python setlocal colorcolumn=110,111,112,113
   " autocmd FileType python nnoremap L :ALENextWrap<CR>:ALEDetail<CR><C-w><C-p>
   " autocmd FileType python nnoremap H :ALEPreviousWrap<CR>:ALEDetail<CR><C-w><C-p>
 augroup END
@@ -769,4 +737,3 @@ let g:context_add_mappings = 0
 require('lualine').setup({
   extenstion = { 'fzf', 'lazy', 'quickfix' }
 })
-require('editorconfig').properties.trim_trailing_whitespace = true
