@@ -1,0 +1,19 @@
+#!/bin/bash
+
+if [ $# -ne 2 ]; then
+    echo "Usage: $0 <search_string> <replace_string>"
+    exit 1
+fi
+
+search_string="$1"
+replace_string="$2"
+
+git ls-files | while read -r file; do
+    if [[ "$file" == *"$search_string"* ]]; then
+        new_name="${file//$search_string/$replace_string}"
+        git mv "$file" "$new_name"
+        echo "Renamed: $file -> $new_name"
+    fi
+done
+
+echo "Renaming complete. Don't forget to commit the changes!"

@@ -51,7 +51,7 @@ fi
 if ! [[ -x "$envdir"/bin/uv ]]; then
   # Ensure that uv is installed.
   dbg "installing uv"
-  "$envdir"/bin/python -mpip install -U uv || die "installing uv"
+  "$envdir"/bin/python -mpip install -U uv pyyaml types-PyYAML || die "installing uv"
 fi
 
 if ! [[ -x "$envdir"/bin/"$raw_toolname" ]]; then
