@@ -14,7 +14,7 @@ return h.make_builtin({
     method = { FORMATTING },
     filetypes = { "python" },
     generator_opts = {
-        command = ".venv/bin/autoimport",
+        command = "autoimport",
         args = function(params)
             assert(params.method == FORMATTING)
             return { "-" }

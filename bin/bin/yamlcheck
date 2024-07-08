@@ -1,0 +1,27 @@
+#!/Users/wbbradley/.bootstrappy/bin/python
+import yaml
+import sys
+import argparse
+
+
+def main()->None:
+    parser = argparse.ArgumentParser("yamlcheck")
+    parser.add_argument("--stdin-filename", default="stdin")
+    parser.add_argument("filename", nargs="?", default="-")
+    args = parser.parse_args()
+
+    if args.filename == "-":
+        file = sys.stdin
+        filename = args.stdin_filename
+    else:
+        file = open(args.filename)
+        filename = args.filename
+
+    try:
+        yaml.safe_load(file)
+    except yaml.scanner.ScannerError as e:
+        sys.exit(f"{filename}:{e.context_mark.line+1}:{e.context_mark.column+1}: {e.problem}")
+
+
+if __name__ == "__main__":
+    main()

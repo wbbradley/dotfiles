@@ -16,8 +16,10 @@ if not (vim.uv or vim.loop).fs_stat(lazypath) then
 end
 vim.opt.rtp:prepend(lazypath)
 
+-- packages
 local lazy_plugins = {
   "folke/trouble.nvim",
+  "nvim-lualine/lualine.nvim",
   "jremmen/vim-ripgrep",
   {
     "ibhagwan/fzf-lua",
@@ -28,8 +30,8 @@ local lazy_plugins = {
         fzf_opts = {
           ['--layout'] = 'default',
         }
-       -- cmd = "git grep --line-number --column --color=always",
-     })
+        -- cmd = "git grep --line-number --column --color=always",
+      })
     end
   },
   "nvimtools/none-ls.nvim",
@@ -48,13 +50,9 @@ local lazy_plugins = {
 if vim.g.lazy_loaded == nil then
   require("lazy").setup(lazy_plugins, {})
   vim.g.lazy_loaded = true
-end 
+end
 
 vim.cmd("colorscheme gruvbox")
-
-require('lspconfig').ruff.setup {
-  cmd = { ".venv/bin/ruff", "server", "--preview" },
-}
 
 local function keymap(mode, shortcut, command)
   vim.keymap.set(mode, shortcut, command, { noremap = true, silent = true })
@@ -72,14 +70,9 @@ local function imap(shortcut, command)
   keymap("i", shortcut, command)
 end
 
-local nvim_lua_init_path = "${HOME}/.config/home-manager/nvim/init.lua"
-nmap("<Leader>ne", ":edit" .. nvim_lua_init_path .. "<CR>")
-nmap("<Leader>nr", ":luafile" .. nvim_lua_init_path .. "<CR>")
--- nmap("<C-o>", ":Telescope buffers<CR>")
-nmap('M', '<cmd>Telescope oldfiles<CR>')
+nmap('M', ':FzfLua oldfiles<CR>')
 nmap("<C-p>", ":FzfLua git_files<CR>")
 nmap("E", ':lua require("fzf-lua").live_grep()')
-nmap("<C-x>", function() print("hello") end)
 nmap("vv", "viw")
 
 -- AI setup
@@ -92,8 +85,8 @@ vmap("<M-k>", ":AI<CR>")
 
 -- Treesitter
 require("treesitter-context").setup {
-  -- mode = 'cursor'
-  mode = 'topline',
+  mode = 'cursor'
+  -- mode = 'topline',
 }
 vim.cmd [[
   hi TreesitterContextBottom gui=underline guisp=Grey
@@ -151,17 +144,24 @@ vim.g.laststatus = 2
 
 local null_ls = require("null-ls")
 null_ls.setup({
+  autostart = true,
   sources = {
     require("autoimport"),
     require("shellcheck"),
-    null_ls.builtins.formatting.isort.with {
-      command = ".venv/bin/isort",
-    },
-    null_ls.builtins.diagnostics.mypy.with {
-      command = ".venv/bin/mypy",
-    },
+    require("jsoncheck"),
+    require("yamlcheck"),
+    null_ls.builtins.diagnostics.mypy,
+    null_ls.builtins.formatting.isort,
   }
 })
+
+-- Put ruff after isort and autoimport to ensure proper formatting.
+local lspconfig = require('lspconfig')
+lspconfig.ruff.setup {
+  cmd = { "ruff", "server", "--preview" },
+}
+lspconfig.rust_analyzer.setup {
+}
 
 vim.keymap.set('n', "F", function()
   require("fzf-lua").live_grep({
@@ -173,10 +173,18 @@ vim.keymap.set('n', "<F3>", function()
     cmd = "git grep --line-number --column --color=always"
   })
 end)
+
+local function search_tags_filtered()
+  local current_word = vim.fn.expand("<cword>")
+  require('fzf-lua').tags({ fzf_opts = { ['--query'] = current_word } })
+end
+
+nmap('g]', "<cmd>lua require('fzf-lua').tags({ fzf_opts = { ['--query'] = vim.fn.expand('<cword>') } })<CR>")
+
 vim.cmd [[
 set encoding=utf-8
 " set undofile
-set undodir=~/.vim/undodir
+set undodir=~/.local/share/nvim/undodir
 set encoding=utf-8
 set number
 set noshowmode
@@ -206,7 +214,7 @@ set wildignore+=*.o
 set wildignore+=*.a
 set hidden
 set confirm
-set nocursorline
+set cursorline
 
 :autocmd VimResized * wincmd =
 
@@ -214,26 +222,8 @@ augroup sql
   autocmd FileType sql setlocal makeprg=pgsanity\ %
 augroup END
 
-augroup python
-  autocmd FileType python nmap <buffer> <F8> :Autoformat<CR>
-  autocmd FileType python setlocal textwidth=100
-  autocmd FileType python vmap <buffer> <leader>r creveal_type(<Esc>pa)<Esc>
-augroup END
-
-
-" let g:autoformat_verbosemode=1
-" let g:autoformat_autoindent = 0
-" let g:autoformat_retab = 0
-" let g:autoformat_remove_trailing_spaces = 1
-
-let g:EditorConfig_max_line_indicator = 'none'
-let g:ruby_indent_assignment_style = 'variable'
-" Turn on case-insensitive feature for EasyMotion
-let g:EasyMotion_smartcase = 1
-nmap ] <Plug>(easymotion-prefix)
-nmap , <Plug>(easymotion-overwin-f)
 nmap <Space> :let @+=@0<CR>
-nmap gd #
+" nmap gd #
 " nnoremap <Esc> :helpclose<CR>:cclose<CR>:pclose<CR>:lclose<CR><Esc>
 nnoremap <C-h> <C-w>h
 nnoremap <C-j> <C-w>j
@@ -248,78 +238,7 @@ let g:vim_markdown_folding_disabled = 1
 set wildchar=<Tab> wildmenu wildmode=full
 set tabstop=2 softtabstop=2 expandtab shiftwidth=2 smarttab
 
-" let g:qf_modifiable = 1
-let g:hindent_on_save = 0
-" let g:hdevtools_stack = 1
-let g:python_pep8_indent_hang_indent = 4
-
-let g:lightline = get(g:, 'lightline', {})
-let g:lightline.component_expand = get(g:lightline, 'component_expand', {})
-let g:lightline.component_expand.linter_checking = 'lightline#ale#checking'
-let g:lightline.component_expand.linter_warnings = 'lightline#ale#warnings'
-let g:lightline.component_expand.linter_errors = 'lightline#ale#errors'
-let g:lightline.component_expand.linter_ok = 'lightline#ale#ok'
-
-let g:lightline.component_type = {
-      \     'tabs': 'tabsel',
-      \     'close': 'raw',
-      \     'linter_checking': 'left',
-      \     'linter_warnings': 'warning',
-      \     'linter_errors': 'error',
-      \     'linter_ok': 'left',
-      \ }
-
-let g:lightline.component_function = get(g:lightline, 'component_function', {})
-let g:lightline.component_function.filename = 'LightlineFilename'
-
-function! LightlineFilename()
-  return expand('%')
-endfunction
-
-let g:lightline.active = get(g:lightline, 'active', {})
-let g:lightline.active.right = [
-      \   [ 'lineinfo' ],
-		  \   [ 'fileformat', 'fileencoding', 'filetype' ],
-      \   [ 'linter_checking', 'linter_errors', 'linter_warnings', 'linter_ok' ]
-      \ ]
 let g:vimsyn_noerror = 1
-let g:ale_virtualenv_dir_names = ['.venv']
-let g:ale_completion_enabled = 0
-let g:ale_virtualtext_cursor = 2
-let g:ale_python_autoflake_executable = $PWD . '/env/bin/autoflake'
-let g:ale_python_autoflake_options = '--remove-all-unused-imports'
-let g:ale_python_mypy_executable = $PWD . '/env/bin/mypy'
-let b:ale_python_mypy_options = '--ignore-missing-imports'
-" let g:ale_python_mypy_options = system('printf "%s" "$LOCAL_MYPY_FLAGS"')
-let g:ale_python_isort_executable = $PWD . '/env/bin/isort'
-let g:ale_python_isort_options = '-l 100 --skip __init__.py --skip ipython.py'
-let g:ale_python_pylint_executable = $PWD . '/env/bin/pylint'
-let g:ale_python_black_executable = $PWD . '/env/bin/autopep8'
-let g:ale_python_autopep8_executable = $PWD . '/env/bin/autopep8'
-let g:ale_python_autopep8_options = '--max-line-length 100 --experimental -a'
-let g:ale_haskell_hls_executable = 'haskell-language-server-wrapper-1.7.0.0'
-let g:ale_python_pylint_change_directory = 0
-let g:ale_python_pylint_use_global = 0
-"  " 'isort', 'autoflake', 'autopep8', 'trim_whitespace']
-
-"let g:ale_fixers = {
-"      \   'python': ['autoimport', 'isort', 'ruff_format', 'ruff', 'trim_whitespace']
-"      \ , 'cpp': ['clang-format']
-"      \ , 'c': ['clang-format']
-"      \ , 'proto': ['clang-format', 'protolint', 'buf-format']
-"      \ , 'rust': ['rustfmt', 'trim_whitespace', 'remove_trailing_lines']
-"      \ , 'haskell': ['hfmt']
-"      \ }
-"let g:ale_rust_cargo_use_clippy = 1
-"let g:ale_rust_rustfmt_options = '--edition 2021'
-"let g:ale_fix_on_save = 1
-"let g:ale_linters = {
-"      \   'haskell': ['hls']
-"      \ , 'python': ['ruff', 'mypy']
-"      \ , 'javascript': []
-"      \ , 'rust': ['cargo']
-"      \ }
-" let g:ale_rust_rls_toolchain = 'nightly'
 
 augroup dot
   autocmd!
@@ -328,8 +247,6 @@ augroup END
 
 augroup Haskell
   autocmd!
-  autocmd FileType haskell nnoremap <buffer> <leader>? :call ale#cursor#ShowCursorDetail()<cr>
-  autocmd FileType haskell nnoremap <buffer> <C-]> :ALEGoToDefinition<CR>
   " autocmd FileType haskell nnoremap <buffer> <Leader>ht :GhcModType<cr>
   " autocmd FileType haskell nnoremap <buffer> <Leader>htc :GhcModTypeClear<cr>
 augroup END
@@ -337,52 +254,9 @@ augroup END
 " FZF UI version of search.
 command! -bang -nargs=* GGrep
   \ call fzf#vim#grep(
-  \   'git grep --line-number -- '.shellescape(<q-args>).' | grep -v -e dist/ -e static/ -e ".bundle:" -e "mobile/assets/.*\.js"', 0,
+  \   'git grep --line-number -- '.shellescape(<q-args>).' | grep -v -e dist/ -e static/ -e ".bundle:" -e "mobile/assets/.*\.js"',
+  \   0,
   \   fzf#vim#with_preview({'dir': systemlist('git rev-parse --show-toplevel')[0]}), <bang>0)
-
-let g:multi_cursor_exit_from_insert_mode=1
-let g:multi_cursor_exit_from_visual_mode=1
-let g:gitgutter_max_signs = 2000
-
-let g:airline#extensions#ale#enabled = 1
-let g:airline_powerline_fonts = 0
-" let g:airline_section_z = ''
-" let g:airline_section_warning = ''
-
-let g:gitgutter_escape_grep = 1
-let g:gitgutter_eager = 0
-
-let g:pyindent_open_paren = '&sw'
-let g:pyindent_continue = '&sw'
-
-" let g:go_version_warning = 0
-" let g:go_highlight_build_constraints = 1
-let g:go_fmt_command = "goimports"
-let g:go_def_mode='gopls'
-" let g:go_info_mode='gopls'
-" let g:go_fmt_fail_silently = 0
-
-let g:fzf_preview_window = ['up:50%', 'ctrl-/']
-" imap <c-n> <plug>(fzf-complete-word)
-imap <c-l> <plug>(fzf-complete-line)
-
-let g:go_decls_mode = 'fzf'
-
-" let g:go_def_mapping_enabled = 1
-" let g:go_doc_keywordprg_enabled = 0
-" let g:go_fmt_command = 'goimports'
-" let g:go_fmt_fail_silently = 1
-" let g:go_code_completion_enabled = 1
-let g:go_list_type = 'quickfix'
-" let g:go_highlight_build_constraints = 1
-" let g:go_highlight_generate_tags = 1
-" let g:go_highlight_functions = 1
-" let g:go_highlight_function_calls = 1
-" let g:go_highlight_operators = 1
-" let g:go_statusline_duration = 10000
-
-let g:vim_json_syntax_conceal = 0
-let g:jsx_ext_required = 0
 
 " Make the quickfix window take up the entirety of the bottom of the window
 " when it opens
@@ -426,6 +300,16 @@ endfunction
 
 command! Bclosehidden call CloseCleanHiddenBuffers()
 autocmd BufWritePost * :Bclosehidden
+
+function! s:trim_trailing_whitespace() abort
+  let l:view = winsaveview()
+  keeppatterns %substitute/\m\s\+$//e
+  call winrestview(l:view)
+endfunction
+augroup trim_spaces
+  autocmd!
+  autocmd BufWritePre * call <SID>trim_trailing_whitespace()
+augroup END
 
 autocmd FileType gitcommit setlocal textwidth=71
 autocmd FileType config setlocal tabstop=2 softtabstop=0 expandtab shiftwidth=2 smarttab
@@ -474,6 +358,7 @@ nnoremap <Leader>1 :e ~/README.md<CR>Go<Esc>:r!date<CR>:set paste<CR>o
 nnoremap <Leader>2 :e ~/github.txt<CR>Go<Esc>:r!date<CR>o
 nnoremap <Leader>c :%s/\<<C-r><C-w>\>/
 vnoremap <Leader>c "hy:%s/<C-r>h/
+vnoremap <Leader>x :!chmod +x %<CR>
 vnoremap <Leader>/ :Commentary<CR>
 nnoremap <Leader>P :set paste<CR>p:set nopaste<CR>
 vnoremap % :%s/
@@ -514,7 +399,7 @@ nmap Q VQ
 
 nmap <Leader><Leader> va}=
 " nnoremap <expr> <C-p> (len(system('git -C ' . expand('%:p:h') . ' rev-parse' )) ? (':Files ' . expand('%:p:h')) : ':GFiles')."\<cr>"
-nmap B :Buffers<CR>
+nmap B :FzfLua buffers<CR>
 " nmap M :History<CR>
 nmap <CR><CR> :!<CR>
 
@@ -584,20 +469,6 @@ function! FindWordUnderCursor()
   execute "LiveGrep " . str
 endfunction
 
-function! FindTagUnderCursor()
-  let str = expand("<cword>")
-  if str == ""
-    return
-  endif
-
-  execute "Tags " . str
-endfunction
-
-command! -nargs=1 LiveGrep lua require('telescope.builtin').live_grep({ default_text = <f-args> })
-command! -nargs=1 Tags lua require('telescope.builtin').tags({ default_text = <f-args> })
-command! AllTags lua require('telescope.builtin').tags()
-command! Buffers lua require('telescope.builtin').buffers()
-
 function! FindWordUnderCursorNoUI()
   let str = expand("<cword>")
   if str == ""
@@ -661,8 +532,7 @@ nnoremap <leader>f :call FindPromptRaw()<CR>
 " nnoremap F :call FindPromptFzf()<CR>
 nnoremap E :call FindPromptDirect()<CR>
 nnoremap <leader>g :w<CR>:!git add %<CR>
-nnoremap T :AllTags<CR>
-nnoremap g] :call FindTagUnderCursor()<CR>
+nnoremap T :FzfLua tags<CR>
 
 map <F5> :echo "hi<" . synIDattr(synID(line("."),col("."),1),"name") . '> trans<' . synIDattr(synID(line("."),col("."),0),"name") . "> lo<" . synIDattr(synIDtrans(synID(line("."),col("."),1)),"name") . ">"<CR>
 nnoremap <leader>b :Buffers<CR>
@@ -687,11 +557,8 @@ nnoremap <leader>w :wa<CR>
 nnoremap <leader>v <C-w>v<C-w>l<C-w>n<C-w>h
 
 nnoremap <leader>90 :e ~/.config/nvim/init.lua<CR>
-nnoremap <leader>9o :e ~/.vimrc<CR>
-nnoremap <leader>91 :e ~/local.vimrc<CR>
 nnoremap <leader>92 :e ~/.bashrc<CR>
 nnoremap <leader>93 :e ~/local.bashrc<CR>
-nnoremap <leader>9x :e ~/.xmonad/xmonad.hs<CR>:vsplit<CR>:e ~/.config/xmobar/xmobar.config<CR>:set ft=haskell<CR>
 nnoremap <leader>i Oimport ipdb<CR>ipdb.set_trace()<Esc>j_
 nnoremap <leader>p Oimport pdb<CR>pdb.set_trace()<Esc>j_
 
@@ -780,7 +647,6 @@ autocmd BufRead,BufNewFile *.md setlocal textwidth=100 expandtab nocindent autoi
 autocmd FileType conf setlocal expandtab sw=2 sts=2 smartindent
 autocmd FileType sh setlocal expandtab sw=2 sts=2 ts=2 expandtab smartindent
 autocmd FileType qf nmap <buffer> <Esc> :close<CR>
-autocmd FileType ale-preview nmap <buffer> <Esc> :close<CR>
 
 augroup filetypedetect
     au! BufRead,BufNewFile *.pyi setfiletype python
@@ -788,6 +654,7 @@ augroup filetypedetect
 augroup END
 
 augroup Python
+  autocmd FileType python setlocal sw=4 sts=4 ts=4 expandtab
   autocmd FileType python setlocal sw=4 sts=4 ts=4 expandtab
   autocmd BufWritePre *.py lua vim.lsp.buf.format()
 augroup END
@@ -822,10 +689,8 @@ filetype indent on
 
 " hi ColorColumn ctermfg=blue ctermbg=darkgray guibg=#333333 guifg=#1111bb cterm=NONE
 augroup python
-  autocmd FileType python setlocal textwidth=100
-  autocmd FileType python setlocal colorcolumn=100,101,102,103
-  " autocmd FileType python nnoremap L :ALENextWrap<CR>:ALEDetail<CR><C-w><C-p>
-  " autocmd FileType python nnoremap H :ALEPreviousWrap<CR>:ALEDetail<CR><C-w><C-p>
+  autocmd FileType python setlocal textwidth=110
+  " autocmd FileType python setlocal colorcolumn=110,111,112,113
 augroup END
 
 " hi! MatchParen cterm=NONE,bold gui=NONE,bold guibg=#eee8d5 guifg=NONE
@@ -840,8 +705,8 @@ endif
 silent! source local.vimrc
 
 nnoremap - _
-nnoremap L :lnext<CR>
-nnoremap H :lprev<CR>
+nnoremap L :lua vim.diagnostic.goto_next()<CR>
+nnoremap H :lua vim.diagnostic.goto_prev()<CR>
 nnoremap <F9> :cprev<CR>
 nnoremap <F10> :cnext<CR>
 
@@ -860,7 +725,11 @@ let g:context_add_mappings = 0
 " hi Search guifg=#090819 guibg=#047943
 " hi SpellBad guifg=NONE guibg=#660a0a guisp=NONE gui=NONE cterm=NONE
 " hi SpellCap guibg=#a58545 guifg=NONE guisp=NONE gui=NONE cterm=NONE
-" hi MatchParen guifg=#ccccc1 guibg=#5555cc 
+" hi MatchParen guifg=#ccccc1 guibg=#5555cc
 " hi markdownItalic term=bold cterm=bold ctermfg=220 gui=bold guifg=#ffd700
 " hi rustCommentLine guifg=#555555
 ]]
+
+require('lualine').setup({
+  extenstion = { 'fzf', 'lazy', 'quickfix' }
+})
