@@ -144,12 +144,14 @@ vim.g.laststatus = 2
 
 local null_ls = require("null-ls")
 null_ls.setup({
+  autostart = true,
   sources = {
     require("autoimport"),
     require("shellcheck"),
     require("jsoncheck"),
-    null_ls.builtins.formatting.isort,
+    require("yamlcheck"),
     null_ls.builtins.diagnostics.mypy,
+    null_ls.builtins.formatting.isort,
   }
 })
 
@@ -171,6 +173,14 @@ vim.keymap.set('n', "<F3>", function()
     cmd = "git grep --line-number --column --color=always"
   })
 end)
+
+local function search_tags_filtered()
+  local current_word = vim.fn.expand("<cword>")
+  require('fzf-lua').tags({ fzf_opts = { ['--query'] = current_word } })
+end
+
+nmap('g]', "<cmd>lua require('fzf-lua').tags({ fzf_opts = { ['--query'] = vim.fn.expand('<cword>') } })<CR>")
+
 vim.cmd [[
 set encoding=utf-8
 " set undofile
@@ -237,8 +247,6 @@ augroup END
 
 augroup Haskell
   autocmd!
-  autocmd FileType haskell nnoremap <buffer> <leader>? :call ale#cursor#ShowCursorDetail()<cr>
-  autocmd FileType haskell nnoremap <buffer> <C-]> :ALEGoToDefinition<CR>
   " autocmd FileType haskell nnoremap <buffer> <Leader>ht :GhcModType<cr>
   " autocmd FileType haskell nnoremap <buffer> <Leader>htc :GhcModTypeClear<cr>
 augroup END
@@ -350,6 +358,7 @@ nnoremap <Leader>1 :e ~/README.md<CR>Go<Esc>:r!date<CR>:set paste<CR>o
 nnoremap <Leader>2 :e ~/github.txt<CR>Go<Esc>:r!date<CR>o
 nnoremap <Leader>c :%s/\<<C-r><C-w>\>/
 vnoremap <Leader>c "hy:%s/<C-r>h/
+vnoremap <Leader>x :!chmod +x %<CR>
 vnoremap <Leader>/ :Commentary<CR>
 nnoremap <Leader>P :set paste<CR>p:set nopaste<CR>
 vnoremap % :%s/
@@ -460,15 +469,6 @@ function! FindWordUnderCursor()
   execute "LiveGrep " . str
 endfunction
 
-function! FindTagUnderCursor()
-  let str = expand("<cword>")
-  if str == ""
-    return
-  endif
-
-  execute "Tags " . str
-endfunction
-
 function! FindWordUnderCursorNoUI()
   let str = expand("<cword>")
   if str == ""
@@ -533,7 +533,6 @@ nnoremap <leader>f :call FindPromptRaw()<CR>
 nnoremap E :call FindPromptDirect()<CR>
 nnoremap <leader>g :w<CR>:!git add %<CR>
 nnoremap T :FzfLua tags<CR>
-nnoremap g] :call FindTagUnderCursor()<CR>
 
 map <F5> :echo "hi<" . synIDattr(synID(line("."),col("."),1),"name") . '> trans<' . synIDattr(synID(line("."),col("."),0),"name") . "> lo<" . synIDattr(synIDtrans(synID(line("."),col("."),1)),"name") . ">"<CR>
 nnoremap <leader>b :Buffers<CR>
@@ -648,7 +647,6 @@ autocmd BufRead,BufNewFile *.md setlocal textwidth=100 expandtab nocindent autoi
 autocmd FileType conf setlocal expandtab sw=2 sts=2 smartindent
 autocmd FileType sh setlocal expandtab sw=2 sts=2 ts=2 expandtab smartindent
 autocmd FileType qf nmap <buffer> <Esc> :close<CR>
-autocmd FileType ale-preview nmap <buffer> <Esc> :close<CR>
 
 augroup filetypedetect
     au! BufRead,BufNewFile *.pyi setfiletype python
@@ -692,9 +690,7 @@ filetype indent on
 " hi ColorColumn ctermfg=blue ctermbg=darkgray guibg=#333333 guifg=#1111bb cterm=NONE
 augroup python
   autocmd FileType python setlocal textwidth=110
-  autocmd FileType python setlocal colorcolumn=110,111,112,113
-  " autocmd FileType python nnoremap L :ALENextWrap<CR>:ALEDetail<CR><C-w><C-p>
-  " autocmd FileType python nnoremap H :ALEPreviousWrap<CR>:ALEDetail<CR><C-w><C-p>
+  " autocmd FileType python setlocal colorcolumn=110,111,112,113
 augroup END
 
 " hi! MatchParen cterm=NONE,bold gui=NONE,bold guibg=#eee8d5 guifg=NONE
@@ -709,8 +705,8 @@ endif
 silent! source local.vimrc
 
 nnoremap - _
-nnoremap L :lnext<CR>
-nnoremap H :lprev<CR>
+nnoremap L :lua vim.diagnostic.goto_next()<CR>
+nnoremap H :lua vim.diagnostic.goto_prev()<CR>
 nnoremap <F9> :cprev<CR>
 nnoremap <F10> :cnext<CR>
 
