@@ -1,0 +1,50 @@
+#!.venv/bin/python
+
+import sys
+import json
+import yaml
+
+def json_to_yaml(json_data):
+    return yaml.dump(json_data, default_flow_style=False)
+
+def yaml_to_json(yaml_data):
+    return json.dumps(yaml_data, indent=2)
+
+def main():
+    if len(sys.argv) != 2:
+        print("Usage: python script.py <file_path>")
+        sys.exit(1)
+
+    file_path = sys.argv[1]
+
+    try:
+        with open(file_path, 'r') as file:
+            content = file.read()
+
+        if file_path.lower().endswith('.json'):
+            # Convert JSON to YAML
+            data = json.loads(content)
+            result = json_to_yaml(data)
+        elif file_path.lower().endswith(('.yml', '.yaml')):
+            # Convert YAML to JSON
+            data = yaml.safe_load(content)
+            result = yaml_to_json(data)
+        else:
+            print(f"Unsupported file extension: {file_path}")
+            sys.exit(1)
+
+        print(result)
+
+    except FileNotFoundError:
+        print(f"File not found: {file_path}")
+        sys.exit(1)
+    except json.JSONDecodeError:
+        print(f"Invalid JSON file: {file_path}")
+        sys.exit(1)
+    except yaml.YAMLError:
+        print(f"Invalid YAML file: {file_path}")
+        sys.exit(1)
+
+if __name__ == "__main__":
+    main()
+

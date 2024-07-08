@@ -1,63 +1,73 @@
 #!/bin/bash
 
-# MacOS does not come with realpath.
-case "$(uname)" in
-  Darwin)
-    # MacOS lacks realpath. Use Perl.
-    realpath() {
-      dirname="$(perl -e 'use Cwd "abs_path"; print abs_path(shift)' "$1")"
-      echo "$dirname"
-    }
-    ;;
-esac
-
-# shellcheck disable=SC1091
-. "$HOME/.bootstrappyrc"
+dbg() {
+  if [[ -n $BOOTSTRAPPY_VERBOSE ]]; then
+    printf "\001\033[0;38;2;100;150;150m\002%s\001\033[0m\002: " "bootstrappy" >&2
+    printf "%s" "$*" >&2
+    printf "\n" >&2
+  fi
+}
 
 raw_toolname="$(basename "$0")"
+if [[ -x .venv/bin/"$raw_toolname" ]]; then
+  # This tool already exists inside the local virtualenv.
+  dbg "running $raw_toolname from $PWD/.venv/bin"
+  exec .venv/bin/"$raw_toolname" "$@"
+fi
+
+# shellcheck disable=SC1091
+dbg "sourcing $HOME/.bootstrappyrc"
+. "$HOME/.bootstrappyrc"
+
 toolname="${raw_toolname//-/_}"
 progname="bootstrappy[$raw_toolname]"
 
+
 die() {
-  printf "\001\033[0;38;2;200;15;15m%s\033[0m\002: error: " "$progname" >&2
+  printf "\001\033[0;38;2;200;15;15m\002%s\001\033[0m\002: error: " "$progname" >&2
   printf "%s" "$*" >&2
   printf "\n" >&2
   exit 1
 }
 
 install() {
-  package="$1"
-  echo "$0: installing $package" >&2
-  ( pip install "$package" >&2 ) || die "failed to install $package"
+  envdir="$1"
+  package="$2"
+  dbg "bootstrappy: installing $package"
+  "$envdir"/bin/python -muv pip install "$package" >&2 || die "failed to install $package"
 }
-envdir="$HOME/.bootstrappy/$raw_toolname"
-activate="$envdir/bin/activate"
 
-command -v pyenv >/dev/null || die "you need to install pyenv"
+# envdir is where the user-site packages will be installed.
+envdir="$HOME/.bootstrappy"
 
-if ! [[ -f "$activate" ]]; then
+if ! [[ -f "$envdir"/pyvenv.cfg ]]; then
+  # Make sure the bootstrappy virtual environment is set up.
+  dbg "creating $(dirname "$envdir")"
   mkdir -p "$(dirname "$envdir")"
-  ( cd "$HOME"; pyenv exec python3 -mvenv "$envdir" >&2 ) || die "unable to make a virtualenv [envdir=$envdir]"
-  if ! [[ -f "$activate" ]]; then
-    die "could not create virtual env"
-  fi
-  # shellcheck disable=SC1090
-  . "$activate" || die "python env is not set up [envdir=$envdir]"
+  dbg "installing venv"
+  python3 -mvenv "$envdir" || die "creating $envdir venv"
+fi
+
+if ! [[ -x "$envdir"/bin/uv ]]; then
+  # Ensure that uv is installed.
+  dbg "installing uv"
+  "$envdir"/bin/python -mpip install -U uv pyyaml types-PyYAML || die "installing uv"
+fi
+
+if ! [[ -x "$envdir"/bin/"$raw_toolname" ]]; then
+  # It looks like our tool is not installed.
   if [[ -n "${!toolname}" ]]; then
-    echo "using .bootstrappyrc override for $toolname=${!toolname}" >&2
     # User has defined an override for this toolname's installation package.
-    install "${!toolname}"
+    dbg "[bootstrappy] using .bootstrappyrc override for $toolname=${!toolname}"
+    install "$envdir" "${!toolname}"
   else
     # Use the raw toolname itself as an installation package.
-    install "$raw_toolname"
+    install "$envdir" "$raw_toolname"
   fi
-else
-  # shellcheck disable=SC1090
-  . "$activate" || die "python env is not set up [envdir=$envdir]"
+  if ! [[ -x "$envdir"/bin/"$raw_toolname" ]]; then
+    die "installation of '$raw_toolname' failed [toolname='$toolname', resolved='${!toolname}']"
+  fi
 fi
 
-if [[ "$(realpath "$(command -v "$raw_toolname")")" == "$(realpath "$0")" ]]; then
-  rm -rf "$envdir"
-  die "tool resolved back to bootstrappy [toolname=$raw_toolname]. maybe you need to add its real package name to ~/.bootstrappyrc?"
-fi
-exec "$raw_toolname" "$@"
+dbg "dispatching to '$envdir/bin/$raw_toolname'"
+exec "$envdir"/bin/"$raw_toolname" "$@"

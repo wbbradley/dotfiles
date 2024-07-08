@@ -1,0 +1,28 @@
+#!/usr/bin/env python3
+import json
+import sys
+from json.decoder import JSONDecodeError
+import argparse
+
+
+def main()->None:
+    parser = argparse.ArgumentParser("jsoncheck")
+    parser.add_argument("--stdin-filename", default="stdin")
+    parser.add_argument("filename", nargs="?", default="-")
+    args = parser.parse_args()
+
+    if args.filename == "-":
+        file = sys.stdin
+        filename = args.stdin_filename
+    else:
+        file = open(args.filename)
+        filename = args.filename
+
+    try:
+        json.load(file)
+    except JSONDecodeError as e:
+        sys.exit(f"{filename}:{e.lineno}:{e.colno}: {e.msg}")
+
+
+if __name__ == "__main__":
+    main()
