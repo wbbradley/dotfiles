@@ -14,6 +14,7 @@ on-linux() {
 }
 
 BREW_DEPS=(
+  alacritty
   ansifilter
   asciinema
   awscli
@@ -49,15 +50,15 @@ BREW_DEPS=(
   ykman
 )
 
-mkdir -p "$HOME"/bin ||:
+mkdir -p "$HOME"/.local/bin ||:
 
 if on-macos; then
     echo "Checking that homebrew is installed..."
     brew --version
 
-    defaults write -g InitialKeyRepeat -int 15
-    defaults write -g KeyRepeat -int 0
-    defaults write com.apple.CrashReporter DialogType none
+    # defaults write -g InitialKeyRepeat -int 15
+    # defaults write -g KeyRepeat -int 0
+    # defaults write com.apple.CrashReporter DialogType none
     defaults write com.apple.finder AppleShowAllFiles true
 
     brew install "${BREW_DEPS[@]}" || die "brew install failed"
@@ -65,12 +66,12 @@ if on-macos; then
 elif on-linux; then
   if command -v apt 2>/dev/null; then
     # sudo apt-get update
-    sudo apt-get install -y universal-ctags pass git vim tmux
-    sudo apt-get upgrade -y universal-ctags pass git vim tmux
+    sudo apt-get install -y universal-ctags pass git vim tmux alacritty neovim
+    sudo apt-get upgrade -y universal-ctags pass git vim tmux alacritty neovim
   else
     sudo yum update -y
-    sudo yum install -y ctags pass git vim tmux
-    sudo yum upgrade -y ctags pass git vim tmux
+    sudo yum install -y ctags pass git vim tmux alacritty neovim
+    sudo yum upgrade -y ctags pass git vim tmux alacritty neovim
   fi
 else
   die "unsupported platform [uname=$(uname)]"
@@ -99,14 +100,14 @@ dotfiles_dir="$HOME/src/dotfiles"
 )
 
 # Install ripgrep.
-if ! rg >/dev/null 2>/dev/null && on-linux; then
+if on-linux && ! rg >/dev/null 2>/dev/null && on-linux; then
   (
     cd /var/tmp || die "failed to cd to /var/tmp"
-    trap "rm -rf ripgrep-13.0.0-*" EXIT
+    trap "rm -rf ripgrep-*" EXIT
     ripgrep_ver=14.0.3
     curl -LO https://github.com/BurntSushi/ripgrep/releases/download/"$ripgrep_ver"/ripgrep-"$ripgrep_ver"-x86_64-unknown-linux-musl.tar.gz
     tar xf ripgrep-*-linux-musl.tar.gz
-    cp ripgrep-*/rg "$HOME/bin/rg"
+    cp ripgrep-*/rg "$HOME/.local/bin/rg"
   )
 fi
 
