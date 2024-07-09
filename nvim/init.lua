@@ -1,7 +1,4 @@
 -- Lazy package manager
-vim.g.python3_host_prog = "~/src/vim-ai-lolmax/.venv/bin/python"
-vim.g.lolmax_root_url = "http://localhost:8000"
-
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 
 if not (vim.uv or vim.loop).fs_stat(lazypath) then
@@ -19,6 +16,7 @@ vim.opt.rtp:prepend(lazypath)
 -- packages
 local lazy_plugins = {
   "folke/trouble.nvim",
+  "lewis6991/gitsigns.nvim",
   "nvim-lualine/lualine.nvim",
   "jremmen/vim-ripgrep",
   {
@@ -36,10 +34,6 @@ local lazy_plugins = {
   },
   "nvimtools/none-ls.nvim",
   "neovim/nvim-lspconfig",
-  {
-    "davehughes/vim-ai-lolmax",
-    dir = "~/src/vim-ai-lolmax",
-  },
   "nvim-lua/plenary.nvim",
   "nvim-treesitter/nvim-treesitter",
   "nvim-treesitter/nvim-treesitter-context",
@@ -51,7 +45,13 @@ if vim.g.lazy_loaded == nil then
   require("lazy").setup(lazy_plugins, {})
   vim.g.lazy_loaded = true
 end
-
+require('gitsigns').setup {
+  current_line_blame = trye,
+  current_line_blame_opts = {
+    virt_text_pos = 'right_align',
+  }
+}
+vim.cmd "Gitsigns toggle_current_line_blame"
 vim.cmd("colorscheme gruvbox")
 
 local function keymap(mode, shortcut, command)
@@ -160,8 +160,7 @@ local lspconfig = require('lspconfig')
 lspconfig.ruff.setup {
   cmd = { "ruff", "server", "--preview" },
 }
-lspconfig.rust_analyzer.setup {
-}
+lspconfig.rust_analyzer.setup({})
 
 vim.keymap.set('n', "F", function()
   require("fzf-lua").live_grep({
@@ -214,7 +213,7 @@ set wildignore+=*.o
 set wildignore+=*.a
 set hidden
 set confirm
-set cursorline
+" set cursorline
 
 :autocmd VimResized * wincmd =
 
