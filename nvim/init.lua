@@ -411,17 +411,6 @@ nmap <leader>N :let @a=1<Bar>%s/\<\d\+\>/\=(@a+setreg('a',@a+1))/<CR>
 " nmap <leader>l /\%>100v.\+
 nmap <leader>l iimport logging<CR>logger = logging.getLogger(__name__)<CR><Esc>
 
-function! FindPromptFzf()
-  let i = input("Search: ", "")
-  let j = substitute(i, "_", ".", "g")
-	let str = substitute(j, "test_", ".*", "g")
-	if str == ""
-		return
-	endif
-
-	execute "GGrep " . str
-endfunction
-
 function! FindPromptDirect()
   let i = input("Search: ", "")
   let j = substitute(i, "_", ".", "g")
@@ -528,7 +517,6 @@ nnoremap <leader>` :!ctags -R .<CR>
 nnoremap <F4> :call FindWordUnderCursorNoUI()<CR>
 
 nnoremap <leader>f :call FindPromptRaw()<CR>
-" nnoremap F :call FindPromptFzf()<CR>
 nnoremap E :call FindPromptDirect()<CR>
 nnoremap <leader>g :w<CR>:!git add %<CR>
 nnoremap T :FzfLua tags<CR>

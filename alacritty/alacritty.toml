@@ -1,13 +1,13 @@
 [window]
-decorations = "None"
+decorations = "Full" # "None"
 option_as_alt = "OnlyRight"
 
 [scrolling]
 history = 100000
 
 [font]
-normal = { family = "SauceCodePro Nerd Font Mono", style = "Regular" }
-bold = { family = "SauceCodePro Nerd Font Mono", style = "Medium" }
+normal = { family = "Fira Code", style = "Regular" }
+bold = { family = "Fira Code", style = "Medium" }
 italic = { family = "SauceCodePro Nerd Font Mono", style = "Italic" }
 bold_italic = { family = "SauceCodePro Nerd Font Mono", style = "SemiBold Italic" }
 size = 14
@@ -17,4 +17,4 @@ builtin_box_drawing = true
 osc52 = "OnlyCopy"
 
 [mouse]
-hide_when_typing = true
+hide_when_typing = false
