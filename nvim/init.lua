@@ -75,14 +75,6 @@ nmap("<C-p>", ":FzfLua git_files<CR>")
 nmap("E", ':lua require("fzf-lua").live_grep()')
 nmap("vv", "viw")
 
--- AI setup
-vim.g.vim_ai_debug = 1
-vim.g.vim_ai_debug_log_file = "/tmp/vim-ai.log"
-vim.g.vim_ai_model = "gpt-4-default"
-nmap("<Leader>ai", ":set noautoindent<CR>:AIChat<CR>")
-vmap("<Leader>ai", ":AI<CR>")
-vmap("<M-k>", ":AI<CR>")
-
 -- Treesitter
 require("treesitter-context").setup {
   mode = 'cursor'
@@ -411,17 +403,6 @@ nmap <leader>N :let @a=1<Bar>%s/\<\d\+\>/\=(@a+setreg('a',@a+1))/<CR>
 " nmap <leader>l /\%>100v.\+
 nmap <leader>l iimport logging<CR>logger = logging.getLogger(__name__)<CR><Esc>
 
-function! FindPromptFzf()
-  let i = input("Search: ", "")
-  let j = substitute(i, "_", ".", "g")
-	let str = substitute(j, "test_", ".*", "g")
-	if str == ""
-		return
-	endif
-
-	execute "GGrep " . str
-endfunction
-
 function! FindPromptDirect()
   let i = input("Search: ", "")
   let j = substitute(i, "_", ".", "g")
@@ -528,7 +509,6 @@ nnoremap <leader>` :!ctags -R .<CR>
 nnoremap <F4> :call FindWordUnderCursorNoUI()<CR>
 
 nnoremap <leader>f :call FindPromptRaw()<CR>
-" nnoremap F :call FindPromptFzf()<CR>
 nnoremap E :call FindPromptDirect()<CR>
 nnoremap <leader>g :w<CR>:!git add %<CR>
 nnoremap T :FzfLua tags<CR>
@@ -697,7 +677,6 @@ augroup END
 
 let c_no_curly_error=1
 
-silent! source ~/local.vimrc
 if resolve(expand("~/.vimrc")) != resolve(expand("$PWD/.vimrc"))
   silent! source .vimrc
 endif
