@@ -1,6 +1,9 @@
 #!/bin/bash
 root_dir="$HOME"/src/ai
-
+die() {
+  echo "$0: $*" >&2
+  exit 1
+}
 if ! [[ -f "$root_dir"/.venv/pyvenv.cfg ]]; then
   die "no ai virtualenv exists 'root_dir=$root_dir'. try running '$root_dir/setup-env'"
 fi
