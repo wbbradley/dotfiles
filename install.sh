@@ -59,7 +59,8 @@ if on-macos; then
     defaults write com.apple.CrashReporter DialogType none
     defaults write com.apple.finder AppleShowAllFiles true
 
-    brew install "${BREW_DEPS[@]}"
+    brew install "${BREW_DEPS[@]}" || die "brew install failed"
+    luarocks install luacheck || die "luacheck install failed"
 elif on-linux; then
   if command -v apt 2>/dev/null; then
     # sudo apt-get update
