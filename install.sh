@@ -38,6 +38,7 @@ BREW_DEPS=(
   reattach-to-user-namespace
   ripgrep
   shellcheck
+  stylua
   rlwrap
   session-manager-plugin
   swig

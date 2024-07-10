@@ -15,151 +15,146 @@ vim.opt.rtp:prepend(lazypath)
 
 -- packages
 local lazy_plugins = {
-  "folke/trouble.nvim",
-  "lewis6991/gitsigns.nvim",
-  "nvim-lualine/lualine.nvim",
-  {
-    'stevearc/conform.nvim',
-    opts = {},
-  },
-  "mfussenegger/nvim-lint",
-  "jremmen/vim-ripgrep",
-  {
-    "ibhagwan/fzf-lua",
-    config = function()
-      -- calling `setup` is optional for customization
-      require("fzf-lua").setup({
-        preview_opts = 'hidden', -- NB: Toggle the preview with <F4>.
-        fzf_opts = {
-          ['--layout'] = 'default',
-        }
-        -- cmd = "git grep --line-number --column --color=always",
-      })
-    end
-  },
-  -- "nvimtools/none-ls.nvim",
-  -- "neovim/nvim-lspconfig",
-  "nvim-lua/plenary.nvim",
-  "nvim-treesitter/nvim-treesitter",
-  "nvim-treesitter/nvim-treesitter-context",
-  { "ellisonleao/gruvbox.nvim", priority = 1000 , config = true},
+	"folke/trouble.nvim",
+	"lewis6991/gitsigns.nvim",
+	"nvim-lualine/lualine.nvim",
+	{
+		"stevearc/conform.nvim",
+		opts = {},
+	},
+	"mfussenegger/nvim-lint",
+	"jremmen/vim-ripgrep",
+	{
+		"ibhagwan/fzf-lua",
+		config = function()
+			-- calling `setup` is optional for customization
+			require("fzf-lua").setup({
+				preview_opts = "hidden", -- NB: Toggle the preview with <F4>.
+				fzf_opts = {
+					["--layout"] = "default",
+				},
+				-- cmd = "git grep --line-number --column --color=always",
+			})
+		end,
+	},
+	-- "nvimtools/none-ls.nvim",
+	-- "neovim/nvim-lspconfig",
+	"nvim-lua/plenary.nvim",
+	"nvim-treesitter/nvim-treesitter",
+	"nvim-treesitter/nvim-treesitter-context",
+	{ "ellisonleao/gruvbox.nvim", priority = 1000, config = true },
 }
 
 -- Lazy doesn't support hot reloading, so we need to check if it's already been loaded
 if vim.g.lazy_loaded == nil then
-  require("lazy").setup(lazy_plugins, {})
-  vim.g.lazy_loaded = true
+	require("lazy").setup(lazy_plugins, {})
+	vim.g.lazy_loaded = true
 end
-require('gitsigns').setup {
-  current_line_blame = true,
-  current_line_blame_opts = {
-    virt_text_pos = 'right_align',
-  }
-}
-vim.cmd "Gitsigns toggle_current_line_blame"
+require("gitsigns").setup({
+	current_line_blame = true,
+	current_line_blame_opts = {
+		virt_text_pos = "right_align",
+	},
+})
+vim.cmd("Gitsigns toggle_current_line_blame")
 
 vim.cmd("colorscheme gruvbox")
 
+-- :help conform
 require("conform").setup({
-  python = function(bufnr)
-    return { "isort", "ruff_format" }
-  end,
+	notify_on_error = false,
+	format_on_save = {
+		lsp_format = "fallback",
+		timeout_ms = 500,
+	},
+	formatters_by_ft = {
+		lua = { "stylua" },
+		python = { "isort", "ruff_fix", "ruff_format" },
+		rust = { "rustfmt" },
+	},
 })
-vim.api.nvim_create_autocmd("BufWritePre", {
-  pattern = "*",
-  callback = function(args)
-    require("conform").format({ bufnr = args.buf })
-  end,
-})
-require('lint').linters_by_ft = {
-  python = {'ruff'},
-  yaml = {'yamllint'},
-  lua = {'luacheck'}
+-- vim.api.nvim_create_autocmd("BufWritePre", { pattern = "*", callback = function(args) require("conform").format({ bufnr = args.buf }) end, })
+require("lint").linters_by_ft = {
+	python = { "ruff", "mypy" },
+	yaml = { "yamllint" },
+	lua = { "luacheck" },
 }
-vim.api.nvim_create_autocmd("BufWritePost", {
-  pattern = "*",
-  callback = function(args)
-    require('lint').try_lint()
-  end,
+vim.api.nvim_create_autocmd({ "BufEnter", "BufWritePost", "InsertLeave" }, {
+	pattern = "*",
+	callback = function()
+		require("lint").try_lint()
+	end,
 })
 
 local function keymap(mode, shortcut, command)
-  vim.keymap.set(mode, shortcut, command, { noremap = true, silent = true })
+	vim.keymap.set(mode, shortcut, command, { noremap = true, silent = true })
 end
 
 local function nmap(shortcut, command)
-  keymap("n", shortcut, command)
+	keymap("n", shortcut, command)
 end
 
-local function vmap(shortcut, command)
-  keymap("v", shortcut, command)
-end
-
-local function imap(shortcut, command)
-  keymap("i", shortcut, command)
-end
-
-nmap('M', ':FzfLua oldfiles<CR>')
+nmap("M", ":FzfLua oldfiles<CR>")
 nmap("<C-p>", ":FzfLua git_files<CR>")
 nmap("E", ':lua require("fzf-lua").live_grep()')
 nmap("vv", "viw")
 
 -- Treesitter
-require("treesitter-context").setup {
-  mode = 'cursor'
-  -- mode = 'topline',
-}
-vim.cmd [[
+require("treesitter-context").setup({
+	mode = "cursor",
+	-- mode = 'topline',
+})
+vim.cmd([[
   hi TreesitterContextBottom gui=underline guisp=Grey
   hi TreesitterContextLineNumberBottom gui=underline guisp=Grey
-]]
+]])
 require("nvim-treesitter.configs").setup({
-  ensure_installed = {
-    "bash",
-    "c",
-    "clojure",
-    "cpp",
-    "css",
-    "dockerfile",
-    "fennel",
-    "go",
-    "hcl",
-    "html",
-    "http",
-    "java",
-    "json",
-    "kotlin",
-    "lua",
-    "markdown",
-    "nix",
-    "python",
-    "ruby",
-    "rust",
-    "scala",
-    "starlark",
-    "sql",
-    "terraform",
-    "thrift",
-    "toml",
-    "tsx",
-    "typescript",
-    "vim",
-    "vimdoc",
-    "xml",
-    "yaml",
-  },
-  highlight = {
-    enable = true,
+	ensure_installed = {
+		"bash",
+		"c",
+		"clojure",
+		"cpp",
+		"css",
+		"dockerfile",
+		"fennel",
+		"go",
+		"hcl",
+		"html",
+		"http",
+		"java",
+		"json",
+		"kotlin",
+		"lua",
+		"markdown",
+		"nix",
+		"python",
+		"ruby",
+		"rust",
+		"scala",
+		"starlark",
+		"sql",
+		"terraform",
+		"thrift",
+		"toml",
+		"tsx",
+		"typescript",
+		"vim",
+		"vimdoc",
+		"xml",
+		"yaml",
+	},
+	highlight = {
+		enable = true,
 
-    -- disable highlight for large files
-    disable = function(_lang, buf)
-      local max_filesize = 100 * 1024 -- 100 KB
-      local ok, stats = pcall(vim.loop.fs_stat, vim.api.nvim_buf_get_name(buf))
-      if ok and stats and stats.size > max_filesize then
-        return true
-      end
-    end,
-  },
+		-- disable highlight for large files
+		disable = function(_lang, buf)
+			local max_filesize = 100 * 1024 -- 100 KB
+			local ok, stats = pcall(vim.loop.fs_stat, vim.api.nvim_buf_get_name(buf))
+			if ok and stats and stats.size > max_filesize then
+				return true
+			end
+		end,
+	},
 })
 vim.g.laststatus = 2
 
@@ -184,25 +179,20 @@ vim.g.laststatus = 2
 -- }
 -- lspconfig.rust_analyzer.setup({})
 
-vim.keymap.set('n', "F", function()
-  require("fzf-lua").live_grep({
-    cmd = "git grep --line-number --column --color=always"
-  })
+vim.keymap.set("n", "F", function()
+	require("fzf-lua").live_grep({
+		cmd = "git grep --line-number --column --color=always",
+	})
 end)
-vim.keymap.set('n', "<F3>", function()
-  require("fzf-lua").grep_cword({
-    cmd = "git grep --line-number --column --color=always"
-  })
+vim.keymap.set("n", "<F3>", function()
+	require("fzf-lua").grep_cword({
+		cmd = "git grep --line-number --column --color=always",
+	})
 end)
 
-local function search_tags_filtered()
-  local current_word = vim.fn.expand("<cword>")
-  require('fzf-lua').tags({ fzf_opts = { ['--query'] = current_word } })
-end
+nmap("g]", "<cmd>lua require('fzf-lua').tags({ fzf_opts = { ['--query'] = vim.fn.expand('<cword>') } })<CR>")
 
-nmap('g]', "<cmd>lua require('fzf-lua').tags({ fzf_opts = { ['--query'] = vim.fn.expand('<cword>') } })<CR>")
-
-vim.cmd [[
+vim.cmd([[
 set encoding=utf-8
 " set undofile
 set undodir=~/.local/share/nvim/undodir
@@ -740,8 +730,8 @@ let g:context_add_mappings = 0
 " hi MatchParen guifg=#ccccc1 guibg=#5555cc
 " hi markdownItalic term=bold cterm=bold ctermfg=220 gui=bold guifg=#ffd700
 " hi rustCommentLine guifg=#555555
-]]
+]])
 
-require('lualine').setup({
-  extenstion = { 'fzf', 'lazy', 'quickfix' }
+require("lualine").setup({
+	extensions = { "fzf", "lazy", "quickfix" },
 })
