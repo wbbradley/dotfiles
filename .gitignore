@@ -12,3 +12,14 @@ bin/bin/fak
 bin/bin/protonum
 bin/bin/wim
 bin/bin/wim-key
+.config/asciinema/*
+.config/btop/*
+.config/glab-cli/*
+.config/htop/*
+.config/iterm2/*
+.config/karabiner/*
+.config/karabiner/**
+.config/pip/*
+.config/zed/.*
+.config/zed/*
+.config/kitty/*

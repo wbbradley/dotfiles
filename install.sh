@@ -109,16 +109,10 @@ if ! rg >/dev/null 2>/dev/null && on-linux; then
   )
 fi
 
-if ! [[ -h "$HOME"/.config/nvim ]]; then
-  echo "Installing nvim config (linking to dotfiles)..."
-  mv "$HOME"/.config/{nvim,nvim.bak}
-  ln -s "$HOME"/src/dotfiles/nvim "$HOME"/.config/
-fi
-
-if ! [[ -h "$HOME"/.config/alacritty ]]; then
-  echo "Installing alacritty config (linking to dotfiles)..."
-  mv "$HOME"/.config/{alacritty,alacritty.bak}
-  ln -s "$HOME"/src/dotfiles/alacritty "$HOME"/.config/
+if ! [[ -h "$HOME"/.config ]]; then
+  mv .config{,.bak}
+  echo "Linking ~/.config to ~/src/dotfiles/.config..."
+  ln -s "$HOME"/src/dotfiles/.config "$HOME"/
 fi
 
 rm -rf "${HOME:?}/bin"
