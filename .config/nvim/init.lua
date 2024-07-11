@@ -74,10 +74,12 @@ require("conform").setup({
 	},
 })
 -- vim.api.nvim_create_autocmd("BufWritePre", { pattern = "*", callback = function(args) require("conform").format({ bufnr = args.buf }) end, })
+require("lint").linters.cargo = require("cargo")
 require("lint").linters_by_ft = {
 	python = { "ruff", "mypy" },
 	yaml = { "yamllint" },
 	lua = { "luacheck" },
+	rust = { "cargo" },
 }
 vim.api.nvim_create_autocmd({ "BufEnter", "BufWritePost", "InsertLeave" }, {
 	pattern = "*",
