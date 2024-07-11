@@ -112,7 +112,7 @@ if on-linux && ! rg >/dev/null 2>/dev/null && on-linux; then
 fi
 
 if ! [[ -h "$HOME"/.config ]]; then
-  mv .config{,.bak}
+  mv "$HOME"/.config{,.bak}
   echo "Linking ~/.config to ~/src/dotfiles/.config..."
   ln -s "$HOME"/src/dotfiles/.config "$HOME"/
 fi
