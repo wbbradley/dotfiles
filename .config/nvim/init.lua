@@ -69,7 +69,7 @@ require("conform").setup({
 	},
 	formatters_by_ft = {
 		lua = { "stylua" },
-		python = { "isort", "ruff_fix", "ruff_format" },
+		python = { "autoimport", "isort", "ruff_fix", "ruff_format" },
 		rust = { "rustfmt" },
 	},
 })
@@ -77,6 +77,7 @@ require("conform").setup({
 require("lint").linters.cargo = require("cargo")
 require("lint").linters_by_ft = {
 	python = { "ruff", "mypy" },
+	sh = { "shellcheck" },
 	yaml = { "yamllint" },
 	lua = { "luacheck" },
 	rust = { "cargo" },
@@ -159,27 +160,6 @@ require("nvim-treesitter.configs").setup({
 	},
 })
 vim.g.laststatus = 2
-
--- local null_ls = require("null-ls")
--- null_ls.setup({
---   debug = true,
---   autostart = true,
---   sources = {
---     -- require("autoimport"),
---     require("shellcheck"),
---     require("jsoncheck"),
---     require("yamlcheck"),
---     -- null_ls.builtins.diagnostics.mypy,
---     -- null_ls.builtins.formatting.isort,
---   }
--- })
-
--- Put ruff after isort and autoimport to ensure proper formatting.
--- local lspconfig = require('lspconfig')
--- lspconfig.ruff.setup {
---   cmd = { "ruff", "server", "--preview" },
--- }
--- lspconfig.rust_analyzer.setup({})
 
 vim.keymap.set("n", "F", function()
 	require("fzf-lua").live_grep({
