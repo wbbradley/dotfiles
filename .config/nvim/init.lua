@@ -266,16 +266,6 @@ augroup Bash
   autocmd FileType bash,sh setlocal iskeyword+=45
 augroup END
 
-augroup Ruby
-  au!
-  autocmd FileType ruby,eruby setlocal expandtab shiftwidth=2 tabstop=2
-  autocmd FileType ruby setlocal commentstring=#\ %s
-  autocmd FileType ruby setlocal iskeyword+=!
-  autocmd FileType ruby,eruby setlocal iskeyword+=?
-  autocmd FileType ruby nnoremap <buffer> <leader>d Odebugger<Esc>_
-  autocmd FileType eruby nnoremap <buffer> <leader>d O<% debugger %><Esc>_
-augroup END
-
 function! CloseCleanHiddenBuffers()
   " Store the buffer numbers of all buffers currently displayed in a window
   let l:visible = []
@@ -311,26 +301,6 @@ autocmd FileType sql setlocal tabstop=2 softtabstop=0 expandtab shiftwidth=2 sma
 augroup ProtoBuf
   autocmd!
   autocmd FileType proto nmap <buffer> <Leader>n :!protonum %<CR>L
-augroup END
-
-augroup Golang
-  autocmd!
-  autocmd FileType go setlocal tabstop=4 shiftwidth=4
-  autocmd FileType go nmap <buffer> <Leader>s <Plug>(go-implements)
-  autocmd FileType go nmap <buffer> <Leader>i <Plug>(go-info)
-  autocmd FileType go nmap <buffer> <Leader>gd <Plug>(go-doc)
-  autocmd FileType go nmap <buffer> <Leader>gv <Plug>(go-doc-vertical)
-  autocmd FileType go nmap <buffer> <Leader>gb <Plug>(go-doc-browser)
-  autocmd FileType go nmap <buffer> <leader>r <Plug>(go-run)
-  autocmd FileType go nmap <buffer> <leader>b <Plug>(go-build)
-  autocmd FileType go nmap <buffer> <leader>t <Plug>(go-test)
-  " autocmd FileType go nmap <leader>c <Plug>(go-coverage)
-  autocmd FileType go nmap <buffer> <Leader>ds <Plug>(go-def-split)
-  autocmd FileType go nmap <buffer> <Leader>dv <Plug>(go-def-vertical)
-  autocmd FileType go nmap <buffer> <Leader>dt <Plug>(go-def-tab)
-  autocmd FileType go nmap <buffer> <Leader>e <Plug>(go-rename)
-  autocmd FileType go nmap <buffer> <C-]> :GoDef<CR>
-  autocmd FileType go nmap <buffer> <F7> :GoBuild<CR>
 augroup END
 
 augroup Haskell
@@ -531,9 +501,10 @@ vmap <C-v> <Plug>(expand_region_shrink)
 
 " turning syntax on tends to redraw the screen nicely
 nnoremap <leader><space> :noh<cr>:match<cr>:set nopaste<CR>:redraw!<CR>
-nnoremap <leader>t viwy:tabnew<CR>:e ~/vim-todo.txt<CR>ggPa<CR><Esc>:wq<CR>
+nnoremap <leader>t mTviwy:e ~/vim-todo.txt<CR>ggPa<CR><Esc>:w<CR>'T
 nnoremap <leader>T :tabnew<CR>:e ~/vim-todo.txt<CR>
 nnoremap <leader>q :conf qa<CR>
+nnoremap <leader>d :set makeprg=dangle<CR>:make<CR>
 nnoremap <leader>w :wa<CR>
 nnoremap <leader>v <C-w>v<C-w>l<C-w>n<C-w>h
 nnoremap <leader><C-v> :r!pbpaste<CR>
