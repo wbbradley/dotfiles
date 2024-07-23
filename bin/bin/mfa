@@ -1,4 +1,5 @@
 #!/bin/bash -e
+# Related to https://scalesec.com/blog/why-your-yubikey-wont-work-with-aws-cli/
 
 copy-to-clipboard() {
   if [[ "$(uname)" = 'Darwin' ]]; then
