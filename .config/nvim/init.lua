@@ -43,6 +43,11 @@ local lazy_plugins = {
 	"nvim-treesitter/nvim-treesitter",
 	"nvim-treesitter/nvim-treesitter-context",
 	{ "ellisonleao/gruvbox.nvim", priority = 1000, config = true },
+	{ "rust-lang/rust.vim" },
+	{
+		"mrcjkb/rustaceanvim",
+		ft = { "rust" },
+	},
 }
 
 -- Lazy doesn't support hot reloading, so we need to check if it's already been loaded
