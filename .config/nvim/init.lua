@@ -48,6 +48,7 @@ local lazy_plugins = {
 		"mrcjkb/rustaceanvim",
 		ft = { "rust" },
 	},
+	"andersevenrud/nvim_context_vt",
 }
 
 -- Lazy doesn't support hot reloading, so we need to check if it's already been loaded
@@ -64,6 +65,13 @@ require("gitsigns").setup({
 vim.cmd("Gitsigns toggle_current_line_blame")
 
 vim.cmd("colorscheme gruvbox")
+require("nvim_context_vt").setup({
+	min_rows = 30,
+	disable_ft = { "markdown", "lua" },
+	-- Disable display of virtual text below blocks for indentation based languages like Python
+	-- Default: false
+	disable_virtual_lines = false,
+})
 
 -- :help conform
 require("conform").setup({
