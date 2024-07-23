@@ -15,6 +15,7 @@ vim.opt.rtp:prepend(lazypath)
 
 -- packages
 local lazy_plugins = {
+	"easymotion/vim-easymotion",
 	"folke/trouble.nvim",
 	"lewis6991/gitsigns.nvim",
 	"nvim-lualine/lualine.nvim",
@@ -76,6 +77,19 @@ require("nvim_context_vt").setup({
 -- :help conform
 require("conform").setup({
 	notify_on_error = false,
+	formatters = {
+		autoimport = {
+			command = "autoimport",
+			args = { "-" },
+			stdin = true,
+			-- A function that calculates the directory to run the command in
+			cwd = require("conform.util").root_file({ ".git" }),
+			require_cwd = false,
+			exit_codes = { 0 },
+			-- Set to false to disable merging the config with the base definition
+			inherit = false,
+		},
+	},
 	format_on_save = {
 		lsp_format = "fallback",
 		timeout_ms = 500,
@@ -114,6 +128,7 @@ nmap("M", ":FzfLua oldfiles<CR>")
 nmap("<C-p>", ":FzfLua git_files<CR>")
 nmap("E", ':lua require("fzf-lua").live_grep()')
 nmap("vv", "viw")
+nmap(",", "<Plug>(easymotion-s)")
 
 -- Treesitter
 require("treesitter-context").setup({
@@ -220,7 +235,7 @@ set wildignore+=*.o
 set wildignore+=*.a
 set hidden
 set confirm
-" set cursorline
+set cursorline
 
 :autocmd VimResized * wincmd =
 
@@ -611,7 +626,7 @@ autocmd FileType htmldjango setlocal sw=2 sts=2 ts=2 expandtab
 autocmd FileType html setlocal sw=2 sts=2 ts=2 expandtab
 autocmd FileType less setlocal sw=2 sts=2 ts=2 expandtab
 autocmd FileType css setlocal sw=2 sts=2 ts=2 expandtab
-autocmd FileType markdown setlocal textwidth=100 expandtab nocindent autoindent nosmartindent ts=2 sw=2 sts=2 cino=
+autocmd FileType markdown setlocal textwidth=100 expandtab nocindent autoindent nosmartindent ts=2 sw=2 sts=2 cino= spell
 autocmd BufRead,BufNewFile *.md setlocal textwidth=100 expandtab nocindent autoindent nosmartindent ts=2 sw=2 sts=2 cino=
 autocmd FileType conf setlocal expandtab sw=2 sts=2 smartindent
 autocmd FileType sh setlocal expandtab sw=2 sts=2 ts=2 expandtab smartindent
