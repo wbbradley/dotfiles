@@ -751,4 +751,4 @@ _G.gather_and_send = function()
 	}):start()
 end
 
-nmap("<leader>0", ":lua gather_and_send()<CR>")
+nmap("<leader>a", ":lua gather_and_send()<CR>")

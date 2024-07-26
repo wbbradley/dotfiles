@@ -93,7 +93,7 @@ if [[ -d /opt/homebrew/bin ]]; then
 fi
 
 # shellcheck disable=SC2155
-export PS1="\$(if (( \$? )); then printf 'ERROR '; fi)\[\e[48;3;80;38;5;32m\]‹\h›\[\e[0m\] \[\e[48;3;80;38;5;214m\]\$(parse_git_branch)\[\e[0m\]\n\[\e[48;5;95;38;5;214m\] \$(parse_working_dir) \[\e[0m\] "
+export PS1="\$(if (( \$? )); then printf 'ERROR '; fi)\[\e[48;3;80;38;5;214m\]\$(parse_git_branch)\[\e[0m\]\n\[\e[48;5;95;38;5;214m\] \$(parse_working_dir) \[\e[0m\] "
 
 pass-file() {
   filename="$1"
