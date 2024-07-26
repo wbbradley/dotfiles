@@ -527,15 +527,14 @@ vmap <C-v> <Plug>(expand_region_shrink)
 :set nowritebackup
 :endif
 
-" turning syntax on tends to redraw the screen nicely
-nnoremap <leader><space> :noh<cr>:match<cr>:set nopaste<CR>:redraw!<CR>
-nnoremap <leader>t mTviwy:e ~/vim-todo.txt<CR>ggPa<CR><Esc>:w<CR>'T
-nnoremap <leader>T :tabnew<CR>:e ~/vim-todo.txt<CR>
-nnoremap <leader>q :conf qa<CR>
-nnoremap <leader>d :set makeprg=dangle<CR>:make<CR>
-nnoremap <leader>w :wa<CR>
-nnoremap <leader>v <C-w>v<C-w>l<C-w>n<C-w>h
 nnoremap <leader><C-v> :r!pbpaste<CR>
+nnoremap <leader><space> :noh<cr>:match<cr>:set nopaste<CR>:redraw!<CR>
+nnoremap <leader>T :tabnew<CR>:e ~/vim-todo.txt<CR>
+nnoremap <leader>d :set makeprg=dangle<CR>:make<CR>
+nnoremap <leader>q :conf qa<CR>
+nnoremap <leader>t mTviwy:e ~/vim-todo.txt<CR>ggPa<CR><Esc>:w<CR>'T
+nnoremap <leader>v <C-w>v<C-w>l<C-w>n<C-w>h
+nnoremap <leader>w :wa<CR>
 
 nnoremap <leader>90 :e ~/.config/nvim/init.lua<CR>
 nnoremap <leader>9a :e ~/.config/alacritty/alacritty.toml<CR>
@@ -643,6 +642,7 @@ augroup Python
   " autocmd BufWritePre *.py lua vim.lsp.buf.format()
 augroup END
 
+autocmd BufRead *.ai setlocal ft=markdown
 augroup RustCore
   autocmd FileType rust nmap <F7> :pclose<CR>:setlocal makeprg=cargo\ clippy<CR>:lmake<CR><CR>
   autocmd FileType rust setlocal tags=./rusty-tags.vi;/,$RUST_SRC_PATH/rusty-tags.vi,tags
@@ -664,8 +664,6 @@ set signcolumn=yes
 set termguicolors
 let &t_8f = "\<Esc>[38;2;%lu;%lu;%lum"
 let &t_8b = "\<Esc>[48;2;%lu;%lu;%lum"
-
-let g:rainbow_active = 0
 
 syntax on
 filetype plugin on
@@ -716,3 +714,41 @@ let g:context_add_mappings = 0
 require("lualine").setup({
 	extensions = { "fzf", "lazy", "quickfix" },
 })
+
+local Job = require("plenary.job")
+
+_G.gather_and_send = function()
+	local buf_contents = vim.api.nvim_buf_get_lines(0, 0, -1, false)
+	local command = "ai"
+
+	vim.notify("ai running...", vim.log.levels.INFO)
+
+	Job:new({
+		command = command,
+		args = { "--embedded" },
+		writer = buf_contents,
+		on_stdout = function(_, stdout_data)
+			vim.schedule(function()
+				vim.api.nvim_buf_set_lines(0, -1, -1, false, { stdout_data })
+			end)
+		end,
+		on_stderr = function(_, stderr_data)
+			vim.schedule(function()
+				for _, line in ipairs(stderr_data) do
+					vim.notify(line, vim.log.levels.ERROR)
+				end
+			end)
+		end,
+		on_exit = function(_j, return_val)
+			vim.schedule(function()
+				if return_val == 0 then
+					vim.notify("ai completed successfully", vim.log.levels.INFO)
+				else
+					vim.notify("ai failed with code: " .. return_val, vim.log.levels.ERROR)
+				end
+			end)
+		end,
+	}):start()
+end
+
+nmap("<leader>0", ":lua gather_and_send()<CR>")

@@ -1,4 +1,4 @@
---kinds-python=-iv
+--kinds-python=-i
 --exclude=build
 --exclude=target
 --exclude=*.html

@@ -14,6 +14,5 @@ fi
 if (( 0 )) && [[ "$PWD" != "$root_dir" ]] && command -v rlwrap 2>/dev/null >/dev/null; then
   exec rlwrap ai "$@"
 else
-  cd "$root_dir"/src || die "failed to cd"
-  exec python -m ai.cli "$@"
+  exec "$root_dir"/.venv/bin/python -m ai.main "$@"
 fi
