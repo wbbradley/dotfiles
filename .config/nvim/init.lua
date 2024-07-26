@@ -39,7 +39,7 @@ local lazy_plugins = {
 		end,
 	},
 	-- "nvimtools/none-ls.nvim",
-	-- "neovim/nvim-lspconfig",
+	"neovim/nvim-lspconfig",
 	"nvim-lua/plenary.nvim",
 	"nvim-treesitter/nvim-treesitter",
 	"nvim-treesitter/nvim-treesitter-context",
@@ -65,6 +65,29 @@ require("gitsigns").setup({
 })
 vim.cmd("Gitsigns toggle_current_line_blame")
 
+require("lspconfig").gopls.setup({})
+vim.api.nvim_create_autocmd("BufWritePre", {
+	pattern = "*.go",
+	callback = function()
+		local params = vim.lsp.util.make_range_params()
+		params.context = { only = { "source.organizeImports" } }
+		-- buf_request_sync defaults to a 1000ms timeout. Depending on your
+		-- machine and codebase, you may want longer. Add an additional
+		-- argument after params if you find that you have to write the file
+		-- twice for changes to be saved.
+		-- E.g., vim.lsp.buf_request_sync(0, "textDocument/codeAction", params, 3000)
+		local result = vim.lsp.buf_request_sync(0, "textDocument/codeAction", params)
+		for cid, res in pairs(result or {}) do
+			for _, r in pairs(res.result or {}) do
+				if r.edit then
+					local enc = (vim.lsp.get_client_by_id(cid) or {}).offset_encoding or "utf-16"
+					vim.lsp.util.apply_workspace_edit(r.edit, enc)
+				end
+			end
+		end
+		vim.lsp.buf.format({ async = false })
+	end,
+})
 vim.cmd("colorscheme gruvbox")
 require("nvim_context_vt").setup({
 	min_rows = 30,
@@ -122,6 +145,10 @@ end
 
 local function nmap(shortcut, command)
 	keymap("n", shortcut, command)
+end
+
+local function vmap(shortcut, command)
+	keymap("v", shortcut, command)
 end
 
 nmap("M", ":FzfLua oldfiles<CR>")
@@ -239,6 +266,9 @@ set cursorline
 
 :autocmd VimResized * wincmd =
 
+augroup go
+  autocmd FileType go inoremap <C-n> <C-x><C-o>
+augroup END
 augroup sql
   autocmd FileType sql setlocal makeprg=pgsanity\ %
 augroup END
@@ -694,21 +724,6 @@ nnoremap <F10> :cnext<CR>
 if &diff
   syntax on
 endif
-
-let g:context_add_mappings = 0
-
-" colorscheme slate
-" colorscheme morning
-" hi clear SpellBad
-" hi clear SpellCap
-" hi CursorLine term=NONE cterm=NONE guibg=NONE
-" hi PreProc term=NONE cterm=NONE guibg=NONE guifg=NONE
-" hi Search guifg=#090819 guibg=#047943
-" hi SpellBad guifg=NONE guibg=#660a0a guisp=NONE gui=NONE cterm=NONE
-" hi SpellCap guibg=#a58545 guifg=NONE guisp=NONE gui=NONE cterm=NONE
-" hi MatchParen guifg=#ccccc1 guibg=#5555cc
-" hi markdownItalic term=bold cterm=bold ctermfg=220 gui=bold guifg=#ffd700
-" hi rustCommentLine guifg=#555555
 ]])
 
 require("lualine").setup({
@@ -717,19 +732,60 @@ require("lualine").setup({
 
 local Job = require("plenary.job")
 
-_G.gather_and_send = function()
-	local buf_contents = vim.api.nvim_buf_get_lines(0, 0, -1, false)
+_G.get_visual_selection_end_line = function()
+	local _, le, _ = unpack(vim.fn.getpos("'>"))
+	return le
+end
+
+_G.get_next_insertion_line = function()
+	local mode = vim.fn.mode()
+	local end_line
+
+	if mode == "v" or mode == "V" or mode == "\22" then -- visual, visual-line, visual-block
+		end_line = _G.get_visual_selection_end_line()
+	else
+		local current_line = vim.api.nvim_win_get_cursor(0)[1]
+		end_line = current_line
+	end
+
+	local insert_position = end_line
+	return insert_position + 1
+end
+
+_G.send_contents = function(buf_contents, extra_args, insert_inline)
 	local command = "ai"
+	local state
+	if insert_inline then
+		state = { insertion_point = _G.get_next_insertion_line() }
+	else
+		state = { insertion_point = -1 }
+	end
 
-	vim.notify("ai running...", vim.log.levels.INFO)
-
+	vim.notify(
+		string.format("ai running [insert_inline=%s, insertion_point=%s]...", insert_inline, state.insertion_point),
+		vim.log.levels.INFO
+	)
+	local args = { "--embedded" }
+	if type(extra_args) == "table" then
+		for i = 1, #extra_args do
+			table.insert(args, extra_args[i])
+		end
+	end
 	Job:new({
 		command = command,
-		args = { "--embedded" },
+		args = args,
 		writer = buf_contents,
 		on_stdout = function(_, stdout_data)
 			vim.schedule(function()
-				vim.api.nvim_buf_set_lines(0, -1, -1, false, { stdout_data })
+				local lines = vim.split(stdout_data, "\n", true)
+				vim.api.nvim_buf_set_lines(0, state.insertion_point, state.insertion_point, true, lines)
+				-- Go to the end of the inserted text.
+				if state.insertion_point == -1 then
+					vim.api.nvim_command("normal! G")
+				else
+					state.insertion_point = state.insertion_point + #lines
+					vim.api.nvim_command(tostring(state.insertion_point))
+				end
 			end)
 		end,
 		on_stderr = function(_, stderr_data)
@@ -751,4 +807,23 @@ _G.gather_and_send = function()
 	}):start()
 end
 
+_G.gather_visual_and_send = function()
+	local _, lnum1, col1, _ = unpack(vim.fn.getpos("'<"))
+	local _, lnum2, col2, _ = unpack(vim.fn.getpos("'>"))
+	local lines = vim.fn.getline(lnum1, lnum2)
+	if #lines == 0 then
+		return ""
+	end
+	lines[#lines] = string.sub(lines[#lines], 1, col2)
+	lines[1] = string.sub(lines[1], col1)
+	local buf_contents = table.concat(lines, "\n")
+	_G.send_contents(buf_contents, { "--one-shot" }, true)
+end
+
+_G.gather_and_send = function()
+	local buf_contents = vim.api.nvim_buf_get_lines(0, 0, -1, false)
+	_G.send_contents(buf_contents)
+end
+
 nmap("<leader>a", ":lua gather_and_send()<CR>")
+vmap("<leader>a", ":lua gather_visual_and_send()<CR>")
