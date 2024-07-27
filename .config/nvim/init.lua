@@ -112,6 +112,9 @@ require("conform").setup({
 			-- Set to false to disable merging the config with the base definition
 			inherit = false,
 		},
+		mdformat = {
+			args = { "--number", "--wrap", "100", "-" },
+		},
 	},
 	format_on_save = {
 		lsp_format = "fallback",
@@ -119,6 +122,7 @@ require("conform").setup({
 	},
 	formatters_by_ft = {
 		lua = { "stylua" },
+		markdown = { "mdformat" },
 		python = { "autoimport", "isort", "ruff_fix", "ruff_format" },
 		rust = { "rustfmt" },
 	},
@@ -742,18 +746,17 @@ _G.get_next_insertion_line = function()
 	local end_line
 
 	if mode == "v" or mode == "V" or mode == "\22" then -- visual, visual-line, visual-block
-		end_line = _G.get_visual_selection_end_line()
+		return _G.get_visual_selection_end_line()
 	else
 		local current_line = vim.api.nvim_win_get_cursor(0)[1]
 		end_line = current_line
 	end
 
 	local insert_position = end_line
-	return insert_position + 1
+	return insert_position
 end
 
 _G.send_contents = function(buf_contents, extra_args, insert_inline)
-	local command = "ai"
 	local state
 	if insert_inline then
 		state = { insertion_point = _G.get_next_insertion_line() }
@@ -772,7 +775,7 @@ _G.send_contents = function(buf_contents, extra_args, insert_inline)
 		end
 	end
 	Job:new({
-		command = command,
+		command = "ai",
 		args = args,
 		writer = buf_contents,
 		on_stdout = function(_, stdout_data)
@@ -797,6 +800,7 @@ _G.send_contents = function(buf_contents, extra_args, insert_inline)
 		end,
 		on_exit = function(_j, return_val)
 			vim.schedule(function()
+				require("conform").format()
 				if return_val == 0 then
 					vim.notify("ai completed successfully", vim.log.levels.INFO)
 				else
@@ -807,7 +811,7 @@ _G.send_contents = function(buf_contents, extra_args, insert_inline)
 	}):start()
 end
 
-_G.gather_visual_and_send = function()
+_G.gather_visual_selection = function()
 	local _, lnum1, col1, _ = unpack(vim.fn.getpos("'<"))
 	local _, lnum2, col2, _ = unpack(vim.fn.getpos("'>"))
 	local lines = vim.fn.getline(lnum1, lnum2)
@@ -816,14 +820,33 @@ _G.gather_visual_and_send = function()
 	end
 	lines[#lines] = string.sub(lines[#lines], 1, col2)
 	lines[1] = string.sub(lines[1], col1)
-	local buf_contents = table.concat(lines, "\n")
-	_G.send_contents(buf_contents, { "--one-shot" }, true)
+	return table.concat(lines, "\n")
+end
+
+_G.create_review_visual_selection_buffer = function()
+	-- Get current filetype
+	local filetype = vim.bo.filetype
+
+	local selected_text = _G.gather_visual_selection()
+
+	-- Create the content to insert in new buffer
+	local content = string.format("> user\n\nPlease review this:\n```%s\n%s\n```", filetype, selected_text)
+
+	-- Open a new buffer
+	vim.cmd("split")
+	vim.cmd("enew")
+	vim.cmd("setlocal ft=markdown")
+
+	-- Insert the content
+	vim.api.nvim_buf_set_lines(0, 0, -1, false, vim.split(content, "\n"))
 end
 
 _G.gather_and_send = function()
+	vim.cmd("setlocal ft=markdown")
+	require("conform").format()
 	local buf_contents = vim.api.nvim_buf_get_lines(0, 0, -1, false)
 	_G.send_contents(buf_contents)
 end
 
 nmap("<leader>a", ":lua gather_and_send()<CR>")
-vmap("<leader>a", ":lua gather_visual_and_send()<CR>")
+vmap("<leader>a", ":lua create_review_visual_selection_buffer()<CR>:lua gather_and_send()<CR>")
