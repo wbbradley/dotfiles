@@ -353,7 +353,12 @@ function! s:trim_trailing_whitespace() abort
 endfunction
 augroup trim_spaces
   autocmd!
-  autocmd BufWritePre * call <SID>trim_trailing_whitespace()
+  autocmd BufWritePre *.md call <SID>trim_trailing_whitespace()
+  autocmd BufWritePre *.rs call <SID>trim_trailing_whitespace()
+  autocmd BufWritePre *.py call <SID>trim_trailing_whitespace()
+  autocmd BufWritePre *.cpp call <SID>trim_trailing_whitespace()
+  autocmd BufWritePre *.c call <SID>trim_trailing_whitespace()
+  autocmd BufWritePre *.h call <SID>trim_trailing_whitespace()
 augroup END
 
 autocmd FileType gitcommit setlocal textwidth=71
