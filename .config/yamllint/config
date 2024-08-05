@@ -1,0 +1,7 @@
+# vim: set ft=yaml
+---
+extends: default
+rules:
+  line-length:
+    max: 100
+  indent-sequences: false

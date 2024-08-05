@@ -66,6 +66,8 @@ require("gitsigns").setup({
 vim.cmd("Gitsigns toggle_current_line_blame")
 
 require("lspconfig").gopls.setup({})
+require("lspconfig").terraformls.setup({})
+-- require("lspconfig").rust_analyzer.setup({})
 vim.api.nvim_create_autocmd("BufWritePre", {
 	pattern = "*.go",
 	callback = function()
@@ -125,16 +127,17 @@ require("conform").setup({
 		markdown = { "mdformat" },
 		python = { "autoimport", "isort", "ruff_fix", "ruff_format" },
 		rust = { "rustfmt" },
+		terraform = { "terraform_fmt" },
 	},
 })
 -- vim.api.nvim_create_autocmd("BufWritePre", { pattern = "*", callback = function(args) require("conform").format({ bufnr = args.buf }) end, })
-require("lint").linters.cargo = require("cargo")
+-- require("lint").linters.cargo = require("cargo")
 require("lint").linters_by_ft = {
 	python = { "ruff", "mypy" },
 	sh = { "shellcheck" },
 	yaml = { "yamllint" },
 	lua = { "luacheck" },
-	rust = { "cargo" },
+	-- rust = { "cargo" },
 }
 vim.api.nvim_create_autocmd({ "BufEnter", "BufWritePost", "InsertLeave" }, {
 	pattern = "*",
@@ -682,6 +685,7 @@ augroup Python
 augroup END
 
 autocmd BufRead *.ai setlocal ft=markdown
+autocmd BufRead *.tf setlocal ft=terraform
 augroup RustCore
   autocmd FileType rust nmap <F7> :pclose<CR>:setlocal makeprg=cargo\ clippy<CR>:lmake<CR><CR>
   autocmd FileType rust setlocal tags=./rusty-tags.vi;/,$RUST_SRC_PATH/rusty-tags.vi,tags
