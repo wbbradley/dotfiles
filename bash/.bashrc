@@ -453,8 +453,8 @@ agent() {
 GPG_TTY="$(tty)"
 export GPG_TTY
 
-[ -f "$HOME/.ghcup/env" ] && . "$HOME/.ghcup/env" # ghcup-env
-[ -f "$HOME/.cargo/env" ] && . "$HOME/.cargo/env"
+[[ -f "$HOME/.ghcup/env" ]] && . "$HOME/.ghcup/env" # ghcup-env
+[[ -f "$HOME/.cargo/env" ]] && . "$HOME/.cargo/env"
 
 [[ -f ~/.fzf.bash ]] && source ~/.fzf.bash
 
@@ -462,5 +462,5 @@ if [[ -f "$HOME/local.bashrc" ]]; then
   . "$HOME/local.bashrc"
 fi
 export HELIX_RUNTIME=~/src/helix/runtime
-# export RUSTFLAGS='-Cforce-frame-pointers=yes'
+export RUSTFLAGS='-Cforce-frame-pointers=yes'
 printf ''
