@@ -43,8 +43,9 @@ local lazy_plugins = {
 	"nvim-lua/plenary.nvim",
 	"nvim-treesitter/nvim-treesitter",
 	"nvim-treesitter/nvim-treesitter-context",
+	"hrsh7th/nvim-cmp",
 	{ "ellisonleao/gruvbox.nvim", priority = 1000, config = true },
-	{ "rust-lang/rust.vim" },
+	"rust-lang/rust.vim",
 	{
 		"mrcjkb/rustaceanvim",
 		ft = { "rust" },
@@ -64,6 +65,7 @@ require("gitsigns").setup({
 	},
 })
 vim.cmd("Gitsigns toggle_current_line_blame")
+local _ = require("cmp")
 
 require("lspconfig").gopls.setup({})
 require("lspconfig").terraformls.setup({})
@@ -137,7 +139,18 @@ require("lint").linters_by_ft = {
 	sh = { "shellcheck" },
 	yaml = { "yamllint" },
 	lua = { "luacheck" },
+	sql = { "pgsanity" },
 	-- rust = { "cargo" },
+}
+local mypy_linter = require("lint").linters.mypy
+mypy_linter.args = {
+	"--show-column-numbers",
+	"--show-error-end",
+	"--hide-error-codes",
+	"--hide-error-context",
+	"--no-color-output",
+	"--no-error-summary",
+	"--no-pretty",
 }
 vim.api.nvim_create_autocmd({ "BufEnter", "BufWritePost", "InsertLeave" }, {
 	pattern = "*",
@@ -145,7 +158,35 @@ vim.api.nvim_create_autocmd({ "BufEnter", "BufWritePost", "InsertLeave" }, {
 		require("lint").try_lint()
 	end,
 })
+local function parse_pgsanity_output(output, bufnr, _linter_cwd)
+	local diagnostics = {}
+	for line in output:gmatch("[^\r\n]+") do
+		local lnum, description = line:match("line (%d+): ERROR: (.+)")
+		if lnum and description then
+			table.insert(diagnostics, {
+				bufnr = bufnr,
+				lnum = tonumber(lnum) - 1,
+				col = 0,
+				end_lnum = tonumber(lnum) - 1,
+				end_col = -1,
+				severity = vim.diagnostic.severity.ERROR,
+				message = description,
+			})
+		end
+	end
+	return diagnostics
+end
 
+require("lint").linters.pgsanity = {
+	cmd = "pgsanity",
+	stdin = true, -- or false if it doesn't support content input via stdin. In that case the filename is automatically added to the arguments.
+	append_fname = true, -- Automatically append the file name to `args` if `stdin = false` (default: true)
+	args = { "--add-semicolon" }, -- list of arguments. Can contain functions with zero arguments that will be evaluated once the linter is used.
+	stream = nil, -- ('stdout' | 'stderr' | 'both') configure the stream to which the linter outputs the linting result.
+	ignore_exitcode = false, -- set this to true if the linter exits with a code != 0 and that's considered normal.
+	env = nil, -- custom environment table to use with the external process. Note that this replaces the *entire* environment, it is not additive.
+	parser = parse_pgsanity_output,
+}
 local function keymap(mode, shortcut, command)
 	vim.keymap.set(mode, shortcut, command, { noremap = true, silent = true })
 end
@@ -347,7 +388,7 @@ function! CloseCleanHiddenBuffers()
 endfunction
 
 command! Bclosehidden call CloseCleanHiddenBuffers()
-autocmd BufWritePost * :Bclosehidden
+" autocmd BufWritePost * :Bclosehidden
 
 function! s:trim_trailing_whitespace() abort
   let l:view = winsaveview()
@@ -857,5 +898,5 @@ _G.gather_and_send = function()
 	_G.send_contents(buf_contents)
 end
 
-nmap("<leader>a", ":lua gather_and_send()<CR>")
+-- nmap("<leader>a", ":lua gather_and_send()<CR>")
 vmap("<leader>a", ":lua create_review_visual_selection_buffer()<CR>:lua gather_and_send()<CR>")

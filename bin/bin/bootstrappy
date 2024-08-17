@@ -1,6 +1,10 @@
 #!/bin/bash
 
 dbg() {
+  if [[ -n "$VIM" ]]; then
+    echo "$@" >> "$HOME"/vim-"$raw_toolname".log
+    return
+  fi
   if [[ -n $BOOTSTRAPPY_VERBOSE ]]; then
     printf "\001\033[0;38;2;100;150;150m\002%s\001\033[0m\002: " "bootstrappy" >&2
     printf "%s" "$*" >&2
@@ -11,7 +15,7 @@ dbg() {
 raw_toolname="$(basename "$0")"
 if [[ -x .venv/bin/"$raw_toolname" ]]; then
   # This tool already exists inside the local virtualenv.
-  dbg "running $raw_toolname from $PWD/.venv/bin"
+  dbg "running $raw_toolname from $PWD/.venv/bin [pwd=$PWD, args=($*)]"
   exec .venv/bin/"$raw_toolname" "$@"
 fi
 
