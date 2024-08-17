@@ -36,6 +36,7 @@ BREW_DEPS=(
   pkg-config
   pinentry
   pinentry-mac
+  postgresql@14
   reattach-to-user-namespace
   ripgrep
   shellcheck
@@ -63,6 +64,8 @@ if on-macos; then
 
     brew install "${BREW_DEPS[@]}" || die "brew install failed"
     luarocks install luacheck || die "luacheck install failed"
+    echo "NB: make sure you manage brew services."
+    brew services
 elif on-linux; then
   if command -v apt 2>/dev/null; then
     # sudo apt-get update
@@ -80,7 +83,7 @@ fi
 # Make sure needed tools are available
 git --version > /dev/null || die "git not installed"
 curl --version > /dev/null || die "curl not installed"
-vim --version > /dev/null || die "vim not installed"
+nvim --version > /dev/null || die "vim not installed"
 
 
 dotfiles_dir="$HOME/src/dotfiles"
@@ -121,4 +124,3 @@ rm -rf "${HOME:?}/bin"
 ln -sf "$dotfiles_dir/bin/bin" "$HOME/bin" || die "failed to link bin dir"
 
 echo "Dotfiles installation was successful, please logout of your shell, and log back in."
-echo "Run clean-vim.sh at any time to set up vim, or to reset it."
