@@ -29,10 +29,26 @@ local lazy_plugins = {
 		"ibhagwan/fzf-lua",
 		config = function()
 			-- calling `setup` is optional for customization
+			local actions = require("fzf-lua.actions")
 			require("fzf-lua").setup({
 				preview_opts = "hidden", -- NB: Toggle the preview with <F4>.
 				fzf_opts = {
 					["--layout"] = "default",
+				},
+				actions = {
+					files = {
+						["enter"] = function(selected, opts)
+							local retval = actions.file_edit_or_qf(selected, opts)
+							if vim.fn.win_gettype() == "quickfix" then
+								vim.api.nvim_feedkeys(
+									vim.api.nvim_replace_termcodes("<CR>", true, true, true),
+									"n",
+									false
+								)
+							end
+							return retval
+						end,
+					},
 				},
 				-- cmd = "git grep --line-number --column --color=always",
 			})
@@ -816,6 +832,13 @@ endif
 
 require("lualine").setup({
 	extensions = { "fzf", "lazy", "quickfix" },
+	sections = {
+		lualine_x = {
+			"encoding", -- "fileformat",
+			"searchcount",
+			"filetype",
+		},
+	},
 })
 
 local Job = require("plenary.job")

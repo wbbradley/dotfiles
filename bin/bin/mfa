@@ -9,6 +9,7 @@ copy-to-clipboard() {
   fi
 }
 
+echo "$(date): ran $0" >>"$HOME"/mfa.log
 ykman oath accounts code "$(ykman oath accounts list)" \
   | awk '{ num = $2 } END { printf("%s\n", num) }' \
   | copy-to-clipboard
