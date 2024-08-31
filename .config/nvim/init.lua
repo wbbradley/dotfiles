@@ -138,6 +138,7 @@ require("lint").linters_by_ft = {
 	python = { "ruff", "mypy" },
 	sh = { "shellcheck" },
 	yaml = { "yamllint" },
+	toml = { "tomllint" },
 	lua = { "luacheck" },
 	sql = { "pgsanity" },
 	-- rust = { "cargo" },
@@ -187,6 +188,34 @@ require("lint").linters.pgsanity = {
 	env = nil, -- custom environment table to use with the external process. Note that this replaces the *entire* environment, it is not additive.
 	parser = parse_pgsanity_output,
 }
+local function parse_tomllint_output(output, bufnr, _linter_cwd)
+	local diagnostics = {}
+	for line in output:gmatch("[^\r\n]+") do
+		local _, lnum, col, description = line:match("(.+):(%d+):(%d+): error: (.+)")
+		if lnum and description then
+			table.insert(diagnostics, {
+				bufnr = bufnr,
+				lnum = tonumber(lnum) - 1,
+				col = tonumber(col) - 1,
+				end_lnum = tonumber(lnum) - 1,
+				end_col = tonumber(col),
+				severity = vim.diagnostic.severity.ERROR,
+				message = description,
+			})
+		end
+	end
+	return diagnostics
+end
+require("lint").linters.tomllint = {
+	cmd = "tomllint",
+	stdin = true, -- or false if it doesn't support content input via stdin. In that case the filename is automatically added to the arguments.
+	append_fname = false, -- Automatically append the file name to `args` if `stdin = false` (default: true)
+	args = { "-" }, -- list of arguments. Can contain functions with zero arguments that will be evaluated once the linter is used.
+	stream = "stderr", -- ('stdout' | 'stderr' | 'both') configure the stream to which the linter outputs the linting result.
+	ignore_exitcode = false, -- set this to true if the linter exits with a code != 0 and that's considered normal.
+	env = nil, -- custom environment table to use with the external process. Note that this replaces the *entire* environment, it is not additive.
+	parser = parse_tomllint_output,
+}
 local function keymap(mode, shortcut, command)
 	vim.keymap.set(mode, shortcut, command, { noremap = true, silent = true })
 end
@@ -209,6 +238,8 @@ nmap(",", "<Plug>(easymotion-s)")
 require("treesitter-context").setup({
 	mode = "cursor",
 	-- mode = 'topline',
+	-- max_lines = 5,
+	multiline_threshold = 4,
 })
 vim.cmd([[
   hi TreesitterContextBottom gui=underline guisp=Grey
@@ -755,7 +786,7 @@ filetype indent on
 
 " hi ColorColumn ctermfg=blue ctermbg=darkgray guibg=#333333 guifg=#1111bb cterm=NONE
 augroup python
-  autocmd FileType python setlocal textwidth=110
+  autocmd FileType python setlocal textwidth=100
   " autocmd FileType python setlocal colorcolumn=110,111,112,113
 augroup END
 
@@ -774,7 +805,10 @@ nnoremap L :lua vim.diagnostic.goto_next()<CR>
 nnoremap H :lua vim.diagnostic.goto_prev()<CR>
 nnoremap <F9> :cprev<CR>
 nnoremap <F10> :cnext<CR>
-
+" Make sure % works normally.
+ounmap %
+vunmap %
+nunmap %
 if &diff
   syntax on
 endif
