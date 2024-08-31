@@ -1,5 +1,5 @@
 [window]
-decorations = "None" # "Full"
+decorations = "Full"
 option_as_alt = "OnlyRight"
 padding.x = 4
 padding.y = 4
