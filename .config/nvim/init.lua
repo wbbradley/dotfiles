@@ -419,24 +419,6 @@ augroup Bash
   autocmd FileType bash,sh setlocal iskeyword+=45
 augroup END
 
-function! CloseCleanHiddenBuffers()
-  " Store the buffer numbers of all buffers currently displayed in a window
-  let l:visible = []
-  for l:winnr in range(1, winnr('$'))
-    call add(l:visible, winbufnr(l:winnr))
-  endfor
-
-  " Close all buffers that are not in 'visible' and not modified
-  for l:buffer in range(1, bufnr('$'))
-    if index(l:visible, l:buffer) == -1 && buflisted(l:buffer) && !getbufvar(l:buffer, '&mod')
-      execute 'silent! bdelete' l:buffer
-    endif
-  endfor
-endfunction
-
-command! Bclosehidden call CloseCleanHiddenBuffers()
-" autocmd BufWritePost * :Bclosehidden
-
 function! s:trim_trailing_whitespace() abort
   let l:view = winsaveview()
   keeppatterns %substitute/\m\s\+$//e
@@ -833,6 +815,9 @@ endif
 require("lualine").setup({
 	extensions = { "fzf", "lazy", "quickfix" },
 	sections = {
+		lualine_c = {
+			{ "filename", path = 1 },
+		},
 		lualine_x = {
 			"encoding", -- "fileformat",
 			"searchcount",
@@ -957,3 +942,52 @@ end
 
 -- nmap("<leader>a", ":lua gather_and_send()<CR>")
 vmap("<leader>a", ":lua create_review_visual_selection_buffer()<CR>:lua gather_and_send()<CR>")
+
+nmap("<leader>P", ":PopulateQuickFixFromClipboard<CR>")
+vim.api.nvim_create_user_command("PopulateQuickFixFromClipboard", function()
+	-- Grab the contents of the system clipboard
+	local clipboard_contents = vim.fn.system("pbpaste")
+	local clipboard_lines = vim.split(clipboard_contents, "\n", { plain = true, trimempty = true })
+
+	-- Define the possible formats for locations (adjust as needed)
+	local location_patterns = {
+		-- File paths (relative or absolute)
+		{ pattern = "^(.*):(%d+):(.*)", filename_group = 1, lnum_group = 2, description_group = 3 },
+
+		-- Python stack trace lines
+		{ pattern = 'File (%b""), line (%d+), in (%w+)', filename_group = 1, lnum_group = 2, description_group = 3 },
+	}
+
+	-- Find all the locations that match any of the patterns, and record them in a table of tables.
+	local locations = {}
+	for _, line in ipairs(clipboard_lines) do
+		for _, pattern_info in ipairs(location_patterns) do
+			local p1, p2, p3 = line:match(pattern_info.pattern)
+			if p1 then
+				local captures = { p1, p2, p3 }
+				local filename = captures[pattern_info.filename_group]:gsub('^"(.*)"$', "%1")
+				if
+					not string.find(filename, "site-packages", 1, true)
+					and not string.find(filename, "Python.framework", 1, true)
+				then
+					local lnum = tonumber(captures[pattern_info.lnum_group]) or 0
+					local description = captures[pattern_info.description_group]
+					table.insert(locations, {
+						filename = filename,
+						lnum = lnum,
+						text = description,
+					})
+				end
+			end
+		end
+	end
+
+	if #locations > 0 then
+		-- Populate the location list window
+		vim.fn.setqflist({}, "r", { title = "Clipboard Locations", items = locations })
+		vim.cmd("copen") -- Open the location list window
+		vim.cmd.cfirst()
+	else
+		vim.notify("No locations found in clipboard.", vim.log.levels.INFO)
+	end
+end, {})
