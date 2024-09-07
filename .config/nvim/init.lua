@@ -168,6 +168,16 @@ mypy_linter.args = {
 	"--no-color-output",
 	"--no-error-summary",
 	"--no-pretty",
+	function()
+		-- Get the buffer number of the current buffer
+		local current_buffer_number = vim.api.nvim_get_current_buf()
+
+		-- Get the full path to the buffer
+		local full_path = vim.api.nvim_buf_get_name(current_buffer_number)
+
+		-- Return the full path
+		return full_path
+	end,
 }
 vim.api.nvim_create_autocmd({ "BufEnter", "BufWritePost", "InsertLeave" }, {
 	pattern = "*",

@@ -1,10 +1,7 @@
 #!/bin/bash
 
 dbg() {
-  if [[ -n "$VIM" ]]; then
-    echo "$@" >> "$HOME"/vim-"$raw_toolname".log
-    return
-  fi
+  echo "$(date -Iseconds): $0 $*" >> "$HOME"/bootstrappy.log
   if [[ -n $BOOTSTRAPPY_VERBOSE ]]; then
     printf "\001\033[0;38;2;100;150;150m\002%s\001\033[0m\002: " "bootstrappy" >&2
     printf "%s" "$*" >&2
@@ -15,12 +12,16 @@ dbg() {
 raw_toolname="$(basename "$0")"
 if [[ -x .venv/bin/"$raw_toolname" ]]; then
   # This tool already exists inside the local virtualenv.
-  dbg "running $raw_toolname from $PWD/.venv/bin [pwd=$PWD, args=($*)]"
-  exec .venv/bin/"$raw_toolname" "$@"
+  dbg "running $raw_toolname from $PWD/.venv/bin [PWD='$PWD', args=($*)]"
+  tmpfile="$(mktemp)"
+  trap 'rm '"$tmpfile" EXIT
+  /usr/bin/time -o "$tmpfile" .venv/bin/"$raw_toolname" "$@"
+  dbg "$raw_toolname took $(cat "$tmpfile")"
 fi
 
 # shellcheck disable=SC1091
 dbg "sourcing $HOME/.bootstrappyrc"
+# shellcheck disable=SC1091
 . "$HOME/.bootstrappyrc"
 
 toolname="${raw_toolname//-/_}"
@@ -73,5 +74,5 @@ if ! [[ -x "$envdir"/bin/"$raw_toolname" ]]; then
   fi
 fi
 
-dbg "dispatching to '$envdir/bin/$raw_toolname'"
+dbg "dispatching to '$envdir/bin/$raw_toolname' with args=($*)"
 exec "$envdir"/bin/"$raw_toolname" "$@"
