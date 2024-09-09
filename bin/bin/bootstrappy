@@ -36,43 +36,61 @@ die() {
 }
 
 install() {
-  envdir="$1"
+  env_dir="$1"
   package="$2"
+
+  if ! [[ -x "$env_dir"/bin/uv ]]; then
+    if [[ -z "$allow_making_venv" ]]; then
+      dbg "no env_dir/bin/uv [env_dir=$env_dir]"
+      return 1
+    fi
+    # Ensure that uv is installed.
+    dbg "installing uv"
+    "$env_dir"/bin/python -mpip install -U uv pyyaml types-PyYAML || die "installing uv"
+  fi
+
   dbg "bootstrappy: installing $package"
-  "$envdir"/bin/python -muv pip install "$package" >&2 || die "failed to install $package"
+  "$env_dir"/bin/python -muv pip install "$package" >&2 || die "failed to install $package"
 }
 
-# envdir is where the user-site packages will be installed.
-envdir="$HOME/.bootstrappy"
-
-if ! [[ -f "$envdir"/pyvenv.cfg ]]; then
-  # Make sure the bootstrappy virtual environment is set up.
-  dbg "creating $(dirname "$envdir")"
-  mkdir -p "$(dirname "$envdir")"
-  dbg "installing venv"
-  python3 -mvenv "$envdir" || die "creating $envdir venv"
-fi
-
-if ! [[ -x "$envdir"/bin/uv ]]; then
-  # Ensure that uv is installed.
-  dbg "installing uv"
-  "$envdir"/bin/python -mpip install -U uv pyyaml types-PyYAML || die "installing uv"
-fi
-
-if ! [[ -x "$envdir"/bin/"$raw_toolname" ]]; then
-  # It looks like our tool is not installed.
-  if [[ -n "${!toolname}" ]]; then
-    # User has defined an override for this toolname's installation package.
-    dbg "[bootstrappy] using .bootstrappyrc override for $toolname=${!toolname}"
-    install "$envdir" "${!toolname}"
-  else
-    # Use the raw toolname itself as an installation package.
-    install "$envdir" "$raw_toolname"
+try-env-dir() {
+  env_dir="$1"
+  allow_making_venv="$2"
+  shift 2
+  if ! [[ -f "$env_dir"/pyvenv.cfg ]]; then
+    if [[ -z "$allow_making_venv" ]]; then
+      dbg "no env_dir/pyvenv [env_dir=$env_dir]"
+      return 1
+    fi
+    # Make sure the bootstrappy virtual environment is set up.
+    dbg "creating $(dirname "$env_dir")"
+    mkdir -p "$(dirname "$env_dir")"
+    dbg "installing venv"
+    python3 -mvenv "$env_dir" || die "creating $env_dir venv"
   fi
-  if ! [[ -x "$envdir"/bin/"$raw_toolname" ]]; then
-    die "installation of '$raw_toolname' failed [toolname='$toolname', resolved='${!toolname}']"
-  fi
-fi
 
-dbg "dispatching to '$envdir/bin/$raw_toolname' with args=($*)"
-exec "$envdir"/bin/"$raw_toolname" "$@"
+  if ! [[ -x "$env_dir"/bin/"$raw_toolname" ]]; then
+    if [[ -z "$allow_making_venv" ]]; then
+      dbg "no env_dir/bin/$raw_toolname [env_dir=$env_dir]"
+      return 1
+    fi
+    # It looks like our tool is not installed.
+    if [[ -n "${!toolname}" ]]; then
+      # User has defined an override for this toolname's installation package.
+      dbg "[bootstrappy] using .bootstrappyrc override for $toolname=${!toolname}"
+      install "$env_dir" "${!toolname}"
+    else
+      # Use the raw toolname itself as an installation package.
+      install "$env_dir" "$raw_toolname"
+    fi
+    if ! [[ -x "$env_dir"/bin/"$raw_toolname" ]]; then
+      die "installation of '$raw_toolname' failed [toolname='$toolname', resolved='${!toolname}']"
+    fi
+  fi
+
+  dbg "execing '$env_dir/bin/$raw_toolname' with args=($*)"
+  exec "$env_dir"/bin/"$raw_toolname" "$@"
+}
+try-env-dir "$PWD"/.venv '' "$@"
+try-env-dir "$HOME"/.bootstrappy '1' "$@"
+
