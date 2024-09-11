@@ -1,1 +1,0 @@
-To update pathogen, download the pathogen handler from https://raw.github.com/tpope/vim-pathogen/master/autoload/pathogen.vim and place it in the vim/.vim/autoload directory.
