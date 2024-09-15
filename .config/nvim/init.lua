@@ -952,7 +952,7 @@ vim.api.nvim_create_user_command("PopulateQuickFixFromClipboard", function()
 	-- Define the possible formats for locations (adjust as needed)
 	local location_patterns = {
 		-- File paths (relative or absolute)
-		{ pattern = "^(.*):(%d+):(.*)", filename_group = 1, lnum_group = 2, description_group = 3 },
+		{ pattern = "^([^:]+):(%d+):(.*)", filename_group = 1, lnum_group = 2, description_group = 3 },
 
 		-- Python stack trace lines
 		{ pattern = 'File (%b""), line (%d+), in (%w+)', filename_group = 1, lnum_group = 2, description_group = 3 },
@@ -969,6 +969,7 @@ vim.api.nvim_create_user_command("PopulateQuickFixFromClipboard", function()
 				if
 					not string.find(filename, "site-packages", 1, true)
 					and not string.find(filename, "Python.framework", 1, true)
+					and not string.find(filename, "importlib", 1, true)
 				then
 					local lnum = tonumber(captures[pattern_info.lnum_group]) or 0
 					local description = captures[pattern_info.description_group]
