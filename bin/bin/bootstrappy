@@ -89,7 +89,10 @@ try-env-dir() {
   fi
 
   dbg "execing '$env_dir/bin/$raw_toolname' with args=($*)"
-  exec "$env_dir"/bin/"$raw_toolname" "$@"
+  "$env_dir"/bin/"$raw_toolname" "$@"
+  res="$?"
+  dbg "exited with code ($res)"
+  exit "$res"
 }
 try-env-dir "$PWD"/.venv '' "$@"
 try-env-dir "$HOME"/.bootstrappy '1' "$@"
