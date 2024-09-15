@@ -206,6 +206,9 @@ export HISTCONTROL=ignoreboth:erasedups
 export EMACS_SOCKET_NAME="${TMPDIR}/emacs$(id -u)/server"
 export EDITOR='nvim' # client -nw -c -a ""'
 
+tail-ide() {
+  tail -n 1000 -f "$HOME"/sample.profile "$HOME"/.local/state/nvim/*.log "$HOME"/bootstrappy.log
+}
 on-macos() {
   [[ "$(uname)" = "Darwin" ]]
 }

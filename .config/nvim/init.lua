@@ -20,7 +20,7 @@ local lazy_plugins = {
 	"lewis6991/gitsigns.nvim",
 	"nvim-lualine/lualine.nvim",
 	{
-		"stevearc/conform.nvim",
+		"wbbradley/conform.nvim",
 		opts = {},
 	},
 	"mfussenegger/nvim-lint",
@@ -137,7 +137,7 @@ require("conform").setup({
 		},
 	},
 	format_on_save = {
-		lsp_format = "fallback",
+		lsp_format = "never",
 		timeout_ms = 1500,
 	},
 	formatters_by_ft = {
