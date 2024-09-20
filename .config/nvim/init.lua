@@ -1,4 +1,7 @@
+-- [[
 -- Lazy package manager
+-- luacheck: globals vim
+-- ]]
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 
 if not (vim.uv or vim.loop).fs_stat(lazypath) then
@@ -18,6 +21,7 @@ local lazy_plugins = {
 	"easymotion/vim-easymotion",
 	"folke/trouble.nvim",
 	"lewis6991/gitsigns.nvim",
+	"folke/which-key.nvim",
 	"nvim-lualine/lualine.nvim",
 	{
 		"wbbradley/conform.nvim",
@@ -59,7 +63,28 @@ local lazy_plugins = {
 	"nvim-lua/plenary.nvim",
 	"nvim-treesitter/nvim-treesitter",
 	"nvim-treesitter/nvim-treesitter-context",
-	"hrsh7th/nvim-cmp",
+	{
+		"folke/lazydev.nvim",
+		ft = "lua", -- only load on lua files
+		opts = {
+			library = {
+				-- See the configuration section for more details
+				-- Load luvit types when the `vim.uv` word is found
+				{ path = "luvit-meta/library", words = { "vim%.uv" } },
+			},
+		},
+	},
+	{ "Bilal2453/luvit-meta", lazy = true },
+	{ -- optional completion source for require statements and module annotations
+		"hrsh7th/nvim-cmp",
+		opts = function(_, opts)
+			opts.sources = opts.sources or {}
+			table.insert(opts.sources, {
+				name = "lazydev",
+				group_index = 0, -- set group index to 0 to skip loading LuaLS completions
+			})
+		end,
+	},
 	{ "ellisonleao/gruvbox.nvim", priority = 1000, config = true },
 	"rust-lang/rust.vim",
 	{
@@ -86,28 +111,30 @@ local _ = require("cmp")
 require("lspconfig").gopls.setup({})
 require("lspconfig").terraformls.setup({})
 -- require("lspconfig").rust_analyzer.setup({})
-vim.api.nvim_create_autocmd("BufWritePre", {
-	pattern = "*.go",
-	callback = function()
-		local params = vim.lsp.util.make_range_params()
-		params.context = { only = { "source.organizeImports" } }
-		-- buf_request_sync defaults to a 1000ms timeout. Depending on your
-		-- machine and codebase, you may want longer. Add an additional
-		-- argument after params if you find that you have to write the file
-		-- twice for changes to be saved.
-		-- E.g., vim.lsp.buf_request_sync(0, "textDocument/codeAction", params, 3000)
-		local result = vim.lsp.buf_request_sync(0, "textDocument/codeAction", params)
-		for cid, res in pairs(result or {}) do
-			for _, r in pairs(res.result or {}) do
-				if r.edit then
-					local enc = (vim.lsp.get_client_by_id(cid) or {}).offset_encoding or "utf-16"
-					vim.lsp.util.apply_workspace_edit(r.edit, enc)
+if false then
+	vim.api.nvim_create_autocmd("BufWritePre", {
+		pattern = "*.go",
+		callback = function()
+			local params = vim.lsp.util.make_range_params()
+			params.context = { only = { "source.organizeImports" } }
+			-- buf_request_sync defaults to a 1000ms timeout. Depending on your
+			-- machine and codebase, you may want longer. Add an additional
+			-- argument after params if you find that you have to write the file
+			-- twice for changes to be saved.
+			-- E.g., vim.lsp.buf_request_sync(0, "textDocument/codeAction", params, 3000)
+			local result = vim.lsp.buf_request_sync(0, "textDocument/codeAction", params)
+			for cid, res in pairs(result or {}) do
+				for _, r in pairs(res.result or {}) do
+					if r.edit then
+						local enc = (vim.lsp.get_client_by_id(cid) or {}).offset_encoding or "utf-16"
+						vim.lsp.util.apply_workspace_edit(r.edit, enc)
+					end
 				end
 			end
-		end
-		vim.lsp.buf.format({ async = false })
-	end,
-})
+			vim.lsp.buf.format({ async = false })
+		end,
+	})
+end
 vim.cmd("colorscheme gruvbox")
 require("nvim_context_vt").setup({
 	min_rows = 30,
@@ -137,7 +164,7 @@ require("conform").setup({
 		},
 	},
 	format_on_save = {
-		lsp_format = "never",
+		lsp_format = "fallback",
 		timeout_ms = 1500,
 	},
 	formatters_by_ft = {
@@ -148,7 +175,12 @@ require("conform").setup({
 		terraform = { "terraform_fmt" },
 	},
 })
--- vim.api.nvim_create_autocmd("BufWritePre", { pattern = "*", callback = function(args) require("conform").format({ bufnr = args.buf }) end, })
+vim.api.nvim_create_autocmd("BufWritePre", {
+	pattern = "*",
+	callback = function(args)
+		require("conform").format({ bufnr = args.buf })
+	end,
+})
 -- require("lint").linters.cargo = require("cargo")
 require("lint").linters_by_ft = {
 	python = { "ruff", "mypy" },
@@ -157,6 +189,7 @@ require("lint").linters_by_ft = {
 	toml = { "tomllint" },
 	lua = { "luacheck" },
 	sql = { "pgsanity" },
+	-- go = { "golangci-lint" },
 	-- rust = { "cargo" },
 }
 local mypy_linter = require("lint").linters.mypy
@@ -397,13 +430,6 @@ augroup Haskell
   " autocmd FileType haskell nnoremap <buffer> <Leader>htc :GhcModTypeClear<cr>
 augroup END
 
-" FZF UI version of search.
-command! -bang -nargs=* GGrep
-  \ call fzf#vim#grep(
-  \   'git grep --line-number -- '.shellescape(<q-args>).' | grep -v -e dist/ -e static/ -e ".bundle:" -e "mobile/assets/.*\.js"',
-  \   0,
-  \   fzf#vim#with_preview({'dir': systemlist('git rev-parse --show-toplevel')[0]}), <bang>0)
-
 " Make the quickfix window take up the entirety of the bottom of the window
 " when it opens
 autocmd FileType qf wincmd J
@@ -539,28 +565,6 @@ function! FindPromptRaw()
   cw
 endfunction
 
-function! FindPromptDirectGit()
-  let i = input("Search: ", "")
-  let j = substitute(i, "_", ".", "g")
-	let str = substitute(j, "test_", ".*", "g")
-	if str == ""
-		return
-	endif
-
-	execute "Ggrep -q '" . str . "'"
-  cw
-  redraw!
-endfunction
-
-function! FindWordUnderCursor()
-  let str = expand("<cword>")
-  if str == ""
-    return
-  endif
-
-  execute "LiveGrep " . str
-endfunction
-
 function! FindWordUnderCursorNoUI()
   let str = expand("<cword>")
   if str == ""
@@ -615,7 +619,6 @@ endfunction
 
 nnoremap <leader>` :!ctags -R .<CR>
 
-" nnoremap <F3> :call FindWordUnderCursor()<CR>
 " :execute 'grep! ' . expand('<cword>') . ' *'<CR>
 
 nnoremap <F4> :call FindWordUnderCursorNoUI()<CR>
