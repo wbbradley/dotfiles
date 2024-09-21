@@ -1,8 +1,8 @@
 [window]
 decorations = "Full"
 option_as_alt = "OnlyRight"
-padding.x = 4
-padding.y = 4
+padding.x = 0
+padding.y = 0
 
 [scrolling]
 history = 100000

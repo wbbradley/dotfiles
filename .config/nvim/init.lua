@@ -82,6 +82,9 @@ nmap("H", ":lua vim.diagnostic.goto_prev()<CR>")
 nmap("<F9>", ":cprev<CR>")
 nmap("<F10>", ":cnext<CR>")
 
+nmap("T", function()
+  require("fzf-lua").tags()
+end)
 nmap("F", function()
   require("fzf-lua").live_grep({
     cmd = "git grep --line-number --column --color=always",
