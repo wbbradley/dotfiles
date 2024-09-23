@@ -37,7 +37,11 @@ vim.opt.splitbelow = true
 --  See `:help 'list'`
 --  and `:help 'listchars'`
 vim.opt.list = true
-vim.opt.listchars = { tab = "» ", trail = "·", nbsp = "␣" }
+vim.opt.listchars = {
+  tab = "  ",
+  trail = "·",
+  nbsp = "␣",
+}
 
 -- Preview substitutions live, as you type!
 vim.opt.inccommand = "split"
@@ -65,6 +69,9 @@ local function vmap(shortcut, command)
 end
 
 nmap("<Esc>", "<cmd>nohlsearch<CR>")
+nmap("<S-Tab>", "<<")
+vmap("<S-Tab>", "<<")
+vmap("<Tab>", ">>")
 nmap(";", ":")
 imap("jk", "<Esc>")
 nmap("<Leader>q", ":conf qa<CR>")
@@ -73,6 +80,15 @@ nmap("<leader>90", ":e ~/.config/nvim/init.lua<CR>")
 nmap("<leader>9a", ":e ~/.config/alacritty/alacritty.toml<CR>")
 nmap("<leader>92", ":e ~/.bashrc<CR>")
 nmap("<leader>93", ":e ~/local.bashrc<CR>")
+nmap("<leader>99", ":e ~/src/dotfiles.old/.config/nvim/init.lua<CR>")
+nmap("<Leader>c", ":%s/\\<<C-r><C-w>\\>/")
+vmap("<Leader>c", '"hy:%s/<C-r>h/')
+
+nmap("Q", "gqq")
+vmap("Q", "gq")
+nmap("c<Space>", "ct_")
+nmap("s", ':exec "normal i".nr2char(getchar())."\\el"<CR>')
+
 nmap("<leader>i", "Oimport ipdb<CR>ipdb.set_trace()<Esc>j_")
 nmap("<leader>p", "Oimport pdb<CR>pdb.set_trace()<Esc>j_")
 nmap("<leader>e", ":e `=expand('%:p:h')`<CR>")
@@ -109,9 +125,10 @@ vim.api.nvim_create_user_command("PopulateQuickFixFromClipboard", function()
 
   -- Define the possible formats for locations (adjust as needed)
   local location_patterns = {
+    -- Rust backtrace
+    { pattern = ".*at ([^:]+):(%d+):(%d+)$", filename_group = 1, lnum_group = 2, description_group = 3 },
     -- File paths (relative or absolute)
     { pattern = "^([^:]+):(%d+):(.*)", filename_group = 1, lnum_group = 2, description_group = 3 },
-
     -- Python stack trace lines
     {
       pattern = 'File (%b""), line (%d+), in (%w+)',
@@ -131,6 +148,7 @@ vim.api.nvim_create_user_command("PopulateQuickFixFromClipboard", function()
         local filename = captures[pattern_info.filename_group]:gsub('^"(.*)"$', "%1")
         if
           not string.find(filename, "site-packages", 1, true)
+          and not string.find(filename, "/rustc/", 1, true)
           and not string.find(filename, "Python.framework", 1, true)
           and not string.find(filename, "importlib", 1, true)
         then
@@ -141,6 +159,7 @@ vim.api.nvim_create_user_command("PopulateQuickFixFromClipboard", function()
             lnum = lnum,
             text = description,
           })
+          break
         end
       end
     end
@@ -189,6 +208,14 @@ vim.api.nvim_create_autocmd("TextYankPost", {
   end,
 })
 
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = "go",
+  callback = function()
+    vim.bo.tabstop = 2
+    vim.bo.shiftwidth = 2
+    vim.bo.expandtab = false
+  end,
+})
 -- [[ Install `lazy.nvim` plugin manager ]]
 --    See `:help lazy.nvim.txt` or https://github.com/folke/lazy.nvim for more info
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
@@ -262,6 +289,11 @@ require("lazy").setup({
     },
   },
 
+  "rust-lang/rust.vim",
+  {
+    "mrcjkb/rustaceanvim",
+    ft = { "rust" },
+  },
   -- NOTE: Plugins can also be configured to run Lua code when they are loaded.
   --
   -- This is often very useful to both group configuration, as well as handle
@@ -509,11 +541,6 @@ require("lazy").setup({
       vim.api.nvim_create_autocmd("LspAttach", {
         group = vim.api.nvim_create_augroup("kickstart-lsp-attach", { clear = true }),
         callback = function(event)
-          -- NOTE: Remember that Lua is a real programming language, and as such it is possible
-          -- to define small helper and utility functions so you don't have to repeat yourself.
-          --
-          -- In this case, we create a function that lets us more easily define mappings specific
-          -- for LSP related items. It sets the mode, buffer and description for us each time.
           local map = function(keys, func, desc, mode)
             mode = mode or "n"
             vim.keymap.set(mode, keys, func, { buffer = event.buf, desc = "LSP: " .. desc })
@@ -714,11 +741,8 @@ require("lazy").setup({
       end,
       formatters_by_ft = {
         lua = { "stylua" },
-        -- Conform can also run multiple formatters sequentially
-        -- python = { "isort", "black" },
-        --
-        -- You can use 'stop_after_first' to run the first available formatter from the list
-        -- javascript = { "prettierd", "prettier", stop_after_first = true },
+        rust = { "rustfmt" },
+        python = { "autoimport", "isort", "ruff" },
       },
     },
   },
@@ -942,6 +966,28 @@ require("lazy").setup({
     },
   },
 })
-
+vim.api.nvim_create_autocmd({ "BufWinEnter" }, {
+  -- group = "userconfig",
+  desc = "return cursor to where it was last time closing the file",
+  pattern = "*",
+  command = 'silent! normal! g`"zv',
+})
+vim.api.nvim_create_autocmd("BufNew", {
+  group = vim.api.nvim_create_augroup("lintls-bufnew", { clear = true }),
+  callback = function(event)
+    if vim.fn.executable("lintls") == 1 then
+      vim.lsp.start({
+        name = "lintls",
+        cmd = { "lintls" },
+        root_dir = vim.fs.root(0, { ".git", "pyproject.toml", "setup.py", "Cargo.toml", "go.mod" }),
+      }, {
+        bufnr = 0,
+        reuse_client = function(_, _)
+          return true
+        end,
+      })
+    end
+  end,
+})
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
