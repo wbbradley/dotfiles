@@ -74,6 +74,7 @@ vmap("<S-Tab>", "<")
 vmap("<Tab>", ">")
 nmap(";", ":")
 imap("jk", "<Esc>")
+nmap("g]", "<cmd>lua require('fzf-lua').tags({ fzf_opts = { ['--query'] = vim.fn.expand('<cword>') } })<CR>")
 nmap("<Leader>q", ":conf qa<CR>")
 nmap("<leader><space>", ":noh<cr>:match<cr>:set nopaste<CR>:redraw!<CR>")
 nmap("<leader>90", ":e ~/.config/nvim/init.lua<CR>")
@@ -792,7 +793,7 @@ require("lazy").setup({
           lsp_format_opt = "fallback"
         end
         return {
-          timeout_ms = 500,
+          timeout_ms = 1500,
           lsp_format = lsp_format_opt,
         }
       end,
