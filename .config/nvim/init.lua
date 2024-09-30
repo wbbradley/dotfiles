@@ -70,8 +70,8 @@ end
 
 nmap("<Esc>", "<cmd>nohlsearch<CR>")
 nmap("<S-Tab>", "<<")
-vmap("<S-Tab>", "<<")
-vmap("<Tab>", ">>")
+vmap("<S-Tab>", "<")
+vmap("<Tab>", ">")
 nmap(";", ":")
 imap("jk", "<Esc>")
 nmap("<Leader>q", ":conf qa<CR>")
@@ -127,6 +127,13 @@ vim.api.nvim_create_user_command("PopulateQuickFixFromClipboard", function()
   local location_patterns = {
     -- Rust backtrace
     { pattern = ".*at ([^:]+):(%d+):(%d+)$", filename_group = 1, lnum_group = 2, description_group = 3 },
+    -- Rust cargo build output
+    {
+      pattern = ".* ([^:]+):(%d+):(.*)",
+      filename_group = 1,
+      lnum_group = 2,
+      description_group = "line_before",
+    },
     -- File paths (relative or absolute)
     { pattern = "^([^:]+):(%d+):(.*)", filename_group = 1, lnum_group = 2, description_group = 3 },
     -- Python stack trace lines
@@ -140,6 +147,7 @@ vim.api.nvim_create_user_command("PopulateQuickFixFromClipboard", function()
 
   -- Find all the locations that match any of the patterns, and record them in a table of tables.
   local locations = {}
+  local prior_line = ""
   for _, line in ipairs(clipboard_lines) do
     for _, pattern_info in ipairs(location_patterns) do
       local p1, p2, p3 = line:match(pattern_info.pattern)
@@ -153,7 +161,12 @@ vim.api.nvim_create_user_command("PopulateQuickFixFromClipboard", function()
           and not string.find(filename, "importlib", 1, true)
         then
           local lnum = tonumber(captures[pattern_info.lnum_group]) or 0
-          local description = captures[pattern_info.description_group]
+          local description
+          if pattern_info.description_group == "line_before" then
+            description = prior_line
+          else
+            description = captures[pattern_info.description_group]
+          end
           table.insert(locations, {
             filename = filename,
             lnum = lnum,
@@ -163,6 +176,7 @@ vim.api.nvim_create_user_command("PopulateQuickFixFromClipboard", function()
         end
       end
     end
+    prior_line = line
   end
 
   if #locations > 0 then
@@ -207,6 +221,17 @@ vim.api.nvim_create_autocmd("TextYankPost", {
     vim.highlight.on_yank()
   end,
 })
+
+vim.cmd([[
+augroup RustCore
+  autocmd FileType rust setlocal makeprg=cargo\ clippy")
+  autocmd FileType rust nmap <F7> :pclose<CR>:setlocal makeprg=cargo\ clippy<CR>:make<CR><CR>:copen<CR>
+  autocmd FileType rust nmap <F8> :pclose<CR>:setlocal makeprg=cargo\ clippy<CR>:make<CR><CR>:copen<CR>
+  autocmd FileType rust setlocal tags=./rusty-tags.vi;/,$RUST_SRC_PATH/rusty-tags.vi,tags
+  autocmd BufRead *.rs setlocal tags=./rusty-tags.vi;/,$RUST_SRC_PATH/rusty-tags.vi,tags
+  autocmd BufWritePost *.rs :silent! exec "!rusty-tags vi --quiet --start-dir=" . expand('%:p:h') . "&"
+augroup END
+]])
 
 vim.api.nvim_create_autocmd("FileType", {
   pattern = "go",
@@ -287,6 +312,15 @@ require("lazy").setup({
         changedelete = { text = "~" },
       },
     },
+  },
+  {
+    "stevearc/oil.nvim",
+    ---@module 'oil'
+    ---@type oil.SetupOpts
+    opts = {},
+    -- Optional dependencies
+    dependencies = { { "echasnovski/mini.icons", opts = {} } },
+    -- dependencies = { "nvim-tree/nvim-web-devicons" }, -- use if prefer nvim-web-devicons
   },
 
   "rust-lang/rust.vim",
@@ -699,6 +733,7 @@ require("lazy").setup({
       local ensure_installed = vim.tbl_keys(servers or {})
       vim.list_extend(ensure_installed, {
         "stylua", -- Used to format Lua code
+        "clangd",
       })
       require("mason-tool-installer").setup({ ensure_installed = ensure_installed })
 
@@ -814,8 +849,10 @@ require("lazy").setup({
         mapping = cmp.mapping.preset.insert({
           -- Select the [n]ext item
           ["<C-n>"] = cmp.mapping.select_next_item(),
+          ["<C-j>"] = cmp.mapping.select_next_item(),
           -- Select the [p]revious item
           ["<C-p>"] = cmp.mapping.select_prev_item(),
+          ["<C-k>"] = cmp.mapping.select_prev_item(),
 
           -- Scroll the documentation window [b]ack / [f]orward
           ["<C-b>"] = cmp.mapping.scroll_docs(-4),
@@ -824,6 +861,7 @@ require("lazy").setup({
           -- Accept ([y]es) the completion.
           --  This will auto-import if your LSP supports it.
           --  This will expand snippets if the LSP sent a snippet.
+          ["<Tab>"] = cmp.mapping.confirm({ select = true }),
           ["<C-y>"] = cmp.mapping.confirm({ select = true }),
 
           -- If you prefer more traditional completion keymaps,
@@ -881,43 +919,6 @@ require("lazy").setup({
     opts = { signs = false },
   },
 
-  { -- Collection of various small independent plugins/modules
-    "echasnovski/mini.nvim",
-    config = function()
-      -- Better Around/Inside textobjects
-      --
-      -- Examples:
-      --  - va)  - [V]isually select [A]round [)]paren
-      --  - yinq - [Y]ank [I]nside [N]ext [Q]uote
-      --  - ci'  - [C]hange [I]nside [']quote
-      require("mini.ai").setup({ n_lines = 500 })
-
-      -- Add/delete/replace surroundings (brackets, quotes, etc.)
-      --
-      -- - saiw) - [S]urround [A]dd [I]nner [W]ord [)]Paren
-      -- - sd'   - [S]urround [D]elete [']quotes
-      -- - sr)'  - [S]urround [R]eplace [)] [']
-      require("mini.surround").setup()
-
-      -- Simple and easy statusline.
-      --  You could remove this setup call if you don't like it,
-      --  and try some other statusline plugin
-      local statusline = require("mini.statusline")
-      -- set use_icons to true if you have a Nerd Font
-      statusline.setup({ use_icons = vim.g.have_nerd_font })
-
-      -- You can configure sections in the statusline by overriding their
-      -- default behavior. For example, here we set the section for
-      -- cursor location to LINE:COLUMN
-      ---@diagnostic disable-next-line: duplicate-set-field
-      statusline.section_location = function()
-        return "%2l:%-2v"
-      end
-
-      -- ... and there is more!
-      --  Check out: https://github.com/echasnovski/mini.nvim
-    end,
-  },
   { -- Highlight, edit, and navigate code
     "nvim-treesitter/nvim-treesitter",
     build = ":TSUpdate",
@@ -933,7 +934,9 @@ require("lazy").setup({
         "luadoc",
         "markdown",
         "markdown_inline",
+        "python",
         "query",
+        "rust",
         "vim",
         "vimdoc",
       },
@@ -976,20 +979,53 @@ require("lazy").setup({
     },
   },
 })
+
 vim.api.nvim_create_autocmd({ "BufWinEnter" }, {
-  -- group = "userconfig",
+  group = vim.api.nvim_create_augroup("cursor-pos-on-reopen", { clear = true }),
   desc = "return cursor to where it was last time closing the file",
   pattern = "*",
   command = 'silent! normal! g`"zv',
 })
-vim.api.nvim_create_autocmd("BufNew", {
+
+vim.g.toggle_diagnostics = function()
+  vim.diagnostic.enable(not vim.diagnostic.is_enabled())
+end
+
+vim.api.nvim_set_keymap(
+  "n",
+  "<space>d",
+  "<cmd>lua vim.g.toggle_diagnostics()<CR>",
+  { noremap = true, silent = true }
+)
+vim.api.nvim_create_autocmd({ "BufRead" }, {
   group = vim.api.nvim_create_augroup("lintls-bufnew", { clear = true }),
-  callback = function(event)
-    if vim.fn.executable("lintls") == 1 then
+  callback = function(_)
+    if vim.fn.executable("lintls") ~= 0 then
+      -- We found an executable for lintls.
+      vim.lsp.set_log_level(vim.log.levels.INFO)
       vim.lsp.start({
         name = "lintls",
         cmd = { "lintls" },
         root_dir = vim.fs.root(0, { ".git", "pyproject.toml", "setup.py", "Cargo.toml", "go.mod" }),
+        settings = {
+          languages = {
+            toml = {
+              linters = {
+                {
+                  program = "tomllint",
+                  args = { "-" },
+                  pattern = "(.*):(\\d+):(\\d+): error: (.*)",
+                  filename_match = 1,
+                  line_match = 2,
+                  start_col_match = 3,
+                  description_match = 4,
+                  use_stdin = true,
+                  use_stderr = true,
+                },
+              },
+            },
+          },
+        },
       }, {
         bufnr = 0,
         reuse_client = function(_, _)
@@ -999,6 +1035,7 @@ vim.api.nvim_create_autocmd("BufNew", {
     end
   end,
 })
+
 vim.api.nvim_create_autocmd({ "BufWritePre" }, {
   group = vim.api.nvim_create_augroup("go-imports", { clear = true }),
   pattern = "*.go",
