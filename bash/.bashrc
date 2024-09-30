@@ -466,4 +466,5 @@ if [[ -f "$HOME/local.bashrc" ]]; then
 fi
 export HELIX_RUNTIME=~/src/helix/runtime
 export RUSTFLAGS='-Cforce-frame-pointers=yes'
+export RUST_SRC_PATH="$(rustc --print sysroot)"/lib/rustlib/src/rust/library/
 printf ''
