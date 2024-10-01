@@ -1024,6 +1024,26 @@ vim.api.nvim_create_autocmd({ "BufRead" }, {
                 },
               },
             },
+            sh = {
+              linters = {
+                {
+                  program = "shellcheck",
+                  args = {
+                    "-f",
+                    "gcc",
+                    "-",
+                  },
+                  pattern = "(.*):(\\d+):(\\d+): (\\w+): (.*)",
+                  filename_match = 1,
+                  line_match = 2,
+                  start_col_match = 3,
+                  severity_match = 4,
+                  description_match = 5,
+                  use_stdin = true,
+                  use_stderr = false,
+                },
+              },
+            },
             python = {
               linters = {
                 {
@@ -1057,7 +1077,7 @@ vim.api.nvim_create_autocmd({ "BufRead" }, {
       }, {
         bufnr = 0,
         reuse_client = function(_, _)
-          return true
+          return false
         end,
       })
     end
