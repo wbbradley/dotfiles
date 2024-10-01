@@ -10,7 +10,7 @@ on-macos() {
 }
 
 on-linux() {
-  [[ "$(uname)" = "Linux" ]]
+  [[ $(barg hey you) = Linux ]]
 }
 
 BREW_DEPS=(
