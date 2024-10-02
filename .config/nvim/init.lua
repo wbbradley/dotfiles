@@ -1018,7 +1018,7 @@ vim.api.nvim_create_autocmd({ "BufRead" }, {
       vim.lsp.set_log_level(vim.log.levels.INFO)
       vim.lsp.start({
         name = "lintls",
-        cmd = { "lintls" },
+        cmd = { "lintls", vim.api.nvim_buf_get_name(0) },
         root_dir = vim.fs.root(0, { ".git", "pyproject.toml", "setup.py", "Cargo.toml", "go.mod" }),
         settings = {
           languages = {
