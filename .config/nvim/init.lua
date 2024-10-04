@@ -12,8 +12,8 @@ end)
 
 vim.opt.breakindent = true
 
--- Save undo history
-vim.opt.undofile = true
+-- Do not save undo history because it's annoying.
+vim.opt.undofile = false
 
 -- Case-insensitive searching UNLESS \C or one or more capital letters in the search term
 vim.opt.ignorecase = true
@@ -797,10 +797,28 @@ require("lazy").setup({
           lsp_format = lsp_format_opt,
         }
       end,
+      formatters = {
+        autoimport = {
+          command = "autoimport",
+          args = { "-" },
+          stdin = true,
+          -- A function that calculates the directory to run the command in
+          cwd = function()
+            return vim.fs.root(0, { ".git", "pyproject.toml", "setup.py" })
+          end,
+          require_cwd = false,
+          exit_codes = { 0 },
+          -- Set to false to disable merging the config with the base definition
+          inherit = false,
+        },
+        mdformat = {
+          args = { "--number", "--wrap", "100", "-" },
+        },
+      },
       formatters_by_ft = {
         lua = { "stylua" },
         rust = { "rustfmt" },
-        python = { "autoimport", "isort", "ruff" },
+        python = { "autoimport", "isort", "ruff_format", "ruff_fix" },
       },
     },
   },
