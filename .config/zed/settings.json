@@ -14,7 +14,7 @@
   "ui_font_size": 14,
   "buffer_font_size": 14,
   "theme": {
-    "mode": "system",
+    "mode": "dark",
     "light": "Gruvbox Light Hard",
     "dark": "Gruvbox Dark Hard"
   },

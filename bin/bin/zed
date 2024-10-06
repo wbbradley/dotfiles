@@ -1,0 +1,4 @@
+#!/bin/bash
+export RUST_BACKTRACE=1
+export RUST_LOG=info
+exec cargo run --manifest-path "$HOME"/src/zed/crates/zed/Cargo.toml -- "$@"

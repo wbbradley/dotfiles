@@ -75,13 +75,17 @@ vmap("<Tab>", ">")
 nmap(";", ":")
 imap("jk", "<Esc>")
 nmap("g]", "<cmd>lua require('fzf-lua').tags({ fzf_opts = { ['--query'] = vim.fn.expand('<cword>') } })<CR>")
+nmap("T", "<cmd>lua require('fzf-lua').tags()<CR>")
 nmap("<Leader>q", ":conf qa<CR>")
+nmap("<Leader>`", ":!ctags -R .<CR>")
 nmap("<leader><space>", ":noh<cr>:match<cr>:set nopaste<CR>:redraw!<CR>")
 nmap("<leader>90", ":e ~/.config/nvim/init.lua<CR>")
 nmap("<leader>9a", ":e ~/.config/alacritty/alacritty.toml<CR>")
 nmap("<leader>92", ":e ~/.bashrc<CR>")
 nmap("<leader>93", ":e ~/local.bashrc<CR>")
 nmap("<leader>99", ":e ~/src/dotfiles.old/.config/nvim/init.lua<CR>")
+nmap("<leader>9l", ":e ~/.local/state/nvim/lsp.log<CR>")
+nmap("<leader>9k", ":e ~/.config/zed/keymap.json<CR>")
 nmap("<Leader>c", ":%s/\\<<C-r><C-w>\\>/")
 vmap("<Leader>c", '"hy:%s/<C-r>h/')
 
@@ -99,12 +103,10 @@ nmap("H", ":lua vim.diagnostic.goto_prev()<CR>")
 nmap("<F9>", ":cprev<CR>")
 nmap("<F10>", ":cnext<CR>")
 
-nmap("T", function()
-  require("fzf-lua").tags()
-end)
+-- nmap("T", function() require("telescope.builtin").tags({ path_display = function(path) return require("plenary.path").shorten(path, 10) end, }) end)
 nmap("F", function()
   require("fzf-lua").live_grep({
-    cmd = "git grep --line-number --column --color=always",
+    cmd = "git grep --line-number --column --color=never",
   })
 end)
 nmap("<F3>", function()
@@ -228,9 +230,6 @@ augroup RustCore
   autocmd FileType rust setlocal makeprg=cargo\ clippy")
   autocmd FileType rust nmap <F7> :pclose<CR>:setlocal makeprg=cargo\ clippy<CR>:make<CR><CR>:copen<CR>
   autocmd FileType rust nmap <F8> :pclose<CR>:setlocal makeprg=cargo\ clippy<CR>:make<CR><CR>:copen<CR>
-  autocmd FileType rust setlocal tags=./rusty-tags.vi;/,$RUST_SRC_PATH/rusty-tags.vi,tags
-  autocmd BufRead *.rs setlocal tags=./rusty-tags.vi;/,$RUST_SRC_PATH/rusty-tags.vi,tags
-  autocmd BufWritePost *.rs :silent! exec "!rusty-tags vi --quiet --start-dir=" . expand('%:p:h') . "&"
 augroup END
 ]])
 
@@ -279,7 +278,7 @@ require("lazy").setup({
         fzf_opts = {
           ["--layout"] = "default",
         },
-        actions = {
+        --[[actions = {
           files = {
             ["enter"] = function(selected, opts)
               local retval = actions.file_edit_or_qf(selected, opts)
@@ -289,7 +288,7 @@ require("lazy").setup({
               return retval
             end,
           },
-        },
+        },]]
         -- cmd = "git grep --line-number --column --color=always",
       })
     end,
@@ -463,6 +462,7 @@ require("lazy").setup({
 
       -- [[ Configure Telescope ]]
       -- See `:help telescope` and `:help telescope.setup()`
+      local actions = require("telescope.actions")
       require("telescope").setup({
         -- You can put your default mappings / updates / etc. in here
         --  All the info you're looking for is in `:help telescope.setup()`
@@ -470,8 +470,9 @@ require("lazy").setup({
         defaults = {
           mappings = {
             i = {
-              ["<C-k>"] = require("telescope.actions").move_selection_previous,
-              ["<C-j>"] = require("telescope.actions").move_selection_next,
+              ["<esc>"] = actions.close,
+              ["<C-k>"] = actions.move_selection_previous,
+              ["<C-j>"] = actions.move_selection_next,
             },
           },
         },
@@ -498,7 +499,7 @@ require("lazy").setup({
       vim.keymap.set("n", "<leader>sd", builtin.diagnostics, { desc = "[S]earch [D]iagnostics" })
       vim.keymap.set("n", "<leader>sr", builtin.resume, { desc = "[S]earch [R]esume" })
       vim.keymap.set("n", "<leader>s.", builtin.oldfiles, { desc = '[S]earch Recent Files ("." for repeat)' })
-      vim.keymap.set("n", "<leader><leader>", builtin.buffers, { desc = "[ ] Find existing buffers" })
+      -- vim.keymap.set("n", "<leader><leader>", builtin.buffers, { desc = "[ ] Find existing buffers" })
 
       -- Slightly advanced example of overriding default behavior and theme
       vim.keymap.set("n", "<leader>/", function()
@@ -539,6 +540,26 @@ require("lazy").setup({
     },
   },
   { "Bilal2453/luvit-meta", lazy = true },
+  {
+    "nvim-treesitter/nvim-treesitter-context",
+    config = function()
+      require("treesitter-context").setup({
+        enable = true, -- Enable this plugin (Can be enabled/disabled later via commands)
+        max_lines = 3, -- How many lines the window should span. Values <= 0 mean no limit.
+        min_window_height = 10, -- Minimum editor window height to enable context. Values <= 0 mean no limit.
+        line_numbers = true,
+        multiline_threshold = 3, -- Maximum number of lines to show for a single context
+        trim_scope = "inner", -- Which context lines to discard if `max_lines` is exceeded. Choices: 'inner', 'outer'
+        mode = "cursor", -- Line used to calculate context. Choices: 'cursor', 'topline'
+        -- Separator between context and content. Should be a single character string, like '-'.
+        -- When separator is set, the context will only show up when there are at least 2 lines above cursorline.
+        separator = nil,
+        zindex = 20, -- The Z-index of the context window
+        on_attach = nil, -- (fun(buf: integer): boolean) return false to disable attaching
+      })
+    end,
+  },
+
   {
     -- Main LSP Configuration
     "neovim/nvim-lspconfig",
@@ -683,6 +704,7 @@ require("lazy").setup({
       local capabilities = vim.lsp.protocol.make_client_capabilities()
       capabilities =
         vim.tbl_deep_extend("force", capabilities, require("cmp_nvim_lsp").default_capabilities())
+      capabilities.textDocument.completion.completionItem.snippetSupport = false
 
       -- Enable the following language servers
       --  Feel free to add/remove any LSPs that you want here. They will automatically be installed.
@@ -1028,10 +1050,55 @@ vim.api.nvim_set_keymap(
   "<cmd>lua vim.g.toggle_diagnostics()<CR>",
   { noremap = true, silent = true }
 )
+
+local function is_home_directory(path)
+  local home_dir = os.getenv("HOME")
+  return path == home_dir
+end
+
+local function file_age_in_seconds(filename)
+  local uv = vim.loop
+  local stat = uv.fs_stat(filename)
+
+  if stat and stat.mtime then
+    -- Get the current time in seconds since the epoch
+    local current_time = os.time()
+
+    -- Calculate the age by subtracting the modification time from the current time
+    return current_time - stat.mtime.sec
+  else
+    return nil
+  end
+end
+
+local function run_ctags_in_project_root()
+  local root_dir = vim.fs.root(0, { ".git" })
+
+  if root_dir then
+    if is_home_directory(root_dir) then
+      return
+    end
+    local tags_filename = root_dir .. "/tags"
+    local success, age_in_seconds = pcall(file_age_in_seconds, tags_filename)
+    if not success or (age_in_seconds > 5 * 60) then
+      local cmd = 'sh -c "cd ' .. root_dir .. '; ctags -R . &"'
+      vim.fn.system(cmd)
+    end
+  end
+end
+
+-- Set up an autocmd to run ctags on BufWritePost event from a root dir.
+vim.api.nvim_create_autocmd({ "BufWritePost" }, {
+  group = vim.api.nvim_create_augroup("ctags-on-save", { clear = true }),
+  callback = function(_)
+    run_ctags_in_project_root()
+  end,
+})
+
 vim.api.nvim_create_autocmd({ "BufRead" }, {
   group = vim.api.nvim_create_augroup("lintls-bufnew", { clear = true }),
   callback = function(_)
-    if vim.fn.executable("lintls") ~= 0 then
+    if false and vim.fn.executable("lintls") ~= 0 then
       -- We found an executable for lintls.
       vim.lsp.set_log_level(vim.log.levels.INFO)
       vim.lsp.start({
@@ -1077,6 +1144,29 @@ vim.api.nvim_create_autocmd({ "BufRead" }, {
             },
             python = {
               linters = {
+                {
+                  program = "mypy",
+                  args = {
+                    "--show-column-numbers",
+                    "--show-error-end",
+                    "--hide-error-codes",
+                    "--hide-error-context",
+                    "--no-color-output",
+                    "--no-error-summary",
+                    "--no-pretty",
+                    "--shadow-file",
+                    "$filename",
+                    "/dev/stdin",
+                  },
+                  pattern = "(.*):(\\d+):(\\d+):\\d+:(\\d+): error: (.*)",
+                  filename_match = 1,
+                  line_match = 2,
+                  start_col_match = 3,
+                  end_col_match = 4,
+                  description_match = 5,
+                  use_stdin = true,
+                  use_stderr = false,
+                },
                 {
                   program = "ruff",
                   args = {

@@ -1,15 +1,9 @@
-// Zed keymap
-//
-// For information on binding keys, see the Zed
-// documentation: https://zed.dev/docs/key-bindings
-//
-// To see the default key bindings run `zed: open default keymap`
-// from the command palette.
 [
   {
     "context": "Workspace",
     "bindings": {
-      // "shift shift": "file_finder::Toggle"
+      "ctrl-p": "file_finder::Toggle",
+      "shift-f": "project_search::SearchInNew"
     }
   },
   {
@@ -19,13 +13,27 @@
     }
   },
   {
-    "context": "Editor && VimControl",
+    "context": "Editor && vim_mode == visual",
+    "bindings": {
+      "shift-tab": ["workspace::SendKeystrokes", "<"],
+      "tab": ["workspace::SendKeystrokes", ">"]
+    }
+  },
+  {
+    "context": "VimControl && !menu && vim_mode == normal",
     "bindings": {
       ";": ["workspace::SendKeystrokes", ":"],
-      "ctrl-p": "file_finder::Toggle",
       "shift-t": ["workspace::SendKeystrokes", "g shift-s"],
+      "ctrl-p": "file_finder::Toggle",
       "f7": "diagnostics::Deploy",
-      "\\ q": "zed::Quit"
+      "\\ q": "zed::Quit",
+      "shift-f": "project_search::SearchInNew"
     }
-  }
+        },
+        {
+                "context": "VimControl && !menu",
+                "bindings": {
+                        "shift-f": "project_search::SearchInNew"
+                }
+        }
 ]
