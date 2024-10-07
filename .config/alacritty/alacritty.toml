@@ -1,8 +1,6 @@
 [window]
 decorations = "Full"
 option_as_alt = "OnlyRight"
-padding.x = 4
-padding.y = 4
 
 [scrolling]
 history = 100000
@@ -12,7 +10,7 @@ normal = { family = "FiraCode Nerd Font Mono", style = "Regular" }
 bold = { family = "FiraCode Nerd Font Mono", style = "Medium" }
 italic = { family = "SauceCodePro Nerd Font Mono", style = "Italic" }
 bold_italic = { family = "SauceCodePro Nerd Font Mono", style = "SemiBold Italic" }
-size = 14
+size = 12
 builtin_box_drawing = true
 
 [terminal]

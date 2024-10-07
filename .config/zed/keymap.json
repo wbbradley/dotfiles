@@ -20,7 +20,7 @@
     }
   },
   {
-    "context": "VimControl && !menu && vim_mode == normal",
+    "context": "Editor && !menu && vim_mode == normal",
     "bindings": {
       ";": ["workspace::SendKeystrokes", ":"],
       "shift-t": ["workspace::SendKeystrokes", "g shift-s"],
@@ -29,11 +29,5 @@
       "\\ q": "zed::Quit",
       "shift-f": "project_search::SearchInNew"
     }
-        },
-        {
-                "context": "VimControl && !menu",
-                "bindings": {
-                        "shift-f": "project_search::SearchInNew"
-                }
-        }
+  },
 ]

@@ -1,4 +1,16 @@
 #!/bin/bash
-export RUST_BACKTRACE=1
-export RUST_LOG=info
-exec cargo run --manifest-path "$HOME"/src/zed/crates/zed/Cargo.toml -- "$@"
+die() {
+  echo "$0: $*"
+  exit 1
+}
+
+export RUST_LOG="${RUST_LOG:-info}"
+export ZED_LOG_TO_STDOUT="${ZED_LOG_TO_STDOUT:-1}"
+
+if [[ -n "$DBG" ]]; then
+  cargo build --manifest-path "$HOME"/src/zed/crates/zed/Cargo.toml || die "failed to build zed"
+  exec lldb "$HOME"/src/zed/target/debug/zed -- "$@"
+else
+  export RUST_BACKTRACE=1
+  exec cargo run --manifest-path "$HOME"/src/zed/crates/zed/Cargo.toml -- "$@"
+fi
