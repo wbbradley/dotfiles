@@ -5,105 +5,98 @@
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 
 if not (vim.uv or vim.loop).fs_stat(lazypath) then
-	vim.fn.system({
-		"git",
-		"clone",
-		"--filter=blob:none",
-		"https://github.com/folke/lazy.nvim.git",
-		"--branch=stable", -- latest stable release
-		lazypath,
-	})
+  vim.fn.system({
+    "git",
+    "clone",
+    "--filter=blob:none",
+    "https://github.com/folke/lazy.nvim.git",
+    "--branch=stable", -- latest stable release
+    lazypath,
+  })
 end
 vim.opt.rtp:prepend(lazypath)
 
 -- packages
 local lazy_plugins = {
-	"easymotion/vim-easymotion",
-	"folke/trouble.nvim",
-	"lewis6991/gitsigns.nvim",
-	"folke/which-key.nvim",
-	"nvim-lualine/lualine.nvim",
-	{
-		"wbbradley/conform.nvim",
-		opts = {},
-	},
-	"mfussenegger/nvim-lint",
-	"jremmen/vim-ripgrep",
-	{
-		"ibhagwan/fzf-lua",
-		config = function()
-			-- calling `setup` is optional for customization
-			local actions = require("fzf-lua.actions")
-			require("fzf-lua").setup({
-				preview_opts = "hidden", -- NB: Toggle the preview with <F4>.
-				fzf_opts = {
-					["--layout"] = "default",
-				},
-				actions = {
-					files = {
-						["enter"] = function(selected, opts)
-							local retval = actions.file_edit_or_qf(selected, opts)
-							if vim.fn.win_gettype() == "quickfix" then
-								vim.api.nvim_feedkeys(
-									vim.api.nvim_replace_termcodes("<CR>", true, true, true),
-									"n",
-									false
-								)
-							end
-							return retval
-						end,
-					},
-				},
-				-- cmd = "git grep --line-number --column --color=always",
-			})
-		end,
-	},
-	-- "nvimtools/none-ls.nvim",
-	"neovim/nvim-lspconfig",
-	"nvim-lua/plenary.nvim",
-	"nvim-treesitter/nvim-treesitter",
-	"nvim-treesitter/nvim-treesitter-context",
-	{
-		"folke/lazydev.nvim",
-		ft = "lua", -- only load on lua files
-		opts = {
-			library = {
-				-- See the configuration section for more details
-				-- Load luvit types when the `vim.uv` word is found
-				{ path = "luvit-meta/library", words = { "vim%.uv" } },
-			},
-		},
-	},
-	{ "Bilal2453/luvit-meta", lazy = true },
-	{ -- optional completion source for require statements and module annotations
-		"hrsh7th/nvim-cmp",
-		opts = function(_, opts)
-			opts.sources = opts.sources or {}
-			table.insert(opts.sources, {
-				name = "lazydev",
-				group_index = 0, -- set group index to 0 to skip loading LuaLS completions
-			})
-		end,
-	},
-	{ "ellisonleao/gruvbox.nvim", priority = 1000, config = true },
-	"rust-lang/rust.vim",
-	{
-		"mrcjkb/rustaceanvim",
-		ft = { "rust" },
-	},
-	"andersevenrud/nvim_context_vt",
+  "easymotion/vim-easymotion",
+  "folke/trouble.nvim",
+  "lewis6991/gitsigns.nvim",
+  "folke/which-key.nvim",
+  "nvim-lualine/lualine.nvim",
+  {
+    "wbbradley/conform.nvim",
+    opts = {},
+  },
+  "mfussenegger/nvim-lint",
+  "jremmen/vim-ripgrep",
+  {
+    "ibhagwan/fzf-lua",
+    config = function()
+      -- calling `setup` is optional for customization
+      local actions = require("fzf-lua.actions")
+      require("fzf-lua").setup({
+        preview_opts = "hidden", -- NB: Toggle the preview with <F4>.
+        fzf_opts = {
+          ["--layout"] = "default",
+        },
+        actions = {
+          files = {
+            ["enter"] = function(selected, opts)
+              local retval = actions.file_edit_or_qf(selected, opts)
+              if vim.fn.win_gettype() == "quickfix" then
+                vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<CR>", true, true, true), "n", false)
+              end
+              return retval
+            end,
+          },
+        },
+        -- cmd = "git grep --line-number --column --color=always",
+      })
+    end,
+  },
+  -- "nvimtools/none-ls.nvim",
+  "neovim/nvim-lspconfig",
+  "nvim-lua/plenary.nvim",
+  "nvim-treesitter/nvim-treesitter",
+  "nvim-treesitter/nvim-treesitter-context",
+  {
+    "folke/lazydev.nvim",
+    ft = "lua", -- only load on lua files
+    opts = {
+      library = {
+        -- See the configuration section for more details
+        -- Load luvit types when the `vim.uv` word is found
+        { path = "luvit-meta/library", words = { "vim%.uv" } },
+      },
+    },
+  },
+  { "Bilal2453/luvit-meta", lazy = true },
+  { -- optional completion source for require statements and module annotations
+    "hrsh7th/nvim-cmp",
+    opts = function(_, opts)
+      opts.sources = opts.sources or {}
+      table.insert(opts.sources, {
+        name = "lazydev",
+        group_index = 0, -- set group index to 0 to skip loading LuaLS completions
+      })
+    end,
+  },
+  { "ellisonleao/gruvbox.nvim", priority = 1000, config = true },
+  "rust-lang/rust.vim",
+  -- { "mrcjkb/rustaceanvim", ft = { "rust" }, },
+  "andersevenrud/nvim_context_vt",
 }
 
 -- Lazy doesn't support hot reloading, so we need to check if it's already been loaded
 if vim.g.lazy_loaded == nil then
-	require("lazy").setup(lazy_plugins, {})
-	vim.g.lazy_loaded = true
+  require("lazy").setup(lazy_plugins, {})
+  vim.g.lazy_loaded = true
 end
 require("gitsigns").setup({
-	current_line_blame = true,
-	current_line_blame_opts = {
-		virt_text_pos = "right_align",
-	},
+  current_line_blame = true,
+  current_line_blame_opts = {
+    virt_text_pos = "right_align",
+  },
 })
 vim.cmd("Gitsigns toggle_current_line_blame")
 local _ = require("cmp")
@@ -112,169 +105,169 @@ require("lspconfig").gopls.setup({})
 require("lspconfig").terraformls.setup({})
 -- require("lspconfig").rust_analyzer.setup({})
 if false then
-	vim.api.nvim_create_autocmd("BufWritePre", {
-		pattern = "*.go",
-		callback = function()
-			local params = vim.lsp.util.make_range_params()
-			params.context = { only = { "source.organizeImports" } }
-			-- buf_request_sync defaults to a 1000ms timeout. Depending on your
-			-- machine and codebase, you may want longer. Add an additional
-			-- argument after params if you find that you have to write the file
-			-- twice for changes to be saved.
-			-- E.g., vim.lsp.buf_request_sync(0, "textDocument/codeAction", params, 3000)
-			local result = vim.lsp.buf_request_sync(0, "textDocument/codeAction", params)
-			for cid, res in pairs(result or {}) do
-				for _, r in pairs(res.result or {}) do
-					if r.edit then
-						local enc = (vim.lsp.get_client_by_id(cid) or {}).offset_encoding or "utf-16"
-						vim.lsp.util.apply_workspace_edit(r.edit, enc)
-					end
-				end
-			end
-			vim.lsp.buf.format({ async = false })
-		end,
-	})
+  vim.api.nvim_create_autocmd("BufWritePre", {
+    pattern = "*.go",
+    callback = function()
+      local params = vim.lsp.util.make_range_params()
+      params.context = { only = { "source.organizeImports" } }
+      -- buf_request_sync defaults to a 1000ms timeout. Depending on your
+      -- machine and codebase, you may want longer. Add an additional
+      -- argument after params if you find that you have to write the file
+      -- twice for changes to be saved.
+      -- E.g., vim.lsp.buf_request_sync(0, "textDocument/codeAction", params, 3000)
+      local result = vim.lsp.buf_request_sync(0, "textDocument/codeAction", params)
+      for cid, res in pairs(result or {}) do
+        for _, r in pairs(res.result or {}) do
+          if r.edit then
+            local enc = (vim.lsp.get_client_by_id(cid) or {}).offset_encoding or "utf-16"
+            vim.lsp.util.apply_workspace_edit(r.edit, enc)
+          end
+        end
+      end
+      vim.lsp.buf.format({ async = false })
+    end,
+  })
 end
 vim.cmd("colorscheme gruvbox")
 require("nvim_context_vt").setup({
-	min_rows = 30,
-	disable_ft = { "markdown", "lua" },
-	-- Disable display of virtual text below blocks for indentation based languages like Python
-	-- Default: false
-	disable_virtual_lines = false,
+  min_rows = 30,
+  disable_ft = { "markdown", "lua" },
+  -- Disable display of virtual text below blocks for indentation based languages like Python
+  -- Default: false
+  disable_virtual_lines = false,
 })
 
 -- :help conform
 require("conform").setup({
-	notify_on_error = false,
-	formatters = {
-		autoimport = {
-			command = "autoimport",
-			args = { "-" },
-			stdin = true,
-			-- A function that calculates the directory to run the command in
-			cwd = require("conform.util").root_file({ ".git" }),
-			require_cwd = false,
-			exit_codes = { 0 },
-			-- Set to false to disable merging the config with the base definition
-			inherit = false,
-		},
-		mdformat = {
-			args = { "--number", "--wrap", "100", "-" },
-		},
-	},
-	format_on_save = {
-		lsp_format = "fallback",
-		timeout_ms = 1500,
-	},
-	formatters_by_ft = {
-		lua = { "stylua" },
-		markdown = { "mdformat" },
-		python = { "autoimport", "isort", "ruff_fix", "ruff_format" },
-		rust = { "rustfmt" },
-		terraform = { "terraform_fmt" },
-	},
+  notify_on_error = false,
+  formatters = {
+    autoimport = {
+      command = "autoimport",
+      args = { "-" },
+      stdin = true,
+      -- A function that calculates the directory to run the command in
+      cwd = require("conform.util").root_file({ ".git" }),
+      require_cwd = false,
+      exit_codes = { 0 },
+      -- Set to false to disable merging the config with the base definition
+      inherit = false,
+    },
+    mdformat = {
+      args = { "--number", "--wrap", "100", "-" },
+    },
+  },
+  format_on_save = {
+    lsp_format = "fallback",
+    timeout_ms = 1500,
+  },
+  formatters_by_ft = {
+    lua = { "stylua" },
+    markdown = { "mdformat" },
+    python = { "autoimport", "isort", "ruff_fix", "ruff_format" },
+    rust = { "rustfmt" },
+    terraform = { "terraform_fmt" },
+  },
 })
 vim.api.nvim_create_autocmd("BufWritePre", {
-	pattern = "*",
-	callback = function(args)
-		require("conform").format({ bufnr = args.buf })
-	end,
+  pattern = "*",
+  callback = function(args)
+    require("conform").format({ bufnr = args.buf })
+  end,
 })
 -- require("lint").linters.cargo = require("cargo")
 require("lint").linters_by_ft = {
-	python = { "ruff", "mypy" },
-	sh = { "shellcheck" },
-	yaml = { "yamllint" },
-	toml = { "tomllint" },
-	lua = { "luacheck" },
-	sql = { "pgsanity" },
-	-- go = { "golangci-lint" },
-	-- rust = { "cargo" },
+  python = { "ruff", "mypy" },
+  sh = { "shellcheck" },
+  yaml = { "yamllint" },
+  toml = { "tomllint" },
+  lua = { "luacheck" },
+  sql = { "pgsanity" },
+  -- go = { "golangci-lint" },
+  -- rust = { "cargo" },
 }
 local mypy_linter = require("lint").linters.mypy
 mypy_linter.args = {
-	"--show-column-numbers",
-	"--show-error-end",
-	"--hide-error-codes",
-	"--hide-error-context",
-	"--no-color-output",
-	"--no-error-summary",
-	"--no-pretty",
+  "--show-column-numbers",
+  "--show-error-end",
+  "--hide-error-codes",
+  "--hide-error-context",
+  "--no-color-output",
+  "--no-error-summary",
+  "--no-pretty",
 }
 vim.api.nvim_create_autocmd({ "BufEnter", "BufWritePost", "InsertLeave" }, {
-	pattern = "*",
-	callback = function()
-		require("lint").try_lint()
-	end,
+  pattern = "*",
+  callback = function()
+    require("lint").try_lint()
+  end,
 })
 local function parse_pgsanity_output(output, bufnr, _linter_cwd)
-	local diagnostics = {}
-	for line in output:gmatch("[^\r\n]+") do
-		local lnum, description = line:match("line (%d+): ERROR: (.+)")
-		if lnum and description then
-			table.insert(diagnostics, {
-				bufnr = bufnr,
-				lnum = tonumber(lnum) - 1,
-				col = 0,
-				end_lnum = tonumber(lnum) - 1,
-				end_col = -1,
-				severity = vim.diagnostic.severity.ERROR,
-				message = description,
-			})
-		end
-	end
-	return diagnostics
+  local diagnostics = {}
+  for line in output:gmatch("[^\r\n]+") do
+    local lnum, description = line:match("line (%d+): ERROR: (.+)")
+    if lnum and description then
+      table.insert(diagnostics, {
+        bufnr = bufnr,
+        lnum = tonumber(lnum) - 1,
+        col = 0,
+        end_lnum = tonumber(lnum) - 1,
+        end_col = -1,
+        severity = vim.diagnostic.severity.ERROR,
+        message = description,
+      })
+    end
+  end
+  return diagnostics
 end
 
 require("lint").linters.pgsanity = {
-	cmd = "pgsanity",
-	stdin = true, -- or false if it doesn't support content input via stdin. In that case the filename is automatically added to the arguments.
-	append_fname = true, -- Automatically append the file name to `args` if `stdin = false` (default: true)
-	args = { "--add-semicolon" }, -- list of arguments. Can contain functions with zero arguments that will be evaluated once the linter is used.
-	stream = nil, -- ('stdout' | 'stderr' | 'both') configure the stream to which the linter outputs the linting result.
-	ignore_exitcode = false, -- set this to true if the linter exits with a code != 0 and that's considered normal.
-	env = nil, -- custom environment table to use with the external process. Note that this replaces the *entire* environment, it is not additive.
-	parser = parse_pgsanity_output,
+  cmd = "pgsanity",
+  stdin = true, -- or false if it doesn't support content input via stdin. In that case the filename is automatically added to the arguments.
+  append_fname = true, -- Automatically append the file name to `args` if `stdin = false` (default: true)
+  args = { "--add-semicolon" }, -- list of arguments. Can contain functions with zero arguments that will be evaluated once the linter is used.
+  stream = nil, -- ('stdout' | 'stderr' | 'both') configure the stream to which the linter outputs the linting result.
+  ignore_exitcode = false, -- set this to true if the linter exits with a code != 0 and that's considered normal.
+  env = nil, -- custom environment table to use with the external process. Note that this replaces the *entire* environment, it is not additive.
+  parser = parse_pgsanity_output,
 }
 local function parse_tomllint_output(output, bufnr, _linter_cwd)
-	local diagnostics = {}
-	for line in output:gmatch("[^\r\n]+") do
-		local _, lnum, col, description = line:match("(.+):(%d+):(%d+): error: (.+)")
-		if lnum and description then
-			table.insert(diagnostics, {
-				bufnr = bufnr,
-				lnum = tonumber(lnum) - 1,
-				col = tonumber(col) - 1,
-				end_lnum = tonumber(lnum) - 1,
-				end_col = tonumber(col),
-				severity = vim.diagnostic.severity.ERROR,
-				message = description,
-			})
-		end
-	end
-	return diagnostics
+  local diagnostics = {}
+  for line in output:gmatch("[^\r\n]+") do
+    local _, lnum, col, description = line:match("(.+):(%d+):(%d+): error: (.+)")
+    if lnum and description then
+      table.insert(diagnostics, {
+        bufnr = bufnr,
+        lnum = tonumber(lnum) - 1,
+        col = tonumber(col) - 1,
+        end_lnum = tonumber(lnum) - 1,
+        end_col = tonumber(col),
+        severity = vim.diagnostic.severity.ERROR,
+        message = description,
+      })
+    end
+  end
+  return diagnostics
 end
 require("lint").linters.tomllint = {
-	cmd = "tomllint",
-	stdin = true, -- or false if it doesn't support content input via stdin. In that case the filename is automatically added to the arguments.
-	append_fname = false, -- Automatically append the file name to `args` if `stdin = false` (default: true)
-	args = { "-" }, -- list of arguments. Can contain functions with zero arguments that will be evaluated once the linter is used.
-	stream = "stderr", -- ('stdout' | 'stderr' | 'both') configure the stream to which the linter outputs the linting result.
-	ignore_exitcode = false, -- set this to true if the linter exits with a code != 0 and that's considered normal.
-	env = nil, -- custom environment table to use with the external process. Note that this replaces the *entire* environment, it is not additive.
-	parser = parse_tomllint_output,
+  cmd = "tomllint",
+  stdin = true, -- or false if it doesn't support content input via stdin. In that case the filename is automatically added to the arguments.
+  append_fname = false, -- Automatically append the file name to `args` if `stdin = false` (default: true)
+  args = { "-" }, -- list of arguments. Can contain functions with zero arguments that will be evaluated once the linter is used.
+  stream = "stderr", -- ('stdout' | 'stderr' | 'both') configure the stream to which the linter outputs the linting result.
+  ignore_exitcode = false, -- set this to true if the linter exits with a code != 0 and that's considered normal.
+  env = nil, -- custom environment table to use with the external process. Note that this replaces the *entire* environment, it is not additive.
+  parser = parse_tomllint_output,
 }
 local function keymap(mode, shortcut, command)
-	vim.keymap.set(mode, shortcut, command, { noremap = true, silent = true })
+  vim.keymap.set(mode, shortcut, command, { noremap = true, silent = true })
 end
 
 local function nmap(shortcut, command)
-	keymap("n", shortcut, command)
+  keymap("n", shortcut, command)
 end
 
 local function vmap(shortcut, command)
-	keymap("v", shortcut, command)
+  keymap("v", shortcut, command)
 end
 
 nmap("M", ":FzfLua oldfiles<CR>")
@@ -285,74 +278,74 @@ nmap(",", "<Plug>(easymotion-s)")
 
 -- Treesitter
 require("treesitter-context").setup({
-	mode = "cursor",
-	-- mode = 'topline',
-	-- max_lines = 5,
-	multiline_threshold = 4,
+  mode = "cursor",
+  -- mode = 'topline',
+  -- max_lines = 5,
+  multiline_threshold = 4,
 })
 vim.cmd([[
   hi TreesitterContextBottom gui=underline guisp=Grey
   hi TreesitterContextLineNumberBottom gui=underline guisp=Grey
 ]])
 require("nvim-treesitter.configs").setup({
-	ensure_installed = {
-		"bash",
-		"c",
-		"clojure",
-		"cpp",
-		"css",
-		"dockerfile",
-		"fennel",
-		"go",
-		"hcl",
-		"html",
-		"http",
-		"java",
-		"json",
-		"kotlin",
-		"lua",
-		"markdown",
-		"nix",
-		"python",
-		"ruby",
-		"rust",
-		"scala",
-		"starlark",
-		"sql",
-		"terraform",
-		"thrift",
-		"toml",
-		"tsx",
-		"typescript",
-		"vim",
-		"vimdoc",
-		"xml",
-		"yaml",
-	},
-	highlight = {
-		enable = true,
+  ensure_installed = {
+    "bash",
+    "c",
+    "clojure",
+    "cpp",
+    "css",
+    "dockerfile",
+    "fennel",
+    "go",
+    "hcl",
+    "html",
+    "http",
+    "java",
+    "json",
+    "kotlin",
+    "lua",
+    "markdown",
+    "nix",
+    "python",
+    "ruby",
+    "rust",
+    "scala",
+    "starlark",
+    "sql",
+    "terraform",
+    "thrift",
+    "toml",
+    "tsx",
+    "typescript",
+    "vim",
+    "vimdoc",
+    "xml",
+    "yaml",
+  },
+  highlight = {
+    enable = true,
 
-		-- disable highlight for large files
-		disable = function(_lang, buf)
-			local max_filesize = 100 * 1024 -- 100 KB
-			local ok, stats = pcall(vim.loop.fs_stat, vim.api.nvim_buf_get_name(buf))
-			if ok and stats and stats.size > max_filesize then
-				return true
-			end
-		end,
-	},
+    -- disable highlight for large files
+    disable = function(_lang, buf)
+      local max_filesize = 100 * 1024 -- 100 KB
+      local ok, stats = pcall(vim.loop.fs_stat, vim.api.nvim_buf_get_name(buf))
+      if ok and stats and stats.size > max_filesize then
+        return true
+      end
+    end,
+  },
 })
 vim.g.laststatus = 2
 
 vim.keymap.set("n", "F", function()
-	require("fzf-lua").live_grep({
-		cmd = "git grep --line-number --column --color=always",
-	})
+  require("fzf-lua").live_grep({
+    cmd = "git grep --line-number --column --color=always",
+  })
 end)
 vim.keymap.set("n", "<F3>", function()
-	require("fzf-lua").grep_cword({
-		cmd = "git grep --line-number --column --color=always",
-	})
+  require("fzf-lua").grep_cword({
+    cmd = "git grep --line-number --column --color=always",
+  })
 end)
 
 nmap("g]", "<cmd>lua require('fzf-lua').tags({ fzf_opts = { ['--query'] = vim.fn.expand('<cword>') } })<CR>")
@@ -653,6 +646,8 @@ nnoremap <leader>w :wa<CR>
 
 nnoremap <leader>90 :e ~/.config/nvim/init.lua<CR>
 nnoremap <leader>9a :e ~/.config/alacritty/alacritty.toml<CR>
+nnoremap <leader>9k :e ~/.config/zed/keymap.json<CR>
+nnoremap <leader>9n :e ~/notes.md<CR>G
 nnoremap <leader>92 :e ~/.bashrc<CR>
 nnoremap <leader>9b :e ~/.bashrc<CR>
 nnoremap <leader>93 :e ~/local.bashrc<CR>
@@ -816,131 +811,135 @@ endif
 ]])
 
 require("lualine").setup({
-	extensions = { "fzf", "lazy", "quickfix" },
-	sections = {
-		lualine_c = {
-			{ "filename", path = 1 },
-		},
-		lualine_x = {
-			"encoding", -- "fileformat",
-			"searchcount",
-			"filetype",
-		},
-	},
+  extensions = { "fzf", "lazy", "quickfix" },
+  sections = {
+    lualine_c = {
+      { "filename", path = 1 },
+    },
+    lualine_x = {
+      "encoding", -- "fileformat",
+      "searchcount",
+      "filetype",
+    },
+  },
 })
 
 local Job = require("plenary.job")
 
 _G.get_visual_selection_end_line = function()
-	local _, le, _ = unpack(vim.fn.getpos("'>"))
-	return le
+  local _, le, _ = unpack(vim.fn.getpos("'>"))
+  return le
 end
 
 _G.get_next_insertion_line = function()
-	local mode = vim.fn.mode()
-	local end_line
+  local mode = vim.fn.mode()
+  local end_line
 
-	if mode == "v" or mode == "V" or mode == "\22" then -- visual, visual-line, visual-block
-		return _G.get_visual_selection_end_line()
-	else
-		local current_line = vim.api.nvim_win_get_cursor(0)[1]
-		end_line = current_line
-	end
+  if mode == "v" or mode == "V" or mode == "\22" then -- visual, visual-line, visual-block
+    return _G.get_visual_selection_end_line()
+  else
+    local current_line = vim.api.nvim_win_get_cursor(0)[1]
+    end_line = current_line
+  end
 
-	local insert_position = end_line
-	return insert_position
+  local insert_position = end_line
+  return insert_position
 end
 
 _G.send_contents = function(buf_contents, extra_args, insert_inline)
-	local state
-	if insert_inline then
-		state = { insertion_point = _G.get_next_insertion_line() }
-	else
-		state = { insertion_point = -1 }
-	end
+  local state
+  if insert_inline then
+    state = { insertion_point = _G.get_next_insertion_line() }
+  else
+    state = { insertion_point = -1 }
+  end
 
-	vim.notify(
-		string.format("ai running [insert_inline=%s, insertion_point=%s]...", insert_inline, state.insertion_point),
-		vim.log.levels.INFO
-	)
-	local args = { "--embedded" }
-	if type(extra_args) == "table" then
-		for i = 1, #extra_args do
-			table.insert(args, extra_args[i])
-		end
-	end
-	Job:new({
-		command = "ai",
-		args = args,
-		writer = buf_contents,
-		on_stdout = function(_, stdout_data)
-			vim.schedule(function()
-				local lines = vim.split(stdout_data, "\n", true)
-				vim.api.nvim_buf_set_lines(0, state.insertion_point, state.insertion_point, true, lines)
-				-- Go to the end of the inserted text.
-				if state.insertion_point == -1 then
-					vim.api.nvim_command("normal! G")
-				else
-					state.insertion_point = state.insertion_point + #lines
-					vim.api.nvim_command(tostring(state.insertion_point))
-				end
-			end)
-		end,
-		on_stderr = function(_, stderr_data)
-			vim.schedule(function()
-				for _, line in ipairs(stderr_data) do
-					vim.notify(line, vim.log.levels.ERROR)
-				end
-			end)
-		end,
-		on_exit = function(_j, return_val)
-			vim.schedule(function()
-				require("conform").format()
-				if return_val == 0 then
-					vim.notify("ai completed successfully", vim.log.levels.INFO)
-				else
-					vim.notify("ai failed with code: " .. return_val, vim.log.levels.ERROR)
-				end
-			end)
-		end,
-	}):start()
+  vim.notify(
+    string.format(
+      "ai running [insert_inline=%s, insertion_point=%s]...",
+      insert_inline,
+      state.insertion_point
+    ),
+    vim.log.levels.INFO
+  )
+  local args = { "--embedded" }
+  if type(extra_args) == "table" then
+    for i = 1, #extra_args do
+      table.insert(args, extra_args[i])
+    end
+  end
+  Job:new({
+    command = "ai",
+    args = args,
+    writer = buf_contents,
+    on_stdout = function(_, stdout_data)
+      vim.schedule(function()
+        local lines = vim.split(stdout_data, "\n", true)
+        vim.api.nvim_buf_set_lines(0, state.insertion_point, state.insertion_point, true, lines)
+        -- Go to the end of the inserted text.
+        if state.insertion_point == -1 then
+          vim.api.nvim_command("normal! G")
+        else
+          state.insertion_point = state.insertion_point + #lines
+          vim.api.nvim_command(tostring(state.insertion_point))
+        end
+      end)
+    end,
+    on_stderr = function(_, stderr_data)
+      vim.schedule(function()
+        for _, line in ipairs(stderr_data) do
+          vim.notify(line, vim.log.levels.ERROR)
+        end
+      end)
+    end,
+    on_exit = function(_j, return_val)
+      vim.schedule(function()
+        require("conform").format()
+        if return_val == 0 then
+          vim.notify("ai completed successfully", vim.log.levels.INFO)
+        else
+          vim.notify("ai failed with code: " .. return_val, vim.log.levels.ERROR)
+        end
+      end)
+    end,
+  }):start()
 end
 
 _G.gather_visual_selection = function()
-	local _, lnum1, col1, _ = unpack(vim.fn.getpos("'<"))
-	local _, lnum2, col2, _ = unpack(vim.fn.getpos("'>"))
-	local lines = vim.fn.getline(lnum1, lnum2)
-	if #lines == 0 then
-		return ""
-	end
-	lines[#lines] = string.sub(lines[#lines], 1, col2)
-	lines[1] = string.sub(lines[1], col1)
-	return table.concat(lines, "\n")
+  local _, lnum1, col1, _ = unpack(vim.fn.getpos("'<"))
+  local _, lnum2, col2, _ = unpack(vim.fn.getpos("'>"))
+  local lines = vim.fn.getline(lnum1, lnum2)
+  if #lines == 0 then
+    return ""
+  end
+  lines[#lines] = string.sub(lines[#lines], 1, col2)
+  lines[1] = string.sub(lines[1], col1)
+  return table.concat(lines, "\n")
 end
 
 _G.create_review_visual_selection_buffer = function()
-	-- Get current filetype
-	local filetype = vim.bo.filetype
+  -- Get current filetype
+  local filetype = vim.bo.filetype
 
-	local selected_text = _G.gather_visual_selection()
+  local selected_text = _G.gather_visual_selection()
 
-	-- Create the content to insert in new buffer
-	local content = string.format("> user\n\nPlease review this:\n```%s\n%s\n```", filetype, selected_text)
+  -- Create the content to insert in new buffer
+  local content = string.format("> user\n\nPlease review this:\n```%s\n%s\n```", filetype, selected_text)
 
-	-- Open a new buffer
-	vim.cmd("split")
-	vim.cmd("enew")
-	vim.cmd("setlocal ft=markdown")
+  -- Open a new buffer
+  vim.cmd("split")
+  vim.cmd("enew")
+  vim.cmd("setlocal ft=markdown")
 
-	-- Insert the content
-	vim.api.nvim_buf_set_lines(0, 0, -1, false, vim.split(content, "\n"))
+  -- Insert the content
+  vim.api.nvim_buf_set_lines(0, 0, -1, false, vim.split(content, "\n"))
 end
 
 _G.gather_and_send = function()
-	vim.cmd("setlocal ft=markdown")
-	require("conform").format()
-	local buf_contents = vim.api.nvim_buf_get_lines(0, 0, -1, false)
-	_G.send_contents(buf_contents)
+  vim.cmd("setlocal ft=markdown")
+  require("conform").format()
+  local buf_contents = vim.api.nvim_buf_get_lines(0, 0, -1, false)
+  _G.send_contents(buf_contents)
 end
 
 -- nmap("<leader>a", ":lua gather_and_send()<CR>")
@@ -948,50 +947,55 @@ vmap("<leader>a", ":lua create_review_visual_selection_buffer()<CR>:lua gather_a
 
 nmap("<leader>P", ":PopulateQuickFixFromClipboard<CR>")
 vim.api.nvim_create_user_command("PopulateQuickFixFromClipboard", function()
-	-- Grab the contents of the system clipboard
-	local clipboard_contents = vim.fn.system("pbpaste")
-	local clipboard_lines = vim.split(clipboard_contents, "\n", { plain = true, trimempty = true })
+  -- Grab the contents of the system clipboard
+  local clipboard_contents = vim.fn.system("pbpaste")
+  local clipboard_lines = vim.split(clipboard_contents, "\n", { plain = true, trimempty = true })
 
-	-- Define the possible formats for locations (adjust as needed)
-	local location_patterns = {
-		-- File paths (relative or absolute)
-		{ pattern = "^([^:]+):(%d+):(.*)", filename_group = 1, lnum_group = 2, description_group = 3 },
+  -- Define the possible formats for locations (adjust as needed)
+  local location_patterns = {
+    -- File paths (relative or absolute)
+    { pattern = "^([^:]+):(%d+):(.*)", filename_group = 1, lnum_group = 2, description_group = 3 },
 
-		-- Python stack trace lines
-		{ pattern = 'File (%b""), line (%d+), in (%w+)', filename_group = 1, lnum_group = 2, description_group = 3 },
-	}
+    -- Python stack trace lines
+    {
+      pattern = 'File (%b""), line (%d+), in (%w+)',
+      filename_group = 1,
+      lnum_group = 2,
+      description_group = 3,
+    },
+  }
 
-	-- Find all the locations that match any of the patterns, and record them in a table of tables.
-	local locations = {}
-	for _, line in ipairs(clipboard_lines) do
-		for _, pattern_info in ipairs(location_patterns) do
-			local p1, p2, p3 = line:match(pattern_info.pattern)
-			if p1 then
-				local captures = { p1, p2, p3 }
-				local filename = captures[pattern_info.filename_group]:gsub('^"(.*)"$', "%1")
-				if
-					not string.find(filename, "site-packages", 1, true)
-					and not string.find(filename, "Python.framework", 1, true)
-					and not string.find(filename, "importlib", 1, true)
-				then
-					local lnum = tonumber(captures[pattern_info.lnum_group]) or 0
-					local description = captures[pattern_info.description_group]
-					table.insert(locations, {
-						filename = filename,
-						lnum = lnum,
-						text = description,
-					})
-				end
-			end
-		end
-	end
+  -- Find all the locations that match any of the patterns, and record them in a table of tables.
+  local locations = {}
+  for _, line in ipairs(clipboard_lines) do
+    for _, pattern_info in ipairs(location_patterns) do
+      local p1, p2, p3 = line:match(pattern_info.pattern)
+      if p1 then
+        local captures = { p1, p2, p3 }
+        local filename = captures[pattern_info.filename_group]:gsub('^"(.*)"$', "%1")
+        if
+          not string.find(filename, "site-packages", 1, true)
+          and not string.find(filename, "Python.framework", 1, true)
+          and not string.find(filename, "importlib", 1, true)
+        then
+          local lnum = tonumber(captures[pattern_info.lnum_group]) or 0
+          local description = captures[pattern_info.description_group]
+          table.insert(locations, {
+            filename = filename,
+            lnum = lnum,
+            text = description,
+          })
+        end
+      end
+    end
+  end
 
-	if #locations > 0 then
-		-- Populate the location list window
-		vim.fn.setqflist({}, "r", { title = "Clipboard Locations", items = locations })
-		vim.cmd("copen") -- Open the location list window
-		vim.cmd.cfirst()
-	else
-		vim.notify("No locations found in clipboard.", vim.log.levels.INFO)
-	end
+  if #locations > 0 then
+    -- Populate the location list window
+    vim.fn.setqflist({}, "r", { title = "Clipboard Locations", items = locations })
+    vim.cmd("copen") -- Open the location list window
+    vim.cmd.cfirst()
+  else
+    vim.notify("No locations found in clipboard.", vim.log.levels.INFO)
+  end
 end, {})
