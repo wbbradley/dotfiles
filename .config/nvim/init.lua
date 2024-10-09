@@ -824,6 +824,48 @@ require("lualine").setup({
   },
 })
 
+local function is_home_directory(path)
+  local home_dir = os.getenv("HOME")
+  return path == home_dir
+end
+
+local function file_age_in_seconds(filename)
+  local uv = vim.loop
+  local stat = uv.fs_stat(filename)
+  if stat and stat.mtime then
+    -- Get the current time in seconds since the epoch
+    local current_time = os.time()
+    -- Calculate the age by subtracting the modification time from the current time
+    return current_time - stat.mtime.sec
+  else
+    return nil
+  end
+end
+
+local function run_ctags_in_project_root()
+  local root_dir = vim.fs.root(0, { ".git" })
+
+  if root_dir then
+    if is_home_directory(root_dir) then
+      return
+    end
+    local tags_filename = root_dir .. "/tags"
+    local success, age_in_seconds = pcall(file_age_in_seconds, tags_filename)
+    if not success or (age_in_seconds > 5 * 60) then
+      local cmd = 'sh -c "cd ' .. root_dir .. '; ctags -R . &"'
+      vim.fn.system(cmd)
+    end
+  end
+end
+
+-- Set up an autocmd to run ctags on BufWritePost event from a root dir.
+vim.api.nvim_create_autocmd({ "BufWritePost" }, {
+  group = vim.api.nvim_create_augroup("ctags-on-save", { clear = true }),
+  callback = function(_)
+    run_ctags_in_project_root()
+  end,
+})
+
 local Job = require("plenary.job")
 
 _G.get_visual_selection_end_line = function()
