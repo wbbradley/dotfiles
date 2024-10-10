@@ -8,6 +8,7 @@ export RUST_LOG="${RUST_LOG:-info}"
 export ZED_LOG_TO_STDOUT="${ZED_LOG_TO_STDOUT:-1}"
 
 if [[ -n "$DBG" ]]; then
+  cargo check --manifest-path "$HOME"/src/zed/crates/gpui/Cargo.toml || die "gpu build failed"
   cargo build --manifest-path "$HOME"/src/zed/crates/zed/Cargo.toml || die "failed to build zed"
   exec lldb "$HOME"/src/zed/target/debug/zed -- "$@"
 else

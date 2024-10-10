@@ -27,7 +27,8 @@
       "ctrl-p": "file_finder::Toggle",
       "f7": "diagnostics::Deploy",
       "\\ q": "zed::Quit",
-      "shift-f": "project_search::SearchInNew"
+      "shift-f": ["workspace::SendKeystrokes", "cmd-shift-f"],
+      "shift-m": "projects::OpenRecent"
     }
-  },
+  }
 ]
