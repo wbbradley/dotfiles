@@ -880,7 +880,7 @@ local function run_ctags_in_project_root()
     end
     local tags_filename = root_dir .. "/tags"
     local success, age_in_seconds = pcall(file_age_in_seconds, tags_filename)
-    if not success or (age_in_seconds > 5 * 60) then
+    if not success or age_in_seconds == nil or (age_in_seconds > 5 * 60) then
       local cmd = 'sh -c "cd ' .. root_dir .. '; ctags -R . &"'
       vim.fn.system(cmd)
     end

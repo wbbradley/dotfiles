@@ -1,2 +1,8 @@
 #!/bin/bash
-exec rustup run stable rust-analyzer "$@"
+
+toolchain=stable
+
+if [[ -f rust-toolchain.toml ]]; then
+  toolchain="$(<rust-toolchain.toml grep '^channel' | awk -F ' ' '{ print $3 }' | sed -Ee 's/"//g')"
+fi
+exec rustup run "$toolchain" rust-analyzer "$@"
