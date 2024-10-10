@@ -22,6 +22,12 @@ local lazy_plugins = {
   "folke/trouble.nvim",
   "lewis6991/gitsigns.nvim",
   "folke/which-key.nvim",
+  {
+    "folke/todo-comments.nvim",
+    event = "VimEnter",
+    dependencies = { "nvim-lua/plenary.nvim" },
+    opts = { signs = false },
+  },
   "nvim-lualine/lualine.nvim",
   {
     "wbbradley/conform.nvim",
@@ -55,7 +61,46 @@ local lazy_plugins = {
     end,
   },
   -- "nvimtools/none-ls.nvim",
-  "neovim/nvim-lspconfig",
+  {
+    "neovim/nvim-lspconfig",
+    dependencies = {
+      { "j-hui/fidget.nvim", opts = {} },
+      "hrsh7th/nvim-cmp",
+    },
+    config = function()
+      vim.api.nvim_create_autocmd("LspAttach", {
+        group = vim.api.nvim_create_augroup("kickstart-lsp-attach", { clear = true }),
+        callback = function(event)
+          local capabilities = vim.lsp.protocol.make_client_capabilities()
+          vim.tbl_deep_extend("force", capabilities, require("cmp_nvim_lsp").default_capabilities())
+        end,
+      })
+    end,
+  },
+  {
+    "hrsh7th/nvim-cmp",
+    event = "InsertEnter",
+    dependencies = {
+      "hrsh7th/cmp-nvim-lsp",
+      "hrsh7th/cmp-path",
+    },
+    config = function()
+      local cmp = require("cmp")
+      cmp.setup({
+        completion = { completeopt = "menu,menuone,noinsert" },
+        mapping = cmp.mapping.preset.insert({
+          ["<C-j>"] = cmp.mapping.select_next_item(),
+          ["<C-h>"] = cmp.mapping.select_prev_item(),
+          ["<Tab>"] = cmp.mapping.confirm({ select = true }),
+        }),
+        sources = {
+          { name = "lazydev", group_index = 0 },
+          { name = "nvim_lsp" },
+          { name = "path" },
+        },
+      })
+    end,
+  },
   "nvim-lua/plenary.nvim",
   "nvim-treesitter/nvim-treesitter",
   "nvim-treesitter/nvim-treesitter-context",
@@ -71,19 +116,9 @@ local lazy_plugins = {
     },
   },
   { "Bilal2453/luvit-meta", lazy = true },
-  { -- optional completion source for require statements and module annotations
-    "hrsh7th/nvim-cmp",
-    opts = function(_, opts)
-      opts.sources = opts.sources or {}
-      table.insert(opts.sources, {
-        name = "lazydev",
-        group_index = 0, -- set group index to 0 to skip loading LuaLS completions
-      })
-    end,
-  },
   { "ellisonleao/gruvbox.nvim", priority = 1000, config = true },
   "rust-lang/rust.vim",
-  -- { "mrcjkb/rustaceanvim", ft = { "rust" }, },
+  { "mrcjkb/rustaceanvim", ft = { "rust" } },
   "andersevenrud/nvim_context_vt",
 }
 
@@ -690,8 +725,6 @@ vmap <C-F7> <Esc> <C-F7>
 
 nmap c<Space> ct_
 
-set tags=tags;./rusty-tags.vi;/,$RUST_SRC_PATH/rusty-tags.vi
-
 nnoremap n nzz
 nnoremap N Nzz
 nnoremap s :exec "normal i".nr2char(getchar())."\el"<CR>
@@ -756,10 +789,6 @@ autocmd BufRead *.ai setlocal ft=markdown
 autocmd BufRead *.tf setlocal ft=terraform
 augroup RustCore
   autocmd FileType rust nmap <F7> :pclose<CR>:setlocal makeprg=cargo\ clippy<CR>:lmake<CR><CR>
-  autocmd FileType rust setlocal tags=./rusty-tags.vi;/,$RUST_SRC_PATH/rusty-tags.vi,tags
-  autocmd BufRead *.rs setlocal tags=./rusty-tags.vi;/,$RUST_SRC_PATH/rusty-tags.vi,tags
-  " autocmd BufWritePre *.rs lua vim.lsp.buf.format()
-  autocmd BufWritePost *.rs :silent! exec "!rusty-tags vi --quiet --start-dir=" . expand('%:p:h') . "&"
 augroup END
 
 set ignorecase
