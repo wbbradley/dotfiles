@@ -20,6 +20,28 @@
     }
   },
   {
+    "context": "Editor",
+    "bindings": {
+      "ctrl-k": null,
+      "ctrl-j": null
+    }
+  },
+  {
+    "context": "Editor || Terminal",
+    "bindings": {
+      "ctrl-b o": "terminal_panel::ToggleFocus",
+      "ctrl-b j": "terminal_panel::ToggleFocus",
+      "ctrl-b k": "terminal_panel::ToggleFocus"
+    }
+  },
+  {
+    "context": "Picker || Editor",
+    "bindings": {
+      "ctrl-j": ["workspace::SendKeystrokes", "down"],
+      "ctrl-k": ["workspace::SendKeystrokes", "up"]
+    }
+  },
+  {
     "context": "Editor && !menu && vim_mode == normal",
     "bindings": {
       ";": ["workspace::SendKeystrokes", ":"],
