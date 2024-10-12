@@ -35,10 +35,30 @@
     }
   },
   {
-    "context": "Picker || Editor",
+    "context": "Terminal",
+    "bindings": {
+      "ctrl-b z": "workspace::ToggleZoom"
+    }
+  },
+  {
+    "context": "ProjectPanel",
+    "bindings": {
+      "ctrl-w l": ["workspace::SendKeystrokes", "escape"]
+    }
+  },
+  {
+    "context": "Picker || Editor || ProjectPanel",
     "bindings": {
       "ctrl-j": ["workspace::SendKeystrokes", "down"],
-      "ctrl-k": ["workspace::SendKeystrokes", "up"]
+      "ctrl-k": ["workspace::SendKeystrokes", "up"],
+      "ctrl-h": ["workspace::SendKeystrokes", "left"],
+      "ctrl-l": ["workspace::SendKeystrokes", "right"]
+    }
+  },
+  {
+    "context": "ProjectSearchBar || EmptyPane",
+    "bindings": {
+      "escape": ["workspace::SendKeystrokes", "cmd-w"]
     }
   },
   {
