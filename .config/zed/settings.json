@@ -3,7 +3,7 @@
   "assistant": {
     "default_model": {
       "provider": "openai",
-      "model": "gpt-3.5-turbo"
+      "model": "gpt-4o"
     },
     "version": "2"
   },
@@ -12,9 +12,8 @@
     "inline_completion_provider": "supermaven"
   },
   "vim_mode": true,
-  "ui_font_family": "MesloLGL Nerd Font",
-  "ui_font_size": 12,
-  "buffer_font_family": "MesloLGL Nerd Font",
+  "ui_font_size": 13,
+  "buffer_font_family": "FiraCode Nerd Font", // MesloLGL Nerd Font",
   "buffer_font_size": 12,
   "theme": {
     "mode": "dark",
