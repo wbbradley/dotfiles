@@ -56,7 +56,7 @@
     }
   },
   {
-    "context": "ProjectSearchBar || EmptyPane",
+    "context": "ProjectSearchBar || EmptyPane || BufferSearchBar",
     "bindings": {
       "escape": ["workspace::SendKeystrokes", "cmd-w"]
     }
