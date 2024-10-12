@@ -232,6 +232,7 @@ mypy_linter.args = {
 }
 vim.api.nvim_create_autocmd({ "BufEnter", "BufWritePost", "InsertLeave" }, {
   pattern = "*",
+  group = vim.api.nvim_create_augroup("lint-on-save", { clear = true }),
   callback = function()
     require("lint").try_lint()
   end,
@@ -316,6 +317,7 @@ require("treesitter-context").setup({
   mode = "cursor",
   -- mode = 'topline',
   -- max_lines = 5,
+  min_window_height = 20,
   multiline_threshold = 4,
 })
 vim.cmd([[
@@ -373,7 +375,9 @@ require("nvim-treesitter.configs").setup({
 vim.g.laststatus = 2
 
 vim.keymap.set("n", "F", function()
-  require("fzf-lua").live_grep({
+  require("fzf-lua").grep({
+    no_esc = true,
+    search = "",
     cmd = "git grep --line-number --column --color=always",
   })
 end)
@@ -882,6 +886,7 @@ local function run_ctags_in_project_root()
     local success, age_in_seconds = pcall(file_age_in_seconds, tags_filename)
     if not success or age_in_seconds == nil or (age_in_seconds > 5 * 60) then
       local cmd = 'sh -c "cd ' .. root_dir .. '; ctags -R . &"'
+      -- vim.notify(cmd)
       vim.fn.system(cmd)
     end
   end
