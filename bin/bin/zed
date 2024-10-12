@@ -4,14 +4,51 @@ die() {
   exit 1
 }
 
+lkg=0
+force_build=1
+if [[ "$1" == "lkg" ]]; then
+  shift
+  if [[ -n "$DBG" ]]; then
+    die "lkg DBG mode not supported"
+  fi
+  lkg=1
+  if [[ "$1" != "-f" ]]; then
+    force_build=0
+  else
+    shift
+  fi
+fi
+
 export RUST_LOG="${RUST_LOG:-info}"
 export ZED_LOG_TO_STDOUT="${ZED_LOG_TO_STDOUT:-1}"
+profile=dev
+
+if (( lkg )); then
+  profile=release
+fi
+
+case "$profile" in
+  release)
+    profile_dir=release
+    ;;
+  dev)
+    profile_dir=debug
+    ;;
+esac
+
+binary="$HOME"/src/zed/target/"$profile_dir"/zed
+
+if (( force_build )) || ! [[ -x "$binary" ]]; then
+  cargo build --manifest-path "$HOME"/src/zed/crates/zed/Cargo.toml --profile="$profile" || die "failed to build zed"
+else
+  echo "Skipping build. [binary='$binary']"
+fi
 
 if [[ -n "$DBG" ]]; then
-  cargo check --manifest-path "$HOME"/src/zed/crates/gpui/Cargo.toml || die "gpu build failed"
-  cargo build --manifest-path "$HOME"/src/zed/crates/zed/Cargo.toml || die "failed to build zed"
-  exec lldb "$HOME"/src/zed/target/debug/zed -- "$@"
+  echo "Debugging Zed. [DBG=$DBG, binary='$binary']"
+  exec lldb "$HOME"/src/zed/target/"$profile_dir"/zed -- "$@"
 else
+  echo "Running Zed. [DBG=$DBG, binary='$binary']"
   export RUST_BACKTRACE=1
-  exec cargo run --manifest-path "$HOME"/src/zed/crates/zed/Cargo.toml -- "$@"
+  exec "$binary" "$@"
 fi
