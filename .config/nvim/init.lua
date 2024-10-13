@@ -70,7 +70,7 @@ local lazy_plugins = {
     config = function()
       vim.api.nvim_create_autocmd("LspAttach", {
         group = vim.api.nvim_create_augroup("kickstart-lsp-attach", { clear = true }),
-        callback = function(event)
+        callback = function(_)
           local capabilities = vim.lsp.protocol.make_client_capabilities()
           vim.tbl_deep_extend("force", capabilities, require("cmp_nvim_lsp").default_capabilities())
         end,
@@ -1029,9 +1029,15 @@ vim.api.nvim_create_user_command("PopulateQuickFixFromClipboard", function()
 
   -- Define the possible formats for locations (adjust as needed)
   local location_patterns = {
+    -- Rust cargo build output
+    {
+      pattern = ".* ([^: ]+):(%d+):(.*)",
+      filename_group = 1,
+      lnum_group = 2,
+      description_group = "line_before",
+    },
     -- File paths (relative or absolute)
-    { pattern = "^([^:]+):(%d+):(.*)", filename_group = 1, lnum_group = 2, description_group = 3 },
-
+    { pattern = "^([^ :]+):(%d+):(.*)", filename_group = 1, lnum_group = 2, description_group = 3 },
     -- Python stack trace lines
     {
       pattern = 'File (%b""), line (%d+), in (%w+)',
@@ -1053,6 +1059,7 @@ vim.api.nvim_create_user_command("PopulateQuickFixFromClipboard", function()
           not string.find(filename, "site-packages", 1, true)
           and not string.find(filename, "Python.framework", 1, true)
           and not string.find(filename, "importlib", 1, true)
+          and not string.find(filename, "/rustc/", 1, true)
         then
           local lnum = tonumber(captures[pattern_info.lnum_group]) or 0
           local description = captures[pattern_info.description_group]

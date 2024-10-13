@@ -15,15 +15,18 @@
   {
     "context": "Editor && vim_mode == visual",
     "bindings": {
+      // REVIEW(conrad): "shift-tab": ["vim::PushOperator", "Outdent"],
       "shift-tab": ["workspace::SendKeystrokes", "<"],
-      "tab": ["workspace::SendKeystrokes", ">"]
+      "tab": ["workspace::SendKeystrokes", ">"],
+      "shift-q": ["workspace::SendKeystrokes", "g q"]
     }
   },
   {
     "context": "Editor",
     "bindings": {
       "ctrl-k": null,
-      "ctrl-j": null
+      "ctrl-j": null,
+      "f12": "editor::OpenExcerpts"
     }
   },
   {
@@ -49,16 +52,24 @@
   {
     "context": "Picker || Editor || ProjectPanel",
     "bindings": {
+      "ctrl-d": ["workspace::SendKeystrokes", "pagedown"],
+      "ctrl-h": ["workspace::SendKeystrokes", "left"],
       "ctrl-j": ["workspace::SendKeystrokes", "down"],
       "ctrl-k": ["workspace::SendKeystrokes", "up"],
-      "ctrl-h": ["workspace::SendKeystrokes", "left"],
-      "ctrl-l": ["workspace::SendKeystrokes", "right"]
+      "ctrl-l": ["workspace::SendKeystrokes", "right"],
+      "ctrl-u": ["workspace::SendKeystrokes", "pageup"]
     }
   },
   {
     "context": "ProjectSearchBar || EmptyPane || BufferSearchBar",
     "bindings": {
       "escape": ["workspace::SendKeystrokes", "cmd-w"]
+    }
+  },
+  {
+    "context": "VimControl && !menu",
+    "bindings": {
+      "z enter": "editor::ScrollCursorTop"
     }
   },
   {
@@ -70,7 +81,14 @@
       "f7": "diagnostics::Deploy",
       "\\ q": "zed::Quit",
       "shift-f": ["workspace::SendKeystrokes", "cmd-shift-f"],
-      "shift-m": "projects::OpenRecent"
+      "shift-m": "projects::OpenRecent",
+      "ctrl-w n": "pane::SplitDown",
+      "ctrl-w v": "pane::SplitRight",
+      "shift-l": "editor::GoToDiagnostic",
+      "shift-h": "editor::GoToPrevDiagnostic",
+      // "ctrl-b l": "workspace::FocusRightDock",
+      // "ctrl-b h": "workspace::FocusLeftDock",
+      "v v": ["workspace::SendKeystrokes", "v i w"]
     }
   }
 ]
