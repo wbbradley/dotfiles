@@ -21,6 +21,14 @@ local lazy_plugins = {
   "easymotion/vim-easymotion",
   "folke/trouble.nvim",
   "lewis6991/gitsigns.nvim",
+  {
+    "zbirenbaum/copilot.lua",
+    cmd = "Copilot",
+    event = "InsertEnter",
+    config = function()
+      require("copilot").setup({})
+    end,
+  },
   "folke/which-key.nvim",
   {
     "folke/todo-comments.nvim",
@@ -792,7 +800,7 @@ augroup END
 autocmd BufRead *.ai setlocal ft=markdown
 autocmd BufRead *.tf setlocal ft=terraform
 augroup RustCore
-  autocmd FileType rust nmap <F7> :pclose<CR>:setlocal makeprg=cargo\ clippy<CR>:lmake<CR><CR>
+  autocmd FileType rust nmap <F7> :pclose<CR>:setlocal makeprg=cargo\ check<CR>:lmake<CR><CR>
 augroup END
 
 set ignorecase

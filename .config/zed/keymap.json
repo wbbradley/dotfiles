@@ -1,9 +1,14 @@
 [
   {
+    "context": "Workspace && !ProjectSearchBar && !BufferSearchBar",
+    "bindings": {
+      "shift-f": "project_search::SearchInNew"
+    }
+  },
+  {
     "context": "Workspace",
     "bindings": {
-      "ctrl-p": "file_finder::Toggle",
-      "shift-f": "project_search::SearchInNew"
+      "ctrl-p": "file_finder::Toggle"
     }
   },
   {
@@ -85,10 +90,12 @@
       "ctrl-w n": "pane::SplitDown",
       "ctrl-w v": "pane::SplitRight",
       "shift-l": "editor::GoToDiagnostic",
-      "shift-h": "editor::GoToPrevDiagnostic",
+      "shift-h": "editor::GoToPrevDiagnostic"
       // "ctrl-b l": "workspace::FocusRightDock",
       // "ctrl-b h": "workspace::FocusLeftDock",
-      "v v": ["workspace::SendKeystrokes", "v i w"]
+      // REVIEW(conrad): The "vv" mapping is not working in Vim mode, it also has the side effect of
+      // delaying the transition to Visual mode, despite pressing "i" after the first "v".
+      // "v v": ["workspace::SendKeystrokes", "v i w"]
     }
   }
 ]

@@ -14,13 +14,14 @@ bin/bin/wim
 bin/bin/wim-key
 .config/asciinema/*
 .config/btop/*
+.config/github-copilot
 .config/glab-cli/*
 .config/htop/*
 .config/iterm2/*
 .config/karabiner/*
 .config/karabiner/**
-.config/pip/*
-.config/zed/.*
-.config/zed/*
 .config/kitty/*
 .config/nvim/spell
+.config/pip/*
+.config/zed/*
+.config/zed/.*
