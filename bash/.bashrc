@@ -425,11 +425,8 @@ graphical-mode() {
   fi
 }
 
-agent() {
-  keys=(
-    "$HOME/.ssh/eoy-2022"
-  )
-
+agent-with-keys() {
+  keys=( "$@" )
   if [[ -z "$SSH_AGENT_PID" ]]; then
     eval "$(ssh-agent)"
     if [[ -n "$SSH_AGENT_PID" ]]; then
