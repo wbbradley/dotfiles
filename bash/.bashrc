@@ -288,9 +288,9 @@ elif on-linux; then
   alias open='xdg-open'
 fi
 
-if command -v exa >/dev/null; then
+if command -v eza >/dev/null; then
   # exa trumps other ls settings
-  alias ls='exa -Bla -s modified'
+  alias ls='eza -Bla -s modified'
 fi
 
 command -v xmodmap >/dev/null 2>/dev/null && [[ -f "$HOME/xmodmap.file" ]] && xmodmap -v "$HOME/xmodmap.file"

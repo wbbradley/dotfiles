@@ -1,6 +1,9 @@
 // See https://zed.dev/docs/configuring-zed.
 {
   "vim_mode": true,
+  "search": {
+    "regex": true
+  },
   "features": {
     "inline_completion_provider": "supermaven"
   },
@@ -19,7 +22,7 @@
   "theme": {
     "mode": "dark",
     "light": "Gruvbox Light Hard",
-    "dark": "Gruvbox Dark Hard"
+    "dark": "Solarized Light"
   },
   "cursor_blink": false,
   "scrollbar": { "show": "never" },
