@@ -89,6 +89,7 @@ if [[ -d "$HOME"/.local/bin ]]; then
 fi
 prepend_path_to PATH "$HOME"/bin
 if [[ -d /opt/homebrew/bin ]]; then
+  prepend_path_to PATH /opt/homebrew/sbin
   prepend_path_to PATH /opt/homebrew/bin
 fi
 

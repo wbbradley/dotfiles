@@ -1054,7 +1054,6 @@ vim.api.nvim_create_user_command("PopulateQuickFixFromClipboard", function()
       description_group = 3,
     },
   }
-
   -- Find all the locations that match any of the patterns, and record them in a table of tables.
   local locations = {}
   for _, line in ipairs(clipboard_lines) do
@@ -1069,6 +1068,9 @@ vim.api.nvim_create_user_command("PopulateQuickFixFromClipboard", function()
           and not string.find(filename, "importlib", 1, true)
           and not string.find(filename, "/rustc/", 1, true)
         then
+          if filename:sub(1, 5) == "/app/" then
+            filename = filename:sub(6)
+          end
           local lnum = tonumber(captures[pattern_info.lnum_group]) or 0
           local description = captures[pattern_info.description_group]
           table.insert(locations, {
