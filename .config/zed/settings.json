@@ -1,6 +1,11 @@
 // See https://zed.dev/docs/configuring-zed.
 {
   "vim_mode": true,
+  "git": {
+    "inline_blame": {
+      "enabled": false
+    }
+  },
   "search": {
     "regex": true
   },
@@ -21,8 +26,8 @@
   "buffer_font_size": 12,
   "theme": {
     "mode": "dark",
-    "light": "Gruvbox Light Hard",
-    "dark": "Solarized Light"
+    "dark": "Gruvbox Dark Hard",
+    "light": "Solarized Light"
   },
   "cursor_blink": false,
   "scrollbar": { "show": "never" },

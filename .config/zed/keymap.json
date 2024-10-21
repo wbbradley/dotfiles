@@ -2,7 +2,9 @@
   {
     "context": "Workspace && !ProjectSearchBar && !BufferSearchBar",
     "bindings": {
-      "shift-f": "project_search::SearchInNew"
+      // REVIEW(conrad): This is a hack to make the "f" key work in the search bar but it prevents typing F
+      // in the search bar.
+      // "shift-f": "project_search::SearchInNew"
     }
   },
   {
@@ -85,7 +87,8 @@
       "ctrl-p": "file_finder::Toggle",
       "f7": "diagnostics::Deploy",
       "\\ q": "zed::Quit",
-      "shift-f": ["workspace::SendKeystrokes", "cmd-shift-f"],
+      "shift-f": ["workspace::SendKeystrokes", "cmd-shift-f delete"],
+      "f3": ["workspace::SendKeystrokes", "cmd-shift-f enter"],
       "shift-m": "projects::OpenRecent",
       "ctrl-w n": "pane::SplitDown",
       "ctrl-w v": "pane::SplitRight",
