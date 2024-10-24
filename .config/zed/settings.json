@@ -1,6 +1,15 @@
 // See https://zed.dev/docs/configuring-zed.
 {
   "vim_mode": true,
+  "file_scan_exclusions": [
+    "*.vi",
+    "tags",
+    "dist",
+    ".venv",
+    "*/*~",
+    "*~",
+    "**/*~"
+  ],
   "git": {
     "inline_blame": {
       "enabled": false
@@ -9,12 +18,28 @@
   "search": {
     "regex": true
   },
+  "experimental.theme_overrides": {
+    // TODO: use a different color for matching brackets.
+    // "editor.document_highlight.read_background": "#f1f1f13a",
+    // "editor.document_highlight.write_background": "#fc6f6466",
+    // "search.match_background": "#52fbfb60",
+    // "status_bar.background": "#333944ff",
+    // "editor.gutter.background": "#282c33ff",
+    "syntax": {
+      "comment": {
+        "font_weight": 100
+      }
+    }
+  },
+  "preview_tabs": {
+    "enabled": true
+  },
   "features": {
     "inline_completion_provider": "supermaven"
   },
   "assistant": {
     "default_model": {
-      "provider": "openai",
+      "provider": "copilot_chat",
       "model": "gpt-4o"
     },
     "version": "2"

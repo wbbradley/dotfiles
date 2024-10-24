@@ -41,7 +41,7 @@ local lazy_plugins = {
     "wbbradley/conform.nvim",
     opts = {},
   },
-  "mfussenegger/nvim-lint",
+  -- "mfussenegger/nvim-lint",
   "jremmen/vim-ripgrep",
   {
     "ibhagwan/fzf-lua",
@@ -217,9 +217,9 @@ vim.api.nvim_create_autocmd("BufWritePre", {
     require("conform").format({ bufnr = args.buf })
   end,
 })
--- require("lint").linters.cargo = require("cargo")
+--[[ require("lint").linters.cargo = require("cargo")
 require("lint").linters_by_ft = {
-  python = { "ruff", "mypy" },
+  python = { "ruff" }, -- , "mypy" },
   sh = { "shellcheck" },
   yaml = { "yamllint" },
   toml = { "tomllint" },
@@ -302,6 +302,7 @@ require("lint").linters.tomllint = {
   env = nil, -- custom environment table to use with the external process. Note that this replaces the *entire* environment, it is not additive.
   parser = parse_tomllint_output,
 }
+]]
 local function keymap(mode, shortcut, command)
   vim.keymap.set(mode, shortcut, command, { noremap = true, silent = true })
 end
@@ -905,6 +906,108 @@ vim.api.nvim_create_autocmd({ "BufWritePost" }, {
   group = vim.api.nvim_create_augroup("ctags-on-save", { clear = true }),
   callback = function(_)
     run_ctags_in_project_root()
+  end,
+})
+
+vim.api.nvim_create_autocmd({ "BufRead" }, {
+  group = vim.api.nvim_create_augroup("lintls-bufread", { clear = true }),
+  callback = function(_)
+    if vim.fn.executable("lintls") ~= 0 then
+      -- We found an executable for lintls.
+      vim.lsp.set_log_level(vim.log.levels.INFO)
+      vim.lsp.start({
+        name = "lintls",
+        cmd = { "lintls", vim.api.nvim_buf_get_name(0) },
+        root_dir = vim.fs.root(0, { ".git", "pyproject.toml", "setup.py", "Cargo.toml", "go.mod" }),
+        settings = {
+          languages = {
+            toml = {
+              linters = {
+                {
+                  program = "tomllint",
+                  args = { "-" },
+                  pattern = "(.*):(\\d+):(\\d+): error: (.*)",
+                  filename_match = 1,
+                  line_match = 2,
+                  start_col_match = 3,
+                  description_match = 4,
+                  use_stdin = true,
+                  use_stderr = true,
+                },
+              },
+            },
+            sh = {
+              linters = {
+                {
+                  program = "shellcheck",
+                  args = {
+                    "-f",
+                    "gcc",
+                    "-",
+                  },
+                  pattern = "(.*):(\\d+):(\\d+): (\\w+): (.*)",
+                  filename_match = 1,
+                  line_match = 2,
+                  start_col_match = 3,
+                  severity_match = 4,
+                  description_match = 5,
+                  use_stdin = true,
+                  use_stderr = false,
+                },
+              },
+            },
+            python = {
+              linters = {
+                {
+                  program = "mypy",
+                  args = {
+                    "--show-column-numbers",
+                    "--show-error-end",
+                    "--hide-error-codes",
+                    "--hide-error-context",
+                    "--no-color-output",
+                    "--no-error-summary",
+                    "--no-pretty",
+                    "--shadow-file",
+                    "$filename",
+                    "/dev/stdin",
+                    "$filename",
+                  },
+                  pattern = "(.*):(\\d+):(\\d+):\\d+:(\\d+): error: (.*)",
+                  filename_match = 1,
+                  line_match = 2,
+                  start_col_match = 3,
+                  end_col_match = 4,
+                  description_match = 5,
+                  use_stdin = true,
+                  use_stderr = false,
+                },
+                {
+                  program = "ruff",
+                  args = {
+                    "check",
+                    "--stdin-filename",
+                    "$filename",
+                  },
+                  pattern = "(.*):(\\d+):(\\d+): (.*)",
+                  filename_match = 1,
+                  line_match = 2,
+                  start_col_match = 3,
+                  description_match = 4,
+                  use_stdin = true,
+                  use_stderr = false,
+                },
+              },
+            },
+          },
+        },
+      }, {
+        bufnr = 0,
+        reuse_client = function(_, _)
+          return false
+        end,
+      })
+    end
   end,
 })
 

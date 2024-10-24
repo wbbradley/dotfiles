@@ -37,10 +37,12 @@
     }
   },
   {
-    "context": "Editor || Terminal",
+    "context": "Editor",
     "bindings": {
       "ctrl-b o": "terminal_panel::ToggleFocus",
       "ctrl-b j": "terminal_panel::ToggleFocus",
+      "ctrl-b l": "terminal_panel::ToggleFocus",
+      "ctrl-b h": "terminal_panel::ToggleFocus",
       "ctrl-b k": "terminal_panel::ToggleFocus"
     }
   },
@@ -84,16 +86,22 @@
     "bindings": {
       ";": ["workspace::SendKeystrokes", ":"],
       "shift-t": ["workspace::SendKeystrokes", "g shift-s"],
+      // REVIEW: This shift-tab mapping is not working.
+      // "shift-tab": ["workspace::SendKeystrokes", "V <"],
       "ctrl-p": "file_finder::Toggle",
       "f7": "diagnostics::Deploy",
       "\\ q": "zed::Quit",
+      "\\ space": ["workspace::SendKeystrokes", "escape"],
       "shift-f": ["workspace::SendKeystrokes", "cmd-shift-f delete"],
       "f3": ["workspace::SendKeystrokes", "cmd-shift-f enter"],
       "shift-m": "projects::OpenRecent",
       "ctrl-w n": "pane::SplitDown",
       "ctrl-w v": "pane::SplitRight",
       "shift-l": "editor::GoToDiagnostic",
-      "shift-h": "editor::GoToPrevDiagnostic"
+      "shift-h": "editor::GoToPrevDiagnostic",
+      "ctrl-d": ["workspace::SendKeystrokes", "3 0 down"],
+      "ctrl-u": ["workspace::SendKeystrokes", "3 0 up"],
+      "\\ c": "editor::Rename"
       // "ctrl-b l": "workspace::FocusRightDock",
       // "ctrl-b h": "workspace::FocusLeftDock",
       // REVIEW(conrad): The "vv" mapping is not working in Vim mode, it also has the side effect of

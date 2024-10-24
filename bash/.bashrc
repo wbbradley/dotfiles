@@ -204,11 +204,16 @@ dot-ez() {
 export HISTSIZE=5000000
 export HISTCONTROL=ignoreboth:erasedups
 
-export EMACS_SOCKET_NAME="${TMPDIR}/emacs$(id -u)/server"
 export EDITOR='nvim' # client -nw -c -a ""'
 
 tail-ide() {
-  tail -n 1000 -f "$HOME"/sample.profile "$HOME"/.local/state/nvim/*.log "$HOME"/bootstrappy.log
+  logs=(
+    # "$HOME"/sample.profile 
+    "$HOME"/.local/state/lintls/lintls.log
+    # "$HOME"/.local/state/nvim/*.log
+    # "$HOME"/bootstrappy.log
+  )
+  tail -n 100 -f "${logs[@]}"
 }
 on-macos() {
   [[ "$(uname)" = "Darwin" ]]
@@ -290,7 +295,7 @@ elif on-linux; then
 fi
 
 if command -v eza >/dev/null; then
-  # exa trumps other ls settings
+  # eza trumps other ls settings
   alias ls='eza -Bla -s modified'
 fi
 
