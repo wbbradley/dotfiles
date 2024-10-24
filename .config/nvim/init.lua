@@ -90,7 +90,9 @@ local lazy_plugins = {
     event = "InsertEnter",
     dependencies = {
       "hrsh7th/cmp-nvim-lsp",
+      "hrsh7th/cmp-buffer",
       "hrsh7th/cmp-path",
+      "hrsh7th/cmp-cmdline",
     },
     config = function()
       local cmp = require("cmp")
@@ -98,13 +100,14 @@ local lazy_plugins = {
         completion = { completeopt = "menu,menuone,noinsert" },
         mapping = cmp.mapping.preset.insert({
           ["<C-j>"] = cmp.mapping.select_next_item(),
-          ["<C-h>"] = cmp.mapping.select_prev_item(),
+          ["<C-k>"] = cmp.mapping.select_prev_item(),
           ["<Tab>"] = cmp.mapping.confirm({ select = true }),
         }),
         sources = {
           { name = "lazydev", group_index = 0 },
           { name = "nvim_lsp" },
           { name = "path" },
+          { name = "buffer" },
         },
       })
     end,
