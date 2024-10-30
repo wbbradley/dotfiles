@@ -19,7 +19,7 @@
 [branch]
   autosetuprebase = always
 [merge]
-  ff = only
+  # ff = only
   tool = vimdiff
 [alias]
   tagcommit = rev-list -n 1
@@ -33,9 +33,6 @@
 	path = 
 [init]
 	defaultBranch = main
-[merge]
-  ff = only
-  tool = vimdiff
 [mergetool]
   keepBackup = false
 [mergetool "sourcetree"]

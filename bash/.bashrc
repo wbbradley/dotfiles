@@ -2,6 +2,7 @@
 # shellcheck disable=SC1090,SC1091,SC2207
 [[ $- != *i* ]] && return
 
+export PATH=/opt/homebrew/opt/openjdk/bin:"$PATH"
 export RIPGREP_CONFIG_PATH="$HOME/.ripgreprc"
 export FZF_DEFAULT_COMMAND="rg --files"
 # --iglob '*' --iglob '.*' --iglob '!*.swp' --iglob '!.*.swp' --iglob '!*.pyc' --iglob '!.git/' --iglob '!env/bin' --iglob '!node_modules' --iglob '!.*env/'"
@@ -84,13 +85,14 @@ new-main() {
 
 . "$HOME/bin/utils.sh"
 
-if [[ -d "$HOME"/.local/bin ]]; then
-  prepend_path_to PATH "$HOME"/.local/bin
-fi
 prepend_path_to PATH "$HOME"/bin
 if [[ -d /opt/homebrew/bin ]]; then
   prepend_path_to PATH /opt/homebrew/sbin
   prepend_path_to PATH /opt/homebrew/bin
+fi
+
+if [[ -d "$HOME"/.local/bin ]]; then
+  prepend_path_to PATH "$HOME"/.local/bin
 fi
 
 # shellcheck disable=SC2155
@@ -209,11 +211,12 @@ export EDITOR='nvim' # client -nw -c -a ""'
 tail-ide() {
   logs=(
     # "$HOME"/sample.profile 
-    "$HOME"/.local/state/lintls/lintls.log
+    "$HOME"/.local/state/pickls/pickls.log
+    "$HOME"/Library/Logs/Zed/Zed.log
     # "$HOME"/.local/state/nvim/*.log
     # "$HOME"/bootstrappy.log
   )
-  tail -n 100 -f "${logs[@]}"
+  tail -n 0 -f "${logs[@]}"
 }
 on-macos() {
   [[ "$(uname)" = "Darwin" ]]

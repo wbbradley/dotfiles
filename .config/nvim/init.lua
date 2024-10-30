@@ -25,8 +25,23 @@ local lazy_plugins = {
     "zbirenbaum/copilot.lua",
     cmd = "Copilot",
     event = "InsertEnter",
+
     config = function()
-      require("copilot").setup({})
+      require("copilot").setup({
+        suggestion = {
+          auto_trigger = true,
+          hide_during_completion = false,
+          keymap = {
+            -- accept = "C-l",
+          },
+        },
+        filetypes = {
+          markdown = true,
+        },
+      })
+      vim.cmd([[
+        imap <expr> <Plug>(vimrc:copilot-dummy-map) copilot#Accept("\<Tab>")
+      ]])
     end,
   },
   "folke/which-key.nvim",
@@ -102,7 +117,17 @@ local lazy_plugins = {
           ["<C-j>"] = cmp.mapping.select_next_item(),
           ["<C-k>"] = cmp.mapping.select_prev_item(),
           ["<Tab>"] = cmp.mapping.confirm({ select = true }),
+          --[[["<C-l>"] = cmp.mapping(function(fallback)
+            vim.api.nvim_feedkeys(
+              vim.fn["copilot#Accept"](vim.api.nvim_replace_termcodes("<Tab>", true, true, true)),
+              "n",
+              true
+            )
+          end),]]
         }),
+        experimental = {
+          ghost_text = false, -- this feature conflict with copilot.vim's preview.
+        },
         sources = {
           { name = "lazydev", group_index = 0 },
           { name = "nvim_lsp" },
@@ -527,8 +552,8 @@ nnoremap ; :
 " nnoremap <C-i> <C-i>zz
 nnoremap <leader>+ viwyo"""<Esc>pA."""<Esc>_wvU<Esc>V:s/_/ /<CR>:noh<CR>:match<CR>
 nnoremap <Leader>! :view ~/README.md<CR>
-nnoremap <Leader>1 :e ~/README.md<CR>Go<Esc>:r!date<CR>:set paste<CR>o
-nnoremap <Leader>2 :e ~/github.txt<CR>Go<Esc>:r!date<CR>o
+nnoremap <Leader>1 :e ~/README.md<CR>Go<Esc>:r!date<CR>
+nnoremap <Leader>2 :e ~/github.txt<CR>Go<Esc>:r!date<CR>
 nnoremap <Leader>c :%s/\<<C-r><C-w>\>/
 vnoremap <Leader>c "hy:%s/<C-r>h/
 vnoremap <Leader>x :!chmod +x %<CR>
@@ -913,16 +938,17 @@ vim.api.nvim_create_autocmd({ "BufWritePost" }, {
 })
 
 vim.api.nvim_create_autocmd({ "BufRead" }, {
-  group = vim.api.nvim_create_augroup("lintls-bufread", { clear = true }),
+  group = vim.api.nvim_create_augroup("pickls-bufread", { clear = true }),
   callback = function(_)
-    if vim.fn.executable("lintls") ~= 0 then
-      -- We found an executable for lintls.
+    if vim.fn.executable("pickls") ~= 0 then
+      -- We found an executable for pickls.
       vim.lsp.set_log_level(vim.log.levels.INFO)
       vim.lsp.start({
-        name = "lintls",
-        cmd = { "lintls", vim.api.nvim_buf_get_name(0) },
+        name = "pickls",
+        cmd = { "pickls", vim.api.nvim_buf_get_name(0) },
         root_dir = vim.fs.root(0, { ".git", "pyproject.toml", "setup.py", "Cargo.toml", "go.mod" }),
         settings = {
+          site = "nvim",
           languages = {
             toml = {
               linters = {
@@ -959,7 +985,27 @@ vim.api.nvim_create_autocmd({ "BufRead" }, {
                 },
               },
             },
+            dockerfile = {
+              linters = {
+                {
+                  program = "hadolint",
+                  args = {
+                    "--no-color",
+                    "--format",
+                    "tty",
+                    "-",
+                  },
+                  pattern = "-:(\\d+) [^ ]+ (\\w+): (.*)",
+                  line_match = 1,
+                  severity_match = 2,
+                  description_match = 3,
+                  use_stdin = true,
+                  use_stderr = false,
+                },
+              },
+            },
             python = {
+              root_markers = { ".git", "mypy.ini", "setup.py", "pyproject.toml" },
               linters = {
                 {
                   program = "mypy",

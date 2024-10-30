@@ -1,6 +1,11 @@
 // See https://zed.dev/docs/configuring-zed.
 {
+  "theme": "Gruvbox Dark Hard",
   "vim_mode": true,
+  // "expand_excerpt_lines": 0,
+  "jupyter": {
+    "enabled": false
+  },
   "file_scan_exclusions": [
     "*.vi",
     "tags",
@@ -39,46 +44,154 @@
   },
   "assistant": {
     "default_model": {
-      "provider": "copilot_chat",
-      "model": "gpt-4o"
+      "provider": "anthropic",
+      "model": "claude-3-5-sonnet-latest"
     },
     "version": "2"
   },
   "base_keymap": "VSCode",
-  "ui_font_size": 13,
-  "buffer_font_family": "FiraCode Nerd Font Mono", // MesloLGL Nerd Font",
-  "buffer_font_weight": 400,
+  "ui_font_family": "Avenir",
+  "ui_font_size": 15,
+  "ui_font_weight": 600,
+  "buffer_font_family": "FiraCode Nerd Font Mono",
+  "buffer_font_weight": 600,
   "buffer_font_size": 12,
-  "theme": {
-    "mode": "dark",
-    "dark": "Gruvbox Dark Hard",
-    "light": "Solarized Light"
-  },
   "cursor_blink": false,
   "scrollbar": { "show": "never" },
   "use_autoclose": false,
+  "indent_guides": {
+    "enabled": false,
+    "coloring": "indent_aware",
+    "background_coloring": "disabled",
+    "line_width": 1,
+    "active_line_width": 2
+  },
+  "remove_trailing_whitespace_on_save": true,
   "languages": {
+    "TOML": {
+      "language_servers": ["pickls"]
+    },
     "Python": {
-      "format_on_save": "on"
+      "language_servers": ["pickls"],
+      "format_on_save": [
+        {
+          "external": {
+            "command": "autoimport",
+            "arguments": ["-"]
+          }
+        },
+        {
+          "external": {
+            "command": "isort",
+            "arguments": ["-", "-d"]
+          }
+        },
+        {
+          "external": {
+            "command": "bash",
+            "arguments": [
+              "-c",
+              "ruff check --exit-zero --fix --unsafe-fixes --stdin-filename {buffer_path} | ruff format --stdin-filename {buffer_path}"
+            ]
+          }
+        }
+      ]
     }
   },
   "lsp": {
-    "lintls": {
-      "settings": {
-        "python": {
-          "linters": [
-            {
-              "program": "ruff",
-              "args": ["check", "--stdin-filename", "$filename"],
-              "pattern": "(.*):(\\d+):(\\d+): (.*)",
-              "filename_match": 1,
-              "line_match": 2,
-              "start_col_match": 3,
-              "description_match": 4,
-              "use_stdin": true,
-              "use_stderr": false
-            }
-          ]
+    "pyright": {
+      "enabled": false
+    },
+    "pickls": {
+      "binary": { "path": "pickls", "arguments": ["zed"] },
+      "initialization_options": {
+        "site": "zed",
+        "languages": {
+          "dockerfile": {
+            "linters": [
+              {
+                "program": "hadolint",
+                "args": ["--no-color", "--format", "tty", "-"],
+                "pattern": "-:(\\d+) [^ ]+ (\\w+): (.*)",
+                "line_match": 1,
+                "severity_match": 2,
+                "description_match": 3,
+                "use_stdin": true,
+                "use_stderr": false
+              }
+            ]
+          },
+          "toml": {
+            "linters": [
+              {
+                "program": "tomllint",
+                "args": ["-"],
+                "pattern": "(.*):(\\d+):(\\d+): error: (.*)",
+                "filename_match": 1,
+                "line_match": 2,
+                "start_col_match": 3,
+                "description_match": 4,
+                "use_stdin": true,
+                "use_stderr": true
+              }
+            ]
+          },
+          "shell script": {
+            "linters": [
+              {
+                "program": "shellcheck",
+                "args": ["-f", "gcc", "-"],
+                "pattern": "(.*):(\\d+):(\\d+): (\\w+): (.*)",
+                "filename_match": 1,
+                "line_match": 2,
+                "start_col_match": 3,
+                "severity_match": 4,
+                "description_match": 5,
+                "use_stdin": true,
+                "use_stderr": false
+              }
+            ]
+          },
+          "python": {
+            "root_markers": [".git", "pyproject.toml", "setup.py", "mypy.ini"],
+            "linters": [
+              {
+                "program": "mypy",
+                "args": [
+                  "--show-column-numbers",
+                  "--show-error-end",
+                  "--hide-error-codes",
+                  "--hide-error-context",
+                  "--no-color-output",
+                  "--no-error-summary",
+                  "--no-pretty",
+                  "--shadow-file",
+                  "$filename",
+                  "/dev/stdin",
+                  "$filename"
+                ],
+                "pattern": "(.*):(\\d+):(\\d+):\\d+:(\\d+): error: (.*)",
+                "filename_match": 1,
+                "line_match": 2,
+                "start_col_match": 3,
+                "end_col_match": 4,
+                "description_match": 5,
+                "use_stdin": true,
+                "use_stderr": false
+              },
+              {
+                "program": "ruff",
+                "args": ["check", "--stdin-filename", "$filename"],
+                "pattern": "(.*):(\\d+):(\\d+): (.*)",
+                "filename_match": 1,
+                "line_match": 2,
+                "start_col_match": 3,
+                "description_match": 4,
+                "use_stdin": true,
+                "use_stderr": false
+              }
+            ]
+          }
         }
       }
     }
