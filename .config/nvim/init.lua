@@ -52,10 +52,6 @@ local lazy_plugins = {
     opts = { signs = false },
   },
   "nvim-lualine/lualine.nvim",
-  {
-    "wbbradley/conform.nvim",
-    opts = {},
-  },
   -- "mfussenegger/nvim-lint",
   "jremmen/vim-ripgrep",
   {
@@ -175,30 +171,9 @@ local _ = require("cmp")
 require("lspconfig").gopls.setup({})
 require("lspconfig").terraformls.setup({})
 -- require("lspconfig").rust_analyzer.setup({})
-if false then
-  vim.api.nvim_create_autocmd("BufWritePre", {
-    pattern = "*.go",
-    callback = function()
-      local params = vim.lsp.util.make_range_params()
-      params.context = { only = { "source.organizeImports" } }
-      -- buf_request_sync defaults to a 1000ms timeout. Depending on your
-      -- machine and codebase, you may want longer. Add an additional
-      -- argument after params if you find that you have to write the file
-      -- twice for changes to be saved.
-      -- E.g., vim.lsp.buf_request_sync(0, "textDocument/codeAction", params, 3000)
-      local result = vim.lsp.buf_request_sync(0, "textDocument/codeAction", params)
-      for cid, res in pairs(result or {}) do
-        for _, r in pairs(res.result or {}) do
-          if r.edit then
-            local enc = (vim.lsp.get_client_by_id(cid) or {}).offset_encoding or "utf-16"
-            vim.lsp.util.apply_workspace_edit(r.edit, enc)
-          end
-        end
-      end
-      vim.lsp.buf.format({ async = false })
-    end,
-  })
-end
+vim.api.nvim_create_autocmd("BufWritePre", {
+   callback = function() vim.lsp.buf.format({ bufnr = bufnr }) end
+})
 vim.cmd("colorscheme gruvbox")
 require("nvim_context_vt").setup({
   min_rows = 30,
@@ -208,43 +183,6 @@ require("nvim_context_vt").setup({
   disable_virtual_lines = false,
 })
 
--- :help conform
-require("conform").setup({
-  notify_on_error = false,
-  formatters = {
-    autoimport = {
-      command = "autoimport",
-      args = { "-" },
-      stdin = true,
-      -- A function that calculates the directory to run the command in
-      cwd = require("conform.util").root_file({ ".git" }),
-      require_cwd = false,
-      exit_codes = { 0 },
-      -- Set to false to disable merging the config with the base definition
-      inherit = false,
-    },
-    mdformat = {
-      args = { "--number", "--wrap", "100", "-" },
-    },
-  },
-  format_on_save = {
-    lsp_format = "fallback",
-    timeout_ms = 1500,
-  },
-  formatters_by_ft = {
-    lua = { "stylua" },
-    markdown = { "mdformat" },
-    python = { "autoimport", "isort", "ruff_fix", "ruff_format" },
-    rust = { "rustfmt" },
-    terraform = { "terraform_fmt" },
-  },
-})
-vim.api.nvim_create_autocmd("BufWritePre", {
-  pattern = "*",
-  callback = function(args)
-    require("conform").format({ bufnr = args.buf })
-  end,
-})
 --[[ require("lint").linters.cargo = require("cargo")
 require("lint").linters_by_ft = {
   python = { "ruff" }, -- , "mypy" },
@@ -695,7 +633,8 @@ nnoremap <F4> :call FindWordUnderCursorNoUI()<CR>
 nnoremap <leader>f :call FindPromptRaw()<CR>
 nnoremap E :call FindPromptDirect()<CR>
 nnoremap <leader>g :w<CR>:!git add %<CR>
-nnoremap T :FzfLua tags<CR>
+" nnoremap T :FzfLua tags<CR>
+nnoremap T :FzfLua lsp_workspace_symbols<CR>
 
 map <F5> :echo "hi<" . synIDattr(synID(line("."),col("."),1),"name") . '> trans<' . synIDattr(synID(line("."),col("."),0),"name") . "> lo<" . synIDattr(synIDtrans(synID(line("."),col("."),1)),"name") . ">"<CR>
 nnoremap <leader>b :Buffers<CR>
@@ -947,109 +886,6 @@ vim.api.nvim_create_autocmd({ "BufRead" }, {
         name = "pickls",
         cmd = { "pickls", vim.api.nvim_buf_get_name(0) },
         root_dir = vim.fs.root(0, { ".git", "pyproject.toml", "setup.py", "Cargo.toml", "go.mod" }),
-        settings = {
-          site = "nvim",
-          languages = {
-            toml = {
-              linters = {
-                {
-                  program = "tomllint",
-                  args = { "-" },
-                  pattern = "(.*):(\\d+):(\\d+): error: (.*)",
-                  filename_match = 1,
-                  line_match = 2,
-                  start_col_match = 3,
-                  description_match = 4,
-                  use_stdin = true,
-                  use_stderr = true,
-                },
-              },
-            },
-            sh = {
-              linters = {
-                {
-                  program = "shellcheck",
-                  args = {
-                    "-f",
-                    "gcc",
-                    "-",
-                  },
-                  pattern = "(.*):(\\d+):(\\d+): (\\w+): (.*)",
-                  filename_match = 1,
-                  line_match = 2,
-                  start_col_match = 3,
-                  severity_match = 4,
-                  description_match = 5,
-                  use_stdin = true,
-                  use_stderr = false,
-                },
-              },
-            },
-            dockerfile = {
-              linters = {
-                {
-                  program = "hadolint",
-                  args = {
-                    "--no-color",
-                    "--format",
-                    "tty",
-                    "-",
-                  },
-                  pattern = "-:(\\d+) [^ ]+ (\\w+): (.*)",
-                  line_match = 1,
-                  severity_match = 2,
-                  description_match = 3,
-                  use_stdin = true,
-                  use_stderr = false,
-                },
-              },
-            },
-            python = {
-              root_markers = { ".git", "mypy.ini", "setup.py", "pyproject.toml" },
-              linters = {
-                {
-                  program = "mypy",
-                  args = {
-                    "--show-column-numbers",
-                    "--show-error-end",
-                    "--hide-error-codes",
-                    "--hide-error-context",
-                    "--no-color-output",
-                    "--no-error-summary",
-                    "--no-pretty",
-                    "--shadow-file",
-                    "$filename",
-                    "/dev/stdin",
-                    "$filename",
-                  },
-                  pattern = "(.*):(\\d+):(\\d+):\\d+:(\\d+): error: (.*)",
-                  filename_match = 1,
-                  line_match = 2,
-                  start_col_match = 3,
-                  end_col_match = 4,
-                  description_match = 5,
-                  use_stdin = true,
-                  use_stderr = false,
-                },
-                {
-                  program = "ruff",
-                  args = {
-                    "check",
-                    "--stdin-filename",
-                    "$filename",
-                  },
-                  pattern = "(.*):(\\d+):(\\d+): (.*)",
-                  filename_match = 1,
-                  line_match = 2,
-                  start_col_match = 3,
-                  description_match = 4,
-                  use_stdin = true,
-                  use_stderr = false,
-                },
-              },
-            },
-          },
-        },
       }, {
         bufnr = 0,
         reuse_client = function(_, _)
@@ -1130,7 +966,6 @@ _G.send_contents = function(buf_contents, extra_args, insert_inline)
     end,
     on_exit = function(_j, return_val)
       vim.schedule(function()
-        require("conform").format()
         if return_val == 0 then
           vim.notify("ai completed successfully", vim.log.levels.INFO)
         else
@@ -1173,7 +1008,6 @@ end
 
 _G.gather_and_send = function()
   vim.cmd("setlocal ft=markdown")
-  require("conform").format()
   local buf_contents = vim.api.nvim_buf_get_lines(0, 0, -1, false)
   _G.send_contents(buf_contents)
 end

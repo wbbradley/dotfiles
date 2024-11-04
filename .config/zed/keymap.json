@@ -14,18 +14,30 @@
     }
   },
   {
-    "context": "Editor && vim_mode == insert",
+    "context": "Editor && (vim_mode == insert || vim_mode == replace)",
     "bindings": {
-      "j k": ["workspace::SendKeystrokes", "escape"]
+      "j k": [
+        "workspace::SendKeystrokes",
+        "escape"
+      ]
     }
   },
   {
     "context": "Editor && vim_mode == visual",
     "bindings": {
       // REVIEW(conrad): "shift-tab": ["vim::PushOperator", "Outdent"],
-      "shift-tab": ["workspace::SendKeystrokes", "<"],
-      "tab": ["workspace::SendKeystrokes", ">"],
-      "shift-q": ["workspace::SendKeystrokes", "g q"]
+      "shift-tab": [
+        "workspace::SendKeystrokes",
+        "<"
+      ],
+      "tab": [
+        "workspace::SendKeystrokes",
+        ">"
+      ],
+      "shift-q": [
+        "workspace::SendKeystrokes",
+        "g q"
+      ]
     }
   },
   {
@@ -55,24 +67,48 @@
   {
     "context": "ProjectPanel",
     "bindings": {
-      "ctrl-w l": ["workspace::SendKeystrokes", "escape"]
+      "ctrl-w l": [
+        "workspace::SendKeystrokes",
+        "escape"
+      ]
     }
   },
   {
     "context": "Picker || Editor || ProjectPanel",
     "bindings": {
-      "ctrl-d": ["workspace::SendKeystrokes", "pagedown"],
-      "ctrl-h": ["workspace::SendKeystrokes", "left"],
-      "ctrl-j": ["workspace::SendKeystrokes", "down"],
-      "ctrl-k": ["workspace::SendKeystrokes", "up"],
-      "ctrl-l": ["workspace::SendKeystrokes", "right"],
-      "ctrl-u": ["workspace::SendKeystrokes", "pageup"]
+      "ctrl-d": [
+        "workspace::SendKeystrokes",
+        "pagedown"
+      ],
+      "ctrl-h": [
+        "workspace::SendKeystrokes",
+        "left"
+      ],
+      "ctrl-j": [
+        "workspace::SendKeystrokes",
+        "down"
+      ],
+      "ctrl-k": [
+        "workspace::SendKeystrokes",
+        "up"
+      ],
+      "ctrl-l": [
+        "workspace::SendKeystrokes",
+        "right"
+      ],
+      "ctrl-u": [
+        "workspace::SendKeystrokes",
+        "pageup"
+      ]
     }
   },
   {
     "context": "ProjectSearchBar || EmptyPane || BufferSearchBar",
     "bindings": {
-      "escape": ["workspace::SendKeystrokes", "cmd-w"]
+      "escape": [
+        "workspace::SendKeystrokes",
+        "cmd-w"
+      ]
     }
   },
   {
@@ -82,27 +118,60 @@
     }
   },
   {
+    "context": "Editor && vim_mode == visual",
+    "bindings": {
+      "v": "editor::SelectLargerSyntaxNode" // Expand Selection
+    }
+  },
+  {
     "context": "Editor && !menu && vim_mode == normal",
     "bindings": {
-      ";": ["workspace::SendKeystrokes", ":"],
-      "-": ["workspace::SendKeystrokes", "_"],
-      "shift-t": ["workspace::SendKeystrokes", "g shift-s"],
+      ";": [
+        "workspace::SendKeystrokes",
+        ":"
+      ],
+      "-": [
+        "workspace::SendKeystrokes",
+        "_"
+      ],
+      "shift-t": [
+        "workspace::SendKeystrokes",
+        "g shift-s"
+      ],
       // REVIEW: This shift-tab mapping is not working.
-      // "shift-tab": ["workspace::SendKeystrokes", "V <"],
+      "shift-tab": [
+        "workspace::SendKeystrokes",
+        "cmd-["
+      ],
       "ctrl-p": "file_finder::Toggle",
       "f7": "diagnostics::Deploy",
       "\\ q": "zed::Quit",
-      "\\ space": ["workspace::SendKeystrokes", "escape"],
-      "shift-f": ["workspace::SendKeystrokes", "cmd-shift-f delete"],
-      "f3": ["workspace::SendKeystrokes", "cmd-shift-f enter"],
+      "\\ space": [
+        "workspace::SendKeystrokes",
+        "escape"
+      ],
+      "shift-f": [
+        "workspace::SendKeystrokes",
+        "cmd-shift-f delete"
+      ],
+      "f3": [
+        "workspace::SendKeystrokes",
+        "cmd-shift-f enter"
+      ],
       "shift-m": "projects::OpenRecent",
       "ctrl-w n": "pane::SplitDown",
       "ctrl-w v": "pane::SplitRight",
       "shift-l": "editor::GoToDiagnostic",
       "shift-h": "editor::GoToPrevDiagnostic",
-      "ctrl-d": ["workspace::SendKeystrokes", "3 0 down"],
-      "ctrl-u": ["workspace::SendKeystrokes", "3 0 up"],
-      "\\ c": "editor::Rename"
+      "ctrl-d": [
+        "workspace::SendKeystrokes",
+        "3 0 down"
+      ],
+      "ctrl-u": [
+        "workspace::SendKeystrokes",
+        "3 0 up"
+      ],
+      "\\ c": "editor::Rename",
       // "ctrl-b l": "workspace::FocusRightDock",
       // "ctrl-b h": "workspace::FocusLeftDock",
       // REVIEW(conrad): The "vv" mapping is not working in Vim mode, it also has the side effect of

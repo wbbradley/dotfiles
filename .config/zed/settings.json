@@ -6,6 +6,7 @@
   "jupyter": {
     "enabled": false
   },
+  "use_system_path_prompts": false,
   "file_scan_exclusions": [
     "*.vi",
     "tags",
@@ -44,8 +45,8 @@
   },
   "assistant": {
     "default_model": {
-      "provider": "anthropic",
-      "model": "claude-3-5-sonnet-latest"
+      "provider": "openai",
+      "model": "gpt-4o"
     },
     "version": "2"
   },
@@ -57,143 +58,51 @@
   "buffer_font_weight": 600,
   "buffer_font_size": 12,
   "cursor_blink": false,
-  "scrollbar": { "show": "never" },
+  "scrollbar": {
+    "show": "never"
+  },
   "use_autoclose": false,
   "indent_guides": {
-    "enabled": false,
-    "coloring": "indent_aware",
+    "enabled": true,
+    "coloring": "fixed",
     "background_coloring": "disabled",
     "line_width": 1,
     "active_line_width": 2
   },
   "remove_trailing_whitespace_on_save": true,
+  "format_on_save": "language_server",
   "languages": {
-    "TOML": {
-      "language_servers": ["pickls"]
-    },
     "Python": {
-      "language_servers": ["pickls"],
-      "format_on_save": [
-        {
-          "external": {
-            "command": "autoimport",
-            "arguments": ["-"]
-          }
-        },
-        {
-          "external": {
-            "command": "isort",
-            "arguments": ["-", "-d"]
-          }
-        },
-        {
-          "external": {
-            "command": "bash",
-            "arguments": [
-              "-c",
-              "ruff check --exit-zero --fix --unsafe-fixes --stdin-filename {buffer_path} | ruff format --stdin-filename {buffer_path}"
-            ]
-          }
-        }
+      "language_servers": [
+        "pickls"
       ]
+    },
+    "JavaScript": {
+      "format_on_save": "prettier"
     }
   },
   "lsp": {
-    "pyright": {
-      "enabled": false
-    },
-    "pickls": {
-      "binary": { "path": "pickls", "arguments": ["zed"] },
+    "rust-analyzer": {
       "initialization_options": {
-        "site": "zed",
-        "languages": {
-          "dockerfile": {
-            "linters": [
-              {
-                "program": "hadolint",
-                "args": ["--no-color", "--format", "tty", "-"],
-                "pattern": "-:(\\d+) [^ ]+ (\\w+): (.*)",
-                "line_match": 1,
-                "severity_match": 2,
-                "description_match": 3,
-                "use_stdin": true,
-                "use_stderr": false
-              }
-            ]
-          },
-          "toml": {
-            "linters": [
-              {
-                "program": "tomllint",
-                "args": ["-"],
-                "pattern": "(.*):(\\d+):(\\d+): error: (.*)",
-                "filename_match": 1,
-                "line_match": 2,
-                "start_col_match": 3,
-                "description_match": 4,
-                "use_stdin": true,
-                "use_stderr": true
-              }
-            ]
-          },
-          "shell script": {
-            "linters": [
-              {
-                "program": "shellcheck",
-                "args": ["-f", "gcc", "-"],
-                "pattern": "(.*):(\\d+):(\\d+): (\\w+): (.*)",
-                "filename_match": 1,
-                "line_match": 2,
-                "start_col_match": 3,
-                "severity_match": 4,
-                "description_match": 5,
-                "use_stdin": true,
-                "use_stderr": false
-              }
-            ]
-          },
-          "python": {
-            "root_markers": [".git", "pyproject.toml", "setup.py", "mypy.ini"],
-            "linters": [
-              {
-                "program": "mypy",
-                "args": [
-                  "--show-column-numbers",
-                  "--show-error-end",
-                  "--hide-error-codes",
-                  "--hide-error-context",
-                  "--no-color-output",
-                  "--no-error-summary",
-                  "--no-pretty",
-                  "--shadow-file",
-                  "$filename",
-                  "/dev/stdin",
-                  "$filename"
-                ],
-                "pattern": "(.*):(\\d+):(\\d+):\\d+:(\\d+): error: (.*)",
-                "filename_match": 1,
-                "line_match": 2,
-                "start_col_match": 3,
-                "end_col_match": 4,
-                "description_match": 5,
-                "use_stdin": true,
-                "use_stderr": false
-              },
-              {
-                "program": "ruff",
-                "args": ["check", "--stdin-filename", "$filename"],
-                "pattern": "(.*):(\\d+):(\\d+): (.*)",
-                "filename_match": 1,
-                "line_match": 2,
-                "start_col_match": 3,
-                "description_match": 4,
-                "use_stdin": true,
-                "use_stderr": false
-              }
-            ]
-          }
+        "checkOnSave": {
+          "command": "clippy"
         }
       }
+    },
+    "pickls": {
+      "binary": {
+        "path": "pickls",
+        "arguments": [
+          "zed",
+          "{buffer_path}"
+        ]
+      }
+    },
+    "clangd": {
+      "arguments": [
+        "-background-index",
+        "-compile-commands-dir=build"
+      ]
     }
   }
 }

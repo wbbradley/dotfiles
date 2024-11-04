@@ -23,5 +23,6 @@ bin/bin/wim-key
 .config/kitty/*
 .config/nvim/spell
 .config/pip/*
+.config/swiftpm/*
 .config/zed/*
 .config/zed/.*
