@@ -1,6 +1,11 @@
 // See https://zed.dev/docs/configuring-zed.
 {
+  "terminal": {
+    "dock": "right"
+  },
   "theme": "Gruvbox Dark Hard",
+  "show_wrap_guides": true,
+  // "preferred_line_length": 80,
   "vim_mode": true,
   // "expand_excerpt_lines": 0,
   "jupyter": {
@@ -19,6 +24,32 @@
   "git": {
     "inline_blame": {
       "enabled": false
+    }
+  },
+  "dev": {
+    "experimental.theme_overrides": {
+      "title_bar.background": "#101010"
+    },
+    "confirm_quit": false
+  },
+  "nightly": {
+    "experimental.theme_overrides": {
+      "title_bar.background": "#401040"
+    },
+    "confirm_quit": false
+  },
+  "preview": {
+    "experimental.theme_overrides": {
+      "title_bar.background": "#609040"
+    },
+    "confirm_quit": false
+  },
+  "stable": {
+    // "server_url": "https://staging.zed.dev",
+    "auto_update": false,
+    "confirm_quit": false,
+    "experimental.theme_overrides": {
+      "title_bar.background": "#00f000"
     }
   },
   "search": {
@@ -72,17 +103,21 @@
   "remove_trailing_whitespace_on_save": true,
   "format_on_save": "language_server",
   "languages": {
+    "JSON": {
+      "format_on_save": "prettier"
+    },
+    "JSONC": {
+      "format_on_save": "prettier"
+    },
     "Python": {
-      "language_servers": [
-        "pickls"
-      ]
+      "language_servers": ["pickls"]
     },
     "JavaScript": {
       "format_on_save": "prettier"
     }
   },
   "lsp": {
-    "rust-analyzer": {
+    "_rust-analyzer": {
       "initialization_options": {
         "checkOnSave": {
           "command": "clippy"
@@ -92,17 +127,11 @@
     "pickls": {
       "binary": {
         "path": "pickls",
-        "arguments": [
-          "zed",
-          "{buffer_path}"
-        ]
+        "arguments": []
       }
     },
     "clangd": {
-      "arguments": [
-        "-background-index",
-        "-compile-commands-dir=build"
-      ]
+      "arguments": ["-background-index", "-compile-commands-dir=build"]
     }
   }
 }
