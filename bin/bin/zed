@@ -21,6 +21,7 @@ fi
 
 export RUST_LOG="${RUST_LOG:-info}"
 export ZED_LOG_TO_STDOUT="${ZED_LOG_TO_STDOUT:-1}"
+export ZED_DEVELOPMENT_AUTH=1
 profile=dev
 
 if (( lkg )); then
@@ -39,16 +40,16 @@ esac
 binary="$HOME"/src/zed/target/"$profile_dir"/zed
 
 if (( force_build )) || ! [[ -x "$binary" ]]; then
-  cargo build --manifest-path "$HOME"/src/zed/crates/zed/Cargo.toml --profile="$profile" || die "failed to build zed"
+  time cargo build --manifest-path "$HOME"/src/zed/crates/zed/Cargo.toml --profile="$profile" || die "failed to build zed"
 else
   echo "Skipping build. [binary='$binary']"
 fi
 
 if [[ -n "$DBG" ]]; then
-  echo "Debugging Zed. [DBG=$DBG, binary='$binary']"
+  echo "Debugging Zed. [DBG='$DBG', binary='$binary']"
   exec lldb "$HOME"/src/zed/target/"$profile_dir"/zed -- "$@"
 else
-  echo "Running Zed. [DBG=$DBG, binary='$binary']"
+  echo "Running Zed. [DBG='$DBG', binary='$binary']"
   export RUST_BACKTRACE=1
   exec "$binary" "$@"
 fi

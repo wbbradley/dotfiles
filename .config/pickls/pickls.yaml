@@ -21,7 +21,16 @@ languages:
         severity_match: 2
         use_stderr: false
         use_stdin: true
-  markdown:
+  lua:
+    formatters:
+      - program: lua-format
+        args:
+          - "--indent-width=2"
+          - "--spaces-inside-table-braces"
+          - "--align-table-field"
+          - "--break-before-table-rb"
+          - "--chop-down-table"
+  _markdown:
     formatters:
       - program: mdformat
         args:

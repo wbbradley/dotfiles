@@ -11,7 +11,7 @@ if not (vim.uv or vim.loop).fs_stat(lazypath) then
     "--filter=blob:none",
     "https://github.com/folke/lazy.nvim.git",
     "--branch=stable", -- latest stable release
-    lazypath,
+    lazypath
   })
 end
 vim.opt.rtp:prepend(lazypath)
@@ -33,26 +33,29 @@ local lazy_plugins = {
           hide_during_completion = false,
           keymap = {
             -- accept = "C-l",
-          },
+          }
         },
-        filetypes = {
-          markdown = true,
-        },
+        filetypes = { markdown = true }
       })
       vim.cmd([[
         imap <expr> <Plug>(vimrc:copilot-dummy-map) copilot#Accept("\<Tab>")
       ]])
-    end,
+    end
   },
   "folke/which-key.nvim",
   {
     "folke/todo-comments.nvim",
     event = "VimEnter",
     dependencies = { "nvim-lua/plenary.nvim" },
-    opts = { signs = false },
+    opts = { signs = false }
   },
-  "nvim-lualine/lualine.nvim",
-  -- "mfussenegger/nvim-lint",
+  "nvim-lualine/lualine.nvim", -- "mfussenegger/nvim-lint",
+  {
+    "MysticalDevil/inlay-hints.nvim",
+    event = "LspAttach",
+    dependencies = { "neovim/nvim-lspconfig" },
+    config = function() require("inlay-hints").setup() end
+  },
   "jremmen/vim-ripgrep",
   {
     "ibhagwan/fzf-lua",
@@ -61,40 +64,40 @@ local lazy_plugins = {
       local actions = require("fzf-lua.actions")
       require("fzf-lua").setup({
         preview_opts = "hidden", -- NB: Toggle the preview with <F4>.
-        fzf_opts = {
-          ["--layout"] = "default",
-        },
+        fzf_opts = { ["--layout"] = "default" },
         actions = {
           files = {
             ["enter"] = function(selected, opts)
               local retval = actions.file_edit_or_qf(selected, opts)
               if vim.fn.win_gettype() == "quickfix" then
-                vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<CR>", true, true, true), "n", false)
+                vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<CR>",
+                                                                     true, true,
+                                                                     true), "n",
+                                      false)
               end
               return retval
-            end,
-          },
-        },
+            end
+          }
+        }
         -- cmd = "git grep --line-number --column --color=always",
       })
-    end,
-  },
-  -- "nvimtools/none-ls.nvim",
+    end
+  }, -- "nvimtools/none-ls.nvim",
   {
     "neovim/nvim-lspconfig",
-    dependencies = {
-      { "j-hui/fidget.nvim", opts = {} },
-      "hrsh7th/nvim-cmp",
-    },
+    dependencies = { { "j-hui/fidget.nvim", opts = {} }, "hrsh7th/nvim-cmp" },
+    opts = { inlay_hints = { enabled = true } },
     config = function()
       vim.api.nvim_create_autocmd("LspAttach", {
-        group = vim.api.nvim_create_augroup("kickstart-lsp-attach", { clear = true }),
+        group = vim.api.nvim_create_augroup("kickstart-lsp-attach",
+                                            { clear = true }),
         callback = function(_)
           local capabilities = vim.lsp.protocol.make_client_capabilities()
-          vim.tbl_deep_extend("force", capabilities, require("cmp_nvim_lsp").default_capabilities())
-        end,
+          vim.tbl_deep_extend("force", capabilities,
+                              require("cmp_nvim_lsp").default_capabilities())
+        end
       })
-    end,
+    end
   },
   {
     "hrsh7th/nvim-cmp",
@@ -103,7 +106,7 @@ local lazy_plugins = {
       "hrsh7th/cmp-nvim-lsp",
       "hrsh7th/cmp-buffer",
       "hrsh7th/cmp-path",
-      "hrsh7th/cmp-cmdline",
+      "hrsh7th/cmp-cmdline"
     },
     config = function()
       local cmp = require("cmp")
@@ -112,7 +115,7 @@ local lazy_plugins = {
         mapping = cmp.mapping.preset.insert({
           ["<C-j>"] = cmp.mapping.select_next_item(),
           ["<C-k>"] = cmp.mapping.select_prev_item(),
-          ["<Tab>"] = cmp.mapping.confirm({ select = true }),
+          ["<Tab>"] = cmp.mapping.confirm({ select = true })
           --[[["<C-l>"] = cmp.mapping(function(fallback)
             vim.api.nvim_feedkeys(
               vim.fn["copilot#Accept"](vim.api.nvim_replace_termcodes("<Tab>", true, true, true)),
@@ -122,16 +125,16 @@ local lazy_plugins = {
           end),]]
         }),
         experimental = {
-          ghost_text = false, -- this feature conflict with copilot.vim's preview.
+          ghost_text = false -- this feature conflict with copilot.vim's preview.
         },
         sources = {
           { name = "lazydev", group_index = 0 },
           { name = "nvim_lsp" },
           { name = "path" },
-          { name = "buffer" },
-        },
+          { name = "buffer" }
+        }
       })
-    end,
+    end
   },
   "nvim-lua/plenary.nvim",
   "nvim-treesitter/nvim-treesitter",
@@ -143,15 +146,15 @@ local lazy_plugins = {
       library = {
         -- See the configuration section for more details
         -- Load luvit types when the `vim.uv` word is found
-        { path = "luvit-meta/library", words = { "vim%.uv" } },
-      },
-    },
+        { path = "luvit-meta/library", words = { "vim%.uv" } }
+      }
+    }
   },
   { "Bilal2453/luvit-meta", lazy = true },
   { "ellisonleao/gruvbox.nvim", priority = 1000, config = true },
   "rust-lang/rust.vim",
   { "mrcjkb/rustaceanvim", ft = { "rust" } },
-  "andersevenrud/nvim_context_vt",
+  "andersevenrud/nvim_context_vt"
 }
 
 -- Lazy doesn't support hot reloading, so we need to check if it's already been loaded
@@ -161,18 +164,17 @@ if vim.g.lazy_loaded == nil then
 end
 require("gitsigns").setup({
   current_line_blame = true,
-  current_line_blame_opts = {
-    virt_text_pos = "right_align",
-  },
+  current_line_blame_opts = { virt_text_pos = "right_align" }
 })
 vim.cmd("Gitsigns toggle_current_line_blame")
 local _ = require("cmp")
 
 require("lspconfig").gopls.setup({})
 require("lspconfig").terraformls.setup({})
+require("lspconfig").clangd.setup({})
 -- require("lspconfig").rust_analyzer.setup({})
 vim.api.nvim_create_autocmd("BufWritePre", {
-   callback = function() vim.lsp.buf.format({ bufnr = bufnr }) end
+  callback = function() vim.lsp.buf.format({ bufnr = bufnr }) end
 })
 vim.cmd("colorscheme gruvbox")
 require("nvim_context_vt").setup({
@@ -180,7 +182,7 @@ require("nvim_context_vt").setup({
   disable_ft = { "markdown", "lua" },
   -- Disable display of virtual text below blocks for indentation based languages like Python
   -- Default: false
-  disable_virtual_lines = false,
+  disable_virtual_lines = false
 })
 
 --[[ require("lint").linters.cargo = require("cargo")
@@ -273,13 +275,9 @@ local function keymap(mode, shortcut, command)
   vim.keymap.set(mode, shortcut, command, { noremap = true, silent = true })
 end
 
-local function nmap(shortcut, command)
-  keymap("n", shortcut, command)
-end
+local function nmap(shortcut, command) keymap("n", shortcut, command) end
 
-local function vmap(shortcut, command)
-  keymap("v", shortcut, command)
-end
+local function vmap(shortcut, command) keymap("v", shortcut, command) end
 
 nmap("M", ":FzfLua oldfiles<CR>")
 nmap("<C-p>", ":FzfLua git_files<CR>")
@@ -293,7 +291,7 @@ require("treesitter-context").setup({
   -- mode = 'topline',
   -- max_lines = 5,
   min_window_height = 20,
-  multiline_threshold = 4,
+  multiline_threshold = 4
 })
 vim.cmd([[
   hi TreesitterContextBottom gui=underline guisp=Grey
@@ -332,7 +330,7 @@ require("nvim-treesitter.configs").setup({
     "vim",
     "vimdoc",
     "xml",
-    "yaml",
+    "yaml"
   },
   highlight = {
     enable = true,
@@ -341,28 +339,27 @@ require("nvim-treesitter.configs").setup({
     disable = function(_lang, buf)
       local max_filesize = 100 * 1024 -- 100 KB
       local ok, stats = pcall(vim.loop.fs_stat, vim.api.nvim_buf_get_name(buf))
-      if ok and stats and stats.size > max_filesize then
-        return true
-      end
-    end,
-  },
+      if ok and stats and stats.size > max_filesize then return true end
+    end
+  }
 })
 vim.g.laststatus = 2
 
 vim.keymap.set("n", "F", function()
-  require("fzf-lua").grep({
+  require("fzf-lua").live_grep({
     no_esc = true,
     search = "",
-    cmd = "git grep --line-number --column --color=always",
+    cmd = "git grep --line-number --column --color=always"
   })
 end)
 vim.keymap.set("n", "<F3>", function()
   require("fzf-lua").grep_cword({
-    cmd = "git grep --line-number --column --color=always",
+    cmd = "git grep --line-number --column --color=always"
   })
 end)
 
-nmap("g]", "<cmd>lua require('fzf-lua').tags({ fzf_opts = { ['--query'] = vim.fn.expand('<cword>') } })<CR>")
+nmap("g]",
+     "<cmd>lua require('fzf-lua').tags({ fzf_opts = { ['--query'] = vim.fn.expand('<cword>') } })<CR>")
 
 vim.cmd([[
 set encoding=utf-8
@@ -635,6 +632,7 @@ nnoremap E :call FindPromptDirect()<CR>
 nnoremap <leader>g :w<CR>:!git add %<CR>
 " nnoremap T :FzfLua tags<CR>
 nnoremap T :FzfLua lsp_workspace_symbols<CR>
+nnoremap <leader>m :FzfLua lsp_workspace_diagnostics<CR>
 
 map <F5> :echo "hi<" . synIDattr(synID(line("."),col("."),1),"name") . '> trans<' . synIDattr(synID(line("."),col("."),0),"name") . "> lo<" . synIDattr(synIDtrans(synID(line("."),col("."),1)),"name") . ">"<CR>
 nnoremap <leader>b :Buffers<CR>
@@ -822,15 +820,13 @@ endif
 require("lualine").setup({
   extensions = { "fzf", "lazy", "quickfix" },
   sections = {
-    lualine_c = {
-      { "filename", path = 1 },
-    },
+    lualine_c = { { "filename", path = 1 } },
     lualine_x = {
       "encoding", -- "fileformat",
       "searchcount",
-      "filetype",
-    },
-  },
+      "filetype"
+    }
+  }
 })
 
 local function is_home_directory(path)
@@ -855,9 +851,7 @@ local function run_ctags_in_project_root()
   local root_dir = vim.fs.root(0, { ".git" })
 
   if root_dir then
-    if is_home_directory(root_dir) then
-      return
-    end
+    if is_home_directory(root_dir) then return end
     local tags_filename = root_dir .. "/tags"
     local success, age_in_seconds = pcall(file_age_in_seconds, tags_filename)
     if not success or age_in_seconds == nil or (age_in_seconds > 5 * 60) then
@@ -871,9 +865,7 @@ end
 -- Set up an autocmd to run ctags on BufWritePost event from a root dir.
 vim.api.nvim_create_autocmd({ "BufWritePost" }, {
   group = vim.api.nvim_create_augroup("ctags-on-save", { clear = true }),
-  callback = function(_)
-    run_ctags_in_project_root()
-  end,
+  callback = function(_) run_ctags_in_project_root() end
 })
 
 vim.api.nvim_create_autocmd({ "BufRead" }, {
@@ -885,15 +877,16 @@ vim.api.nvim_create_autocmd({ "BufRead" }, {
       vim.lsp.start({
         name = "pickls",
         cmd = { "pickls", vim.api.nvim_buf_get_name(0) },
-        root_dir = vim.fs.root(0, { ".git", "pyproject.toml", "setup.py", "Cargo.toml", "go.mod" }),
-      }, {
-        bufnr = 0,
-        reuse_client = function(_, _)
-          return false
-        end,
-      })
+        root_dir = vim.fs.root(0, {
+          ".git",
+          "pyproject.toml",
+          "setup.py",
+          "Cargo.toml",
+          "go.mod"
+        })
+      }, { bufnr = 0, reuse_client = function(_, _) return false end })
     end
-  end,
+  end
 })
 
 local Job = require("plenary.job")
@@ -926,19 +919,12 @@ _G.send_contents = function(buf_contents, extra_args, insert_inline)
     state = { insertion_point = -1 }
   end
 
-  vim.notify(
-    string.format(
-      "ai running [insert_inline=%s, insertion_point=%s]...",
-      insert_inline,
-      state.insertion_point
-    ),
-    vim.log.levels.INFO
-  )
+  vim.notify(string.format(
+                 "ai running [insert_inline=%s, insertion_point=%s]...",
+                 insert_inline, state.insertion_point), vim.log.levels.INFO)
   local args = { "--embedded" }
   if type(extra_args) == "table" then
-    for i = 1, #extra_args do
-      table.insert(args, extra_args[i])
-    end
+    for i = 1, #extra_args do table.insert(args, extra_args[i]) end
   end
   Job:new({
     command = "ai",
@@ -947,7 +933,8 @@ _G.send_contents = function(buf_contents, extra_args, insert_inline)
     on_stdout = function(_, stdout_data)
       vim.schedule(function()
         local lines = vim.split(stdout_data, "\n", true)
-        vim.api.nvim_buf_set_lines(0, state.insertion_point, state.insertion_point, true, lines)
+        vim.api.nvim_buf_set_lines(0, state.insertion_point,
+                                   state.insertion_point, true, lines)
         -- Go to the end of the inserted text.
         if state.insertion_point == -1 then
           vim.api.nvim_command("normal! G")
@@ -972,7 +959,7 @@ _G.send_contents = function(buf_contents, extra_args, insert_inline)
           vim.notify("ai failed with code: " .. return_val, vim.log.levels.ERROR)
         end
       end)
-    end,
+    end
   }):start()
 end
 
@@ -980,9 +967,7 @@ _G.gather_visual_selection = function()
   local _, lnum1, col1, _ = unpack(vim.fn.getpos("'<"))
   local _, lnum2, col2, _ = unpack(vim.fn.getpos("'>"))
   local lines = vim.fn.getline(lnum1, lnum2)
-  if #lines == 0 then
-    return ""
-  end
+  if #lines == 0 then return "" end
   lines[#lines] = string.sub(lines[#lines], 1, col2)
   lines[1] = string.sub(lines[1], col1)
   return table.concat(lines, "\n")
@@ -995,7 +980,8 @@ _G.create_review_visual_selection_buffer = function()
   local selected_text = _G.gather_visual_selection()
 
   -- Create the content to insert in new buffer
-  local content = string.format("> user\n\nPlease review this:\n```%s\n%s\n```", filetype, selected_text)
+  local content = string.format("> user\n\nPlease review this:\n```%s\n%s\n```",
+                                filetype, selected_text)
 
   -- Open a new buffer
   vim.cmd("split")
@@ -1013,13 +999,15 @@ _G.gather_and_send = function()
 end
 
 -- nmap("<leader>a", ":lua gather_and_send()<CR>")
-vmap("<leader>a", ":lua create_review_visual_selection_buffer()<CR>:lua gather_and_send()<CR>")
+vmap("<leader>a",
+     ":lua create_review_visual_selection_buffer()<CR>:lua gather_and_send()<CR>")
 
 nmap("<leader>P", ":PopulateQuickFixFromClipboard<CR>")
 vim.api.nvim_create_user_command("PopulateQuickFixFromClipboard", function()
   -- Grab the contents of the system clipboard
   local clipboard_contents = vim.fn.system("pbpaste")
-  local clipboard_lines = vim.split(clipboard_contents, "\n", { plain = true, trimempty = true })
+  local clipboard_lines = vim.split(clipboard_contents, "\n",
+                                    { plain = true, trimempty = true })
 
   -- Define the possible formats for locations (adjust as needed)
   local location_patterns = {
@@ -1028,17 +1016,20 @@ vim.api.nvim_create_user_command("PopulateQuickFixFromClipboard", function()
       pattern = ".* ([^: ]+):(%d+):(.*)",
       filename_group = 1,
       lnum_group = 2,
-      description_group = "line_before",
-    },
-    -- File paths (relative or absolute)
-    { pattern = "^([^ :]+):(%d+):(.*)", filename_group = 1, lnum_group = 2, description_group = 3 },
-    -- Python stack trace lines
+      description_group = "line_before"
+    }, -- File paths (relative or absolute)
+    {
+      pattern = "^([^ :]+):(%d+):(.*)",
+      filename_group = 1,
+      lnum_group = 2,
+      description_group = 3
+    }, -- Python stack trace lines
     {
       pattern = 'File (%b""), line (%d+), in (%w+)',
       filename_group = 1,
       lnum_group = 2,
-      description_group = 3,
-    },
+      description_group = 3
+    }
   }
   -- Find all the locations that match any of the patterns, and record them in a table of tables.
   local locations = {}
@@ -1047,23 +1038,19 @@ vim.api.nvim_create_user_command("PopulateQuickFixFromClipboard", function()
       local p1, p2, p3 = line:match(pattern_info.pattern)
       if p1 then
         local captures = { p1, p2, p3 }
-        local filename = captures[pattern_info.filename_group]:gsub('^"(.*)"$', "%1")
-        if
-          not string.find(filename, "site-packages", 1, true)
-          and not string.find(filename, "Python.framework", 1, true)
-          and not string.find(filename, "importlib", 1, true)
-          and not string.find(filename, "/rustc/", 1, true)
-        then
+        local filename = captures[pattern_info.filename_group]:gsub('^"(.*)"$',
+                                                                    "%1")
+        if not string.find(filename, "site-packages", 1, true) and
+            not string.find(filename, "Python.framework", 1, true) and
+            not string.find(filename, "importlib", 1, true) and
+            not string.find(filename, "/rustc/", 1, true) then
           if filename:sub(1, 5) == "/app/" then
             filename = filename:sub(6)
           end
           local lnum = tonumber(captures[pattern_info.lnum_group]) or 0
           local description = captures[pattern_info.description_group]
-          table.insert(locations, {
-            filename = filename,
-            lnum = lnum,
-            text = description,
-          })
+          table.insert(locations,
+                       { filename = filename, lnum = lnum, text = description })
         end
       end
     end
@@ -1071,7 +1058,8 @@ vim.api.nvim_create_user_command("PopulateQuickFixFromClipboard", function()
 
   if #locations > 0 then
     -- Populate the location list window
-    vim.fn.setqflist({}, "r", { title = "Clipboard Locations", items = locations })
+    vim.fn.setqflist({}, "r",
+                     { title = "Clipboard Locations", items = locations })
     vim.cmd("copen") -- Open the location list window
     vim.cmd.cfirst()
   else

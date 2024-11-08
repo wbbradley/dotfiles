@@ -37,7 +37,13 @@
     }
   },
   {
-    "context": "Editor",
+    "context": "Workspace",
+    "bindings": {
+      "\\ f": "workspace::FollowNextCollaborator"
+    }
+  },
+  {
+    "context": "Editor || Terminal",
     "bindings": {
       "ctrl-b o": "terminal_panel::ToggleFocus",
       "ctrl-b j": "terminal_panel::ToggleFocus",

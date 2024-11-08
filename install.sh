@@ -64,6 +64,7 @@ if on-macos; then
 
     brew install "${BREW_DEPS[@]}" || die "brew install failed"
     luarocks install luacheck || die "luacheck install failed"
+    luarocks install --server=https://luarocks.org/dev luaformatter || die "luaformatter install failed"
     echo "NB: make sure you manage brew services."
     brew services
 elif on-linux; then

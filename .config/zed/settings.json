@@ -26,6 +26,12 @@
       "enabled": false
     }
   },
+  "inlay_hints": {
+    "enabled": true,
+    "show_type_hints": true,
+    "show_parameter_hints": false,
+    "show_other_hints": true
+  },
   "dev": {
     "experimental.theme_overrides": {
       "title_bar.background": "#101010"
@@ -57,9 +63,10 @@
   },
   "experimental.theme_overrides": {
     // TODO: use a different color for matching brackets.
-    // "editor.document_highlight.read_background": "#f1f1f13a",
-    // "editor.document_highlight.write_background": "#fc6f6466",
-    // "search.match_background": "#52fbfb60",
+    // "editor.document_highlight.read_background": "#f1f1017a",
+    //"editor.document_highlight.write_background": "#fc6f6466",
+    "editor.document_highlight.bracket_background": "#52fbfb60",
+    "search.match_background": "#52fbfb60",
     // "status_bar.background": "#333944ff",
     // "editor.gutter.background": "#282c33ff",
     "syntax": {
@@ -90,7 +97,7 @@
   "buffer_font_size": 12,
   "cursor_blink": false,
   "scrollbar": {
-    "show": "never"
+    "show": "always"
   },
   "use_autoclose": false,
   "indent_guides": {
