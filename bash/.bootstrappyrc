@@ -1,3 +1,4 @@
 ykman=yubikey-manager
 aws=awscli
 pymarkdown=pymarkdownlnt
+dympy=mypy

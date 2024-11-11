@@ -31,9 +31,7 @@ local lazy_plugins = {
         suggestion = {
           auto_trigger = true,
           hide_during_completion = false,
-          keymap = {
-            -- accept = "C-l",
-          }
+          keymap = { accept = "<C-l>" }
         },
         filetypes = { markdown = true }
       })

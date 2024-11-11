@@ -1,5 +1,4 @@
 #!/bin/bash
-
 dbg() {
   echo "$(date -Iseconds): $0 $*" >> "$HOME"/bootstrappy.log
   if [[ -n $BOOTSTRAPPY_VERBOSE ]]; then
@@ -9,7 +8,20 @@ dbg() {
   fi
 }
 
+die() {
+  printf "\001\033[0;38;2;200;15;15m\002%s\001\033[0m\002: error: " "$progname" >&2
+  printf "%s" "$*" >&2
+  printf "\n" >&2
+  exit 1
+}
+
+
 raw_toolname="$(basename "$0")"
+if [[ "$raw_toolname" = bootstrappy ]]; then
+  progname="bootstrappy"
+  die "use: ln -s your_tool bootstrappy" >&2
+fi
+
 if [[ -x .venv/bin/"$raw_toolname" ]]; then
   # This tool already exists inside the local virtualenv.
   dbg "running $raw_toolname from $PWD/.venv/bin [PWD='$PWD', args=($*)]"
@@ -27,13 +39,6 @@ dbg "sourcing $HOME/.bootstrappyrc"
 toolname="${raw_toolname//-/_}"
 progname="bootstrappy[$raw_toolname]"
 
-
-die() {
-  printf "\001\033[0;38;2;200;15;15m\002%s\001\033[0m\002: error: " "$progname" >&2
-  printf "%s" "$*" >&2
-  printf "\n" >&2
-  exit 1
-}
 
 install() {
   env_dir="$1"
