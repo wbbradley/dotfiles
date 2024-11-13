@@ -2,7 +2,8 @@
 
 # Check whether any parameters were passed
 if [[ $# -eq 0 ]] && command -v fzf >/dev/null 2>&1; then
-  account="$( find "$HOME"/.password-store -name '*.gpg' | xargs basename | sed -E 's/(.*)\.gpg/\1/' | fzf)"
+  account="$(find "$HOME"/.password-store -name '*.gpg' -print0 | xargs -0 basename | sed -E 's/(.*)\.gpg/\1/' | fzf)"
+  # shellcheck disable=SC2181
   if [[ $? -ne 0 ]]; then
     echo "No password selected" >&2
     exit 1
