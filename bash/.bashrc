@@ -85,12 +85,12 @@ new-main() {
 
 . "$HOME/bin/utils.sh"
 
-prepend_path_to PATH "$HOME"/bin
 if [[ -d /opt/homebrew/bin ]]; then
   prepend_path_to PATH /opt/homebrew/sbin
   prepend_path_to PATH /opt/homebrew/bin
 fi
 
+prepend_path_to PATH "$HOME"/bin
 if [[ -d "$HOME"/.local/bin ]]; then
   prepend_path_to PATH "$HOME"/.local/bin
 fi
@@ -212,8 +212,9 @@ tail-ide() {
   logs=(
     # "$HOME"/sample.profile 
     "$HOME"/.local/state/pickls/pickls.log
-    "$HOME"/Library/Logs/Zed/Zed.log
-    # "$HOME"/.local/state/nvim/*.log
+    "$HOME"/.local/state/dmypyls/dmypyls.log
+    # "$HOME"/Library/Logs/Zed/Zed.log
+    # "$HOME"/.local/state/nvim/lsp.log
     # "$HOME"/bootstrappy.log
   )
   tail -n 0 -f "${logs[@]}"

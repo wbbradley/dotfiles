@@ -1,0 +1,14 @@
+#!/bin/bash
+
+# Check whether any parameters were passed
+if [[ $# -eq 0 ]] && command -v fzf >/dev/null 2>&1; then
+  account="$( find "$HOME"/.password-store -name '*.gpg' | xargs basename | sed -E 's/(.*)\.gpg/\1/' | fzf)"
+  if [[ $? -ne 0 ]]; then
+    echo "No password selected" >&2
+    exit 1
+  fi
+  /opt/homebrew/bin/pass "$account" -c
+else
+  /opt/homebrew/bin/pass "$@"
+fi
+

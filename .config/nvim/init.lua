@@ -887,6 +887,30 @@ vim.api.nvim_create_autocmd({ "BufRead" }, {
   end
 })
 
+vim.api.nvim_create_autocmd({ "BufRead" }, {
+  pattern = { "*.py" },
+  group = vim.api.nvim_create_augroup("dmypyls-bufread", { clear = true }),
+  callback = function(_)
+    if vim.fn.executable("dmypyls") ~= 0 then
+      -- We found an executable for dmypyls.
+      vim.lsp.set_log_level(vim.log.levels.INFO)
+      vim.lsp.start({
+        name = "dmypyls",
+        cmd = { "dmypyls", vim.api.nvim_buf_get_name(0) },
+        root_dir = vim.fs.root(0, {
+          ".git",
+          "pyproject.toml",
+          "setup.py",
+          "mypy.ini"
+        })
+      }, { bufnr = 0, reuse_client = function(_, _) return false end })
+      vim.cmd("nmap <buffer> K :lua vim.lsp.buf.hover()<CR>")
+    end
+  end
+})
+
+vim.diagnostic.config({ float = { source = 'always' } })
+
 local Job = require("plenary.job")
 
 _G.get_visual_selection_end_line = function()

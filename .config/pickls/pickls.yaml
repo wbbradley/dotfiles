@@ -56,27 +56,6 @@ languages:
           - --stdin-filename
           - $filename
     linters:
-      - program: mypy
-        args:
-          - --show-column-numbers
-          - --show-error-end
-          - --hide-error-codes
-          - --hide-error-context
-          - --no-color-output
-          - --no-error-summary
-          - --no-pretty
-          - --shadow-file
-          - $filename
-          - /dev/stdin
-          - $filename
-        pattern: '(.*):(\d+):(\d+):\d+:(\d+): error: (.*)'
-        filename_match: 1
-        line_match: 2
-        start_col_match: 3
-        end_col_match: 4
-        description_match: 5
-        use_stderr: false
-        use_stdin: true
       - program: ruff
         args:
           - check
@@ -93,12 +72,11 @@ languages:
     linters:
       - program: shellcheck
         args: ["-f", "gcc", "-"]
-        pattern: '(.*):(\d+):(\d+): (\w+): (.*)'
-        filename_match: 1
-        line_match: 2
-        start_col_match: 3
-        severity_match: 4
-        description_match: 5
+        pattern: '-:(\d+):(\d+): (\w+): (.*)'
+        line_match: 1
+        start_col_match: 2
+        severity_match: 3
+        description_match: 4
         use_stderr: false
         use_stdin: true
   shell script: *sh
@@ -107,7 +85,6 @@ languages:
       - program: tomllint
         args: ["-"]
         pattern: '(.*):(\d+):(\d+): error: (.*)'
-        filename_match: 1
         line_match: 2
         start_col_match: 3
         description_match: 4
