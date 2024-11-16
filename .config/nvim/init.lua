@@ -84,7 +84,7 @@ local lazy_plugins = {
   {
     "neovim/nvim-lspconfig",
     dependencies = { { "j-hui/fidget.nvim", opts = {} }, "hrsh7th/nvim-cmp" },
-    opts = { inlay_hints = { enabled = true } },
+    opts = { inlay_hints = { enabled = false } },
     config = function()
       vim.api.nvim_create_autocmd("LspAttach", {
         group = vim.api.nvim_create_augroup("kickstart-lsp-attach",
@@ -279,6 +279,7 @@ local function vmap(shortcut, command) keymap("v", shortcut, command) end
 
 nmap("M", ":FzfLua oldfiles<CR>")
 nmap("<C-p>", ":FzfLua git_files<CR>")
+nmap("<leader>[", ":InlayHintsToggle<CR>")
 nmap("E", ':lua require("fzf-lua").live_grep()')
 nmap("vv", "viw")
 nmap(",", "<Plug>(easymotion-s)")
@@ -656,13 +657,16 @@ nnoremap <leader>v <C-w>v<C-w>l<C-w>n<C-w>h
 nnoremap <leader>w :wa<CR>
 
 nnoremap <leader>90 :e ~/.config/nvim/init.lua<CR>
-nnoremap <leader>9a :e ~/.config/alacritty/alacritty.toml<CR>
-nnoremap <leader>9k :e ~/.config/zed/keymap.json<CR>
-nnoremap <leader>9n :e ~/notes.md<CR>G
 nnoremap <leader>92 :e ~/.bashrc<CR>
-nnoremap <leader>9b :e ~/.bashrc<CR>
 nnoremap <leader>93 :e ~/local.bashrc<CR>
+nnoremap <leader>9a :e ~/.config/alacritty/alacritty.toml<CR>
+nnoremap <leader>9b :e ~/.bashrc<CR>
+nnoremap <leader>9d :e ~/.config/dmypyls/dmypyls.yaml<CR>
+nnoremap <leader>9k :e ~/.config/zed/keymap.json<CR>
 nnoremap <leader>9l :e ~/local.bashrc<CR>
+nnoremap <leader>9n :e ~/notes.md<CR>G
+nnoremap <leader>9p :e ~/.config/pickls/pickls.yaml<CR>
+
 nnoremap <leader>i Oimport ipdb<CR>ipdb.set_trace()<Esc>j_
 nnoremap <leader>p Oimport pdb<CR>pdb.set_trace()<Esc>j_
 
@@ -903,7 +907,7 @@ vim.api.nvim_create_autocmd({ "BufRead" }, {
           "setup.py",
           "mypy.ini"
         })
-      }, { bufnr = 0, reuse_client = function(_, _) return false end })
+      }, { bufnr = 0 })
       vim.cmd("nmap <buffer> K :lua vim.lsp.buf.hover()<CR>")
     end
   end

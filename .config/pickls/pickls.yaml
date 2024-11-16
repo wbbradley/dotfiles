@@ -1,6 +1,7 @@
 ---
 symbols:
   source: universal-ctags
+  ctags_timeout_ms: 500
 languages:
   c: &c-settings
     formatters:
@@ -30,7 +31,7 @@ languages:
           - "--align-table-field"
           - "--break-before-table-rb"
           - "--chop-down-table"
-  _markdown:
+  markdown:
     formatters:
       - program: mdformat
         args:
@@ -49,7 +50,7 @@ languages:
       - program: isort
         args: ["-", "-d"]
       - program: ruff
-        args: ["check", "--exit-zero", "--fix", "--stdin-filename", "$filename"]
+        args: ["check", "--fix", "--stdin-filename", "$filename"]
       - program: ruff
         args:
           - format
@@ -80,6 +81,7 @@ languages:
         use_stderr: false
         use_stdin: true
   shell script: *sh
+  bash: *sh
   toml:
     linters:
       - program: tomllint

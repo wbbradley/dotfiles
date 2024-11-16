@@ -28,7 +28,9 @@ if [[ -x .venv/bin/"$raw_toolname" ]]; then
   tmpfile="$(mktemp)"
   trap 'rm '"$tmpfile" EXIT
   /usr/bin/time -o "$tmpfile" .venv/bin/"$raw_toolname" "$@"
+  res=$?
   dbg "$raw_toolname took $(cat "$tmpfile")"
+  exit "$res"
 fi
 
 # shellcheck disable=SC1091

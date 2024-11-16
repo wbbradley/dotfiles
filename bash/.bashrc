@@ -219,6 +219,9 @@ tail-ide() {
   )
   tail -n 0 -f "${logs[@]}"
 }
+tail-pickls() {
+  tail -n 0 -f "$HOME"/.local/state/pickls/pickls.log
+}
 on-macos() {
   [[ "$(uname)" = "Darwin" ]]
 }
@@ -237,7 +240,22 @@ venv() {
     return 0
   fi
 
-  if ! python3 -mvenv .venv; then
+  if [[ -f .python-version ]]; then
+    if command -v pyenv >/dev/null 2>&1; then
+      if ! pyenv install -s; then
+        echo "pyenv install failed!" >&2
+        return 1
+      fi
+      python="$(pyenv which python)"
+      echo "[venv] using python: '$python'"
+    else
+      echo "pyenv not found, but .python-version exists!" >&2
+      return 1
+    fi
+  else
+    python=python3
+  fi
+  if ! "$python" -mvenv .venv; then
     echo "[venv] failed to create .venv dir" >&2
     return 1
   fi
