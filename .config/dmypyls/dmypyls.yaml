@@ -1,0 +1,3 @@
+---
+dmypy_command:
+  - .venv/bin/dmypy
