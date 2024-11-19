@@ -222,6 +222,12 @@ tail-ide() {
 tail-pickls() {
   tail -n 0 -f "$HOME"/.local/state/pickls/pickls.log
 }
+tail-dmypyls() {
+  tail -n 0 -f "$HOME"/.local/state/dmypyls/dmypyls.log
+}
+tail-nvim() {
+  tail -n 0 -f "$HOME"/.local/state/nvim/lsp.log
+}
 on-macos() {
   [[ "$(uname)" = "Darwin" ]]
 }

@@ -1,3 +1,4 @@
 ---
 dmypy_command:
   - .venv/bin/dmypy
+dmypy_shutdown_after_idle_ms: 3600000

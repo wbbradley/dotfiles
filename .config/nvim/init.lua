@@ -33,7 +33,11 @@ local lazy_plugins = {
           hide_during_completion = false,
           keymap = { accept = "<C-l>" }
         },
-        filetypes = { markdown = true }
+        -- panel = { enabled = true, auto_refresh = true },
+        filetypes = {
+          markdown = true,
+          text = false -- prevent copilot while password-store editing
+        }
       })
       vim.cmd([[
         imap <expr> <Plug>(vimrc:copilot-dummy-map) copilot#Accept("\<Tab>")
@@ -631,7 +635,7 @@ nnoremap E :call FindPromptDirect()<CR>
 nnoremap <leader>g :w<CR>:!git add %<CR>
 " nnoremap T :FzfLua tags<CR>
 nnoremap T :FzfLua lsp_workspace_symbols<CR>
-nnoremap <leader>m :FzfLua lsp_workspace_diagnostics<CR>
+nnoremap <F7> :FzfLua lsp_workspace_diagnostics<CR>
 
 map <F5> :echo "hi<" . synIDattr(synID(line("."),col("."),1),"name") . '> trans<' . synIDattr(synID(line("."),col("."),0),"name") . "> lo<" . synIDattr(synIDtrans(synID(line("."),col("."),1)),"name") . ">"<CR>
 nnoremap <leader>b :Buffers<CR>
@@ -682,9 +686,9 @@ augroup END
 
 " F7 & F8 - incremental build (build is so important it gets a two keys for
 " redundancy).
-nmap <F7> :wa<CR> :!clear <CR><CR> :lmake<CR><CR>
-imap <F7> <Esc> <F7>
-vmap <F7> <Esc> <F7>
+" nmap <F7> :wa<CR> :!clear <CR><CR> :lmake<CR><CR>
+" imap <F7> <Esc> <F7>
+" vmap <F7> <Esc> <F7>
 
 nmap <F8> :wa<CR> :!clear <CR><CR> :lmake<CR><CR>
 imap <F8> <Esc> <F7>
@@ -1023,6 +1027,18 @@ _G.gather_and_send = function()
   local buf_contents = vim.api.nvim_buf_get_lines(0, 0, -1, false)
   _G.send_contents(buf_contents)
 end
+
+vim.api.nvim_create_autocmd("BufRead", {
+  group = vim.api.nvim_create_augroup("password-store-copilot-disable",
+                                      { clear = true }),
+  callback = function(_)
+    -- Check whether the current buffer's filename contains the string "pass"
+    -- and if so, disable copilot suggestions.
+    if string.find(vim.api.nvim_buf_get_name(0), "/pass.") then
+      vim.b.copilot_suggestion_auto_trigger = false
+    end
+  end
+})
 
 -- nmap("<leader>a", ":lua gather_and_send()<CR>")
 vmap("<leader>a",

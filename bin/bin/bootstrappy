@@ -29,7 +29,7 @@ if [[ -x .venv/bin/"$raw_toolname" ]]; then
   trap 'rm '"$tmpfile" EXIT
   /usr/bin/time -o "$tmpfile" .venv/bin/"$raw_toolname" "$@"
   res=$?
-  dbg "$raw_toolname took $(cat "$tmpfile")"
+  dbg "$raw_toolname took $(cat "$tmpfile") [res=$res]"
   exit "$res"
 fi
 
