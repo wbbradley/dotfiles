@@ -891,13 +891,6 @@ vim.api.nvim_create_autocmd({ "BufRead" }, {
           "go.mod"
         })
       }, { bufnr = 0, reuse_client = function(_, _) return false end })
-      vim.keymap.set('v', 'g.', function()
-        vim.lsp.buf.code_action({
-          context = { only = { 'pickls.inline-assist' } },
-          apply = true
-          -- range is filled automatically by visual mode selection.
-        })
-      end, { buffer = true })
     end
   end
 })
