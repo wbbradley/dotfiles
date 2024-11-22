@@ -38,6 +38,23 @@ languages:
           - --wrap
           - '80'
           - '-'
+  rust:
+    root_markers:
+      - Cargo.toml
+    linters:
+      - program: cargo
+        args: ["check", "--message-format", "short"]
+        use_stderr: false
+        use_stdin: true
+        pattern: '(.*):(\d+):(\d+): ([^\[]*): (.*)'
+        filename_match: 1
+        line_match: 2
+        start_col_match: 3
+        severity_match: 4
+        description_match: 5
+    formatters:
+      - program: rustfmt
+        args: []
   python:
     root_markers:
       - .git

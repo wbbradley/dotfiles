@@ -155,7 +155,7 @@ local lazy_plugins = {
   { "Bilal2453/luvit-meta", lazy = true },
   { "ellisonleao/gruvbox.nvim", priority = 1000, config = true },
   "rust-lang/rust.vim",
-  { "mrcjkb/rustaceanvim", ft = { "rust" } },
+  -- { "mrcjkb/rustaceanvim", ft = { "rust" } },
   "andersevenrud/nvim_context_vt"
 }
 
@@ -869,10 +869,12 @@ local function run_ctags_in_project_root()
 end
 
 -- Set up an autocmd to run ctags on BufWritePost event from a root dir.
-vim.api.nvim_create_autocmd({ "BufWritePost" }, {
-  group = vim.api.nvim_create_augroup("ctags-on-save", { clear = true }),
-  callback = function(_) run_ctags_in_project_root() end
-})
+if false then
+  vim.api.nvim_create_autocmd({ "BufWritePost" }, {
+    group = vim.api.nvim_create_augroup("ctags-on-save", { clear = true }),
+    callback = function(_) run_ctags_in_project_root() end
+  })
+end
 
 vim.api.nvim_create_autocmd({ "BufRead" }, {
   group = vim.api.nvim_create_augroup("pickls-bufread", { clear = true }),
@@ -891,6 +893,13 @@ vim.api.nvim_create_autocmd({ "BufRead" }, {
           "go.mod"
         })
       }, { bufnr = 0, reuse_client = function(_, _) return false end })
+      vim.keymap.set('v', 'g.', function()
+        vim.lsp.buf.code_action({
+          context = { only = { 'pickls.inline-assist' } },
+          apply = true
+          -- range is filled automatically by visual mode selection.
+        })
+      end, { buffer = true })
     end
   end
 })
