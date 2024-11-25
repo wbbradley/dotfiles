@@ -65,7 +65,7 @@ local lazy_plugins = {
       -- calling `setup` is optional for customization
       local actions = require("fzf-lua.actions")
       require("fzf-lua").setup({
-        preview_opts = "hidden", -- NB: Toggle the preview with <F4>.
+        -- preview_opts = "hidden", -- NB: Toggle the preview with <F4>.
         fzf_opts = { ["--layout"] = "default" },
         actions = {
           files = {
@@ -83,6 +83,7 @@ local lazy_plugins = {
         }
         -- cmd = "git grep --line-number --column --color=always",
       })
+      require("fzf-lua").register_ui_select()
     end
   }, -- "nvimtools/none-ls.nvim",
   {
@@ -155,7 +156,7 @@ local lazy_plugins = {
   { "Bilal2453/luvit-meta", lazy = true },
   { "ellisonleao/gruvbox.nvim", priority = 1000, config = true },
   "rust-lang/rust.vim",
-  -- { "mrcjkb/rustaceanvim", ft = { "rust" } },
+  { "mrcjkb/rustaceanvim", ft = { "rust" } },
   "andersevenrud/nvim_context_vt"
 }
 
@@ -174,10 +175,9 @@ local _ = require("cmp")
 require("lspconfig").gopls.setup({})
 require("lspconfig").terraformls.setup({})
 require("lspconfig").clangd.setup({})
+require('lspconfig').ts_ls.setup({})
+
 -- require("lspconfig").rust_analyzer.setup({})
-vim.api.nvim_create_autocmd("BufWritePre", {
-  callback = function() vim.lsp.buf.format({ bufnr = bufnr }) end
-})
 vim.cmd("colorscheme gruvbox")
 require("nvim_context_vt").setup({
   min_rows = 30,
@@ -279,8 +279,6 @@ end
 
 local function nmap(shortcut, command) keymap("n", shortcut, command) end
 
-local function vmap(shortcut, command) keymap("v", shortcut, command) end
-
 nmap("M", ":FzfLua oldfiles<CR>")
 nmap("<C-p>", ":FzfLua git_files<CR>")
 nmap("<leader>[", ":InlayHintsToggle<CR>")
@@ -363,6 +361,10 @@ end)
 
 nmap("g]",
      "<cmd>lua require('fzf-lua').tags({ fzf_opts = { ['--query'] = vim.fn.expand('<cword>') } })<CR>")
+
+vim.keymap.set('n', '<leader>a', function() vim.lsp.buf.code_action() end)
+
+vim.keymap.set('v', '<leader>a', function() vim.lsp.buf.code_action() end)
 
 vim.cmd([[
 set encoding=utf-8
@@ -656,6 +658,7 @@ nnoremap <leader><space> :noh<cr>:match<cr>:set nopaste<CR>:redraw!<CR>
 nnoremap <leader>T :tabnew<CR>:e ~/vim-todo.txt<CR>
 nnoremap <leader>d :set makeprg=dangle<CR>:make<CR>
 nnoremap <leader>q :conf qa<CR>
+vnoremap <leader>q :conf qa<CR>
 nnoremap <leader>t mTviwy:e ~/vim-todo.txt<CR>ggPa<CR><Esc>:w<CR>'T
 nnoremap <leader>v <C-w>v<C-w>l<C-w>n<C-w>h
 nnoremap <leader>w :wa<CR>
@@ -853,26 +856,26 @@ local function file_age_in_seconds(filename)
   end
 end
 
-local function run_ctags_in_project_root()
-  local root_dir = vim.fs.root(0, { ".git" })
-
-  if root_dir then
-    if is_home_directory(root_dir) then return end
-    local tags_filename = root_dir .. "/tags"
-    local success, age_in_seconds = pcall(file_age_in_seconds, tags_filename)
-    if not success or age_in_seconds == nil or (age_in_seconds > 5 * 60) then
-      local cmd = 'sh -c "cd ' .. root_dir .. '; ctags -R . &"'
-      -- vim.notify(cmd)
-      vim.fn.system(cmd)
-    end
-  end
-end
-
--- Set up an autocmd to run ctags on BufWritePost event from a root dir.
-if false then
+local ctagsAfterSave = os.getenv("CTAGS_ON_SAVE") -- Get the environment variable
+if ctagsAfterSave then
+  -- Execute code for when CTAGS_ON_SAVE is set
   vim.api.nvim_create_autocmd({ "BufWritePost" }, {
     group = vim.api.nvim_create_augroup("ctags-on-save", { clear = true }),
-    callback = function(_) run_ctags_in_project_root() end
+    callback = function(_)
+      local root_dir = vim.fs.root(0, { ".git" })
+
+      if root_dir then
+        if is_home_directory(root_dir) then return end
+        local tags_filename = root_dir .. "/tags"
+        local success, age_in_seconds =
+            pcall(file_age_in_seconds, tags_filename)
+        if not success or age_in_seconds == nil or (age_in_seconds > 5 * 60) then
+          local cmd = 'sh -c "cd ' .. root_dir .. '; ctags -R . &"'
+          -- vim.notify(cmd)
+          vim.fn.system(cmd)
+        end
+      end
+    end
   })
 end
 
@@ -893,16 +896,12 @@ vim.api.nvim_create_autocmd({ "BufRead" }, {
           "go.mod"
         })
       }, { bufnr = 0, reuse_client = function(_, _) return false end })
-      vim.keymap.set('v', 'g.', function()
-        vim.lsp.buf.code_action({
-          context = { only = { 'pickls.inline-assist' } },
-          apply = true
-          -- range is filled automatically by visual mode selection.
-        })
-      end, { buffer = true })
     end
   end
 })
+
+vim.api.nvim_create_autocmd("BufWritePre",
+                            { callback = function() vim.lsp.buf.format() end })
 
 vim.api.nvim_create_autocmd({ "BufRead" }, {
   pattern = { "*.py" },
@@ -1048,10 +1047,6 @@ vim.api.nvim_create_autocmd("BufRead", {
     end
   end
 })
-
--- nmap("<leader>a", ":lua gather_and_send()<CR>")
-vmap("<leader>a",
-     ":lua create_review_visual_selection_buffer()<CR>:lua gather_and_send()<CR>")
 
 nmap("<leader>P", ":PopulateQuickFixFromClipboard<CR>")
 vim.api.nvim_create_user_command("PopulateQuickFixFromClipboard", function()

@@ -14,6 +14,7 @@ bin/bin/wim
 bin/bin/wim-key
 .config/asciinema/*
 .config/btop/*
+.config/clojure/*
 .config/github-copilot
 .config/glab-cli/*
 .config/htop/*

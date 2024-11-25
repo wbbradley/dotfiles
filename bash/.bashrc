@@ -217,16 +217,21 @@ tail-ide() {
     # "$HOME"/.local/state/nvim/lsp.log
     # "$HOME"/bootstrappy.log
   )
-  tail -n 0 -f "${logs[@]}"
+  tail -n 0 -f "${logs[@]}" \
+    | grep --line-buffered --color=always -E '^|WARNING|WARN|ERROR|CRITICAL|FATAL'
 }
 tail-pickls() {
-  tail -n 0 -f "$HOME"/.local/state/pickls/pickls.log
+  tail -n 0 -f "$HOME"/.local/state/pickls/pickls.log \
+    | grep --line-buffered --color=always -E '^|WARNING|WARN|ERROR|CRITICAL|FATAL'
+
 }
 tail-dmypyls() {
-  tail -n 0 -f "$HOME"/.local/state/dmypyls/dmypyls.log
+  tail -n 0 -f "$HOME"/.local/state/dmypyls/dmypyls.log \
+    | grep --line-buffered --color=always -E '^|WARNING|WARN|ERROR|CRITICAL|FATAL'
 }
 tail-nvim() {
-  tail -n 0 -f "$HOME"/.local/state/nvim/lsp.log
+  tail -n 0 -f "$HOME"/.local/state/nvim/lsp.log \
+    | grep --line-buffered --color=always -E '^|WARNING|WARN|ERROR|CRITICAL|FATAL'
 }
 on-macos() {
   [[ "$(uname)" = "Darwin" ]]
@@ -489,6 +494,9 @@ export GPG_TTY
 
 [[ -f "$HOME/.ghcup/env" ]] && . "$HOME/.ghcup/env" # ghcup-env
 [[ -f "$HOME/.cargo/env" ]] && . "$HOME/.cargo/env"
+if [[ -d "$HOME/.ghcup/bin" ]]; then
+  export PATH="$PATH:$HOME/.ghcup/bin"
+fi
 
 [[ -f ~/.fzf.bash ]] && source ~/.fzf.bash
 
