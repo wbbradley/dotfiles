@@ -807,11 +807,6 @@ augroup END
 
 let c_no_curly_error=1
 
-if resolve(expand("~/.vimrc")) != resolve(expand("$PWD/.vimrc"))
-  silent! source .vimrc
-endif
-silent! source local.vimrc
-
 nnoremap - _
 nnoremap L :lua vim.diagnostic.goto_next()<CR>
 nnoremap H :lua vim.diagnostic.goto_prev()<CR>
