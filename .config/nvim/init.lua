@@ -874,6 +874,9 @@ if ctagsAfterSave then
   })
 end
 
+vim.keymap.set("n", "<leader>r", vim.lsp.buf.rename,
+               { silent = true, desc = "Rename symbol" })
+
 vim.api.nvim_create_autocmd({ "BufRead" }, {
   group = vim.api.nvim_create_augroup("pickls-bufread", { clear = true }),
   callback = function(_)

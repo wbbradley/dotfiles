@@ -1,7 +1,11 @@
 ---
 ai:
+  inline_assistants:
+    - provider: ollama
+      model: llama3.2:latest
+    - provider: openai
+      model: gpt-4o
   openai:
-    model: gpt-4o
     api_key_cmd: ["pass", "openai-api-key"]
 symbols:
   source: universal-ctags
