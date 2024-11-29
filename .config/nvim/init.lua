@@ -290,7 +290,7 @@ nmap(",", "<Plug>(easymotion-s)")
 require("treesitter-context").setup({
   mode = "cursor",
   -- mode = 'topline',
-  -- max_lines = 5,
+  max_lines = 5,
   min_window_height = 20,
   multiline_threshold = 4
 })
@@ -340,7 +340,9 @@ require("nvim-treesitter.configs").setup({
     disable = function(_lang, buf)
       local max_filesize = 100 * 1024 -- 100 KB
       local ok, stats = pcall(vim.loop.fs_stat, vim.api.nvim_buf_get_name(buf))
-      if ok and stats and stats.size > max_filesize then return true end
+      if ok and stats and stats.size > max_filesize then
+        return true
+      end
     end
   }
 })
@@ -860,7 +862,9 @@ if ctagsAfterSave then
       local root_dir = vim.fs.root(0, { ".git" })
 
       if root_dir then
-        if is_home_directory(root_dir) then return end
+        if is_home_directory(root_dir) then
+          return
+        end
         local tags_filename = root_dir .. "/tags"
         local success, age_in_seconds =
             pcall(file_age_in_seconds, tags_filename)
@@ -960,7 +964,9 @@ _G.send_contents = function(buf_contents, extra_args, insert_inline)
                  insert_inline, state.insertion_point), vim.log.levels.INFO)
   local args = { "--embedded" }
   if type(extra_args) == "table" then
-    for i = 1, #extra_args do table.insert(args, extra_args[i]) end
+    for i = 1, #extra_args do
+      table.insert(args, extra_args[i])
+    end
   end
   Job:new({
     command = "ai",
@@ -1003,7 +1009,9 @@ _G.gather_visual_selection = function()
   local _, lnum1, col1, _ = unpack(vim.fn.getpos("'<"))
   local _, lnum2, col2, _ = unpack(vim.fn.getpos("'>"))
   local lines = vim.fn.getline(lnum1, lnum2)
-  if #lines == 0 then return "" end
+  if #lines == 0 then
+    return ""
+  end
   lines[#lines] = string.sub(lines[#lines], 1, col2)
   lines[1] = string.sub(lines[1], col1)
   return table.concat(lines, "\n")
@@ -1110,3 +1118,19 @@ vim.api.nvim_create_user_command("PopulateQuickFixFromClipboard", function()
     vim.notify("No locations found in clipboard.", vim.log.levels.INFO)
   end
 end, {})
+
+local function is_git_repo()
+  -- Find whether the current directory is a git repo or is inside a git repo
+  local root_dir = vim.fs.root(0, { ".git" })
+  return root_dir and root_dir ~= ''
+end
+
+vim.defer_fn(function()
+  if vim.fn.empty(vim.fn.expand("%:p")) ~= 0 then
+    if is_git_repo() then
+      vim.cmd("FzfLua git_files")
+    else
+      vim.cmd("FzfLua files")
+    end
+  end
+end, 150)

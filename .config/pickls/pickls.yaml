@@ -1,8 +1,9 @@
 ---
 ai:
+  inline_assistant_include_workspace_files: false
   inline_assistants:
     - provider: ollama
-      model: llama3.2:latest
+      model: qwen2.5-coder:7b
     - provider: openai
       model: gpt-4o
   openai:
@@ -54,6 +55,7 @@ languages:
           - "--align-table-field"
           - "--break-before-table-rb"
           - "--chop-down-table"
+          - "--no-keep-simple-control-block-one-line"
   markdown:
     formatters:
       - program: mdformat
