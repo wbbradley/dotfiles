@@ -1,0 +1,8 @@
+#!/bin/bash
+
+if [[ -x ".venv/bin/pip" ]]; then
+    exec .venv/bin/pip "$@"
+else
+  echo "No .venv/bin/pip found" >&2
+  exit 1
+fi

@@ -61,7 +61,8 @@ languages:
       - program: mdformat
         args:
           - --wrap
-          - '80'
+          - '100'
+          - --number
           - '-'
   python:
     root_markers:
@@ -81,6 +82,8 @@ languages:
           - format
           - --stdin-filename
           - $filename
+      - program: honkhonk
+        args: ["-"]
     linters:
       - program: ruff
         args:
