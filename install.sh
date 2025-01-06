@@ -21,7 +21,7 @@ BREW_DEPS=(
   bash
   bat
   cmake
-  exa
+  eza
   fd
   git
   go

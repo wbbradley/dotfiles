@@ -14,6 +14,7 @@ bin/bin/wim
 bin/bin/wim-key
 .config/walrus/*
 .config/asciinema/*
+.config/op/*
 .config/btop/*
 .config/clojure/*
 .config/github-copilot

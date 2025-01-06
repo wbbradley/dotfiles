@@ -2,6 +2,7 @@
 # shellcheck disable=SC1090,SC1091,SC2207
 [[ $- != *i* ]] && return
 
+export BASH_SILENCE_DEPRECATION_WARNING=1
 export PATH=/opt/homebrew/opt/openjdk/bin:"$PATH"
 export RIPGREP_CONFIG_PATH="$HOME/.ripgreprc"
 export FZF_DEFAULT_COMMAND="rg --files"
