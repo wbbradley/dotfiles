@@ -489,6 +489,11 @@ agent-with-keys() {
   gpg-agent "${args[@]}" --daemon
 }
 
+logit() {
+  touch "$HOME"/notes.md
+  nvim "$HOME"/notes.md "+norm G"
+}
+
 GPG_TTY="$(tty)"
 export GPG_TTY
 

@@ -1,11 +1,9 @@
 ---
 ai:
-  inline_assistant_include_workspace_files: false
+  inline_assistant_include_workspace_files: true
   inline_assistants:
     - provider: ollama
-      model: qwen2.5-coder:7b
-    - provider: openai
-      model: gpt-4o
+      model: llama3.2:latest
   openai:
     api_key_cmd: ["pass", "openai-api-key"]
 symbols:

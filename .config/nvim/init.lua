@@ -16,34 +16,14 @@ if not (vim.uv or vim.loop).fs_stat(lazypath) then
 end
 vim.opt.rtp:prepend(lazypath)
 
+-- Load global variables from lua/config/globals.lua
+local globals = require('config.globals')
+
 -- packages
 local lazy_plugins = {
   "easymotion/vim-easymotion",
   "folke/trouble.nvim",
   "lewis6991/gitsigns.nvim",
-  {
-    "zbirenbaum/copilot.lua",
-    cmd = "Copilot",
-    event = "InsertEnter",
-
-    config = function()
-      require("copilot").setup({
-        suggestion = {
-          auto_trigger = true,
-          hide_during_completion = false,
-          keymap = { accept = "<C-l>" }
-        },
-        -- panel = { enabled = true, auto_refresh = true },
-        filetypes = {
-          markdown = true,
-          text = false -- prevent copilot while password-store editing
-        }
-      })
-      vim.cmd([[
-        imap <expr> <Plug>(vimrc:copilot-dummy-map) copilot#Accept("\<Tab>")
-      ]])
-    end
-  },
   "folke/which-key.nvim",
   {
     "folke/todo-comments.nvim",
@@ -88,57 +68,101 @@ local lazy_plugins = {
   }, -- "nvimtools/none-ls.nvim",
   {
     "neovim/nvim-lspconfig",
-    dependencies = { { "j-hui/fidget.nvim", opts = {} }, "hrsh7th/nvim-cmp" },
+    dependencies = { { "j-hui/fidget.nvim", opts = {} } },
     opts = { inlay_hints = { enabled = false } },
-    config = function()
-      vim.api.nvim_create_autocmd("LspAttach", {
-        group = vim.api.nvim_create_augroup("kickstart-lsp-attach",
-                                            { clear = true }),
-        callback = function(_)
-          local capabilities = vim.lsp.protocol.make_client_capabilities()
-          vim.tbl_deep_extend("force", capabilities,
-                              require("cmp_nvim_lsp").default_capabilities())
-        end
-      })
-    end
+    config = function() end
+    -- config = function()
+    --   vim.api.nvim_create_autocmd("LspAttach", {
+    --     group = vim.api.nvim_create_augroup("kickstart-lsp-attach",
+    --                                         { clear = true }),
+    --     callback = function(_)
+    --       local capabilities = vim.lsp.protocol.make_client_capabilities()
+    --       vim.tbl_deep_extend("force", capabilities,
+    --                           require("cmp_nvim_lsp").default_capabilities())
+    --     end
+    --   })
+    -- end
   },
+  "modocache/move.vim",
   {
-    "hrsh7th/nvim-cmp",
-    event = "InsertEnter",
-    dependencies = {
-      "hrsh7th/cmp-nvim-lsp",
-      "hrsh7th/cmp-buffer",
-      "hrsh7th/cmp-path",
-      "hrsh7th/cmp-cmdline"
+    'saghen/blink.cmp',
+    -- optional: provides snippets for the snippet source
+    dependencies = 'rafamadriz/friendly-snippets',
+
+    -- use a release tag to download pre-built binaries
+    version = 'v0.8.2',
+    -- AND/OR build from source, requires nightly: https://rust-lang.github.io/rustup/concepts/channels.html#working-with-nightly-rust
+    -- build = 'cargo build --release',
+    -- If you use nix, you can build from source using latest nightly rust with:
+    -- build = 'nix run .#build-plugin',
+
+    ---@module 'blink.cmp'
+    ---@type blink.cmp.Config
+    opts = {
+      -- Defaults are at https://cmp.saghen.dev/configuration/reference.html#completion-keyword
+      keymap = {
+        preset = 'default',
+        ['<Tab>'] = { 'select_and_accept', 'fallback' },
+        ['K'] = { 'show_documentation', 'fallback' },
+        ['<C-j>'] = { 'select_next', 'fallback' },
+        ['<C-k>'] = { 'select_prev', 'fallback' }
+      },
+
+      completion = {
+        documentation = { auto_show = true, auto_show_delay_ms = 500 },
+        trigger = { prefetch_on_insert = true }
+      },
+      appearance = {
+        -- Sets the fallback highlight groups to nvim-cmp's highlight groups
+        -- Useful for when your theme doesn't support blink.cmp
+        -- Will be removed in a future release
+        use_nvim_cmp_as_default = true,
+        -- Set to 'mono' for 'Nerd Font Mono' or 'normal' for 'Nerd Font'
+        -- Adjusts spacing to ensure icons are aligned
+        nerd_font_variant = 'mono'
+      },
+
+      -- Default list of enabled providers defined so that you can extend it
+      -- elsewhere in your config, without redefining it, due to `opts_extend`
+      sources = { default = { 'lsp', 'path', 'snippets', 'buffer' } }
     },
-    config = function()
-      local cmp = require("cmp")
-      cmp.setup({
-        completion = { completeopt = "menu,menuone,noinsert" },
-        mapping = cmp.mapping.preset.insert({
-          ["<C-j>"] = cmp.mapping.select_next_item(),
-          ["<C-k>"] = cmp.mapping.select_prev_item(),
-          ["<Tab>"] = cmp.mapping.confirm({ select = true })
-          --[[["<C-l>"] = cmp.mapping(function(fallback)
-            vim.api.nvim_feedkeys(
-              vim.fn["copilot#Accept"](vim.api.nvim_replace_termcodes("<Tab>", true, true, true)),
-              "n",
-              true
-            )
-          end),]]
-        }),
-        experimental = {
-          ghost_text = false -- this feature conflict with copilot.vim's preview.
-        },
-        sources = {
-          { name = "lazydev", group_index = 0 },
-          { name = "nvim_lsp" },
-          { name = "path" },
-          { name = "buffer" }
-        }
-      })
-    end
+    opts_extend = { "sources.default" }
   },
+  -- {
+  --   "hrsh7th/nvim-cmp",
+  --   event = "InsertEnter",
+  --   dependencies = {
+  --     "hrsh7th/cmp-nvim-lsp",
+  --     "hrsh7th/cmp-buffer",
+  --     "hrsh7th/cmp-path",
+  --     "hrsh7th/cmp-cmdline"
+  --   },
+  --   config = function()
+  --     local cmp = require("cmp")
+  --     cmp.setup({
+  --       completion = { completeopt = "menu,menuone,noinsert" },
+  --       mapping = cmp.mapping.preset.insert({
+  --         ["<C-j>"] = cmp.mapping.select_next_item(),
+  --         ["<C-k>"] = cmp.mapping.select_prev_item(),
+  --         ["<Tab>"] = cmp.mapping.confirm({ select = true })
+  --         --[[["<C-l>"] = cmp.mapping(function(fallback)
+  --           vim.api.nvim_feedkeys(
+  --             vim.fn["copilot#Accept"](vim.api.nvim_replace_termcodes("<Tab>", true, true, true)),
+  --             "n",
+  --             true
+  --           )
+  --         end),]]
+  --       }),
+  --       experimental = { ghost_text = false },
+  --       sources = {
+  --         { name = "lazydev", group_index = 0 },
+  --         { name = "nvim_lsp" },
+  --         { name = "path" },
+  --         { name = "buffer" }
+  --       }
+  --     })
+  --   end
+  -- },
   "nvim-lua/plenary.nvim",
   "nvim-treesitter/nvim-treesitter",
   "nvim-treesitter/nvim-treesitter-context",
@@ -160,6 +184,31 @@ local lazy_plugins = {
   "andersevenrud/nvim_context_vt"
 }
 
+if globals.allow_copilot then
+  lazy_plugins[#lazy_plugins + 1] = {
+    "zbirenbaum/copilot.lua",
+    cmd = "Copilot",
+    event = "InsertEnter",
+
+    config = function()
+      require("copilot").setup({
+        suggestion = {
+          auto_trigger = true,
+          hide_during_completion = false,
+          keymap = { accept = "<C-l>" }
+        },
+        -- panel = { enabled = true, auto_refresh = true },
+        filetypes = {
+          markdown = true,
+          text = false -- prevent copilot while password-store editing
+        }
+      })
+      vim.cmd([[
+        imap <expr> <Plug>(vimrc:copilot-dummy-map) copilot#Accept("\<Tab>")
+      ]])
+    end
+  }
+end
 -- Lazy doesn't support hot reloading, so we need to check if it's already been loaded
 if vim.g.lazy_loaded == nil then
   require("lazy").setup(lazy_plugins, {})
@@ -170,12 +219,13 @@ require("gitsigns").setup({
   current_line_blame_opts = { virt_text_pos = "right_align" }
 })
 vim.cmd("Gitsigns toggle_current_line_blame")
-local _ = require("cmp")
+-- local _ = require("cmp")
 
 require("lspconfig").gopls.setup({})
 require("lspconfig").terraformls.setup({})
 require("lspconfig").clangd.setup({})
 require('lspconfig').ts_ls.setup({})
+require('lspconfig').move_analyzer.setup({})
 
 -- require("lspconfig").rust_analyzer.setup({})
 vim.cmd("colorscheme gruvbox")
@@ -1042,17 +1092,19 @@ _G.gather_and_send = function()
   _G.send_contents(buf_contents)
 end
 
-vim.api.nvim_create_autocmd("BufRead", {
-  group = vim.api.nvim_create_augroup("password-store-copilot-disable",
-                                      { clear = true }),
-  callback = function(_)
-    -- Check whether the current buffer's filename contains the string "pass"
-    -- and if so, disable copilot suggestions.
-    if string.find(vim.api.nvim_buf_get_name(0), "/pass.") then
-      vim.b.copilot_suggestion_auto_trigger = false
+if globals.allow_copilot then
+  vim.api.nvim_create_autocmd("BufRead", {
+    group = vim.api.nvim_create_augroup("password-store-copilot-disable",
+                                        { clear = true }),
+    callback = function(_)
+      -- Check whether the current buffer's filename contains the string "pass"
+      -- and if so, disable copilot suggestions.
+      if string.find(vim.api.nvim_buf_get_name(0), "/pass.") then
+        vim.b.copilot_suggestion_auto_trigger = false
+      end
     end
-  end
-})
+  })
+end
 
 nmap("<leader>P", ":PopulateQuickFixFromClipboard<CR>")
 vim.api.nvim_create_user_command("PopulateQuickFixFromClipboard", function()

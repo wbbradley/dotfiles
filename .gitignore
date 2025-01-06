@@ -12,6 +12,7 @@ bin/bin/fak
 bin/bin/protonum
 bin/bin/wim
 bin/bin/wim-key
+.config/walrus/*
 .config/asciinema/*
 .config/btop/*
 .config/clojure/*
