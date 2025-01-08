@@ -209,6 +209,22 @@ if globals.allow_copilot then
     end
   }
 end
+
+vim.g.rustaceanvim = {
+  server = {
+    default_settings = {
+      ['rust-analyzer'] = {
+        rustfmt = {
+          extraArgs = {
+            "--config",
+            "group_imports=StdExternalCrate,imports_granularity=Crate,imports_layout=HorizontalVertical"
+          }
+        }
+      }
+    }
+  }
+}
+
 -- Lazy doesn't support hot reloading, so we need to check if it's already been loaded
 if vim.g.lazy_loaded == nil then
   require("lazy").setup(lazy_plugins, {})
@@ -227,7 +243,19 @@ require("lspconfig").clangd.setup({})
 require('lspconfig').ts_ls.setup({})
 require('lspconfig').move_analyzer.setup({})
 
--- require("lspconfig").rust_analyzer.setup({})
+-- require("lspconfig").rust_analyzer.setup({
+--   settings = {
+--     ['rust-analyzer'] = {
+--       rustfmt = {
+--         extraArgs = {
+--           "--config",
+--           "group_imports=StdExternalCrate,imports_granularity=Crate,imports_layout=HorizontalVertical"
+--         }
+--       }
+--     }
+--   }
+-- })
+
 vim.cmd("colorscheme gruvbox")
 require("nvim_context_vt").setup({
   min_rows = 30,

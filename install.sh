@@ -20,6 +20,7 @@ BREW_DEPS=(
   awscli
   bash
   bat
+  cargo-nextest
   cmake
   eza
   fd
