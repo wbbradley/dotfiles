@@ -712,12 +712,13 @@ nnoremap <leader>` :!ctags -R .<CR>
 
 nnoremap <F4> :call FindWordUnderCursorNoUI()<CR>
 
-nnoremap <leader>f :call FindPromptRaw()<CR>
-nnoremap E :call FindPromptDirect()<CR>
-nnoremap <leader>g :w<CR>:!git add %<CR>
-" nnoremap T :FzfLua tags<CR>
-nnoremap T :FzfLua lsp_workspace_symbols<CR>
 nnoremap <F7> :FzfLua lsp_workspace_diagnostics<CR>
+nnoremap <leader>R :FzfLua lsp_references<CR>
+nnoremap <leader>T :FzfLua lsp_workspace_symbols<CR>
+nnoremap <leader>f :call FindPromptRaw()<CR>
+nnoremap <leader>g :w<CR>:!git add %<CR>
+nnoremap E :call FindPromptDirect()<CR>
+nnoremap T :FzfLua tags<CR>
 
 map <F5> :echo "hi<" . synIDattr(synID(line("."),col("."),1),"name") . '> trans<' . synIDattr(synID(line("."),col("."),0),"name") . "> lo<" . synIDattr(synIDtrans(synID(line("."),col("."),1)),"name") . ">"<CR>
 nnoremap <leader>b :Buffers<CR>

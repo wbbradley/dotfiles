@@ -509,6 +509,5 @@ fi
 if [[ -f "$HOME/local.bashrc" ]]; then
   . "$HOME/local.bashrc"
 fi
-export RUSTFLAGS='-Cforce-frame-pointers=yes'
 export RUST_SRC_PATH="$(rustc --print sysroot)"/lib/rustlib/src/rust/library/
 printf ''
