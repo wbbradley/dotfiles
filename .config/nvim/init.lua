@@ -1198,19 +1198,3 @@ vim.api.nvim_create_user_command("PopulateQuickFixFromClipboard", function()
     vim.notify("No locations found in clipboard.", vim.log.levels.INFO)
   end
 end, {})
-
-local function is_git_repo()
-  -- Find whether the current directory is a git repo or is inside a git repo
-  local root_dir = vim.fs.root(0, { ".git" })
-  return root_dir and root_dir ~= ''
-end
-
-vim.defer_fn(function()
-  if vim.fn.empty(vim.fn.expand("%:p")) ~= 0 then
-    if is_git_repo() then
-      vim.cmd("FzfLua git_files")
-    else
-      vim.cmd("FzfLua files")
-    end
-  end
-end, 150)

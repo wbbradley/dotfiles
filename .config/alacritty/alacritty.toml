@@ -1,5 +1,5 @@
-[terminal.shell]
-program = "/opt/homebrew/bin/bash"
+# [terminal.shell]
+# program = "/opt/homebrew/bin/bash"
 
 [window]
 decorations = "Full"

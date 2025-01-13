@@ -32,6 +32,7 @@ BREW_DEPS=(
   luajit
   luarocks
   neovim
+  node  # Needed for copilot
   pass
   pstree
   pkg-config
@@ -68,6 +69,9 @@ if on-macos; then
     luarocks install --server=https://luarocks.org/dev luaformatter || die "luaformatter install failed"
     echo "NB: make sure you manage brew services."
     brew services
+    echo "Installing FZF..."
+    git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf || die "failed to clone install fzf"
+    ~/.fzf/install
 elif on-linux; then
   if command -v apt 2>/dev/null; then
     # sudo apt-get update
