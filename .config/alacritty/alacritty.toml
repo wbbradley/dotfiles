@@ -1,3 +1,6 @@
+[terminal.shell]
+program = "/opt/homebrew/bin/bash"
+
 [window]
 decorations = "Full"
 option_as_alt = "OnlyRight"
