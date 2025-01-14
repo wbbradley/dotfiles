@@ -1,0 +1,17 @@
+#!/bin/bash
+die() {
+  echo "$0: $*" >&2
+  exit 1
+}
+
+progname="$(basename "$0")"
+
+[[ -d "$HOME"/src/"$progname" ]] || die ""$progname" not found in $HOME/src"
+
+if [[ -x "$HOME"/src/"$progname"/target/release/"$progname" ]]; then
+  exec "$HOME"/src/"$progname"/target/release/"$progname" "$@"
+else
+  echo "Building $progname..." >&2
+  cargo build --quiet --release --manifest-path "$HOME"/src/"$progname"/Cargo.toml || die "cargo build failed"
+  exec "$HOME"/src/"$progname"/target/release/"$progname" "$@"
+fi

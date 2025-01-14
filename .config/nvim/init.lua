@@ -31,7 +31,10 @@ local lazy_plugins = {
     dependencies = { "nvim-lua/plenary.nvim" },
     opts = { signs = false }
   },
-  "nvim-lualine/lualine.nvim", -- "mfussenegger/nvim-lint",
+  {
+    'nvim-lualine/lualine.nvim',
+    dependencies = { 'nvim-tree/nvim-web-devicons' }
+  },
   {
     "MysticalDevil/inlay-hints.nvim",
     event = "LspAttach",
