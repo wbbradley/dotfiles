@@ -620,7 +620,6 @@ nmap Q VQ
 
 nmap <Leader><Leader> va}=
 " nnoremap <expr> <C-p> (len(system('git -C ' . expand('%:p:h') . ' rev-parse' )) ? (':Files ' . expand('%:p:h')) : ':GFiles')."\<cr>"
-nmap B :FzfLua buffers<CR>
 " nmap M :History<CR>
 nmap <CR><CR> :!<CR>
 
@@ -709,12 +708,13 @@ function! FlipHeader()
   endif
 endfunction
 
-nnoremap <leader>` :!ctags -R .<CR>
+nnoremap <leader>` :!ctags -R --exclude=.mypy_cache --exclude=build --exclude=assets --exclude=target --exclude=docs --exclude=examples .<CR>
 
 " :execute 'grep! ' . expand('<cword>') . ' *'<CR>
 
 nnoremap <F4> :call FindWordUnderCursorNoUI()<CR>
 
+nnoremap B :FzfLua buffers<CR>
 nnoremap <F7> :FzfLua lsp_workspace_diagnostics<CR>
 nnoremap <leader>C :FzfLua lsp_incoming_calls<CR>
 nnoremap <leader>R :FzfLua lsp_references<CR>
@@ -952,7 +952,8 @@ if ctagsAfterSave then
         local success, age_in_seconds =
             pcall(file_age_in_seconds, tags_filename)
         if not success or age_in_seconds == nil or (age_in_seconds > 5 * 60) then
-          local cmd = 'sh -c "cd ' .. root_dir .. '; ctags -R . &"'
+          local cmd = 'sh -c "cd ' .. root_dir ..
+                          '; ctags -R --exclude=.mypy_cache --exclude=build --exclude=assets --exclude=target --exclude=docs --exclude=examples . &"'
           -- vim.notify(cmd)
           vim.fn.system(cmd)
         end

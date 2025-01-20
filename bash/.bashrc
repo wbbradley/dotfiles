@@ -1,3 +1,4 @@
+#!/bin/bash
 # vim: ft=bash
 # shellcheck disable=SC1090,SC1091,SC2207
 [[ $- != *i* ]] && return
@@ -37,12 +38,12 @@ if ! shopt -oq posix; then
 fi
 
 _ssh() {
-    local cur prev opts
+    local cur opts
     COMPREPLY=()
     cur="${COMP_WORDS[COMP_CWORD]}"
-    prev="${COMP_WORDS[COMP_CWORD-1]}"
     opts=$(grep '^Host' ~/.ssh/config ~/.ssh/config.d/* 2>/dev/null | grep -v '[?*]' | cut -d ' ' -f 2-)
 
+    # shellcheck disable=SC2086
     COMPREPLY=( $(compgen -W "$opts" -- ${cur}) )
     return 0
 }
@@ -54,7 +55,7 @@ fix-ssh() {
   sock="$(tmux showenv SSH_AUTH_SOCK)"
   if [[ -n "$sock" ]]; then
     eval "$sock"
-    ssh -T git@gitlab.com
+    ssh -T git@github.com
   else
     echo "error: fix-ssh: tmux has no SSH_AUTH_SOCK env var!" >&2
   fi
@@ -68,7 +69,7 @@ fix-ssh() {
 }
 
 hr() {
-  for ((i=0;i<$(( (COLUMNS - 1) ));++i)); do
+  for ((i=0; i < COLUMNS - 1; ++i)); do
     printf '▒'
   done
   printf '\n'
@@ -115,6 +116,7 @@ pass-file() {
 
   leaf_name="$(basename "$filename")"
   echo "pass-file: Writing file $leaf_name to password-store."
+  # shellcheck disable=SC2094
   pass insert -mf "$leaf_name" <"$leaf_name"
 }
 
@@ -129,7 +131,7 @@ gpu() {
 gar() {
   git fetch --tags --prune origin
   main="$(git symbolic-ref refs/remotes/origin/HEAD | sed 's@^refs/remotes/origin/@@')"
-  git rebase origin/$main
+  git rebase origin/"$main"
 }
 
 repo-is-dirty() {
@@ -141,8 +143,21 @@ repo-is-dirty() {
 }
 
 gip() {
-  git add '**/*.rs'
-  git commit -am wip
+  # shellcheck disable=SC2046
+  files_to_add=(
+    $(find . \
+      -type d \( -path ./node_modules -o -path ./.git -o -name build -o -name target \) -prune \
+      -o -type f \( -name '*.rs' -o -name '*.py' \) \
+      -print
+    )
+  )
+  # Check whether there are files to add (test array length)
+  if [[ ${#files_to_add[@]} -gt 0 ]]; then
+    git add -- "${files_to_add[@]}"
+  else
+    echo "gip: No files to add!"
+  fi
+  git commit -am wip --no-verify
 }
 
 gap() {
@@ -394,53 +409,6 @@ fzf-down() {
   fzf --height 50% --min-height 20 --border --bind ctrl-/:toggle-preview "$@"
 }
 
-_gf() {
-  is_in_git_repo || return
-  git -c color.status=always status --short |
-  fzf-down -m --ansi --nth 2..,.. \
-    --preview '(git diff --color=always -- {-1} | sed 1,4d; cat {-1})' |
-  cut -c4- | sed 's/.* -> //'
-}
-
-_gb() {
-  is_in_git_repo || return
-  git branch -a --color=always | grep -v '/HEAD\s' | sort |
-  fzf-down --ansi --multi --tac --preview-window right:70% \
-    --preview 'git log --oneline --graph --date=short --color=always --pretty="format:%C(auto)%cd %h%d %s" $(sed s/^..// <<< {} | cut -d" " -f1)' |
-  sed 's/^..//' | cut -d' ' -f1 |
-  sed 's#^remotes/##'
-}
-
-_gt() {
-  is_in_git_repo || return
-  git tag --sort -version:refname |
-  fzf-down --multi --preview-window right:70% \
-    --preview 'git show --color=always {}'
-}
-
-_gh() {
-  is_in_git_repo || return
-  git log --date=short --format="%C(green)%C(bold)%cd %C(auto)%h%d %s (%an)" --graph --color=always |
-  fzf-down --ansi --no-sort --reverse --multi --bind 'ctrl-s:toggle-sort' \
-    --header 'Press CTRL-S to toggle sort' \
-    --preview 'grep -o "[a-f0-9]\{7,\}" <<< {} | xargs git show --color=always' |
-  grep -o "[a-f0-9]\{7,\}"
-}
-
-_gr() {
-  is_in_git_repo || return
-  git remote -v | awk '{print $1 "\t" $2}' | uniq |
-  fzf-down --tac \
-    --preview 'git log --oneline --graph --date=short --pretty="format:%C(auto)%cd %h%d %s" {1}' |
-  cut -d$'\t' -f1
-}
-
-_gs() {
-  is_in_git_repo || return
-  git stash list | fzf-down --reverse -d: --preview 'git show --color=always {1}' |
-  cut -d: -f1
-}
-
 video-driver() {
   grep "X Driver" /var/log/Xorg.0.log
 }
@@ -509,5 +477,8 @@ fi
 if [[ -f "$HOME/local.bashrc" ]]; then
   . "$HOME/local.bashrc"
 fi
-export RUST_SRC_PATH="$(rustc --print sysroot)"/lib/rustlib/src/rust/library/
+
+declare -x RUST_SRC_PATH
+RUST_SRC_PATH="$(rustc --print sysroot)"/lib/rustlib/src/rust/library/
+
 printf ''

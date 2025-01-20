@@ -55,6 +55,15 @@ BREW_DEPS=(
 
 mkdir -p "$HOME"/.local/bin ||:
 
+setup-fzf() {
+  fzf_dir="$HOME"/.fzf
+  rm -rf "$fzf_dir"
+  echo "Installing FZF..."
+  git clone --depth 1 https://github.com/junegunn/fzf "$fzf_dir"
+  cd "$fzf_dir" || exit
+  ./install --all --no-zsh --no-fish || die "failed to install fzf"
+}
+
 if on-macos; then
     echo "Checking that homebrew is installed..."
     brew --version
@@ -69,9 +78,7 @@ if on-macos; then
     luarocks install --server=https://luarocks.org/dev luaformatter || die "luaformatter install failed"
     echo "NB: make sure you manage brew services."
     brew services
-    echo "Installing FZF..."
-    git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf || die "failed to clone install fzf"
-    ~/.fzf/install
+    setup-fzf
 elif on-linux; then
   if command -v apt 2>/dev/null; then
     # sudo apt-get update
