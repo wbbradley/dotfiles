@@ -98,7 +98,7 @@ if [[ -d "$HOME"/.local/bin ]]; then
 fi
 
 # shellcheck disable=SC2155
-export PS1="\$(if (( \$? )); then printf 'ERROR '; fi)\[\e[48;3;80;38;5;214m\]\$(parse_git_branch)\[\e[0m\]\n\[\e[48;5;95;38;5;214m\] \$(parse_working_dir) \[\e[0m\] "
+export PS1="\$(if (( \$? )); then printf 'ERROR '; fi)\[\e[48;2;80;38;6;214m\]\$(if [ -n \"\$SSH_TTY\" ]; then printf '%s ' \$(hostname); fi)\[\e[0m\]\[\e[48;3;80;38;5;214m\]\$(parse_git_branch)\[\e[0m\]\n\[\e[48;5;95;38;5;214m\] \$(parse_working_dir) \[\e[0m\] "
 
 pass-file() {
   filename="$1"
