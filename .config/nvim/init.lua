@@ -209,6 +209,10 @@ if globals.allow_copilot then
           text = false -- prevent copilot while password-store editing
         }
       })
+      local api = require("copilot.api")
+      api.register_status_notification_handler(function(data)
+        vim.api.nvim_set_var("copilot_status", data.status)
+      end)
       vim.cmd([[
         imap <expr> <Plug>(vimrc:copilot-dummy-map) copilot#Accept("\<Tab>")
       ]])
@@ -226,7 +230,8 @@ vim.g.rustaceanvim = {
             "--config",
             "group_imports=StdExternalCrate,imports_granularity=Crate,imports_layout=HorizontalVertical"
           }
-        }
+        },
+        cargo = { features = { "backup" } }
       }
     }
   }
@@ -910,6 +915,8 @@ if &diff
 endif
 ]])
 
+vim.api.nvim_set_var("copilot_status", "")
+
 require("lualine").setup({
   extensions = { "fzf", "lazy", "quickfix" },
   sections = {
@@ -917,7 +924,20 @@ require("lualine").setup({
     lualine_x = {
       "encoding", -- "fileformat",
       "searchcount",
-      "filetype"
+      "filetype",
+      function()
+        local copilot_status = vim.api.nvim_get_var("copilot_status")
+
+        if copilot_status == "Normal" then
+          return "Copilot(Normal)"
+        elseif copilot_status == "InProgress" then
+          return "Copilot(InProgress)"
+        elseif copilot_status == "Error" then
+          return "Copilot(Error)"
+        else
+          return ""
+        end
+      end
     }
   }
 })
@@ -943,7 +963,7 @@ end
 local ctagsAfterSave = os.getenv("CTAGS_ON_SAVE") -- Get the environment variable
 if ctagsAfterSave then
   -- Execute code for when CTAGS_ON_SAVE is set
-  vim.api.nvim_create_autocmd({ "BufWritePost" }, {
+  vim.api.nvim_create_autocmd({ "BufWritePost", "BufReadPre" }, {
     group = vim.api.nvim_create_augroup("ctags-on-save", { clear = true }),
     callback = function(_)
       local root_dir = vim.fs.root(0, { ".git" })
