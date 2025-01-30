@@ -21,3 +21,4 @@ set completion-ignore-case On
 "\xE2\x80\x94": "--"
 # Ellipsis...
 "\xE2\x80\xA6": "..."
+"\ee": edit-and-execute-command

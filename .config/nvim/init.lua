@@ -763,7 +763,7 @@ nnoremap <leader>93 :e ~/local.bashrc<CR>
 nnoremap <leader>9a :e ~/.config/alacritty/alacritty.toml<CR>
 nnoremap <leader>9b :e ~/.bashrc<CR>
 nnoremap <leader>9d :e ~/.config/dmypyls/dmypyls.yaml<CR>
-nnoremap <leader>9k :e ~/.config/zed/keymap.json<CR>
+nnoremap <leader>9k :e ~/Library/Application Support/k9s/screen-dumps/<CR>
 nnoremap <leader>9l :e ~/local.bashrc<CR>
 nnoremap <leader>9n :e ~/notes.md<CR>G
 nnoremap <leader>9p :e ~/.config/pickls/pickls.yaml<CR>
