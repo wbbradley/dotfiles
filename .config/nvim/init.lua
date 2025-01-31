@@ -231,7 +231,7 @@ vim.g.rustaceanvim = {
             "group_imports=StdExternalCrate,imports_granularity=Crate,imports_layout=HorizontalVertical"
           }
         },
-        cargo = { features = { "backup" } }
+        cargo = { features = { "walrus-service/backup" } }
       }
     }
   }
