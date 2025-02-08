@@ -220,22 +220,24 @@ if globals.allow_copilot then
   }
 end
 
-vim.g.rustaceanvim = {
-  server = {
-    default_settings = {
-      ['rust-analyzer'] = {
-        -- procMacro = { enable = true },
-        rustfmt = {
-          extraArgs = {
-            "--config",
-            "group_imports=StdExternalCrate,imports_granularity=Crate,imports_layout=HorizontalVertical"
-          }
-        },
-        cargo = { features = { "walrus-service/backup" } }
+if vim.fn.expand("%:p:h") == os.getenv("HOME") .. "/src/walrus" then
+  vim.g.rustaceanvim = {
+    server = {
+      default_settings = {
+        ['rust-analyzer'] = {
+          -- procMacro = { enable = true },
+          rustfmt = {
+            extraArgs = {
+              "--config",
+              "group_imports=StdExternalCrate,imports_granularity=Crate,imports_layout=HorizontalVertical"
+            }
+          },
+          cargo = { features = { "walrus-service/backup" } }
+        }
       }
     }
   }
-}
+end
 
 -- Lazy doesn't support hot reloading, so we need to check if it's already been loaded
 if vim.g.lazy_loaded == nil then
