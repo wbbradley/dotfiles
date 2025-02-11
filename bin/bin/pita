@@ -1,0 +1,16 @@
+#!/bin/bash
+export PATH="$HOME"/.cargo/bin:"$PATH"
+
+die() {
+  echo "$0: $*" >&2
+  exit 1
+}
+progname="$(basename "$0")"
+
+[[ -d "$HOME"/src/"$progname" ]] || die ""$progname" not found in $HOME/src"
+
+export RUST_BACKTRACE=1
+exec cargo run --quiet \
+  --release \
+  --manifest-path "$HOME"/src/"$progname"/Cargo.toml \
+  -- "$@"
