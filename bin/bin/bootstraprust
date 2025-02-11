@@ -9,6 +9,7 @@ progname="$(basename "$0")"
 
 [[ -d "$HOME"/src/"$progname" ]] || die ""$progname" not found in $HOME/src"
 
+export RUST_BACKTRACE=1
 if [[ -x "$HOME"/src/"$progname"/target/release/"$progname" ]]; then
   exec "$HOME"/src/"$progname"/target/release/"$progname" "$@"
 else

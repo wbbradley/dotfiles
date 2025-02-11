@@ -220,23 +220,30 @@ if globals.allow_copilot then
   }
 end
 
-if vim.fn.expand("%:p:h") == os.getenv("HOME") .. "/src/walrus" then
-  vim.g.rustaceanvim = {
-    server = {
-      default_settings = {
-        ['rust-analyzer'] = {
-          -- procMacro = { enable = true },
-          rustfmt = {
-            extraArgs = {
-              "--config",
-              "group_imports=StdExternalCrate,imports_granularity=Crate,imports_layout=HorizontalVertical"
-            }
-          },
-          cargo = { features = { "walrus-service/backup" } }
+vim.g.rustaceanvim = {
+  server = {
+    default_settings = {
+      ['rust-analyzer'] = {
+        rustfmt = {
+          extraArgs = {
+            "--config",
+            "group_imports=StdExternalCrate,imports_granularity=Crate"
+          }
         }
       }
     }
   }
+}
+
+if vim.fn.expand("%:p:h") == os.getenv("HOME") .. "/src/walrus" then
+  vim.g.rustaceanvim.server.default_settings['rust-analyzer'].cargo = {
+    features = { "walrus-service/backup" }
+  }
+  vim.g.rustaceanvim.server.default_settings['rust-analyzer'].rustfmt.extraArgs =
+      {
+        "--config",
+        "group_imports=StdExternalCrate,imports_granularity=Crate,imports_layout=HorizontalVertical"
+      }
 end
 
 -- Lazy doesn't support hot reloading, so we need to check if it's already been loaded
@@ -256,19 +263,6 @@ require("lspconfig").terraformls.setup({})
 require("lspconfig").clangd.setup({})
 require('lspconfig').ts_ls.setup({})
 require('lspconfig').move_analyzer.setup({})
-
--- require("lspconfig").rust_analyzer.setup({
---   settings = {
---     ['rust-analyzer'] = {
---       rustfmt = {
---         extraArgs = {
---           "--config",
---           "group_imports=StdExternalCrate,imports_granularity=Crate,imports_layout=HorizontalVertical"
---         }
---       }
---     }
---   }
--- })
 
 vim.cmd("colorscheme gruvbox")
 require("nvim_context_vt").setup({

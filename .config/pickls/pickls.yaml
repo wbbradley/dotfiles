@@ -80,8 +80,6 @@ languages:
           - format
           - --stdin-filename
           - $filename
-      - program: honkhonk
-        args: ["-"]
     linters:
       - program: ruff
         args:
