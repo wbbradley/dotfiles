@@ -239,6 +239,10 @@ export HISTCONTROL=ignoreboth:erasedups
 
 export EDITOR='nvim' # client -nw -c -a ""'
 
+highlight() {
+  grep --line-buffered --color=always -Ei '^|WARNING|WARN|ERROR|CRITICAL|FATAL'
+}
+
 tail-ide() {
   logs=(
     # "$HOME"/sample.profile 
@@ -249,20 +253,20 @@ tail-ide() {
     # "$HOME"/bootstrappy.log
   )
   tail -n 0 -f "${logs[@]}" \
-    | grep --line-buffered --color=always -E '^|WARNING|WARN|ERROR|CRITICAL|FATAL'
+    |& highlight
 }
 tail-pickls() {
   tail -n 0 -f "$HOME"/.local/state/pickls/pickls.log \
-    | grep --line-buffered --color=always -E '^|WARNING|WARN|ERROR|CRITICAL|FATAL'
+    |& highlight
 
 }
 tail-dmypyls() {
   tail -n 0 -f "$HOME"/.local/state/dmypyls/dmypyls.log \
-    | grep --line-buffered --color=always -E '^|WARNING|WARN|ERROR|CRITICAL|FATAL'
+    |& highlight
 }
 tail-nvim() {
   tail -n 0 -f "$HOME"/.local/state/nvim/lsp.log \
-    | grep --line-buffered --color=always -E '^|WARNING|WARN|ERROR|CRITICAL|FATAL'
+    |& highlight
 }
 on-macos() {
   [[ "$(uname)" = "Darwin" ]]

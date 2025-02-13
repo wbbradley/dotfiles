@@ -220,30 +220,40 @@ if globals.allow_copilot then
   }
 end
 
-vim.g.rustaceanvim = {
-  server = {
-    default_settings = {
-      ['rust-analyzer'] = {
-        rustfmt = {
-          extraArgs = {
-            "--config",
-            "group_imports=StdExternalCrate,imports_granularity=Crate"
+if vim.loop.cwd() == os.getenv("HOME") .. "/src/walrus" then
+  vim.print("Walrus detected")
+  vim.g.rustaceanvim = {
+    server = {
+      default_settings = {
+        ['rust-analyzer'] = {
+          -- procMacro = { enable = true },
+          rustfmt = {
+            extraArgs = {
+              "--config",
+              "group_imports=StdExternalCrate,imports_granularity=Crate,imports_layout=HorizontalVertical"
+            }
+          },
+          cargo = { features = { "walrus-service/backup" } }
+        }
+      }
+    }
+  }
+else
+  vim.g.rustaceanvim = {
+    server = {
+      default_settings = {
+        ['rust-analyzer'] = {
+          -- procMacro = { enable = true },
+          rustfmt = {
+            extraArgs = {
+              "--config",
+              "group_imports=StdExternalCrate,imports_granularity=Crate,imports_layout=HorizontalVertical"
+            }
           }
         }
       }
     }
   }
-}
-
-if vim.fn.expand("%:p:h") == os.getenv("HOME") .. "/src/walrus" then
-  vim.g.rustaceanvim.server.default_settings['rust-analyzer'].cargo = {
-    features = { "walrus-service/backup" }
-  }
-  vim.g.rustaceanvim.server.default_settings['rust-analyzer'].rustfmt.extraArgs =
-      {
-        "--config",
-        "group_imports=StdExternalCrate,imports_granularity=Crate,imports_layout=HorizontalVertical"
-      }
 end
 
 -- Lazy doesn't support hot reloading, so we need to check if it's already been loaded
@@ -886,10 +896,11 @@ syntax on
 filetype plugin on
 filetype indent on
 
-" hi ColorColumn ctermfg=blue ctermbg=darkgray guibg=#333333 guifg=#1111bb cterm=NONE
+hi ColorColumn ctermfg=blue ctermbg=darkgray guibg=#333333 guifg=#1111bb cterm=NONE
+set colorcolumn=100,101,102,103
+
 augroup python
   autocmd FileType python setlocal textwidth=100
-  " autocmd FileType python setlocal colorcolumn=110,111,112,113
 augroup END
 
 " hi! MatchParen cterm=NONE,bold gui=NONE,bold guibg=#eee8d5 guifg=NONE
