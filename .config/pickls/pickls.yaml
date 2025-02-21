@@ -15,6 +15,23 @@ languages:
       - program: clang-format
         args: ["-"]
   cpp: *c-settings
+  rust:
+    root_markers:
+      - .git
+    linters:
+      - program: ec
+        args:
+          - -no-color
+          - -format
+          - gcc
+        pattern: '(.*):(\d+):(\d+): (.*): (.*)'
+        filename_match: 1
+        line_match: 2
+        start_col_match: 3
+        severity_match: 4
+        description_match: 5
+        use_stdin: false
+        use_stderr: false
   dockerfile:
     linters:
       - program: hadolint

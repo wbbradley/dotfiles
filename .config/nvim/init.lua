@@ -1009,7 +1009,6 @@ vim.api.nvim_create_autocmd({ "BufRead" }, {
           ".git",
           "pyproject.toml",
           "setup.py",
-          "Cargo.toml",
           "go.mod"
         })
       }, { bufnr = 0, reuse_client = function(_, _) return false end })
