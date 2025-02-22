@@ -20,7 +20,7 @@
   autosetuprebase = always
 [merge]
   # ff = only
-  tool = vimdiff
+  tool = nvim
 [alias]
   tagcommit = rev-list -n 1
   ls-ignored = ls-files . --ignored --exclude-standard --others
@@ -35,6 +35,9 @@
 	defaultBranch = main
 [mergetool]
   keepBackup = false
+[mergetool "nvim"]
+	cmd = /opt/homebrew/bin/nvim \"$MERGED\"
+	trustExitCode = true
 [mergetool "sourcetree"]
 	cmd = /Applications/Sourcetree.app/Contents/Resources/opendiff-w.sh \"$LOCAL\" \"$REMOTE\" -ancestor \"$BASE\" -merge \"$MERGED\"
 	trustExitCode = true
