@@ -1165,6 +1165,8 @@ if globals.allow_copilot then
       -- and if so, disable copilot suggestions.
       if string.find(vim.api.nvim_buf_get_name(0), "/pass.") then
         vim.b.copilot_suggestion_auto_trigger = false
+      elseif string.find(vim.api.nvim_buf_get_name(0), ".md") then
+        vim.b.copilot_suggestion_auto_trigger = false
       end
     end
   })
