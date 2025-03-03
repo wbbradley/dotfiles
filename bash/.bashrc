@@ -185,7 +185,8 @@ gap() {
     git status -s \
     && git commit -am "${message[*]}" \
     && git push -u origin HEAD \
-    && git status -s
+    && git status -s \
+    && printf "\nCurrent SHA: %s\n\n" "$(git rev-parse HEAD)"
   else
     git status
     echo

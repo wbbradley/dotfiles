@@ -732,6 +732,7 @@ nnoremap <F4> :call FindWordUnderCursorNoUI()<CR>
 nnoremap B :FzfLua buffers<CR>
 nnoremap <F7> :FzfLua lsp_workspace_diagnostics<CR>
 nnoremap <leader>C :FzfLua lsp_incoming_calls<CR>
+nnoremap <F12> :FzfLua lsp_incoming_calls<CR>
 nnoremap <leader>R :FzfLua lsp_references<CR>
 nnoremap <leader>T :FzfLua lsp_workspace_symbols<CR>
 nnoremap <leader>f :call FindPromptRaw()<CR>

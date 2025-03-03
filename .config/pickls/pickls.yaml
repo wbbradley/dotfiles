@@ -24,6 +24,7 @@ languages:
           - -no-color
           - -format
           - gcc
+          - $filename
         pattern: '(.*):(\d+):(\d+): (.*): (.*)'
         filename_match: 1
         line_match: 2
