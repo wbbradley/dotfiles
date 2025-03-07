@@ -1,0 +1,4 @@
+#!/bin/bash
+
+echo "$(date): cargo $*" >> "$HOME"/cargo.log
+exec "$HOME"/.cargo/bin/cargo "$@"
