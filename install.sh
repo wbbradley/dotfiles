@@ -24,6 +24,7 @@ BREW_DEPS=(
   cmake
   eza
   fd
+  ffmpeg
   git
   go
   graphviz

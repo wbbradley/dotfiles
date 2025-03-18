@@ -72,14 +72,14 @@ languages:
           - "--break-before-table-rb"
           - "--chop-down-table"
           - "--no-keep-simple-control-block-one-line"
-  markdown:
-    formatters:
-      - program: mdformat
-        args:
-          - --wrap
-          - '100'
-          - --number
-          - '-'
+  # markdown:
+  #   formatters:
+  #     - program: mdformat
+  #       args:
+  #         - --wrap
+  #         - '100'
+  #         - --number
+  #         - '-'
   python:
     root_markers:
       - .git

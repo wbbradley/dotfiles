@@ -3,3 +3,4 @@ aws=awscli
 pymarkdown=pymarkdownlnt
 dympy=mypy
 ec=editorconfig-checker
+whisper=openai-whisper

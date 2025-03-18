@@ -1,4 +1,8 @@
 #!/bin/bash
 
-echo "$(date): cargo $*" >> "$HOME"/cargo.log
+(
+  echo "$(date): cargo $* [PWD=$PWD]"
+  # pstree -p $$
+) >> "$HOME"/cargo.log
+
 exec "$HOME"/.cargo/bin/cargo "$@"

@@ -73,27 +73,40 @@ local lazy_plugins = {
     "neovim/nvim-lspconfig",
     dependencies = { { "j-hui/fidget.nvim", opts = {} } },
     opts = { inlay_hints = { enabled = false } },
-    config = function() end
-    -- config = function()
-    --   vim.api.nvim_create_autocmd("LspAttach", {
-    --     group = vim.api.nvim_create_augroup("kickstart-lsp-attach",
-    --                                         { clear = true }),
-    --     callback = function(_)
-    --       local capabilities = vim.lsp.protocol.make_client_capabilities()
-    --       vim.tbl_deep_extend("force", capabilities,
-    --                           require("cmp_nvim_lsp").default_capabilities())
-    --     end
-    --   })
-    -- end
+    config = function()
+      --   vim.api.nvim_create_autocmd("LspAttach", {
+      --     group = vim.api.nvim_create_augroup("kickstart-lsp-attach",
+      --                                         { clear = true }),
+      --     callback = function(_)
+      --       local capabilities = vim.lsp.protocol.make_client_capabilities()
+      --       vim.tbl_deep_extend("force", capabilities,
+      --                           require("cmp_nvim_lsp").default_capabilities())
+      --     end
+      --   })
+    end
   },
   "modocache/move.vim",
+  {
+    "saecki/crates.nvim",
+    tag = "stable",
+    event = { "BufRead Cargo.toml" },
+    config = function()
+      require("crates").setup {
+        completion = {
+          cmp = { enabled = false },
+          crates = { enabled = true, max_results = 8, min_chars = 3 }
+        },
+        lsp = { enabled = true, actions = true, completion = true, hover = true }
+      }
+    end
+  },
   {
     'saghen/blink.cmp',
     -- optional: provides snippets for the snippet source
     dependencies = 'rafamadriz/friendly-snippets',
 
     -- use a release tag to download pre-built binaries
-    version = 'v0.8.2',
+    version = 'v0.13.1',
     -- AND/OR build from source, requires nightly: https://rust-lang.github.io/rustup/concepts/channels.html#working-with-nightly-rust
     -- build = 'cargo build --release',
     -- If you use nix, you can build from source using latest nightly rust with:
@@ -106,7 +119,7 @@ local lazy_plugins = {
       keymap = {
         preset = 'default',
         ['<Tab>'] = { 'select_and_accept', 'fallback' },
-        ['K'] = { 'show_documentation', 'fallback' },
+        ['<F1>'] = { 'show_documentation', 'fallback' },
         ['<C-j>'] = { 'select_next', 'fallback' },
         ['<C-k>'] = { 'select_prev', 'fallback' }
       },
@@ -127,10 +140,8 @@ local lazy_plugins = {
 
       -- Default list of enabled providers defined so that you can extend it
       -- elsewhere in your config, without redefining it, due to `opts_extend`
-      sources = {
-        default = { 'lsp', 'path', 'snippets', 'buffer' },
-        cmdline = {}
-      }
+      sources = { default = { 'lsp', 'path', 'snippets', 'buffer' } },
+      cmdline = { sources = {} }
     },
     opts_extend = { "sources.default" }
   },
@@ -226,7 +237,6 @@ if vim.loop.cwd() == os.getenv("HOME") .. "/src/walrus" then
     server = {
       default_settings = {
         ['rust-analyzer'] = {
-          -- procMacro = { enable = true },
           rustfmt = {
             extraArgs = {
               "--config",
@@ -243,7 +253,6 @@ else
     server = {
       default_settings = {
         ['rust-analyzer'] = {
-          -- procMacro = { enable = true },
           rustfmt = {
             extraArgs = {
               "--config",
@@ -374,7 +383,6 @@ local function keymap(mode, shortcut, command)
 end
 
 local function nmap(shortcut, command) keymap("n", shortcut, command) end
-
 nmap("M", ":FzfLua oldfiles<CR>")
 nmap("<C-p>", ":FzfLua git_files<CR>")
 nmap("<leader>[", ":InlayHintsToggle<CR>")
