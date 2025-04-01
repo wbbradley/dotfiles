@@ -24,6 +24,17 @@ local lazy_plugins = {
   "easymotion/vim-easymotion",
   "folke/trouble.nvim",
   "lewis6991/gitsigns.nvim",
+  {
+    "hedyhli/outline.nvim",
+    lazy = true,
+    cmd = { "Outline", "OutlineOpen" },
+    keys = { -- Example mapping to toggle outline
+      { "<leader>o", "<cmd>Outline<CR>", desc = "Toggle outline" }
+    },
+    opts = {
+      -- Your setup opts here
+    }
+  },
   "folke/which-key.nvim",
   {
     "folke/todo-comments.nvim",
@@ -140,8 +151,8 @@ local lazy_plugins = {
 
       -- Default list of enabled providers defined so that you can extend it
       -- elsewhere in your config, without redefining it, due to `opts_extend`
-      sources = { default = { 'lsp', 'path', 'snippets', 'buffer' } },
-      cmdline = { sources = {} }
+      sources = { default = { 'lsp', 'path', 'snippets', 'buffer', 'cmdline' } }
+      -- cmdline = { sources = {} }
     },
     opts_extend = { "sources.default" }
   },
@@ -383,6 +394,7 @@ local function keymap(mode, shortcut, command)
 end
 
 local function nmap(shortcut, command) keymap("n", shortcut, command) end
+nmap("<F6>", ":SymbolsOutline<CR>")
 nmap("M", ":FzfLua oldfiles<CR>")
 nmap("<C-p>", ":FzfLua git_files<CR>")
 nmap("<leader>[", ":InlayHintsToggle<CR>")
@@ -482,6 +494,7 @@ set noshowmode
 set exrc
 set number
 set ttyfast
+set relativenumber
 
 if has('win32')
 elseif has('mac')

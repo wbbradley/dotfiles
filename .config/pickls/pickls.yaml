@@ -137,14 +137,3 @@ languages:
         description_match: 4
         use_stderr: true
         use_stdin: true
-  yaml:
-    linters:
-      - program: yamllint
-        args: ["-f", "parsable", "-"]
-        pattern: '.*:(\d+):(\d+): \[(.*)\] (.*) \((.*)\)'
-        line_match: 1
-        start_col_match: 2
-        severity_match: 3
-        description_match: 4
-        use_stderr: false
-        use_stdin: true
