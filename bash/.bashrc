@@ -249,7 +249,7 @@ tail-ide() {
     "$HOME"/.local/state/pickls/pickls.log
     "$HOME"/.local/state/dmypyls/dmypyls.log
     # "$HOME"/Library/Logs/Zed/Zed.log
-    # "$HOME"/.local/state/nvim/lsp.log
+    "$HOME"/.local/state/nvim/lsp.log
     # "$HOME"/bootstrappy.log
   )
   tail -n 0 -f "${logs[@]}" \

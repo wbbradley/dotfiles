@@ -494,7 +494,6 @@ set noshowmode
 set exrc
 set number
 set ttyfast
-set relativenumber
 
 if has('win32')
 elseif has('mac')
