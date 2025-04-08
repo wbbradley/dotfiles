@@ -1,4 +1,3 @@
----
 ai:
   inline_assistant_include_workspace_files: true
   inline_assistants:
@@ -124,6 +123,10 @@ languages:
         use_stdin: true
   shell script: *sh
   bash: *sh
+  yaml:
+    formatters:
+      - program: yamlfmt # github.com/google/yamlfmt
+        args: ["-in"]
   toml:
     formatters:
       - program: taplo

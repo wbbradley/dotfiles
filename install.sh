@@ -14,7 +14,6 @@ on-linux() {
 }
 
 BREW_DEPS=(
-  alacritty
   ansifilter
   asciinema
   awscli
@@ -132,6 +131,12 @@ if ! [[ -h "$HOME"/.config ]]; then
   mv "$HOME"/.config{,.bak}
   echo "Linking ~/.config to ~/src/dotfiles/.config..."
   ln -s "$HOME"/src/dotfiles/.config "$HOME"/
+fi
+
+if command -v cargo >/dev/null 2>&1; then
+  cargo install alacritty
+else
+  echo "cargo not installed, skipping alacritty install"
 fi
 
 rm -rf "${HOME:?}/bin"

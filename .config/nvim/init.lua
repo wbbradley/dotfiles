@@ -231,10 +231,6 @@ if globals.allow_copilot then
           text = false -- prevent copilot while password-store editing
         }
       })
-      local api = require("copilot.api")
-      api.register_status_notification_handler(function(data)
-        vim.api.nvim_set_var("copilot_status", data.status)
-      end)
       vim.cmd([[
         imap <expr> <Plug>(vimrc:copilot-dummy-map) copilot#Accept("\<Tab>")
       ]])
