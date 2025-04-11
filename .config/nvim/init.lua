@@ -135,6 +135,12 @@ local lazy_plugins = {
         ['<C-k>'] = { 'select_prev', 'fallback' }
       },
 
+      cmdline = {
+        completion = {
+          list = { selection = { preselect = false, auto_insert = true } },
+          menu = { auto_show = false }
+        }
+      },
       completion = {
         documentation = { auto_show = true, auto_show_delay_ms = 500 },
         trigger = { prefetch_on_insert = true }
@@ -250,7 +256,8 @@ if vim.loop.cwd() == os.getenv("HOME") .. "/src/walrus" then
               "group_imports=StdExternalCrate,imports_granularity=Crate,imports_layout=HorizontalVertical"
             }
           },
-          cargo = { features = { "walrus-service/backup" } }
+          -- cargo = { features = { "walrus-service/backup" } }
+          cargo = { profile = "dev", features = "all" }
         }
       }
     }
@@ -892,7 +899,7 @@ augroup END
 autocmd BufRead *.ai setlocal ft=markdown
 autocmd BufRead *.tf setlocal ft=terraform
 augroup RustCore
-  " autocmd FileType rust nmap <F7> :pclose<CR>:setlocal makeprg=cargo\ check<CR>:lmake<CR><CR>
+  autocmd FileType rust nmap <F19> :wa<CR>:pclose<CR>:compiler cargo<CR>:setlocal makeprg=cargo\ check<CR>:make<CR><CR>
 augroup END
 
 set ignorecase
@@ -1188,6 +1195,32 @@ if globals.allow_copilot then
     end
   })
 end
+
+local function jump_to_rust_module()
+  local current_dir = vim.fn.expand('%:p:h')
+  local parent_dir = vim.fn.fnamemodify(current_dir, ':h')
+  local dir_name = vim.fn.fnamemodify(current_dir, ':t')
+
+  -- Define the potential module file names
+  local potential_modules = {
+    current_dir .. '/lib.rs',
+    parent_dir .. '/' .. dir_name .. '.rs'
+  }
+
+  -- Check each potential module file and jump if it exists
+  for _, module in ipairs(potential_modules) do
+    if vim.fn.filereadable(module) == 1 then
+      vim.cmd('edit ' .. module)
+      return
+    end
+  end
+
+  print("Module declaration not found")
+end
+
+-- Create a Vim command to easily access the function
+vim.api.nvim_create_user_command('RustJumpToModule', jump_to_rust_module, {})
+nmap("<leader>E", ":RustJumpToModule<CR>")
 
 nmap("<leader>P", ":PopulateQuickFixFromClipboard<CR>")
 vim.api.nvim_create_user_command("PopulateQuickFixFromClipboard", function()
