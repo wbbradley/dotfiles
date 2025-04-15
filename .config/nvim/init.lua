@@ -262,7 +262,7 @@ if vim.loop.cwd() == os.getenv("HOME") .. "/src/walrus" then
       }
     }
   }
-else
+elseif vim.loop.cwd() ~= os.getenv("HOME") .. "/src/sui" then
   vim.g.rustaceanvim = {
     server = {
       default_settings = {
