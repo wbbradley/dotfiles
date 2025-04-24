@@ -100,20 +100,15 @@ for branch in "${stack[@]}"; do
     echo "Creating backup branch '$backup_branch' from '$branch'..."
     git branch "$backup_branch" "$source" || die "git branch '$backup_branch' failed"
 
-    echo "Initiating a squash merge of '$branch' onto '$stack_on'..."
+    echo "Initiating a rebase of '$branch' onto '$stack_on'..."
     echo "Note: use \`git commit -m '$log_message'\` to commit the changes."
     # Point the branch to the current head of the stack.
-    git checkout -B "$branch" "$stack_on" || die "git checkout $stack_on failed"
-    if ! git merge --squash "$source"; then
-      warn "Squash merge failed, aborting..."
+    git checkout "$branch" || die "git checkout $stack_on failed"
+    if ! git rebase "$stack_on"; then
+      warn "Rebase failed, aborting..."
       warn "Run \`git mergetool\` to resolve conflicts."
     fi
-    echo "
-Once you are satisfied, run
-
-    git commit -m '$log_message'
-
-then re-run this script."
+    echo "Once you have finished the rebase, re-run this script."
     exit 1
   fi
 done
