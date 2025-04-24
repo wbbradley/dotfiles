@@ -250,6 +250,7 @@ if vim.loop.cwd() == os.getenv("HOME") .. "/src/walrus" then
     server = {
       default_settings = {
         ['rust-analyzer'] = {
+          diagnostics = { disabled = { "inactive-code" } },
           rustfmt = {
             extraArgs = {
               "--config",
@@ -640,9 +641,8 @@ augroup cstuff
   autocmd FileType c,cpp nnoremap <leader>d Odbg();<Esc>_
 augroup END
 
-nnoremap <F2> :echo "hi<" . synIDattr(synID(line("."),col("."),1),"name") . '> trans<'
-\ . synIDattr(synID(line("."),col("."),0),"name") . "> lo<"
-\ . synIDattr(synIDtrans(synID(line("."),col("."),1)),"name") . ">"<CR>
+nnoremap <F2> :mksession!<CR>
+nnoremap <F14> :source Session.vim<CR>
 
 " allow backspacing over everything in insert mode
 set backspace=indent,eol,start
@@ -659,7 +659,6 @@ nmap Q VQ
 nmap <Leader><Leader> va}=
 " nnoremap <expr> <C-p> (len(system('git -C ' . expand('%:p:h') . ' rev-parse' )) ? (':Files ' . expand('%:p:h')) : ':GFiles')."\<cr>"
 " nmap M :History<CR>
-nmap <CR><CR> :!<CR>
 
 " map home row to exit Insert mode
 imap jk <Esc>
@@ -753,11 +752,11 @@ nnoremap <leader>` :!ctags -R --exclude=.mypy_cache --exclude=build --exclude=as
 nnoremap <F4> :call FindWordUnderCursorNoUI()<CR>
 
 nnoremap B :FzfLua buffers<CR>
-nnoremap <F7> :FzfLua lsp_workspace_diagnostics<CR>
-nnoremap <leader>C :FzfLua lsp_incoming_calls<CR>
-nnoremap <F12> :FzfLua lsp_incoming_calls<CR>
-nnoremap <leader>R :FzfLua lsp_references<CR>
-nnoremap <leader>T :FzfLua lsp_workspace_symbols<CR>
+nnoremap <F7> :FzfLua lsp_workspace_diagnostics async=true<CR>
+nnoremap <leader>C :FzfLua lsp_incoming_calls async=true<CR>
+nnoremap <F12> :FzfLua lsp_incoming_calls async=true<CR>
+nnoremap <leader>R :FzfLua lsp_references async=true<CR>
+nnoremap <leader>T :FzfLua lsp_workspace_symbols async=true<CR>
 nnoremap <leader>f :call FindPromptRaw()<CR>
 nnoremap <leader>g :w<CR>:!git add %<CR>
 nnoremap E :call FindPromptDirect()<CR>
@@ -893,14 +892,19 @@ augroup END
 augroup Python
   autocmd FileType python setlocal sw=4 sts=4 ts=4 expandtab
   autocmd FileType python setlocal sw=4 sts=4 ts=4 expandtab
-  " autocmd BufWritePre *.py lua vim.lsp.buf.format()
+  autocmd FileType python setlocal textwidth=100
+  autocmd FileType python setlocal colorcolumn=100,101,102,103
 augroup END
 
 autocmd BufRead *.ai setlocal ft=markdown
 autocmd BufRead *.tf setlocal ft=terraform
+
 augroup RustCore
   autocmd FileType rust nmap <F19> :wa<CR>:pclose<CR>:compiler cargo<CR>:setlocal makeprg=cargo\ check<CR>:make<CR><CR>
+  autocmd FileType rust setlocal colorcolumn=100,101,102,103
 augroup END
+
+hi ColorColumn ctermfg=blue ctermbg=darkgray guibg=#333333 guifg=#1111bb cterm=NONE
 
 set ignorecase
 set smartcase
@@ -920,11 +924,9 @@ syntax on
 filetype plugin on
 filetype indent on
 
-hi ColorColumn ctermfg=blue ctermbg=darkgray guibg=#333333 guifg=#1111bb cterm=NONE
-set colorcolumn=100,101,102,103
-
-augroup python
-  autocmd FileType python setlocal textwidth=100
+augroup bash
+  autocmd FileType bash setlocal textwidth=100
+  autocmd FileType bash setlocal colorcolumn=100,101,102,103
 augroup END
 
 " hi! MatchParen cterm=NONE,bold gui=NONE,bold guibg=#eee8d5 guifg=NONE
@@ -1019,7 +1021,6 @@ end
 
 vim.keymap.set("n", "<leader>r", vim.lsp.buf.rename,
                { silent = true, desc = "Rename symbol" })
-
 vim.api.nvim_create_autocmd({ "BufRead" }, {
   group = vim.api.nvim_create_augroup("pickls-bufread", { clear = true }),
   callback = function(_)
@@ -1239,7 +1240,7 @@ vim.api.nvim_create_user_command("PopulateQuickFixFromClipboard", function()
       description_group = "line_before"
     }, -- File paths (relative or absolute)
     {
-      pattern = "^([^ :]+):(%d+):(.*)",
+      pattern = "^([^0-9][^ :]*):(%d+):(.*)",
       filename_group = 1,
       lnum_group = 2,
       description_group = 3
@@ -1262,6 +1263,7 @@ vim.api.nvim_create_user_command("PopulateQuickFixFromClipboard", function()
                                                                     "%1")
         if not string.find(filename, "site-packages", 1, true) and
             not string.find(filename, "Python.framework", 1, true) and
+            not string.find(filename, "/.cargo/", 1, true) and
             not string.find(filename, "importlib", 1, true) and
             not string.find(filename, "/rustc/", 1, true) then
           if filename:sub(1, 5) == "/app/" then

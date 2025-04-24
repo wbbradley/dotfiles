@@ -22,6 +22,9 @@
   # ff = only
   tool = nvim
 [alias]
+  cleanup-merged = "!git branch --merged main | grep -E -v '(^\\*|main|testnet|devnet|\\+)' | xargs git branch -d"
+  cleanup-tracking = "!git fetch --prune && git branch --v | grep '\\[gone\\]' | awk '{print $1}' | xargs git branch -D"
+  cleanup = "!git cleanup-merged && git cleanup-tracking"
   tagcommit = rev-list -n 1
   ls-ignored = ls-files . --ignored --exclude-standard --others
   ls-untracked = ls-files . --exclude-standard --others
