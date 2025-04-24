@@ -1,12 +1,12 @@
 #!/bin/bash
 
 die() {
-  echo "$0: error: $*" >&2
+  printf "%s: \001\033[48;3;80;38;5;124m\002error\001\033[0m\002: %s\n" "$0" "$*" >&2
   exit 1
 }
 
 warn() {
-  echo "$0: warn: $*" >&2
+  printf "%s: \001\033[48;3;80;38;5;148m\002warn\001\033[0m\002: %s\n" "$0" "$*" >&2
 }
 
 # TODO: Pull in the current stack definition from an argument or local file. For now it's hardcoded.
@@ -22,6 +22,9 @@ date
 echo "This is git-sk run version $run_version."
 
 checkout-main() {
+  if [[ -n "$(git status -s)" ]]; then
+    die "git status is not clean, please commit or stash your changes."
+  fi
   remote=origin
   main="$(git symbolic-ref refs/remotes/"$remote"/HEAD | sed 's@^refs/remotes/'"$remote"'/@@')"
   git checkout -B "$main" "$remote/$main" || die "git checkout $main failed"
@@ -30,9 +33,11 @@ checkout-main() {
 checkout-main "$1" || die "git checkout failed"
 stack_on=main
 
+
 if [[ "$1" == "rollback" ]]; then
   shift
   run_version="$1"
+  echo "Rolling back to version $run_version..."
   for branch in "${stack[@]}"; do
     if [[ "$run_version" = "origin" ]]; then
       backup_branch="origin/$branch"
@@ -68,6 +73,8 @@ for branch in "${stack[@]}"; do
   if git merge-base --is-ancestor "$stack_on" "$branch"; then
     echo "Branch '$branch' is already up to date with '$stack_on'."
     stack_on="$branch"
+    echo "Force-pushing '$branch' to origin..."
+    git push -fu origin "$branch":"$branch" || die "git push -fu origin $branch:$branch failed"
     continue
   else
     echo "Branch '$branch' is not descended from '$stack_on'..."
