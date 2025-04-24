@@ -1,0 +1,97 @@
+#!/bin/bash
+
+die() {
+  echo "$0: error: $*" >&2
+  exit 1
+}
+
+warn() {
+  echo "$0: warn: $*" >&2
+}
+
+# TODO: Pull in the current stack definition from an argument or local file. For now it's hardcoded.
+stack=(
+  failover-sui-client
+  upgrade-rust-edition
+)
+
+git fetch --prune || die "git fetch failed"
+
+run_version="$(python3 -c 'import time; print(f"{int(time.time())}")')"
+date
+echo "This is git-sk run version $run_version."
+
+checkout-main() {
+  remote=origin
+  main="$(git symbolic-ref refs/remotes/"$remote"/HEAD | sed 's@^refs/remotes/'"$remote"'/@@')"
+  git checkout -B "$main" "$remote/$main" || die "git checkout $main failed"
+}
+
+checkout-main "$1" || die "git checkout failed"
+stack_on=main
+
+if [[ "$1" == "rollback" ]]; then
+  shift
+  run_version="$1"
+  for branch in "${stack[@]}"; do
+    if [[ "$run_version" = "origin" ]]; then
+      backup_branch="origin/$branch"
+    else
+      backup_branch="$branch"-at-"$run_version"
+    fi
+    source="$(git rev-parse "$backup_branch")"
+    if [[ -z "$source" ]]; then
+      warn "branch '$backup_branch' does not exist, skipping..."
+      continue
+    fi
+    echo "Rolling back branch '$branch' to '$backup_branch'..."
+    git branch -f "$branch" "$source" || die "git branch -f $branch $source failed"
+    if [[ "$run_version" != "origin" ]]; then
+      git branch -D "$backup_branch" || die "git branch -D $backup_branch failed"
+    fi
+  done
+  exit 0
+fi
+
+
+for branch in "${stack[@]}"; do
+  source="$(git rev-parse "$branch")"
+  if [[ -z "$source" ]]; then
+    die "branch '$branch' does not exist"
+  fi
+  log_message="$(git log -1 --pretty=format:%s "$source")"
+  if [[ -z "$log_message" ]]; then
+    die "branch '$branch' has no commit message!?"
+  fi
+
+
+  if git merge-base --is-ancestor "$stack_on" "$branch"; then
+    echo "Branch '$branch' is already up to date with '$stack_on'."
+    stack_on="$branch"
+    continue
+  else
+    echo "Branch '$branch' is not descended from '$stack_on'..."
+    # Create a backup of the current branch.
+    backup_branch="$branch"-at-"$run_version"
+    echo "Creating backup branch '$backup_branch' from '$branch'..."
+    git branch "$backup_branch" "$source" || die "git branch '$backup_branch' failed"
+
+    echo "Initiating a squash merge of '$branch' onto '$stack_on'..."
+    echo "Note: use \`git commit -m '$log_message'\` to commit the changes."
+    # Point the branch to the current head of the stack.
+    git checkout -B "$branch" "$stack_on" || die "git checkout $stack_on failed"
+    if ! git merge --squash "$source"; then
+      warn "Squash merge failed, aborting..."
+      warn "Run \`git mergetool\` to resolve conflicts."
+    fi
+    echo "
+Once you are satisfied, run
+
+    git commit -m '$log_message'
+
+then re-run this script."
+    exit 1
+  fi
+done
+echo "All branches are up to date with '$stack_on'."
+git checkout "$stack_on" || die "git checkout $stack_on failed"
