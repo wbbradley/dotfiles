@@ -10,16 +10,16 @@ warn() {
 }
 
 # TODO: Pull in the current stack definition from an argument or local file. For now it's hardcoded.
+git_root_dir="$HOME"/src/walrus
 stack=(
   failover-sui-client
   upgrade-rust-edition
 )
 
+cd "$git_root_dir" || die "cd $git_root_dir failed"
 git fetch --prune || die "git fetch failed"
 
 run_version="$(python3 -c 'import time; print(f"{int(time.time())}")')"
-date
-echo "This is git-sk run version $run_version."
 
 checkout-main() {
   if [[ -n "$(git status -s)" ]]; then
@@ -30,9 +30,26 @@ checkout-main() {
   git checkout -B "$main" "$remote/$main" || die "git checkout $main failed"
 }
 
+
+if [[ "$1" == "-v" ]]; then
+  shift
+  for branch in "${stack[@]}"; do
+    source="$(git rev-parse "$branch")"
+    if [[ -z "$source" ]]; then
+      die "branch '$branch' does not exist"
+    fi
+    log_message="$(git log -1 --pretty=format:%s "$source")"
+    if [[ -z "$log_message" ]]; then
+      die "branch '$branch' has no commit message!?"
+    fi
+    echo "$branch: $log_message"
+  done
+  exit 0
+fi
+
+echo "This is git-sk run version $run_version."
 checkout-main "$1" || die "git checkout failed"
 stack_on=main
-
 
 if [[ "$1" == "rollback" ]]; then
   shift
