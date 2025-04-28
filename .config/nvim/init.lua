@@ -901,7 +901,11 @@ autocmd BufRead *.tf setlocal ft=terraform
 
 augroup RustCore
   autocmd FileType rust nmap <F19> :wa<CR>:pclose<CR>:compiler cargo<CR>:setlocal makeprg=cargo\ check<CR>:make<CR><CR>
+  autocmd FileType rust nmap <F20> :wa<CR>:pclose<CR>:compiler cargo<CR>:setlocal makeprg=cargo\ test\ --no-run<CR>:make<CR><CR>
+  autocmd FileType rust nmap <F21> :wa<CR>:pclose<CR>:compiler cargo<CR>:setlocal makeprg=cargo\ simtest\ build<CR>:make<CR><CR>
   autocmd FileType rust setlocal colorcolumn=100,101,102,103
+  autocmd FileType rust nnoremap <leader>d Owalrus_utils::crumb!();<Esc>_
+
 augroup END
 
 hi ColorColumn ctermfg=blue ctermbg=darkgray guibg=#333333 guifg=#1111bb cterm=NONE
@@ -1255,24 +1259,30 @@ vim.api.nvim_create_user_command("PopulateQuickFixFromClipboard", function()
   -- Find all the locations that match any of the patterns, and record them in a table of tables.
   local locations = {}
   for _, line in ipairs(clipboard_lines) do
-    for _, pattern_info in ipairs(location_patterns) do
-      local p1, p2, p3 = line:match(pattern_info.pattern)
-      if p1 then
-        local captures = { p1, p2, p3 }
-        local filename = captures[pattern_info.filename_group]:gsub('^"(.*)"$',
-                                                                    "%1")
-        if not string.find(filename, "site-packages", 1, true) and
-            not string.find(filename, "Python.framework", 1, true) and
-            not string.find(filename, "/.cargo/", 1, true) and
-            not string.find(filename, "importlib", 1, true) and
-            not string.find(filename, "/rustc/", 1, true) then
-          if filename:sub(1, 5) == "/app/" then
-            filename = filename:sub(6)
+    if not string.find(line, "was not used in the crate graph", 1, true) then
+      for _, pattern_info in ipairs(location_patterns) do
+        local p1, p2, p3 = line:match(pattern_info.pattern)
+        if p1 then
+          local captures = { p1, p2, p3 }
+          local filename = captures[pattern_info.filename_group]:gsub(
+                               '^"(.*)"$', "%1")
+          if string.len(filename) > 1 and
+              not string.find(filename, "site-packages", 1, true) and
+              not string.find(filename, "Python.framework", 1, true) and
+              not string.find(filename, "/.cargo/", 1, true) and
+              not string.find(filename, "importlib", 1, true) and
+              not string.find(filename, "/rustc/", 1, true) then
+            if filename:sub(1, 5) == "/app/" then
+              filename = filename:sub(6)
+            end
+            local lnum = tonumber(captures[pattern_info.lnum_group]) or 0
+            local description = captures[pattern_info.description_group]
+            table.insert(locations, {
+              filename = filename,
+              lnum = lnum,
+              text = description
+            })
           end
-          local lnum = tonumber(captures[pattern_info.lnum_group]) or 0
-          local description = captures[pattern_info.description_group]
-          table.insert(locations,
-                       { filename = filename, lnum = lnum, text = description })
         end
       end
     end
