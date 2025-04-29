@@ -7,7 +7,7 @@ version="$(
     | awk -F\" '{ print $2 }'
 )"
 
-echo "Walrus is currently pointing at Sui $version..."
+printf "Walrus is currently pointing at Sui \001\033[48;3;80;38;5;128m\002%s\001\033[0m\002\n" "$version"
 
 if [[ "$(uname)" = "Darwin" ]]; then
   filename="sui-$version-macos-$(uname -m).tgz"
@@ -23,16 +23,14 @@ echo "Looking for $url [version=$version]..."
 tempdir="$(mktemp -d)"
 trap 'rm -rf '"$tempdir" EXIT
 
+cd "$tempdir"
+
 echo "Downloading $filename from $url..."
 curl -LO "$url"
 
-echo "Moving $filename to $tempdir..."
-mv "$filename" "$tempdir"/
-
-cd "$tempdir"
-
 echo "Extracting $filename..."
 tar -xzf "$filename"
+rm "$filename"
 
 echo "Moving binaries to $HOME/.local/bin..."
 find . -type f -print -exec mv {} "$HOME"/.local/bin/ \;
