@@ -9,4 +9,22 @@ ctags \
   --exclude=docs \
   --exclude=examples \
   .
+mv tags tags.temp
+trap 'rm tags.temp' EXIT
+echo "Removing unnecessary tags..."
+#
+# shellcheck disable=SC2016
+grep -Ev \
+  -e '^"' \
+  -e '^\$ref' \
+  -e '\.json\>' \
+  -e '\.yaml\>' \
+  -e '\.patch\>' \
+  -e '\.css\>' \
+  -e '\.md\>' \
+  -e '\.toml\>' \
+  -e '\/\^[ ]*impl\>' \
+  <tags.temp \
+  >tags
+
 echo "Tags are complete."

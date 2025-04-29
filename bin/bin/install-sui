@@ -1,11 +1,11 @@
 #!/bin/bash
 
 cd "$HOME"/src/walrus
-version="$(git grep MystenLabs/sui.tag=testnet-v \
-  | grep Cargo.lock \
-  | head -n 1 \
-  | awk -F= '{ print $3 }' \
-  | awk -F\# '{ print $1 }')"
+version="$(
+  git grep sui-sdk.=..*MystenLabs/sui \
+    | grep -o ' tag = ".*"' \
+    | awk -F\" '{ print $2 }'
+)"
 
 echo "Walrus is currently pointing at Sui $version..."
 
@@ -16,6 +16,8 @@ else
   filename="sui-$version-ubuntu-x86_64.tgz"
   url="https://github.com/MystenLabs/sui/releases/download/$version/$filename"
 fi
+
+echo "Looking for $url [version=$version]..."
 
 # Make a temp dir
 tempdir="$(mktemp -d)"

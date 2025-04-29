@@ -745,7 +745,7 @@ function! FlipHeader()
   endif
 endfunction
 
-nnoremap <leader>` :!ctags -R --exclude=.mypy_cache --exclude=build --exclude=assets --exclude=target --exclude=docs --exclude=examples .<CR>
+nnoremap <leader>` :!build-ctags<CR>
 
 " :execute 'grep! ' . expand('<cword>') . ' *'<CR>
 
@@ -902,7 +902,7 @@ autocmd BufRead *.tf setlocal ft=terraform
 augroup RustCore
   autocmd FileType rust nmap <F19> :wa<CR>:pclose<CR>:compiler cargo<CR>:setlocal makeprg=cargo\ check<CR>:make<CR><CR>
   autocmd FileType rust nmap <F20> :wa<CR>:pclose<CR>:compiler cargo<CR>:setlocal makeprg=cargo\ test\ --no-run<CR>:make<CR><CR>
-  autocmd FileType rust nmap <F21> :wa<CR>:pclose<CR>:compiler cargo<CR>:setlocal makeprg=cargo\ simtest\ build<CR>:make<CR><CR>
+  autocmd FileType rust nmap <F21> :wa<CR>:pclose<CR>:compiler cargo<CR>:setlocal makeprg=cargo\ simtest\ simtest\ --profile\ simtest<CR>:make<CR><CR>
   autocmd FileType rust setlocal colorcolumn=100,101,102,103
   autocmd FileType rust nnoremap <leader>d Owalrus_utils::crumb!();<Esc>_
 
@@ -1013,8 +1013,7 @@ if ctagsAfterSave then
         local success, age_in_seconds =
             pcall(file_age_in_seconds, tags_filename)
         if not success or age_in_seconds == nil or (age_in_seconds > 5 * 60) then
-          local cmd = 'sh -c "cd ' .. root_dir ..
-                          '; ctags -R --exclude=.mypy_cache --exclude=build --exclude=assets --exclude=target --exclude=docs --exclude=examples . &"'
+          local cmd = 'sh -c "cd ' .. root_dir .. '; build-ctags &"'
           -- vim.notify(cmd)
           vim.fn.system(cmd)
         end

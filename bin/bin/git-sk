@@ -12,7 +12,7 @@ warn() {
 # TODO: Pull in the current stack definition from an argument or local file. For now it's hardcoded.
 git_root_dir="$HOME"/src/walrus
 stack=(
-  rust-sdk-02
+  bump-sui-version
 )
 
 cd "$git_root_dir" || die "cd $git_root_dir failed"
