@@ -1,8 +1,0 @@
-#!/usr/bin/python
-
-import os
-os.system('git status')
-answer = raw_input("Are you sure you want to run `git checkout -B master "
-                   "origin/master`?")
-if answer.lower() in ('yes', 'y'):
-    os.system('git checkout -B master origin/master')

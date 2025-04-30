@@ -10,7 +10,7 @@ on-macos() {
 }
 
 on-linux() {
-  [[ $(barg hey you) = Linux ]]
+  [[ "$(uname)" = Linux ]]
 }
 
 BREW_DEPS=(
@@ -56,6 +56,10 @@ BREW_DEPS=(
 mkdir -p "$HOME"/.local/bin ||:
 
 setup-fzf() {
+  if command -v fzf 2>/dev/null; then
+    echo "Skipping fzf installation as it looks like it's already installed..."
+    return 0
+  fi
   fzf_dir="$HOME"/.fzf
   rm -rf "$fzf_dir"
   echo "Installing FZF..."
@@ -78,12 +82,11 @@ if on-macos; then
     luarocks install --server=https://luarocks.org/dev luaformatter || die "luaformatter install failed"
     echo "NB: make sure you manage brew services."
     brew services
-    setup-fzf
 elif on-linux; then
   if command -v apt 2>/dev/null; then
     # sudo apt-get update
-    sudo apt-get install -y universal-ctags pass git vim tmux alacritty neovim
-    sudo apt-get upgrade -y universal-ctags pass git vim tmux alacritty neovim
+    sudo apt-get install -y universal-ctags pass git vim tmux alacritty build-essential cmake libssl-dev
+    sudo apt-get upgrade -y universal-ctags pass git vim tmux alacritty build-essential cmake libssl-dev
   else
     sudo yum update -y
     sudo yum install -y ctags pass git vim tmux alacritty neovim
@@ -92,6 +95,8 @@ elif on-linux; then
 else
   die "unsupported platform [uname=$(uname)]"
 fi
+
+setup-fzf
 
 # Make sure needed tools are available
 git --version > /dev/null || die "git not installed"
@@ -131,12 +136,6 @@ if ! [[ -h "$HOME"/.config ]]; then
   mv "$HOME"/.config{,.bak}
   echo "Linking ~/.config to ~/src/dotfiles/.config..."
   ln -s "$HOME"/src/dotfiles/.config "$HOME"/
-fi
-
-if command -v cargo >/dev/null 2>&1; then
-  cargo install alacritty
-else
-  echo "cargo not installed, skipping alacritty install"
 fi
 
 rm -rf "${HOME:?}/bin"
