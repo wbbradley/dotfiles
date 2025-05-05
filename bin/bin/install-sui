@@ -1,11 +1,21 @@
 #!/bin/bash
 
+die() {
+  echo "$0: $*" >&2
+  exit 1
+}
+
 cd "$HOME"/src/walrus
-version="$(
-  git grep sui-sdk.=..*MystenLabs/sui \
-    | grep -o ' tag = ".*"' \
-    | awk -F\" '{ print $2 }'
-)"
+if [[ "$1" =~ "v1.*" ]]; then
+  version="$1"
+  shift
+else
+  version="$(
+    git grep sui-sdk.=..*MystenLabs/sui \
+      | grep -o ' tag = ".*"' \
+      | awk -F\" '{ print $2 }'
+  )"
+fi
 
 printf "Walrus is currently pointing at Sui \001\033[48;3;80;38;5;128m\002%s\001\033[0m\002\n" "$version"
 
@@ -26,10 +36,10 @@ trap 'rm -rf '"$tempdir" EXIT
 cd "$tempdir"
 
 echo "Downloading $filename from $url..."
-curl -LO "$url"
+curl -LO "$url" || die "failed to download '$url'"
 
 echo "Extracting $filename..."
-tar -xzf "$filename"
+tar -xzf "$filename" || die "failed to extract '$filename'"
 rm "$filename"
 
 echo "Moving binaries to $HOME/.local/bin..."

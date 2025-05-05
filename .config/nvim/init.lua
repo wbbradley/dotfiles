@@ -96,15 +96,18 @@ local lazy_plugins = {
     dependencies = { { "j-hui/fidget.nvim", opts = {} } },
     opts = { inlay_hints = { enabled = false } },
     config = function()
-      --   vim.api.nvim_create_autocmd("LspAttach", {
-      --     group = vim.api.nvim_create_augroup("kickstart-lsp-attach",
-      --                                         { clear = true }),
-      --     callback = function(_)
-      --       local capabilities = vim.lsp.protocol.make_client_capabilities()
-      --       vim.tbl_deep_extend("force", capabilities,
-      --                           require("cmp_nvim_lsp").default_capabilities())
-      --     end
-      --   })
+      vim.api.nvim_create_autocmd("LspAttach", {
+        group = vim.api.nvim_create_augroup("kickstart-lsp-attach",
+                                            { clear = true }),
+        callback = function(_)
+          -- local capabilities = vim.lsp.protocol.make_client_capabilities()
+          -- vim.tbl_deep_extend("force", capabilities, {
+          --   workspace = { didChangeWatchedFiles = { dynamicRegistration = true } }
+          -- })
+          -- require('lspconfig').rust_analyzer
+          --     .setup { capabilities = capabilities }
+        end
+      })
     end
   },
   "modocache/move.vim",
@@ -255,41 +258,45 @@ if globals.allow_copilot then
   }
 end
 
-if vim.loop.cwd() == os.getenv("HOME") .. "/src/walrus" then
-  vim.print("Walrus detected")
-  vim.g.rustaceanvim = {
-    server = {
-      default_settings = {
-        ['rust-analyzer'] = {
-          diagnostics = { disabled = { "inactive-code" } },
-          rustfmt = {
-            extraArgs = {
-              "--config",
-              "group_imports=StdExternalCrate,imports_granularity=Crate,imports_layout=HorizontalVertical"
-            }
-          },
-          -- cargo = { features = { "walrus-service/backup" } }
-          cargo = { profile = "dev", features = "all" }
-        }
-      }
-    }
-  }
-elseif vim.loop.cwd() ~= os.getenv("HOME") .. "/src/sui" then
-  vim.g.rustaceanvim = {
-    server = {
-      default_settings = {
-        ['rust-analyzer'] = {
-          rustfmt = {
-            extraArgs = {
-              "--config",
-              "group_imports=StdExternalCrate,imports_granularity=Crate,imports_layout=HorizontalVertical"
-            }
-          }
-        }
-      }
-    }
-  }
-end
+-- if vim.loop.cwd() == os.getenv("HOME") .. "/src/walrus" then
+--   vim.print("Walrus detected")
+--           local capabilities = vim.lsp.protocol.make_client_capabilities()
+--           vim.tbl_deep_extend("force", capabilities, {
+--             workspace = { didChangeWatchedFiles = { dynamicRegistration = true } }
+--           })
+--   vim.g.rustaceanvim = {
+--     server = {
+--       default_settings = {
+--         ['rust-analyzer'] = {
+--           diagnostics = { disabled = { "inactive-code" } },
+--           rustfmt = {
+--             extraArgs = {
+--               "--config",
+--               "group_imports=StdExternalCrate,imports_granularity=Crate,imports_layout=HorizontalVertical"
+--             }
+--           },
+--           -- cargo = { features = { "walrus-service/backup" } }
+--           cargo = { profile = "dev", features = "all" }
+--         }
+--       }
+--     }
+--   }
+-- elseif vim.loop.cwd() ~= os.getenv("HOME") .. "/src/sui" then
+--   vim.g.rustaceanvim = {
+--     server = {
+--       default_settings = {
+--         ['rust-analyzer'] = {
+--           rustfmt = {
+--             extraArgs = {
+--               "--config",
+--               "group_imports=StdExternalCrate,imports_granularity=Crate,imports_layout=HorizontalVertical"
+--             }
+--           }
+--         }
+--       }
+--     }
+--   }
+-- end
 
 -- Lazy doesn't support hot reloading, so we need to check if it's already been loaded
 if vim.g.lazy_loaded == nil then
@@ -916,7 +923,6 @@ augroup RustCore
   autocmd FileType rust nmap <F21> :wa<CR>:pclose<CR>:compiler cargo<CR>:setlocal makeprg=cargo\ simtest\ simtest\ build\ --profile\ simtest<CR>:make<CR><CR>
   autocmd FileType rust setlocal colorcolumn=100,101,102,103
   autocmd FileType rust nnoremap <leader>d Owalrus_utils::crumb!();<Esc>_
-
 augroup END
 
 hi ColorColumn ctermfg=blue ctermbg=darkgray guibg=#333333 guifg=#1111bb cterm=NONE
@@ -1307,4 +1313,19 @@ vim.api.nvim_create_user_command("PopulateQuickFixFromClipboard", function()
   else
     vim.notify("No locations found in clipboard.", vim.log.levels.INFO)
   end
+end, {})
+
+nmap("<leader>=", ":OpenNearestCargoToml<CR>")
+vim.api.nvim_create_user_command("OpenNearestCargoToml", function()
+  local path = vim.fn.expand('%:p')
+  local dir = vim.fn.fnamemodify(path, ':h')
+  while dir ~= "/" do
+    local cargo_toml = dir .. "/Cargo.toml"
+    if vim.fn.filereadable(cargo_toml) == 1 then
+      vim.cmd('edit ' .. cargo_toml)
+      return
+    end
+    dir = vim.fn.fnamemodify(dir, ':h')
+  end
+  print("No Cargo.toml found.")
 end, {})

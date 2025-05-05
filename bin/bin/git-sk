@@ -1,25 +1,37 @@
 #!/bin/bash
 
-die() {
-  printf "%s: \001\033[48;3;80;38;5;124m\002error\001\033[0m\002: %s\n" "$0" "$*" >&2
-  exit 1
+app-name() {
+  printf "\001\033[36m\002%s\001\033[0m\002: " "$(basename "$0")" 
+}
+note() {
+  app-name
+  printf "\001\033[32m\002note\001\033[0m\002: %s\n" "$*" >&2
 }
 
 warn() {
-  printf "%s: \001\033[48;3;80;38;5;148m\002warn\001\033[0m\002: %s\n" "$0" "$*" >&2
+  app-name
+  printf "\001\033[33m\002warning\001\033[0m\002: %s\n" "$*" >&2
+}
+
+die() {
+  app-name
+  printf "\001\033[31m\002error\001\033[0m\002: %s\n" "$*" >&2
+  exit 1
 }
 
 # TODO: Pull in the current stack definition from an argument or local file. For now it's hardcoded.
 git_root_dir="$HOME"/src/walrus
 stack=(
-  bump-sui-version
+  rust-sdk-03
+  rust-sdk-04
 )
 
 cd "$git_root_dir" || die "cd $git_root_dir failed"
 git fetch --prune || die "git fetch failed"
 
 run_version="$(python3 -c 'import time; print(f"{int(time.time())}")')"
-
+orig_branch="$(git rev-parse --abbrev-ref HEAD)"
+note "Starting branch: $orig_branch"
 checkout-main() {
   if [[ -n "$(git status -s)" ]]; then
     die "git status is not clean, please commit or stash your changes."
@@ -41,19 +53,19 @@ if [[ "$1" == "-v" ]]; then
     if [[ -z "$log_message" ]]; then
       die "branch '$branch' has no commit message!?"
     fi
-    echo "$branch: $log_message"
+    note "$branch: $log_message"
   done
   exit 0
 fi
 
-echo "This is git-sk run version $run_version."
+note "This is git-sk run version $run_version."
 checkout-main "$1" || die "git checkout failed"
 stack_on=main
 
 if [[ "$1" == "rollback" ]]; then
   shift
   run_version="$1"
-  echo "Rolling back to version $run_version..."
+  note "Rolling back to version $run_version..."
   for branch in "${stack[@]}"; do
     if [[ "$run_version" = "origin" ]]; then
       backup_branch="origin/$branch"
@@ -65,7 +77,7 @@ if [[ "$1" == "rollback" ]]; then
       warn "branch '$backup_branch' does not exist, skipping..."
       continue
     fi
-    echo "Rolling back branch '$branch' to '$backup_branch'..."
+    note "Rolling back branch '$branch' to '$backup_branch'..."
     git branch -f "$branch" "$source" || die "git branch -f $branch $source failed"
     if [[ "$run_version" != "origin" ]]; then
       git branch -D "$backup_branch" || die "git branch -D $backup_branch failed"
@@ -73,7 +85,6 @@ if [[ "$1" == "rollback" ]]; then
   done
   exit 0
 fi
-
 
 for branch in "${stack[@]}"; do
   source="$(git rev-parse "$branch")"
@@ -87,29 +98,32 @@ for branch in "${stack[@]}"; do
 
 
   if git merge-base --is-ancestor "$stack_on" "$branch"; then
-    echo "Branch '$branch' is already up to date with '$stack_on'."
+    note "Branch '$branch' is already up to date with '$stack_on'."
     stack_on="$branch"
-    echo "Force-pushing '$branch' to origin..."
+    note "Force-pushing '$branch' to origin..."
     git push -fu origin "$branch":"$branch" || die "git push -fu origin $branch:$branch failed"
     continue
   else
-    echo "Branch '$branch' is not descended from '$stack_on'..."
+    note "Branch '$branch' is not descended from '$stack_on'..."
     # Create a backup of the current branch.
     backup_branch="$branch"-at-"$run_version"
-    echo "Creating backup branch '$backup_branch' from '$branch'..."
+    note "Creating backup branch '$backup_branch' from '$branch'..."
     git branch "$backup_branch" "$source" || die "git branch '$backup_branch' failed"
 
-    echo "Initiating a rebase of '$branch' onto '$stack_on'..."
-    echo "Note: use \`git commit -m '$log_message'\` to commit the changes."
+    note "Initiating a rebase of '$branch' onto '$stack_on'..."
+    note "Note: use \`git commit -m '$log_message'\` to commit the changes."
     # Point the branch to the current head of the stack.
     git checkout "$branch" || die "git checkout $stack_on failed"
+
     if ! git rebase "$stack_on"; then
       warn "Rebase failed, aborting..."
       warn "Run \`git mergetool\` to resolve conflicts."
+      note "Once you have finished the rebase, re-run this script."
+      exit 1
     fi
-    echo "Once you have finished the rebase, re-run this script."
-    exit 1
+    note "Rebase completed successfully. Continuing..."
   fi
 done
-echo "All branches are up to date with '$stack_on'."
-git checkout "$stack_on" || die "git checkout $stack_on failed"
+note "All branches are up to date with '$stack_on'."
+note "Restoring starting branch '$orig_branch'..."
+git checkout "$orig_branch" || die "git checkout $orig_branch failed"
