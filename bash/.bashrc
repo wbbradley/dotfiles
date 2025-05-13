@@ -223,7 +223,7 @@ garp() {
 }
 
 gs() {
-  git status -s
+  git stack "$@"
 }
 
 alias vi="\$EDITOR"

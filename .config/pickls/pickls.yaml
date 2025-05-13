@@ -18,6 +18,13 @@ languages:
     root_markers:
       - .git
     linters:
+      - program: typos
+        args: ["--format", "brief", "--color", "never", "-"]
+        use_stdin: true
+        pattern: '.*:(\d+):(\d+): (.*)'
+        line_match: 1
+        start_col_match: 2
+        description_match: 3
       - program: ec
         args:
           - -no-color
