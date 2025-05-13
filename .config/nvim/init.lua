@@ -587,9 +587,9 @@ augroup Haskell
 augroup END
 
 nnoremap ; :
-" nnoremap <C-]> <C-]>zz
-" nnoremap <C-o> <C-o>zz
-" nnoremap <C-i> <C-i>zz
+nnoremap <C-]> <C-]>zz
+nnoremap <C-o> <C-o>zz
+nnoremap <C-i> <C-i>zz
 nnoremap <leader>+ viwyo"""<Esc>pA."""<Esc>_wvU<Esc>V:s/_/ /<CR>:noh<CR>:match<CR>
 nnoremap <Leader>! :view ~/README.md<CR>
 nnoremap <Leader>1 :e ~/README.md<CR>Go<Esc>:r!date<CR>
