@@ -22,6 +22,7 @@ bin/bin/wim-key
 .config/gcloud/*
 .config/github-copilot
 .config/glab-cli/*
+.config/gh/*
 .config/gnome-initial-setup-done
 .config/google-chrome/
 .config/graphite
@@ -41,6 +42,7 @@ bin/bin/wim-key
 .config/pip/*
 .config/pulse/
 .config/solana/
+.config/suiup/*
 .config/swiftpm/*
 .config/user-dirs.dirs
 .config/user-dirs.locale

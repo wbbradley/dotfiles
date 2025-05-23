@@ -226,6 +226,14 @@ gs() {
   git stack "$@"
 }
 
+prs() {
+  gh pr status
+}
+
+pr() {
+  gh pr view --comments
+}
+
 alias vi="\$EDITOR"
 alias rgm='rg --multiline-dotall -U'
 alias uuid="python -c \"import uuid;print(uuid.uuid4())\" | tr -d '\n'"

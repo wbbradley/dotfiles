@@ -1,3 +1,3 @@
 local M = {}
-M.allow_copilot = true
+M.allow_copilot = false
 return M

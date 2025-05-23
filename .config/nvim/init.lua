@@ -125,92 +125,92 @@ local lazy_plugins = {
       }
     end
   },
-  {
-    'saghen/blink.cmp',
-    -- optional: provides snippets for the snippet source
-    dependencies = 'rafamadriz/friendly-snippets',
-
-    -- use a release tag to download pre-built binaries
-    version = 'v0.13.1',
-    -- AND/OR build from source, requires nightly: https://rust-lang.github.io/rustup/concepts/channels.html#working-with-nightly-rust
-    -- build = 'cargo build --release',
-    -- If you use nix, you can build from source using latest nightly rust with:
-    -- build = 'nix run .#build-plugin',
-
-    ---@module 'blink.cmp'
-    ---@type blink.cmp.Config
-    opts = {
-      -- Defaults are at https://cmp.saghen.dev/configuration/reference.html#completion-keyword
-      keymap = {
-        preset = 'default',
-        ['<Tab>'] = { 'select_and_accept', 'fallback' },
-        ['<F1>'] = { 'show_documentation', 'fallback' },
-        ['<C-j>'] = { 'select_next', 'fallback' },
-        ['<C-k>'] = { 'select_prev', 'fallback' }
-      },
-
-      cmdline = {
-        completion = {
-          list = { selection = { preselect = false, auto_insert = true } },
-          menu = { auto_show = false }
-        }
-      },
-      completion = {
-        documentation = { auto_show = true, auto_show_delay_ms = 500 },
-        trigger = { prefetch_on_insert = true }
-      },
-      appearance = {
-        -- Sets the fallback highlight groups to nvim-cmp's highlight groups
-        -- Useful for when your theme doesn't support blink.cmp
-        -- Will be removed in a future release
-        use_nvim_cmp_as_default = true,
-        -- Set to 'mono' for 'Nerd Font Mono' or 'normal' for 'Nerd Font'
-        -- Adjusts spacing to ensure icons are aligned
-        nerd_font_variant = 'mono'
-      },
-
-      -- Default list of enabled providers defined so that you can extend it
-      -- elsewhere in your config, without redefining it, due to `opts_extend`
-      sources = { default = { 'lsp', 'path', 'snippets', 'buffer', 'cmdline' } }
-      -- cmdline = { sources = {} }
-    },
-    opts_extend = { "sources.default" }
-  },
   -- {
-  --   "hrsh7th/nvim-cmp",
-  --   event = "InsertEnter",
-  --   dependencies = {
-  --     "hrsh7th/cmp-nvim-lsp",
-  --     "hrsh7th/cmp-buffer",
-  --     "hrsh7th/cmp-path",
-  --     "hrsh7th/cmp-cmdline"
-  --   },
-  --   config = function()
-  --     local cmp = require("cmp")
-  --     cmp.setup({
-  --       completion = { completeopt = "menu,menuone,noinsert" },
-  --       mapping = cmp.mapping.preset.insert({
-  --         ["<C-j>"] = cmp.mapping.select_next_item(),
-  --         ["<C-k>"] = cmp.mapping.select_prev_item(),
-  --         ["<Tab>"] = cmp.mapping.confirm({ select = true })
-  --         --[[["<C-l>"] = cmp.mapping(function(fallback)
-  --           vim.api.nvim_feedkeys(
-  --             vim.fn["copilot#Accept"](vim.api.nvim_replace_termcodes("<Tab>", true, true, true)),
-  --             "n",
-  --             true
-  --           )
-  --         end),]]
-  --       }),
-  --       experimental = { ghost_text = false },
-  --       sources = {
-  --         { name = "lazydev", group_index = 0 },
-  --         { name = "nvim_lsp" },
-  --         { name = "path" },
-  --         { name = "buffer" }
+  --   'saghen/blink.cmp',
+  --   -- optional: provides snippets for the snippet source
+  --   dependencies = 'rafamadriz/friendly-snippets',
+  --
+  --   -- use a release tag to download pre-built binaries
+  --   version = 'v0.13.1',
+  --   -- AND/OR build from source, requires nightly: https://rust-lang.github.io/rustup/concepts/channels.html#working-with-nightly-rust
+  --   -- build = 'cargo build --release',
+  --   -- If you use nix, you can build from source using latest nightly rust with:
+  --   -- build = 'nix run .#build-plugin',
+  --
+  --   ---@module 'blink.cmp'
+  --   ---@type blink.cmp.Config
+  --   opts = {
+  --     -- Defaults are at https://cmp.saghen.dev/configuration/reference.html#completion-keyword
+  --     keymap = {
+  --       preset = 'default',
+  --       ['<Tab>'] = { 'select_and_accept', 'fallback' },
+  --       ['<F1>'] = { 'show_documentation', 'fallback' },
+  --       ['<C-j>'] = { 'select_next', 'fallback' },
+  --       ['<C-k>'] = { 'select_prev', 'fallback' }
+  --     },
+  --
+  --     cmdline = {
+  --       completion = {
+  --         list = { selection = { preselect = false, auto_insert = true } },
+  --         menu = { auto_show = false }
   --       }
-  --     })
-  --   end
+  --     },
+  --     completion = {
+  --       documentation = { auto_show = true, auto_show_delay_ms = 500 },
+  --       trigger = { prefetch_on_insert = true }
+  --     },
+  --     appearance = {
+  --       -- Sets the fallback highlight groups to nvim-cmp's highlight groups
+  --       -- Useful for when your theme doesn't support blink.cmp
+  --       -- Will be removed in a future release
+  --       use_nvim_cmp_as_default = true,
+  --       -- Set to 'mono' for 'Nerd Font Mono' or 'normal' for 'Nerd Font'
+  --       -- Adjusts spacing to ensure icons are aligned
+  --       nerd_font_variant = 'mono'
+  --     },
+  --
+  --     -- Default list of enabled providers defined so that you can extend it
+  --     -- elsewhere in your config, without redefining it, due to `opts_extend`
+  --     sources = { default = { 'lsp', 'path', 'snippets', 'buffer', 'cmdline' } }
+  --     -- cmdline = { sources = {} }
+  --   },
+  --   opts_extend = { "sources.default" }
   -- },
+  {
+    "hrsh7th/nvim-cmp",
+    event = "InsertEnter",
+    dependencies = {
+      "hrsh7th/cmp-nvim-lsp",
+      "hrsh7th/cmp-buffer",
+      "hrsh7th/cmp-path",
+      "hrsh7th/cmp-cmdline"
+    },
+    config = function()
+      local cmp = require("cmp")
+      cmp.setup({
+        completion = { completeopt = "menu,menuone,noinsert" },
+        mapping = cmp.mapping.preset.insert({
+          ["<C-j>"] = cmp.mapping.select_next_item(),
+          ["<C-k>"] = cmp.mapping.select_prev_item(),
+          ["<Tab>"] = cmp.mapping.confirm({ select = true })
+          --[[["<C-l>"] = cmp.mapping(function(fallback)
+            vim.api.nvim_feedkeys(
+              vim.fn["copilot#Accept"](vim.api.nvim_replace_termcodes("<Tab>", true, true, true)),
+              "n",
+              true
+            )
+          end),]]
+        }),
+        experimental = { ghost_text = false },
+        sources = {
+          { name = "lazydev", group_index = 0 },
+          { name = "nvim_lsp" },
+          { name = "path" },
+          { name = "buffer" }
+        }
+      })
+    end
+  },
   "nvim-lua/plenary.nvim",
   "nvim-treesitter/nvim-treesitter",
   "nvim-treesitter/nvim-treesitter-context",
@@ -285,92 +285,6 @@ require("nvim_context_vt").setup({
   disable_virtual_lines = false
 })
 
---[[ require("lint").linters.cargo = require("cargo")
-require("lint").linters_by_ft = {
-  python = { "ruff" }, -- , "mypy" },
-  sh = { "shellcheck" },
-  yaml = { "yamllint" },
-  toml = { "tomllint" },
-  lua = { "luacheck" },
-  sql = { "pgsanity" },
-  -- go = { "golangci-lint" },
-  -- rust = { "cargo" },
-}
-local mypy_linter = require("lint").linters.mypy
-mypy_linter.args = {
-  "--show-column-numbers",
-  "--show-error-end",
-  "--hide-error-codes",
-  "--hide-error-context",
-  "--no-color-output",
-  "--no-error-summary",
-  "--no-pretty",
-}
-vim.api.nvim_create_autocmd({ "BufEnter", "BufWritePost", "InsertLeave" }, {
-  pattern = "*",
-  group = vim.api.nvim_create_augroup("lint-on-save", { clear = true }),
-  callback = function()
-    require("lint").try_lint()
-  end,
-})
-local function parse_pgsanity_output(output, bufnr, _linter_cwd)
-  local diagnostics = {}
-  for line in output:gmatch("[^\r\n]+") do
-    local lnum, description = line:match("line (%d+): ERROR: (.+)")
-    if lnum and description then
-      table.insert(diagnostics, {
-        bufnr = bufnr,
-        lnum = tonumber(lnum) - 1,
-        col = 0,
-        end_lnum = tonumber(lnum) - 1,
-        end_col = -1,
-        severity = vim.diagnostic.severity.ERROR,
-        message = description,
-      })
-    end
-  end
-  return diagnostics
-end
-
-require("lint").linters.pgsanity = {
-  cmd = "pgsanity",
-  stdin = true, -- or false if it doesn't support content input via stdin. In that case the filename is automatically added to the arguments.
-  append_fname = true, -- Automatically append the file name to `args` if `stdin = false` (default: true)
-  args = { "--add-semicolon" }, -- list of arguments. Can contain functions with zero arguments that will be evaluated once the linter is used.
-  stream = nil, -- ('stdout' | 'stderr' | 'both') configure the stream to which the linter outputs the linting result.
-  ignore_exitcode = false, -- set this to true if the linter exits with a code != 0 and that's considered normal.
-  env = nil, -- custom environment table to use with the external process. Note that this replaces the *entire* environment, it is not additive.
-  parser = parse_pgsanity_output,
-}
-local function parse_tomllint_output(output, bufnr, _linter_cwd)
-  local diagnostics = {}
-  for line in output:gmatch("[^\r\n]+") do
-    local _, lnum, col, description = line:match("(.+):(%d+):(%d+): error: (.+)")
-    if lnum and description then
-      table.insert(diagnostics, {
-        bufnr = bufnr,
-        lnum = tonumber(lnum) - 1,
-        col = tonumber(col) - 1,
-        end_lnum = tonumber(lnum) - 1,
-        end_col = tonumber(col),
-        severity = vim.diagnostic.severity.ERROR,
-        message = description,
-      })
-    end
-  end
-  return diagnostics
-end
-require("lint").linters.tomllint = {
-  cmd = "tomllint",
-  stdin = true, -- or false if it doesn't support content input via stdin. In that case the filename is automatically added to the arguments.
-  append_fname = false, -- Automatically append the file name to `args` if `stdin = false` (default: true)
-  args = { "-" }, -- list of arguments. Can contain functions with zero arguments that will be evaluated once the linter is used.
-  stream = "stderr", -- ('stdout' | 'stderr' | 'both') configure the stream to which the linter outputs the linting result.
-  ignore_exitcode = false, -- set this to true if the linter exits with a code != 0 and that's considered normal.
-  env = nil, -- custom environment table to use with the external process. Note that this replaces the *entire* environment, it is not additive.
-  parser = parse_tomllint_output,
-}
-]]
 local function keymap(mode, shortcut, command)
   vim.keymap.set(mode, shortcut, command, { noremap = true, silent = true })
 end
@@ -916,10 +830,10 @@ augroup END
 let c_no_curly_error=1
 
 nnoremap - _
-nnoremap L :lua vim.diagnostic.goto_next()<CR>
-nnoremap H :lua vim.diagnostic.goto_prev()<CR>
-nnoremap <F9> :cprev<CR>
-nnoremap <F10> :cnext<CR>
+nnoremap L :lua vim.diagnostic.goto_next()<CR>zz
+nnoremap H :lua vim.diagnostic.goto_prev()<CR>zz
+nnoremap <F9> :cprev<CR>zz
+nnoremap <F10> :cnext<CR>zz
 " Make sure % works normally.
 ounmap %
 vunmap %
@@ -1046,7 +960,7 @@ vim.api.nvim_create_autocmd({ "BufRead" }, {
   end
 })
 
-vim.diagnostic.config({ float = { source = 'always' } })
+vim.diagnostic.config({ virtual_text = true, float = { source = 'always' } })
 
 local Job = require("plenary.job")
 
