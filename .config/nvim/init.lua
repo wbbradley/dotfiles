@@ -645,6 +645,7 @@ nnoremap <F4> :call FindWordUnderCursorNoUI()<CR>
 
 nnoremap B :FzfLua buffers<CR>
 nnoremap <F7> :FzfLua lsp_workspace_diagnostics async=true<CR>
+nnoremap <F8> :lua vim.diagnostic.setqflist()<CR>
 nnoremap <leader>C :FzfLua lsp_incoming_calls async=true<CR>
 nnoremap <F12> :FzfLua lsp_incoming_calls async=true<CR>
 nnoremap <leader>R :FzfLua lsp_references async=true<CR>
@@ -708,9 +709,9 @@ augroup END
 " imap <F7> <Esc> <F7>
 " vmap <F7> <Esc> <F7>
 
-nmap <F8> :wa<CR> :!clear <CR><CR> :lmake<CR><CR>
-imap <F8> <Esc> <F7>
-vmap <F8> <Esc> <F7>
+" nmap <F8> :wa<CR> :!clear <CR><CR> :lmake<CR><CR>
+" imap <F8> <Esc> <F7>
+" vmap <F8> <Esc> <F7>
 
 " map Shift Tab to outdent
 nmap <S-Tab> V<
