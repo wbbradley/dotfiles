@@ -258,6 +258,46 @@ if globals.allow_copilot then
   }
 end
 
+if vim.loop.cwd() == os.getenv("HOME") .. "/src/walrus" then
+  vim.print("Walrus detected")
+  local capabilities = vim.lsp.protocol.make_client_capabilities()
+  vim.tbl_deep_extend("force", capabilities, {
+    workspace = { didChangeWatchedFiles = { dynamicRegistration = true } }
+  })
+  vim.g.rustaceanvim = {
+    server = {
+      default_settings = {
+        ['rust-analyzer'] = {
+          diagnostics = { disabled = { "inactive-code" } },
+          rustfmt = {
+            extraArgs = {
+              "--config",
+              "group_imports=StdExternalCrate,imports_granularity=Crate,imports_layout=HorizontalVertical"
+            }
+          }
+          -- cargo = { features = { "walrus-service/backup" } }
+          -- cargo = { profile = "dev", features = "all" }
+        }
+      }
+    }
+  }
+elseif vim.loop.cwd() ~= os.getenv("HOME") .. "/src/sui" then
+  vim.g.rustaceanvim = {
+    server = {
+      default_settings = {
+        ['rust-analyzer'] = {
+          rustfmt = {
+            extraArgs = {
+              "--config",
+              "group_imports=StdExternalCrate,imports_granularity=Crate,imports_layout=HorizontalVertical"
+            }
+          }
+        }
+      }
+    }
+  }
+end
+
 -- Lazy doesn't support hot reloading, so we need to check if it's already been loaded
 if vim.g.lazy_loaded == nil then
   require("lazy").setup(lazy_plugins, {})
