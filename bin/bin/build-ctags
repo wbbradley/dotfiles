@@ -23,6 +23,7 @@ grep -Ev \
   -e '\.css\>' \
   -e '\.md\>' \
   -e '\.toml\>' \
+  -e '^main\tbuild.rs\t' \
   -e '\/\^[ ]*impl\>' \
   <tags.temp \
   >tags
