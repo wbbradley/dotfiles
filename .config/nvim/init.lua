@@ -73,6 +73,7 @@ local lazy_plugins = {
         previewers = { builtin = { scrollbar = false, syntax = false } },
         -- preview_opts = "hidden", -- NB: Toggle the preview with <F4>.
         fzf_opts = { ["--layout"] = "default" },
+        previewers = { builtin = { syntax = false } },
         actions = {
           files = {
             ["enter"] = function(selected, opts)
@@ -840,6 +841,7 @@ augroup RustCore
   autocmd FileType rust nmap <F21> :wa<CR>:pclose<CR>:compiler cargo<CR>:setlocal makeprg=cargo\ simtest\ simtest\ build\ --profile\ simtest<CR>:make<CR><CR>
   autocmd FileType rust setlocal colorcolumn=100,101,102,103
   autocmd FileType rust nnoremap <leader>d Owalrus_utils::crumb!();<Esc>_
+  autocmd FileType rust setlocal formatoptions-=o
 augroup END
 
 hi ColorColumn ctermfg=blue ctermbg=darkgray guibg=#333333 guifg=#1111bb cterm=NONE

@@ -1,16 +1,22 @@
 #!/bin/bash
 echo "Building ctags... [PWD=$PWD]"
+tmpfile="$(mktemp)"
+trap 'echo Deleting temp file '"$tmpfile"'; rm '"$tmpfile" EXIT
+
 ctags \
   -R \
+  -f "$tmpfile" \
   --exclude=.mypy_cache \
   --exclude=build \
   --exclude=assets \
+  --exclude=env \
+  --exclude=.venv \
+  --exclude=node_modules \
   --exclude=target \
   --exclude=docs \
   --exclude=examples \
   .
-mv tags tags.temp
-trap 'rm tags.temp' EXIT
+
 echo "Removing unnecessary tags..."
 #
 # shellcheck disable=SC2016
@@ -25,7 +31,8 @@ grep -Ev \
   -e '\.toml\>' \
   -e '^main\tbuild.rs\t' \
   -e '\/\^[ ]*impl\>' \
-  <tags.temp \
-  >tags
+  < "$tmpfile" \
+  >"$tmpfile".tags
 
+mv "$tmpfile".tags tags
 echo "Tags are complete."
