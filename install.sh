@@ -84,9 +84,21 @@ if on-macos; then
     brew services
 elif on-linux; then
   if command -v apt 2>/dev/null; then
-    # sudo apt-get update
-    sudo apt-get install -y universal-ctags pass git vim tmux alacritty build-essential cmake libssl-dev
-    sudo apt-get upgrade -y universal-ctags pass git vim tmux alacritty build-essential cmake libssl-dev
+    sudo apt update -y
+    sudo apt install -y universal-ctags pass git vim tmux build-essential libssl-dev pkg-config ninja-build gettext cmake unzip curl
+    if ! [[ -x /usr/local/bin/nvim ]]; then
+      mkdir -p "$HOME"/src
+
+      # Install NeoVIM
+      git clone https://github.com/neovim/neovim "$HOME"/src/neovim
+      (
+        cd neovim
+        make CMAKE_BUILD_TYPE=RelWithDebInfo \
+          && cd build \
+          && cpack -G DEB \
+          && sudo dpkg -i nvim-linux64.deb
+      )
+    fi
   else
     sudo yum update -y
     sudo yum install -y ctags pass git vim tmux alacritty neovim

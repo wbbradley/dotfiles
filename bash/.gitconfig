@@ -1,9 +1,6 @@
 [user]
 	email = williambbradley@gmail.com
 	name = Will Bradley
-	signingKey = 6AD47A807E525EF1!
-[commit]
-  gpgsign = true
 [log]
   showSignature = false
 [color]
