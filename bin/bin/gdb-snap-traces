@@ -1,2 +1,5 @@
 #!/bin/bash
-echo "$*" | xargs -n 1 -I J gdb -p J -batch -ex 'thread apply all bt' -ex detach
+echo "Got pids: $*"
+echo "$@" \
+  | xargs -n 1 echo \
+  | xargs -I J gdb -p J -batch -ex 'thread apply all bt' -ex detach
