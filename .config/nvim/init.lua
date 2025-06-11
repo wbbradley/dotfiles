@@ -276,7 +276,7 @@ if vim.loop.cwd() == os.getenv("HOME") .. "/src/walrus" then
               "group_imports=StdExternalCrate,imports_granularity=Crate,imports_layout=HorizontalVertical"
             }
           }
-          -- cargo = { features = { "walrus-service/backup" } }
+          -- cargo = { features = { "console-subscriber" } }
           -- cargo = { profile = "dev", features = "all" }
         }
       }
