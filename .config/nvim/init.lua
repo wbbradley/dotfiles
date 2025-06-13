@@ -1184,6 +1184,12 @@ vim.api.nvim_create_user_command("PopulateQuickFixFromClipboard", function()
       description_group = 3
     }, -- Python stack trace lines
     {
+      pattern = "^([^ :]*): ERROR: %d+:(%d+): (.*)",
+      filename_group = 1,
+      lnum_group = 2,
+      description_group = 3
+    }, -- GLSL compilation error
+    {
       pattern = 'File (%b""), line (%d+), in (%w+)',
       filename_group = 1,
       lnum_group = 2,
