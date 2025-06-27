@@ -876,8 +876,8 @@ let c_no_curly_error=1
 nnoremap - _
 nnoremap L :lua vim.diagnostic.goto_next()<CR>zz
 nnoremap H :lua vim.diagnostic.goto_prev()<CR>zz
-nnoremap <F9> :cprev<CR>zz
-nnoremap <F10> :cnext<CR>zz
+nnoremap <F9> :cprev<CR>zzm`
+nnoremap <F10> :cnext<CR>zzm`
 " Make sure % works normally.
 ounmap %
 vunmap %
