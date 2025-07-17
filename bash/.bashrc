@@ -223,7 +223,7 @@ garp() {
 }
 
 gs() {
-  git stack "$@"
+  git-stack "$@"
 }
 
 prs() {

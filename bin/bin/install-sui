@@ -5,8 +5,9 @@ die() {
   exit 1
 }
 
-cd "$HOME"/src/walrus
-if [[ "$1" =~ "v1.*" ]]; then
+cd "$HOME"/src/walrus || die "failed to change directory to $HOME/src/walrus"
+
+if [[ "$1" =~ v1.* ]]; then
   version="$1"
   shift
 else
@@ -18,6 +19,7 @@ else
 fi
 
 printf "Walrus is currently pointing at Sui \001\033[48;3;80;38;5;128m\002%s\001\033[0m\002\n" "$version"
+echo "Existing sui installation is $(sui --version 2>/dev/null || echo "not found")"
 
 if [[ "$(uname)" = "Darwin" ]]; then
   filename="sui-$version-macos-$(uname -m).tgz"
@@ -33,7 +35,7 @@ echo "Looking for $url [version=$version]..."
 tempdir="$(mktemp -d)"
 trap 'rm -rf '"$tempdir" EXIT
 
-cd "$tempdir"
+cd "$tempdir" || die "failed to change directory to tempdir $tempdir"
 
 echo "Downloading $filename from $url..."
 curl -LO "$url" || die "failed to download '$url'"

@@ -35,17 +35,6 @@ local lazy_plugins = {
       -- Your setup opts here
     }
   },
-  {
-    "hedyhli/outline.nvim",
-    lazy = true,
-    cmd = { "Outline", "OutlineOpen" },
-    keys = { -- Example mapping to toggle outline
-      { "<leader>o", "<cmd>Outline<CR>", desc = "Toggle outline" }
-    },
-    opts = {
-      -- Your setup opts here
-    }
-  },
   "folke/which-key.nvim",
   {
     "folke/todo-comments.nvim",
@@ -178,7 +167,7 @@ local lazy_plugins = {
   --   opts_extend = { "sources.default" }
   -- },
   {
-    "hrsh7th/nvim-cmp",
+    "wbbradley/nvim-cmp",
     event = "InsertEnter",
     dependencies = {
       "hrsh7th/cmp-nvim-lsp",
@@ -276,7 +265,6 @@ if vim.loop.cwd() == os.getenv("HOME") .. "/src/walrus" then
               "group_imports=StdExternalCrate,imports_granularity=Crate,imports_layout=HorizontalVertical"
             }
           }
-          -- cargo = { features = { "console-subscriber" } }
           -- cargo = { profile = "dev", features = "all" }
         }
       }
@@ -331,7 +319,6 @@ local function keymap(mode, shortcut, command)
 end
 
 local function nmap(shortcut, command) keymap("n", shortcut, command) end
-nmap("<F6>", ":SymbolsOutline<CR>")
 nmap("M", ":FzfLua oldfiles<CR>")
 nmap("<C-p>", ":FzfLua git_files<CR>")
 nmap("<leader>[", ":InlayHintsToggle<CR>")
