@@ -409,6 +409,13 @@ vim.keymap.set('n', '<leader>a', function() vim.lsp.buf.code_action() end)
 
 vim.keymap.set('v', '<leader>a', function() vim.lsp.buf.code_action() end)
 
+vim.keymap.set('n', 'gt', function()
+  -- Get type definition first
+  vim.cmd("normal! m`")
+  vim.lsp.buf.type_definition()
+  vim.cmd("normal! zz")
+end, { desc = "Go to variable's type definition" })
+
 vim.cmd([[
 set encoding=utf-8
 " set undofile
@@ -530,7 +537,7 @@ augroup Haskell
 augroup END
 
 nnoremap ; :
-nnoremap <C-]> <C-]>zz
+nnoremap <C-]> m`<C-]>zz
 nnoremap <C-o> <C-o>zz
 nnoremap <C-i> <C-i>zz
 nnoremap <leader>+ viwyo"""<Esc>pA."""<Esc>_wvU<Esc>V:s/_/ /<CR>:noh<CR>:match<CR>
@@ -861,10 +868,10 @@ augroup END
 let c_no_curly_error=1
 
 nnoremap - _
-nnoremap L :lua vim.diagnostic.goto_next()<CR>zz
-nnoremap H :lua vim.diagnostic.goto_prev()<CR>zz
-nnoremap <F9> :cprev<CR>zzm`
-nnoremap <F10> :cnext<CR>zzm`
+nnoremap L m`:lua vim.diagnostic.goto_next()<CR>zz
+nnoremap H m`:lua vim.diagnostic.goto_prev()<CR>zz
+nnoremap <F9> m`:cprev<CR>zz
+nnoremap <F10> m`:cnext<CR>zz
 " Make sure % works normally.
 ounmap %
 vunmap %
