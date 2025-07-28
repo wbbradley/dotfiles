@@ -537,7 +537,7 @@ augroup Haskell
 augroup END
 
 nnoremap ; :
-nnoremap <C-]> m`<C-]>zz
+nnoremap <C-]> <C-]>m'zz
 nnoremap <C-o> <C-o>zz
 nnoremap <C-i> <C-i>zz
 nnoremap <leader>+ viwyo"""<Esc>pA."""<Esc>_wvU<Esc>V:s/_/ /<CR>:noh<CR>:match<CR>
@@ -621,15 +621,6 @@ function! FindPromptRaw()
   cw
 endfunction
 
-function! FindWordUnderCursorNoUI()
-  let str = expand("<cword>")
-  if str == ""
-    return
-  endif
-
-  execute "Ggrep -q '" . str . "'"
-endfunction
-
 " Add highlighting for function definition in C++
 function! EnhanceCppSyntax()
   syn match cppFuncDef "::\~\?\zs\h\w*\ze([^)]*\()\s*\(const\)\?\)\?$"
@@ -677,11 +668,9 @@ nnoremap <leader>` :!build-ctags<CR>
 
 " :execute 'grep! ' . expand('<cword>') . ' *'<CR>
 
-nnoremap <F4> :call FindWordUnderCursorNoUI()<CR>
-
 nnoremap B :FzfLua buffers<CR>
-nnoremap <F7> :FzfLua lsp_workspace_diagnostics async=true<CR>
-nnoremap <F8> :lua vim.diagnostic.setqflist()<CR>
+" nnoremap <F7> :FzfLua lsp_workspace_diagnostics async=true<CR>
+nnoremap <F4> :lua vim.diagnostic.setqflist()<CR>
 nnoremap <leader>C :FzfLua lsp_incoming_calls async=true<CR>
 nnoremap <F12> :FzfLua lsp_incoming_calls async=true<CR>
 nnoremap <leader>R :FzfLua lsp_references async=true<CR>
@@ -829,9 +818,9 @@ autocmd BufRead *.ai setlocal ft=markdown
 autocmd BufRead *.tf setlocal ft=terraform
 
 augroup RustCore
-  autocmd FileType rust nmap <F19> :wa<CR>:pclose<CR>:compiler cargo<CR>:setlocal makeprg=cargo\ clippy<CR>:make<CR><CR>
-  autocmd FileType rust nmap <F20> :wa<CR>:pclose<CR>:compiler cargo<CR>:setlocal makeprg=cargo\ test\ --no-run<CR>:make<CR><CR>
-  autocmd FileType rust nmap <F21> :wa<CR>:pclose<CR>:compiler cargo<CR>:setlocal makeprg=cargo\ simtest\ simtest\ build\ --profile\ simtest<CR>:make<CR><CR>
+  autocmd FileType rust nmap <F7> :wa<CR>:pclose<CR>:compiler cargo<CR>:setlocal makeprg=cargo\ clippy<CR>:make<CR><CR>
+  autocmd FileType rust nmap <F8> :wa<CR>:pclose<CR>:compiler cargo<CR>:setlocal makeprg=cargo\ test\ --no-run<CR>:make<CR><CR>
+  autocmd FileType rust nmap <F9> :wa<CR>:pclose<CR>:compiler cargo<CR>:setlocal makeprg=cargo\ simtest\ simtest\ build\ --profile\ simtest<CR>:make<CR><CR>
   autocmd FileType rust setlocal colorcolumn=100,101,102,103
   autocmd FileType rust nnoremap <leader>d Owalrus_utils::crumb!();<Esc>_
   autocmd FileType rust setlocal formatoptions-=o
