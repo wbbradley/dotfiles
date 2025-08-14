@@ -820,7 +820,7 @@ autocmd BufRead *.tf setlocal ft=terraform
 augroup RustCore
   autocmd FileType rust nmap <F7> :wa<CR>:pclose<CR>:compiler cargo<CR>:setlocal makeprg=cargo\ clippy<CR>:make<CR><CR>
   autocmd FileType rust nmap <F8> :wa<CR>:pclose<CR>:compiler cargo<CR>:setlocal makeprg=cargo\ test\ --no-run<CR>:make<CR><CR>
-  autocmd FileType rust nmap <F9> :wa<CR>:pclose<CR>:compiler cargo<CR>:setlocal makeprg=cargo\ simtest\ simtest\ build\ --profile\ simtest<CR>:make<CR><CR>
+  " autocmd FileType rust nmap <F9> :wa<CR>:pclose<CR>:compiler cargo<CR>:setlocal makeprg=cargo\ simtest\ simtest\ build\ --profile\ simtest<CR>:make<CR><CR>
   autocmd FileType rust setlocal colorcolumn=100,101,102,103
   autocmd FileType rust nnoremap <leader>d Owalrus_utils::crumb!();<Esc>_
   autocmd FileType rust setlocal formatoptions-=o
