@@ -278,6 +278,20 @@ require("lspconfig").terraformls.setup({})
 require("lspconfig").clangd.setup({})
 require('lspconfig').ts_ls.setup({})
 require('lspconfig').move_analyzer.setup({})
+require("lspconfig").starpls.setup({})
+
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = "starlark",
+  callback = function()
+    if vim.fn.executable("starpls") ~= 0 then
+      vim.lsp.start({
+        name = "starpls",
+        cmd = { "starpls" },
+        root_dir = vim.fn.getcwd()
+      }, { bufnr = 0 })
+    end
+  end,
+})
 
 vim.cmd("colorscheme gruvbox")
 require("nvim_context_vt").setup({
