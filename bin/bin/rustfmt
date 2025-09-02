@@ -1,0 +1,5 @@
+#!/bin/bash
+
+echo "$(date): rustfmt $* [PWD=$PWD]" >> "$HOME"/rustfmt.log
+
+exec "$HOME"/.cargo/bin/rustfmt "$@"

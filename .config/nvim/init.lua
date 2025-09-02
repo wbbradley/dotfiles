@@ -61,7 +61,7 @@ local lazy_plugins = {
       require("fzf-lua").setup({
         -- preview_opts = "hidden", -- NB: Toggle the preview with <F4>.
         fzf_opts = { ["--layout"] = "default" },
-        previewers = { builtin = { scrollbar = false, syntax = false } },
+        previewers = { builtin = { scrollbar = false, syntax = true } },
         actions = {
           files = {
             ["enter"] = function(selected, opts)
@@ -85,22 +85,9 @@ local lazy_plugins = {
     "neovim/nvim-lspconfig",
     dependencies = { { "j-hui/fidget.nvim", opts = {} } },
     opts = { inlay_hints = { enabled = false } },
-    config = function()
-      vim.api.nvim_create_autocmd("LspAttach", {
-        group = vim.api.nvim_create_augroup("kickstart-lsp-attach",
-                                            { clear = true }),
-        callback = function(_)
-          -- local capabilities = vim.lsp.protocol.make_client_capabilities()
-          -- vim.tbl_deep_extend("force", capabilities, {
-          --   workspace = { didChangeWatchedFiles = { dynamicRegistration = true } }
-          -- })
-          -- require('lspconfig').rust_analyzer
-          --     .setup { capabilities = capabilities }
-        end
-      })
-    end
+    config = function() end
   },
-  "modocache/move.vim",
+  -- "modocache/move.vim",
   {
     "saecki/crates.nvim",
     tag = "stable",
@@ -258,7 +245,7 @@ if vim.loop.cwd() == os.getenv("HOME") .. "/src/walrus" then
     server = {
       default_settings = {
         ['rust-analyzer'] = {
-          diagnostics = { disabled = { "inactive-code" } },
+          diagnostics = { disabled = { "inactive-code", "unlinked-file" } },
           rustfmt = {
             extraArgs = {
               "--config",
@@ -271,20 +258,7 @@ if vim.loop.cwd() == os.getenv("HOME") .. "/src/walrus" then
     }
   }
 elseif vim.loop.cwd() ~= os.getenv("HOME") .. "/src/sui" then
-  vim.g.rustaceanvim = {
-    server = {
-      default_settings = {
-        ['rust-analyzer'] = {
-          rustfmt = {
-            extraArgs = {
-              "--config",
-              "group_imports=StdExternalCrate,imports_granularity=Crate,imports_layout=HorizontalVertical"
-            }
-          }
-        }
-      }
-    }
-  }
+  --
 end
 
 -- Lazy doesn't support hot reloading, so we need to check if it's already been loaded
@@ -569,7 +543,14 @@ augroup cstuff
   autocmd FileType c,cpp nnoremap <leader>d Odbg();<Esc>_
 augroup END
 
-nnoremap <F2> :mksession!<CR>
+function! SaveSessionClean()
+    cclose
+    lclose
+    OutlineClose
+    redraw
+    mksession!
+endfunction
+nnoremap <F2> :call SaveSessionClean()<CR>
 nnoremap <F14> :source Session.vim<CR>
 
 " allow backspacing over everything in insert mode
@@ -669,7 +650,7 @@ nnoremap <leader>` :!build-ctags<CR>
 " :execute 'grep! ' . expand('<cword>') . ' *'<CR>
 
 nnoremap B :FzfLua buffers<CR>
-" nnoremap <F7> :FzfLua lsp_workspace_diagnostics async=true<CR>
+nnoremap <leader><F7> :FzfLua lsp_workspace_diagnostics<CR>
 nnoremap <F4> :lua vim.diagnostic.setqflist()<CR>
 nnoremap <leader>C :FzfLua lsp_incoming_calls async=true<CR>
 nnoremap <F12> :FzfLua lsp_incoming_calls async=true<CR>
@@ -712,6 +693,7 @@ nnoremap <leader>9b :e ~/.bashrc<CR>
 nnoremap <leader>9d :e ~/.config/dmypyls/dmypyls.yaml<CR>
 nnoremap <leader>9k :e ~/Library/Application Support/k9s/screen-dumps/<CR>
 nnoremap <leader>9l :e ~/local.bashrc<CR>
+nnoremap <leader>9L :e ~/.local/state/nvim/lsp.log<CR>
 nnoremap <leader>9n :e ~/notes.md<CR>G
 nnoremap <leader>9p :e ~/.config/pickls/pickls.yaml<CR>
 
@@ -820,6 +802,7 @@ autocmd BufRead *.tf setlocal ft=terraform
 augroup RustCore
   autocmd FileType rust nmap <F7> :wa<CR>:pclose<CR>:compiler cargo<CR>:setlocal makeprg=cargo\ clippy<CR>:make<CR><CR>
   autocmd FileType rust nmap <F8> :wa<CR>:pclose<CR>:compiler cargo<CR>:setlocal makeprg=cargo\ test\ --no-run<CR>:make<CR><CR>
+  autocmd FileType rust nmap <F20> :wa<CR>:!cargo fmt -- %<CR><CR>
   " autocmd FileType rust nmap <F9> :wa<CR>:pclose<CR>:compiler cargo<CR>:setlocal makeprg=cargo\ simtest\ simtest\ build\ --profile\ simtest<CR>:make<CR><CR>
   autocmd FileType rust setlocal colorcolumn=100,101,102,103
   autocmd FileType rust nnoremap <leader>d Owalrus_utils::crumb!();<Esc>_
@@ -962,8 +945,20 @@ vim.api.nvim_create_autocmd({ "BufRead" }, {
   end
 })
 
-vim.api.nvim_create_autocmd("BufWritePre",
-                            { callback = function() vim.lsp.buf.format() end })
+vim.api.nvim_create_autocmd("LspAttach", {
+  group = vim.api.nvim_create_augroup("lsp", { clear = true }),
+  callback = function(args)
+    -- 2
+    vim.api.nvim_create_autocmd("BufWritePre", {
+      -- 3
+      buffer = args.buf,
+      callback = function()
+        -- 4 + 5
+        vim.lsp.buf.format { async = false, id = args.data.client_id }
+      end
+    })
+  end
+})
 
 vim.api.nvim_create_autocmd({ "BufRead" }, {
   pattern = { "*.py" },

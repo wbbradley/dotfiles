@@ -1,0 +1,14 @@
+#!/bin/bash
+if [[ "$PWD" = "$HOME"/src/sui ]]; then
+  args=( )
+else
+  args=( --config 'group_imports=StdExternalCrate,imports_granularity=Crate,imports_layout=HorizontalVertical' )
+fi
+echo "pickls-rustfmt $* [PWD=$PWD]" >> "$HOME"/rustfmt.log
+
+exec rustfmt \
+  --emit stdout \
+  --edition 2024 \
+  -q \
+  "${args[@]}" \
+  "$@"
