@@ -290,7 +290,7 @@ vim.api.nvim_create_autocmd("FileType", {
         root_dir = vim.fn.getcwd()
       }, { bufnr = 0 })
     end
-  end,
+  end
 })
 
 vim.cmd("colorscheme gruvbox")
@@ -525,7 +525,12 @@ augroup Haskell
 augroup END
 
 nnoremap ; :
-nnoremap <C-]> <C-]>m'zz
+
+augroup restore_cursor
+  autocmd!
+  autocmd BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | silent! execute "keepjumps normal! g`\"" | endif
+augroup END
+
 nnoremap <C-o> <C-o>zz
 nnoremap <C-i> <C-i>zz
 nnoremap <leader>+ viwyo"""<Esc>pA."""<Esc>_wvU<Esc>V:s/_/ /<CR>:noh<CR>:match<CR>
