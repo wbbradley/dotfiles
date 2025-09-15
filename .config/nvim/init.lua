@@ -546,7 +546,6 @@ augroup END
 function! SaveSessionClean()
     cclose
     lclose
-    OutlineClose
     redraw
     mksession!
 endfunction
@@ -940,7 +939,7 @@ vim.api.nvim_create_autocmd({ "BufRead" }, {
           "setup.py",
           "go.mod"
         })
-      }, { bufnr = 0, reuse_client = function(_, _) return false end })
+      }, { bufnr = 0 })
     end
   end
 })
@@ -948,39 +947,42 @@ vim.api.nvim_create_autocmd({ "BufRead" }, {
 vim.api.nvim_create_autocmd("LspAttach", {
   group = vim.api.nvim_create_augroup("lsp", { clear = true }),
   callback = function(args)
-    -- 2
     vim.api.nvim_create_autocmd("BufWritePre", {
-      -- 3
       buffer = args.buf,
       callback = function()
-        -- 4 + 5
-        vim.lsp.buf.format { async = false, id = args.data.client_id }
+        vim.lsp.buf.format {
+          async = false,
+          id = args.data.client_id,
+          filter = function(client)
+            return client.supports_method("textDocument/formatting")
+          end
+        }
       end
     })
   end
 })
 
-vim.api.nvim_create_autocmd({ "BufRead" }, {
-  pattern = { "*.py" },
-  group = vim.api.nvim_create_augroup("dmypyls-bufread", { clear = true }),
-  callback = function(_)
-    if vim.fn.executable("dmypyls") ~= 0 then
-      -- We found an executable for dmypyls.
-      vim.lsp.set_log_level(vim.log.levels.INFO)
-      vim.lsp.start({
-        name = "dmypyls",
-        cmd = { "dmypyls", vim.api.nvim_buf_get_name(0) },
-        root_dir = vim.fs.root(0, {
-          ".git",
-          "pyproject.toml",
-          "setup.py",
-          "mypy.ini"
-        })
-      }, { bufnr = 0 })
-      vim.cmd("nmap <buffer> K :lua vim.lsp.buf.hover()<CR>")
-    end
-  end
-})
+-- vim.api.nvim_create_autocmd({ "BufRead" }, {
+--   pattern = { "*.py" },
+--   group = vim.api.nvim_create_augroup("dmypyls-bufread", { clear = true }),
+--   callback = function(_)
+--     if vim.fn.executable("dmypyls") ~= 0 then
+--       -- We found an executable for dmypyls.
+--       vim.lsp.set_log_level(vim.log.levels.INFO)
+--       vim.lsp.start({
+--         name = "dmypyls",
+--         cmd = { "dmypyls", vim.api.nvim_buf_get_name(0) },
+--         root_dir = vim.fs.root(0, {
+--           ".git",
+--           "pyproject.toml",
+--           "setup.py",
+--           "mypy.ini"
+--         })
+--       }, { bufnr = 0 })
+--       vim.cmd("nmap <buffer> K :lua vim.lsp.buf.hover()<CR>")
+--     end
+--   end
+-- })
 
 vim.diagnostic.config({ virtual_text = true, float = { source = 'always' } })
 
@@ -1172,7 +1174,13 @@ vim.api.nvim_create_user_command("PopulateQuickFixFromClipboard", function()
       filename_group = 1,
       lnum_group = 2,
       description_group = 3
-    }
+    },
+    {
+      pattern = "^[^/]*(/[^%(]+)%((%d+)%)(.*)",
+      filename_group = 1,
+      lnum_group = 2,
+      description_group = 3
+    } -- File paths (relative or absolute)
   }
   -- Find all the locations that match any of the patterns, and record them in a table of tables.
   local locations = {}

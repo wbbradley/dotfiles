@@ -39,6 +39,11 @@ languages:
         description_match: 5
         use_stdin: false
         use_stderr: false
+  html: &html
+    formatters:
+      - program: js-beautify
+        args: ["--type", "html", "-f", "-"]
+  htmldjango: *html
   dockerfile:
     linters:
       - program: hadolint
@@ -92,18 +97,18 @@ languages:
       - pyproject.toml
       - setup.py
       - mypy.ini
-    formatters:
-      - program: autoimport
-        args: ["-"]
-      - program: isort
-        args: ["-", "-d"]
-      - program: ruff
-        args: ["check", "--fix", "--stdin-filename", "$filename"]
-      - program: ruff
-        args:
-          - format
-          - --stdin-filename
-          - $filename
+    # formatters:
+      # - program: autoimport
+      #   args: ["-"]
+      # - program: isort
+      #   args: ["-", "-d"]
+      # - program: ruff
+      #   args: ["check", "--fix", "--stdin-filename", "$filename"]
+      # - program: ruff
+      #   args:
+      #     - format
+      #     - --stdin-filename
+      #     - $filename
     linters:
       - program: ruff
         args:
@@ -117,6 +122,16 @@ languages:
         description_match: 4
         use_stderr: false
         use_stdin: true
+      # - program: mypy
+      #   args:
+      #     - $filename
+      #   pattern: '(.*):(\d+): (.*): (.*)'
+      #   filename_match: 1
+      #   line_match: 2
+      #   severity_match: 3
+      #   description_match: 4
+      #   use_stderr: false
+      #   use_stdin: false
   sh: &sh
     linters:
       - program: shellcheck
@@ -135,9 +150,9 @@ languages:
   #     - program: yamlfmt # github.com/google/yamlfmt
   #       args: ["-in"]
   toml:
-    formatters:
-      - program: taplo
-        args: ["format", "--stdin-filepath", "$filename", "-"]
+    # formatters:
+    #   - program: taplo
+    #     args: ["format", "--stdin-filepath", "$filename", "-"]
     linters:
       - program: tomllint
         args: ["-"]
