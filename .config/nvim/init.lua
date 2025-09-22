@@ -257,8 +257,6 @@ if vim.loop.cwd() == os.getenv("HOME") .. "/src/walrus" then
       }
     }
   }
-elseif vim.loop.cwd() ~= os.getenv("HOME") .. "/src/sui" then
-  --
 end
 
 -- Lazy doesn't support hot reloading, so we need to check if it's already been loaded
@@ -273,12 +271,12 @@ require("gitsigns").setup({
 vim.cmd("Gitsigns toggle_current_line_blame")
 -- local _ = require("cmp")
 
-require("lspconfig").gopls.setup({})
-require("lspconfig").terraformls.setup({})
-require("lspconfig").clangd.setup({})
-require('lspconfig').ts_ls.setup({})
-require('lspconfig').move_analyzer.setup({})
-require("lspconfig").starpls.setup({})
+-- vim.lsp.config.gopls.setup({})
+-- vim.lsp.config.terraformls.setup({})
+-- vim.lsp.config.clangd.setup({})
+-- vim.lsp.config.ts_ls.setup({})
+-- vim.lsp.config.move_analyzer.setup({})
+-- vim.lsp.config.starpls.setup({})
 
 vim.api.nvim_create_autocmd("FileType", {
   pattern = "starlark",
@@ -559,7 +557,7 @@ endfunction
 augroup cstuff
   autocmd!
   autocmd FileType c,cpp call SetCOptions()
-  autocmd FileType c,cpp nnoremap <leader>d Odbg();<Esc>_
+  " autocmd FileType c,cpp nnoremap <leader>d Odbg();<Esc>_
 augroup END
 
 function! SaveSessionClean()
@@ -823,7 +821,7 @@ augroup RustCore
   autocmd FileType rust nmap <F20> :wa<CR>:!cargo fmt -- %<CR><CR>
   " autocmd FileType rust nmap <F9> :wa<CR>:pclose<CR>:compiler cargo<CR>:setlocal makeprg=cargo\ simtest\ simtest\ build\ --profile\ simtest<CR>:make<CR><CR>
   autocmd FileType rust setlocal colorcolumn=100,101,102,103
-  autocmd FileType rust nnoremap <leader>d Owalrus_utils::crumb!();<Esc>_
+  " autocmd FileType rust nnoremap <leader>d Owalrus_utils::crumb!();<Esc>_
   autocmd FileType rust setlocal formatoptions-=o
 augroup END
 
