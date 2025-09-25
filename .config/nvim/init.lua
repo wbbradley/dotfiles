@@ -87,7 +87,7 @@ local lazy_plugins = {
     opts = { inlay_hints = { enabled = false } },
     config = function() end
   },
-  -- "modocache/move.vim",
+  { 'wbbradley/move.vim', ft = 'move' },
   {
     "saecki/crates.nvim",
     tag = "stable",
