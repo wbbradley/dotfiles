@@ -14,6 +14,17 @@ languages:
       - program: clang-format
         args: ["-"]
   cpp: *c-settings
+  json:
+    linters:
+      - program: jsoncheck
+        args: ["--stdin-filename", "$filename"]
+        use_stdin: true
+        pattern: '(.*):(\d+):(\d+): (.*)'
+        filename_match: 1
+        line_match: 2
+        start_col_match: 3
+        description_match: 4
+        use_stderr: true
   rust:
     root_markers:
       - .git

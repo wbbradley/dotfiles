@@ -543,6 +543,7 @@ vnoremap <Leader>c "hy:%s/<C-r>h/
 vnoremap <Leader>x :!chmod +x %<CR>
 vnoremap <Leader>/ :Commentary<CR>
 nnoremap <Leader>P :set paste<CR>p:set nopaste<CR>
+nnoremap <Leader>m :%!mdformat --number --wrap 100 -<CR>
 vnoremap % :%s/
 nnoremap <C-b> <C-w>
 
