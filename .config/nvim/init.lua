@@ -696,7 +696,7 @@ vmap <C-v> <Plug>(expand_region_shrink)
 :endif
 
 nnoremap <leader><C-v> :r!pbpaste<CR>
-nnoremap <leader><space> :noh<cr>:match<cr>:set nopaste<CR>:redraw!<CR>
+nnoremap <leader><space> :noh<cr>:match<cr>:set nopaste<cr>:redraw!<CR>
 nnoremap <leader>T :tabnew<CR>:e ~/vim-todo.txt<CR>
 nnoremap <leader>d :set makeprg=dangle<CR>:make<CR>
 nnoremap <leader>q :conf qa<CR>

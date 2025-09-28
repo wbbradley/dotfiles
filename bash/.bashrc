@@ -183,7 +183,7 @@ gap() {
 
   if repo-is-dirty; then
     git status -s \
-    && git commit -am "${message[*]}" \
+    && git commit -av \
     && git push -u origin HEAD \
     && git status -s \
     && printf "\nCurrent SHA: %s\n\n" "$(git rev-parse HEAD)"
