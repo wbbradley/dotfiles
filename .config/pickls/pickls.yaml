@@ -25,6 +25,13 @@ languages:
         start_col_match: 3
         description_match: 4
         use_stderr: true
+  move:
+    root_markers:
+      - .prettierrc
+    formatters:
+      - program: prettier-move
+        args: ["-w", "--stdin-filepath", "$filename"]
+        use_stdin: true
   rust:
     root_markers:
       - .git

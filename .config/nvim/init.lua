@@ -820,7 +820,7 @@ autocmd BufRead *.ai setlocal ft=markdown
 autocmd BufRead *.tf setlocal ft=terraform
 
 augroup RustCore
-  autocmd FileType rust nmap <F7> :wa<CR>:pclose<CR>:compiler cargo<CR>:setlocal makeprg=cargo\ clippy<CR>:make<CR><CR>
+  autocmd FileType rust nmap <F7> :wa<CR>:pclose<CR>:compiler cargo<CR>:setlocal makeprg=cargo\ clippy\ --all-features<CR>:make<CR><CR>
   autocmd FileType rust nmap <F8> :wa<CR>:pclose<CR>:compiler cargo<CR>:setlocal makeprg=cargo\ test\ --no-run<CR>:make<CR><CR>
   autocmd FileType rust nmap <F20> :wa<CR>:!cargo fmt -- %<CR><CR>
   " autocmd FileType rust nmap <F9> :wa<CR>:pclose<CR>:compiler cargo<CR>:setlocal makeprg=cargo\ simtest\ simtest\ build\ --profile\ simtest<CR>:make<CR><CR>
