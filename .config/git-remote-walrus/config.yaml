@@ -1,0 +1,3 @@
+sui_wallet_path: /Users/wbbradley/src/walrus/working_dir/sui_client.yaml
+walrus_config_path: /Users/wbbradley/src/walrus/working_dir/client_config.yaml
+cache_dir: /Users/wbbradley/.cache/git-remote-walrus
