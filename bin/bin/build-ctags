@@ -19,6 +19,7 @@ ctags \
   --langdef=move \
   --langmap=move:.move \
   '--regex-move=/^[[:space:]]*(public(\([^)]*\))?[[:space:]]+)?fun[[:space:]]+([a-zA-Z_][a-zA-Z0-9_]*)/\3/f,function/' \
+  '--regex-move=/^[[:space:]]*(public(\([^)]*\))?[[:space:]]+)?struct[[:space:]]+([a-zA-Z_][a-zA-Z0-9_]*)/\3/f,function/' \
   .
 
 echo "Removing unnecessary tags..."

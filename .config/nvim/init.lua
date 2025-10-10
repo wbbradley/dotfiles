@@ -260,6 +260,11 @@ if vim.loop.cwd() == os.getenv("HOME") .. "/src/walrus" then
       }
     }
   }
+  vim.cmd([[
+    augroup MoveLint
+      autocmd FileType move setlocal makeprg=move-lint
+    augroup END
+  ]])
 end
 
 -- Lazy doesn't support hot reloading, so we need to check if it's already been loaded

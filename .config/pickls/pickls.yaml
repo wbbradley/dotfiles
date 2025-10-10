@@ -26,17 +26,27 @@ languages:
         description_match: 4
         use_stderr: true
   move:
-    root_markers:
-      - .prettierrc
     formatters:
       - program: prettier-move
+        root_markers:
+          - .prettierrc
         args: ["-w", "--stdin-filepath", "$filename"]
         use_stdin: true
+    linters:
+      - program: move-lint
+        args: []
+        use_stdin: false
+        pattern: '([^:]+):(\d+):(\d+): ([^:]+): (.*)'
+        filename_match: 1
+        line_match: 2
+        start_col_match: 3
+        severity_match: 4
+        description_match: 5
   rust:
-    root_markers:
-      - .git
     linters:
       - program: typos
+        root_markers:
+          - .git
         args: ["--format", "brief", "--color", "never", "-"]
         use_stdin: true
         pattern: '.*:(\d+):(\d+): (.*)'
@@ -44,6 +54,8 @@ languages:
         start_col_match: 2
         description_match: 3
       - program: ec
+        root_markers:
+          - .git
         args:
           - -no-color
           - -format
@@ -110,11 +122,6 @@ languages:
   #         - --number
   #         - '-'
   python:
-    root_markers:
-      - .git
-      - pyproject.toml
-      - setup.py
-      - mypy.ini
     # formatters:
       # - program: autoimport
       #   args: ["-"]
@@ -129,6 +136,11 @@ languages:
       #     - $filename
     linters:
       - program: ruff
+        root_markers:
+          - .git
+          - pyproject.toml
+          - setup.py
+          - mypy.ini
         args:
           - check
           - --stdin-filename
@@ -141,6 +153,11 @@ languages:
         use_stderr: false
         use_stdin: true
       # - program: mypy
+      #   root_markers:
+      #     - .git
+      #     - pyproject.toml
+      #     - setup.py
+      #     - mypy.ini
       #   args:
       #     - $filename
       #   pattern: '(.*):(\d+): (.*): (.*)'
