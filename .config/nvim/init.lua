@@ -320,6 +320,24 @@ nmap("E", ':lua require("fzf-lua").live_grep()')
 nmap("vv", "viw")
 nmap(",", "<Plug>(easymotion-s)")
 
+-- Copy file path to system clipboard (relative to git root if in a git repo)
+vim.keymap.set("n", "<leader><C-g>", function()
+  local full_path = vim.fn.expand('%:p')
+  local git_root = vim.fs.root(0, { ".git" })
+  local path_to_copy
+
+  if git_root then
+    -- We're in a git repo, use relative path from git root
+    path_to_copy = vim.fn.fnamemodify(full_path, ':s?' .. git_root .. '/??')
+  else
+    -- Not in a git repo, use full path
+    path_to_copy = full_path
+  end
+
+  vim.fn.setreg('+', path_to_copy)
+  vim.notify('Copied to clipboard: ' .. path_to_copy, vim.log.levels.INFO)
+end, { noremap = true, silent = true })
+
 -- Treesitter
 require("treesitter-context").setup({
   mode = "cursor",
