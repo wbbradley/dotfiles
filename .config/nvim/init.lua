@@ -279,7 +279,7 @@ require("gitsigns").setup({
 vim.cmd("Gitsigns toggle_current_line_blame")
 -- local _ = require("cmp")
 
--- vim.lsp.config.gopls.setup({})
+vim.lsp.enable('gopls')
 -- vim.lsp.config.terraformls.setup({})
 -- vim.lsp.config.clangd.setup({})
 -- vim.lsp.config.ts_ls.setup({})
