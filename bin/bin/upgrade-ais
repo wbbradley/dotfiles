@@ -1,3 +1,4 @@
 #!/bin/bash
-npm install -g @anthropic-ai/claude-code
-brew upgrade crush codex
+npm install -g @anthropic-ai/claude-code 
+npm install -g @openai/codex
+brew upgrade crush
