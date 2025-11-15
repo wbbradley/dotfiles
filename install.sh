@@ -53,8 +53,6 @@ BREW_DEPS=(
   ykman
 )
 
-mkdir -p "$HOME"/.local/bin ||:
-
 setup-fzf() {
   if command -v fzf 2>/dev/null; then
     echo "Skipping fzf installation as it looks like it's already installed..."
@@ -68,48 +66,53 @@ setup-fzf() {
   ./install --all --no-zsh --no-fish || die "failed to install fzf"
 }
 
-if on-macos; then
-    echo "Checking that homebrew is installed..."
-    brew --version
+run-install() (
+  mkdir -p "$HOME"/.local/bin ||:
 
-    # defaults write -g InitialKeyRepeat -int 15
-    # defaults write -g KeyRepeat -int 0
-    # defaults write com.apple.CrashReporter DialogType none
-    defaults write com.apple.finder AppleShowAllFiles true
+  if on-macos; then
+      echo "Checking that homebrew is installed..."
+      brew --version
 
-    brew install "${BREW_DEPS[@]}" || die "brew install failed"
-    luarocks install luacheck || die "luacheck install failed"
-    luarocks install --server=https://luarocks.org/dev luaformatter || die "luaformatter install failed"
-    echo "NB: make sure you manage brew services."
-    brew services
-elif on-linux; then
-  if command -v apt 2>/dev/null; then
-    sudo apt update -y
-    sudo apt install -y universal-ctags pass git vim tmux build-essential libssl-dev pkg-config ninja-build gettext cmake unzip curl
-    if ! [[ -x /usr/local/bin/nvim ]]; then
-      mkdir -p "$HOME"/src
+      # defaults write -g InitialKeyRepeat -int 15
+      # defaults write -g KeyRepeat -int 0
+      # defaults write com.apple.CrashReporter DialogType none
+      defaults write com.apple.finder AppleShowAllFiles true
 
-      # Install NeoVIM
-      git clone https://github.com/neovim/neovim "$HOME"/src/neovim
-      (
-        cd neovim
-        make CMAKE_BUILD_TYPE=RelWithDebInfo \
-          && cd build \
-          && cpack -G DEB \
-          && sudo dpkg -i nvim-linux64.deb
-      )
+      brew install "${BREW_DEPS[@]}" || die "brew install failed"
+      luarocks install luacheck || die "luacheck install failed"
+      luarocks install --server=https://luarocks.org/dev luaformatter || die "luaformatter install failed"
+      echo "NB: make sure you manage brew services."
+      brew services
+  elif on-linux; then
+    if command -v apt 2>/dev/null; then
+      sudo apt update -y
+      sudo apt install -y universal-ctags pass git tmux build-essential libssl-dev pkg-config ninja-build gettext cmake unzip curl
+      if ! [[ -x /usr/local/bin/nvim ]]; then
+        mkdir -p "$HOME"/src
+
+        # Install NeoVIM
+        git clone https://github.com/neovim/neovim "$HOME"/src/neovim
+        (
+          cd "$HOME"/src/neovim || die "failed to cd to neovim src dir"
+          make CMAKE_BUILD_TYPE=RelWithDebInfo \
+            && cd build \
+            && cpack -G DEB \
+            && sudo dpkg -i nvim-linux64.deb
+        ) || die "failed to install neovim (see $HOME/install.log)"
+      fi
+    else
+      sudo yum update -y
+      sudo yum install -y ctags pass git tmux alacritty neovim
+      sudo yum upgrade -y ctags pass git tmux alacritty neovim
     fi
   else
-    sudo yum update -y
-    sudo yum install -y ctags pass git vim tmux alacritty neovim
-    sudo yum upgrade -y ctags pass git vim tmux alacritty neovim
+    die "unsupported platform [uname=$(uname)]"
   fi
-else
-  die "unsupported platform [uname=$(uname)]"
-fi
 
-setup-fzf
+  setup-fzf
+)
 
+run-install >>"$HOME"/install.log 2>&1  || die "installation failed, see $HOME/install.log for details"
 # Make sure needed tools are available
 git --version > /dev/null || die "git not installed"
 curl --version > /dev/null || die "curl not installed"

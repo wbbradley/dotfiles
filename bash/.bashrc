@@ -485,7 +485,7 @@ agent-with-keys() {
   gpg-agent "${args[@]}" --daemon
 }
 
-logit() {
+notes() {
   touch "$HOME"/notes.md
   nvim "$HOME"/notes.md "+norm G"
 }
