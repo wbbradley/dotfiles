@@ -1,0 +1,9 @@
+#!/bin/bash
+# Get the git root.
+root_dir=$(git rev-parse --show-toplevel)
+cd "$root_dir" || exit 1
+# shellcheck disable=SC2044
+for toml in $(find contracts -name Move.toml); do
+  dir=$(dirname "$toml")
+  sui move build --path "$dir"
+done

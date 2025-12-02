@@ -235,7 +235,9 @@ if globals.allow_copilot then
   }
 end
 
-if vim.loop.cwd() == os.getenv("HOME") .. "/src/walrus" then
+local walrus_prefix = os.getenv("HOME") .. "/src/walrus"
+
+if string.sub(vim.loop.cwd(), 1, #walrus_prefix) == walrus_prefix then
   vim.print("Walrus detected")
   local capabilities = vim.lsp.protocol.make_client_capabilities()
   vim.tbl_deep_extend("force", capabilities, {
@@ -249,13 +251,10 @@ if vim.loop.cwd() == os.getenv("HOME") .. "/src/walrus" then
           rustfmt = {
             extraArgs = {
               "--config",
-              "group_imports=StdExternalCrate,imports_granularity=Crate,imports_layout=HorizontalVertical"
+              "edition=2024,group_imports=StdExternalCrate,imports_granularity=Crate,imports_layout=HorizontalVertical"
             }
-          },
-          cargo = {
-            -- profile = "dev",
-            features = { "walrus-service/backup" }
           }
+          -- cargo = { cfgs = { "msim" } }
         }
       }
     }

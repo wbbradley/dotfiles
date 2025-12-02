@@ -21,6 +21,3 @@ export BOOGIE_EXE="$HOME/.dotnet/tools/boogie"
 [[ -f "$HOME/.cargo/env" ]] && . "$HOME/.cargo/env"
 
 printf ''
-
-# add Pulumi to the PATH
-export PATH=$PATH:/Users/wbbradley/.pulumi/bin

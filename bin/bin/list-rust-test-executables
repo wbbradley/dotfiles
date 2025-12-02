@@ -1,0 +1,2 @@
+#!/bin/bash
+cargo test --lib --no-run 2>&1 | grep "Executable.*"

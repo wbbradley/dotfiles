@@ -113,7 +113,20 @@ languages:
           - "--break-before-table-rb"
           - "--chop-down-table"
           - "--no-keep-simple-control-block-one-line"
-  # markdown:
+  markdown:
+    linters:
+      - program: npx
+        args:
+          - markdownlint-cli2
+        root_markers:
+          - .markdownlint-cli2.yaml
+        pattern: '([^:]*):(\d+):(\d+) (.*)'
+        filename_match: 1
+        line_match: 2
+        start_col_match: 3
+        description_match: 4
+        use_stderr: true
+        use_stdin: false
   #   formatters:
   #     - program: mdformat
   #       args:

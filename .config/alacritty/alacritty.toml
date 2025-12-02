@@ -13,7 +13,7 @@ normal = { family = "FiraCode Nerd Font Mono", style = "Regular" }
 bold = { family = "FiraCode Nerd Font Mono", style = "Medium" }
 italic = { family = "SauceCodePro Nerd Font Mono", style = "Italic" }
 bold_italic = { family = "SauceCodePro Nerd Font Mono", style = "SemiBold Italic" }
-size = 12.5
+size = 12
 builtin_box_drawing = true
 
 [terminal]

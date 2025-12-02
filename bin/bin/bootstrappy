@@ -25,12 +25,16 @@ fi
 if [[ -x .venv/bin/"$raw_toolname" ]]; then
   # This tool already exists inside the local virtualenv.
   dbg "running $raw_toolname from $PWD/.venv/bin [PWD='$PWD', args=($*)]"
-  tmpfile="$(mktemp)"
-  trap 'rm '"$tmpfile" EXIT
-  /usr/bin/time -o "$tmpfile" .venv/bin/"$raw_toolname" "$@"
-  res=$?
-  dbg "$raw_toolname took $(cat "$tmpfile") [res=$res]"
-  exit "$res"
+  if [[ -n $BOOTSTRAPPY_VERBOSE ]]; then
+    tmpfile="$(mktemp)"
+    trap 'rm '"$tmpfile" EXIT
+    /usr/bin/time -o "$tmpfile" .venv/bin/"$raw_toolname" "$@"
+    res=$?
+    dbg "$raw_toolname took $(cat "$tmpfile") [res=$res]"
+    exit "$res"
+  else
+    exec .venv/bin/"$raw_toolname" "$@"
+  fi
 fi
 
 # shellcheck disable=SC1091
