@@ -15,11 +15,65 @@ die() {
   exit 1
 }
 
+# Parse github:owner/repo@ref spec into repo_path and ref variables
+parse_github_spec() {
+  local spec="$1"
+  spec="${spec#github:}"  # Remove github: prefix
+
+  if [[ "$spec" == *@* ]]; then
+    repo_path="${spec%@*}"
+    ref="${spec#*@}"
+  else
+    repo_path="$spec"
+    ref="HEAD"
+  fi
+
+  # Validate format: owner/repo
+  if ! [[ "$repo_path" =~ ^[a-zA-Z0-9_-]+/[a-zA-Z0-9_.-]+$ ]]; then
+    die "invalid github repo: $repo_path"
+  fi
+  # Validate ref format
+  if ! [[ "$ref" =~ ^[a-zA-Z0-9_./-]+$ ]]; then
+    die "invalid github ref: $ref"
+  fi
+}
+
+install_from_github() {
+  local env_dir="$1"
+  local spec="$2"
+
+  parse_github_spec "$spec"
+  local repo_name="${repo_path#*/}"
+  local src_dir="$HOME/.bootstrappy/src/$repo_name"
+
+  if [[ -d "$src_dir/.git" ]]; then
+    dbg "updating $repo_path (ref=$ref)"
+    git -C "$src_dir" fetch origin || die "failed to fetch $repo_path"
+    git -C "$src_dir" checkout "$ref" || die "failed to checkout $ref"
+  else
+    dbg "cloning $repo_path"
+    mkdir -p "$(dirname "$src_dir")"
+    git clone "https://github.com/$repo_path.git" "$src_dir" || die "failed to clone $repo_path"
+    if [[ "$ref" != "HEAD" ]]; then
+      dbg "checking out $ref"
+      git -C "$src_dir" checkout "$ref" || die "failed to checkout $ref"
+    fi
+  fi
+
+  dbg "installing from $src_dir"
+  "$env_dir"/bin/python -muv pip install -e "$src_dir" >&2 || die "failed to install from $src_dir"
+}
 
 raw_toolname="$(basename "$0")"
 if [[ "$raw_toolname" = bootstrappy ]]; then
   progname="bootstrappy"
   die "use: ln -s your_tool bootstrappy" >&2
+fi
+
+# Validate toolname to prevent injection
+if ! [[ "$raw_toolname" =~ ^[a-zA-Z0-9_-]+$ ]]; then
+  progname="bootstrappy"
+  die "invalid tool name: $raw_toolname"
 fi
 
 if [[ -x .venv/bin/"$raw_toolname" ]]; then
@@ -60,8 +114,12 @@ install() {
     "$env_dir"/bin/python -mpip install -U uv pyyaml types-PyYAML || die "installing uv"
   fi
 
-  dbg "bootstrappy: installing $package"
-  "$env_dir"/bin/python -muv pip install "$package" >&2 || die "failed to install $package"
+  if [[ "$package" == github:* ]]; then
+    install_from_github "$env_dir" "$package"
+  else
+    dbg "bootstrappy: installing $package"
+    "$env_dir"/bin/python -muv pip install "$package" >&2 || die "failed to install $package"
+  fi
 }
 
 try-env-dir() {

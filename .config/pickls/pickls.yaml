@@ -69,11 +69,6 @@ languages:
         description_match: 5
         use_stdin: false
         use_stderr: false
-  html: &html
-    formatters:
-      - program: js-beautify
-        args: ["--type", "html", "-f", "-"]
-  htmldjango: *html
   dockerfile:
     linters:
       - program: hadolint

@@ -86,8 +86,8 @@ run-install() (
   elif on-linux; then
     if command -v apt 2>/dev/null; then
       sudo apt update -y
-      sudo apt install -y universal-ctags pass git tmux build-essential libssl-dev pkg-config ninja-build gettext cmake unzip curl
-      if ! [[ -x /usr/local/bin/nvim ]]; then
+      sudo apt install -y universal-ctags pass git tmux build-essential libssl-dev pkg-config ninja-build gettext cmake unzip curl eza
+      if ! command -v nvim 2>/dev/null >/dev/null; then
         mkdir -p "$HOME"/src
 
         # Install NeoVIM
@@ -97,7 +97,7 @@ run-install() (
           make CMAKE_BUILD_TYPE=RelWithDebInfo \
             && cd build \
             && cpack -G DEB \
-            && sudo dpkg -i nvim-linux64.deb
+            && sudo dpkg -i nvim-linux*.deb
         ) || die "failed to install neovim (see $HOME/install.log)"
       fi
     else
