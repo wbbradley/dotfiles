@@ -25,7 +25,9 @@
 [alias]
   cleanup-merged = "!git branch --merged main | grep -E -v '(^\\*|main|testnet|devnet|\\+)' | xargs git branch -d"
   cleanup-tracking = "!git fetch --prune && git branch --v | grep '\\[gone\\]' | awk '{print $1}' | xargs git branch -D"
-  cleanup = "!git cleanup-merged && git cleanup-tracking"
+  cleanup-git-stack-backups = "!git branch -v | grep -- -at-1 | awk '{ print $1 }' | xargs -n 1 git branch -D"
+  cleanup = "!git cleanup-merged && git cleanup-tracking && git cleanup-git-stack-backups"
+  fixup = "!git log -n 50 --pretty=format:'%h %s' --no-merges | fzf | cut -c -7 | xargs -o git commit --fixup"
   tagcommit = rev-list -n 1
   ls-ignored = ls-files . --ignored --exclude-standard --others
   ls-untracked = ls-files . --exclude-standard --others
@@ -40,11 +42,10 @@
 [mergetool]
   keepBackup = false
 [mergetool "nvim"]
-	cmd = /opt/homebrew/bin/nvim \"$MERGED\"
+	cmd = /opt/homebrew/bin/nvim \"$MERGED\" '+/<<<<<\\|=====\\|>>>>>'
 	trustExitCode = true
 [mergetool "sourcetree"]
 	cmd = /Applications/Sourcetree.app/Contents/Resources/opendiff-w.sh \"$LOCAL\" \"$REMOTE\" -ancestor \"$BASE\" -merge \"$MERGED\"
 	trustExitCode = true
 [credential]
 	helper = store
-
