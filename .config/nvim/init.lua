@@ -237,6 +237,25 @@ end
 
 local walrus_prefix = os.getenv("HOME") .. "/src/walrus"
 
+vim.g.rustaceanvim = {
+  server = {
+    default_settings = {
+      ['rust-analyzer'] = {
+        diagnostics = { disabled = { "inactive-code", "unlinked-file" } },
+        rustfmt = {
+          overrideCommand = {
+            "rustfmt",
+            "--edition",
+            "2024",
+            "--config",
+            "group_imports=StdExternalCrate,imports_granularity=Crate,imports_layout=HorizontalVertical"
+          }
+        }
+      }
+    }
+  }
+}
+
 if string.sub(vim.loop.cwd(), 1, #walrus_prefix) == walrus_prefix then
   vim.print("Walrus detected")
   local capabilities = vim.lsp.protocol.make_client_capabilities()
@@ -249,9 +268,12 @@ if string.sub(vim.loop.cwd(), 1, #walrus_prefix) == walrus_prefix then
         ['rust-analyzer'] = {
           diagnostics = { disabled = { "inactive-code", "unlinked-file" } },
           rustfmt = {
-            extraArgs = {
+            overrideCommand = {
+              "rustfmt",
+              "--edition",
+              "2024",
               "--config",
-              "edition=2024,group_imports=StdExternalCrate,imports_granularity=Crate,imports_layout=HorizontalVertical"
+              "group_imports=StdExternalCrate,imports_granularity=Crate,imports_layout=HorizontalVertical"
             }
           },
           cargo = { cfgs = { "msim" } }

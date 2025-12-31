@@ -53,6 +53,10 @@ BREW_DEPS=(
   ykman
 )
 
+BREW_CASK_DEPS=(
+  ghostty
+)
+
 setup-fzf() {
   if command -v fzf 2>/dev/null; then
     echo "Skipping fzf installation as it looks like it's already installed..."
@@ -79,10 +83,14 @@ run-install() (
       defaults write com.apple.finder AppleShowAllFiles true
 
       brew install "${BREW_DEPS[@]}" || die "brew install failed"
+      for cask in "${BREW_CASK_DEPS[@]}"; do
+        brew install --cask "$cask" || die "brew cask install failed for $cask"
+      done
       luarocks install luacheck || die "luacheck install failed"
       luarocks install --server=https://luarocks.org/dev luaformatter || die "luaformatter install failed"
       echo "NB: make sure you manage brew services."
       brew services
+      ln -sf "$HOME"/src/dotfiles/.config/ghostty/config "$HOME"/Library/Application\ Support/com.mitchellh.ghostty/config || die "failed to link ghostty config"
   elif on-linux; then
     if command -v apt 2>/dev/null; then
       sudo apt update -y
@@ -113,6 +121,7 @@ run-install() (
 )
 
 run-install >>"$HOME"/install.log 2>&1  || die "installation failed, see $HOME/install.log for details"
+
 # Make sure needed tools are available
 git --version > /dev/null || die "git not installed"
 curl --version > /dev/null || die "curl not installed"
