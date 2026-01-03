@@ -1,3 +1,0 @@
-#!/bin/bash
-
-exec cargo run --quiet --manifest-path "$HOME"/src/git-stack/Cargo.toml -- "$@"
