@@ -52,11 +52,11 @@ parse_git_branch() {
     ref="$(git reflog -1 --color=never | cut -d ' ' -f1)"
 
     if [[ -n "$branch" ]]; then
-      printf "%s:%s " "$branch" "$ref"
+      printf " %s:%s " "$branch" "$ref"
     elif [[ "$HOME" = "$PWD" ]]; then
-      printf "%s " "🏡 "
+      printf " %s " "🏡"
     elif [[ "$HOME/.ssh" = "$PWD" ]]; then
-      printf "%s " "🔒 "
+      printf " %s " "🔒"
     else
       :
     fi

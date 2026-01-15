@@ -14,6 +14,7 @@ if not (vim.uv or vim.loop).fs_stat(lazypath) then
     lazypath
   })
 end
+vim.opt.jumpoptions = "stack,clean"
 vim.opt.rtp:prepend(lazypath)
 
 -- Load global variables from lua/config/globals.lua
@@ -21,9 +22,6 @@ local globals = require('config.globals')
 
 -- packages
 local lazy_plugins = {
-  "easymotion/vim-easymotion",
-  "folke/trouble.nvim",
-  "lewis6991/gitsigns.nvim",
   {
     "hedyhli/outline.nvim",
     lazy = true,
@@ -35,6 +33,9 @@ local lazy_plugins = {
       -- Your setup opts here
     }
   },
+  "easymotion/vim-easymotion",
+  "folke/trouble.nvim",
+  "lewis6991/gitsigns.nvim",
   "folke/which-key.nvim",
   {
     "folke/todo-comments.nvim",
@@ -288,6 +289,9 @@ if string.sub(vim.loop.cwd(), 1, #walrus_prefix) == walrus_prefix then
   ]])
 end
 
+vim.opt.runtimepath:prepend(vim.fn.expand("~/src/jumplist.nvim"))
+require("jumplist").setup({})
+
 -- Lazy doesn't support hot reloading, so we need to check if it's already been loaded
 if vim.g.lazy_loaded == nil then
   require("lazy").setup(lazy_plugins, {})
@@ -301,7 +305,7 @@ vim.cmd("Gitsigns toggle_current_line_blame")
 -- local _ = require("cmp")
 
 vim.lsp.enable('gopls')
--- vim.lsp.config.terraformls.setup({})
+vim.lsp.enable('taplo')
 -- vim.lsp.config.clangd.setup({})
 -- vim.lsp.config.ts_ls.setup({})
 -- vim.lsp.config.move_analyzer.setup({})
@@ -423,6 +427,7 @@ vim.g._ts_force_sync_parsing = true
 vim.g.laststatus = 2
 
 vim.keymap.set("n", "F", function()
+  vim.cmd("normal! m`")
   require("fzf-lua").live_grep({
     no_esc = true,
     search = "",
@@ -430,6 +435,7 @@ vim.keymap.set("n", "F", function()
   })
 end)
 vim.keymap.set("n", "<F3>", function()
+  vim.cmd("normal! m`")
   require("fzf-lua").grep_cword({
     cmd = "git grep --line-number --column --color=always"
   })
