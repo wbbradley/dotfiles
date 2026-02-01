@@ -113,6 +113,7 @@ languages:
       - program: npx
         args:
           - markdownlint-cli2
+          - "$filename"
         root_markers:
           - .markdownlint-cli2.yaml
         pattern: '([^:]*):(\d+):(\d+) (.*)'
