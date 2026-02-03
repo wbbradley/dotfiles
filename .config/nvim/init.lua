@@ -277,7 +277,7 @@ if string.sub(vim.loop.cwd(), 1, #walrus_prefix) == walrus_prefix then
               "group_imports=StdExternalCrate,imports_granularity=Crate,imports_layout=HorizontalVertical"
             }
           },
-          cargo = { cfgs = { "msim" } }
+          cargo = { cfgs = { "msim", "backup" } }
         }
       }
     }
@@ -870,7 +870,7 @@ autocmd BufRead *.ai setlocal ft=markdown
 autocmd BufRead *.tf setlocal ft=terraform
 
 augroup RustCore
-  autocmd FileType rust nmap <F7> :wa<CR>:pclose<CR>:compiler cargo<CR>:setlocal makeprg=cargo\ clippy\ --all-features<CR>:make<CR><CR>
+  autocmd FileType rust nmap <F7> :wa<CR>:pclose<CR>:compiler cargo<CR>:setlocal makeprg=chk<CR>:make<CR><CR>
   autocmd FileType rust nmap <F8> :wa<CR>:pclose<CR>:compiler cargo<CR>:setlocal makeprg=cargo\ test\ --no-run<CR>:make<CR><CR>
   autocmd FileType rust nmap <F8> :wa<CR>:pclose<CR>:compiler cargo<CR>:setlocal makeprg=cargo\ test\ --no-run<CR>:make<CR><CR>
   autocmd FileType rust nmap <F20> :wa<CR>:pclose<CR>:compiler cargo<CR>:setlocal makeprg=cargo\ simtest<CR>:make<CR><CR>
