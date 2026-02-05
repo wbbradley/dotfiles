@@ -881,7 +881,7 @@ augroup RustCore
   autocmd FileType rust setlocal formatoptions-=o
 augroup END
 
-hi ColorColumn ctermfg=blue ctermbg=darkgray guibg=#333333 guifg=#1111bb cterm=NONE
+hi ColorColumn ctermfg=white ctermbg=darkgray guibg=#333333 guifg=#bbbbbb cterm=NONE
 
 set ignorecase
 set smartcase
