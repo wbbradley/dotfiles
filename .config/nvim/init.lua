@@ -502,6 +502,8 @@ augroup sql
   autocmd FileType sql setlocal makeprg=pgsanity\ %
 augroup END
 
+au BufRead,BufNewFile *.mueve setlocal filetype=mueve
+
 nmap <Space> :let @+=@0<CR>
 " nmap gd #
 " nnoremap <Esc> :helpclose<CR>:cclose<CR>:pclose<CR>:lclose<CR><Esc>
@@ -1183,6 +1185,8 @@ if globals.allow_copilot then
       -- Check whether the current buffer's filename contains the string "pass"
       -- and if so, disable copilot suggestions.
       if string.find(vim.api.nvim_buf_get_name(0), "/pass.") then
+        vim.b.copilot_suggestion_auto_trigger = false
+      elseif string.find(vim.api.nvim_buf_get_name(0), ".ssh/") then
         vim.b.copilot_suggestion_auto_trigger = false
       elseif string.find(vim.api.nvim_buf_get_name(0), ".md") then
         vim.b.copilot_suggestion_auto_trigger = false
