@@ -236,8 +236,6 @@ if globals.allow_copilot then
   }
 end
 
-local walrus_prefix = os.getenv("HOME") .. "/src/walrus"
-
 vim.g.rustaceanvim = {
   server = {
     default_settings = {
@@ -257,7 +255,12 @@ vim.g.rustaceanvim = {
   }
 }
 
-if string.sub(vim.loop.cwd(), 1, #walrus_prefix) == walrus_prefix then
+local walrus_sites_prefix = os.getenv("HOME") .. "/src/walrus-sites"
+local walrus_prefix = os.getenv("HOME") .. "/src/walrus"
+
+if string.sub(vim.loop.cwd(), 1, #walrus_sites_prefix) == walrus_sites_prefix then
+  vim.print("Walrus Sites detected")
+elseif string.sub(vim.loop.cwd(), 1, #walrus_prefix) == walrus_prefix then
   vim.print("Walrus detected")
   local capabilities = vim.lsp.protocol.make_client_capabilities()
   vim.tbl_deep_extend("force", capabilities, {
@@ -277,7 +280,7 @@ if string.sub(vim.loop.cwd(), 1, #walrus_prefix) == walrus_prefix then
               "group_imports=StdExternalCrate,imports_granularity=Crate,imports_layout=HorizontalVertical"
             }
           },
-          cargo = { cfgs = { "msim", "backup" } }
+          cargo = { cfgs = { "test-utils", "msim", "backup" } }
         }
       }
     }
