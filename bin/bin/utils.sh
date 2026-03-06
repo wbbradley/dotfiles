@@ -12,6 +12,13 @@ reset-color() {
   printf "\001\033[0m\002"
 }
 
+list-colours() {
+  for i in {0..255}; do
+    echo -en "\e[48;5;${i}m  \e[0m\e[38;5;${i}mcolour$(printf '%03d' $i)\e[0m  "
+    [ $(((i+1)%6)) -eq 4 ] && echo
+  done
+}
+
 bgfgx6() {
   # Convert 2 24-bit Hexadecimal colors into 6-cube colors.
   # Returns ANSI escape code for the given bg/fg combo.
