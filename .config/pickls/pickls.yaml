@@ -14,6 +14,17 @@ languages:
       - program: clang-format
         args: ["-"]
   cpp: *c-settings
+  pman:
+    linters:
+      - program: procman
+        args: ["--check", "$filename"]
+        pattern: '(.*):(\d+):(\d+): error: (.*)'
+        use_stdin: false
+        filenae_match: 1
+        line_match: 2
+        start_col_match: 3
+        description_match: 4
+        use_stderr: true
   json:
     linters:
       - program: jsoncheck
@@ -130,7 +141,7 @@ languages:
           - "--break-before-table-rb"
           - "--chop-down-table"
           - "--no-keep-simple-control-block-one-line"
-  # markdown:
+          # markdown:
     # linters:
     #   - program: npx
     #     args:
@@ -154,17 +165,17 @@ languages:
   #         - '-'
   python:
     # formatters:
-      # - program: autoimport
-      #   args: ["-"]
-      # - program: isort
-      #   args: ["-", "-d"]
-      # - program: ruff
-      #   args: ["check", "--fix", "--stdin-filename", "$filename"]
-      # - program: ruff
-      #   args:
-      #     - format
-      #     - --stdin-filename
-      #     - $filename
+    # - program: autoimport
+    #   args: ["-"]
+    # - program: isort
+    #   args: ["-", "-d"]
+    # - program: ruff
+    #   args: ["check", "--fix", "--stdin-filename", "$filename"]
+    # - program: ruff
+    #   args:
+    #     - format
+    #     - --stdin-filename
+    #     - $filename
     linters:
       - program: ruff
         root_markers:
@@ -183,21 +194,21 @@ languages:
         description_match: 4
         use_stderr: false
         use_stdin: true
-      # - program: mypy
-      #   root_markers:
-      #     - .git
-      #     - pyproject.toml
-      #     - setup.py
-      #     - mypy.ini
-      #   args:
-      #     - $filename
-      #   pattern: '(.*):(\d+): (.*): (.*)'
-      #   filename_match: 1
-      #   line_match: 2
-      #   severity_match: 3
-      #   description_match: 4
-      #   use_stderr: false
-      #   use_stdin: false
+        # - program: mypy
+        #   root_markers:
+        #     - .git
+        #     - pyproject.toml
+        #     - setup.py
+        #     - mypy.ini
+        #   args:
+        #     - $filename
+        #   pattern: '(.*):(\d+): (.*): (.*)'
+        #   filename_match: 1
+        #   line_match: 2
+        #   severity_match: 3
+        #   description_match: 4
+        #   use_stderr: false
+        #   use_stdin: false
   sh: &sh
     linters:
       - program: shellcheck
@@ -211,10 +222,10 @@ languages:
         use_stdin: true
   shell script: *sh
   bash: *sh
-  # yaml:
-  #   formatters:
-  #     - program: yamlfmt # github.com/google/yamlfmt
-  #       args: ["-in"]
+  yaml:
+    formatters:
+      - program: yamlfmt # github.com/google/yamlfmt
+        args: ["-in"]
   toml:
     # formatters:
     #   - program: taplo

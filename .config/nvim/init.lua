@@ -33,7 +33,7 @@ local lazy_plugins = {
       -- Your setup opts here
     }
   },
-  "easymotion/vim-easymotion",
+  { "wbbradley/nvim-procman", ft = "pman" },
   "folke/trouble.nvim",
   "lewis6991/gitsigns.nvim",
   "folke/which-key.nvim",
@@ -342,6 +342,7 @@ end
 
 local function nmap(shortcut, command) keymap("n", shortcut, command) end
 nmap("M", ":FzfLua oldfiles<CR>")
+nmap("mm", "vipgq")
 nmap("<C-p>", ":FzfLua git_files<CR>")
 nmap("<leader>[", ":InlayHintsToggle<CR>")
 nmap("E", ':lua require("fzf-lua").live_grep()')
@@ -426,6 +427,7 @@ require("nvim-treesitter.configs").setup({
     end
   }
 })
+
 vim.g._ts_force_sync_parsing = true
 vim.g.laststatus = 2
 
@@ -1321,3 +1323,4 @@ vim.api.nvim_create_user_command("OpenNearestCargoToml", function()
   end
   print("No Cargo.toml found.")
 end, {})
+
