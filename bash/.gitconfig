@@ -6,7 +6,7 @@
 	verbose = true
   gpgsign = true
 [log]
-  showSignature = true
+  showSignature = false
 [color]
   diff = always
   ui = true

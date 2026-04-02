@@ -14,7 +14,7 @@ languages:
       - program: clang-format
         args: ["-"]
   cpp: *c-settings
-  pman:
+  pman: &procman
     linters:
       - program: procman
         args: ["--check", "$filename"]
@@ -25,6 +25,7 @@ languages:
         start_col_match: 3
         description_match: 4
         use_stderr: true
+  procman: *procman
   json:
     linters:
       - program: jsoncheck
@@ -222,10 +223,10 @@ languages:
         use_stdin: true
   shell script: *sh
   bash: *sh
-  yaml:
-    formatters:
-      - program: yamlfmt # github.com/google/yamlfmt
-        args: ["-in"]
+  # yaml:
+  #  formatters:
+  #    - program: yamlfmt # github.com/google/yamlfmt
+  #      args: ["-in"]
   toml:
     # formatters:
     #   - program: taplo
