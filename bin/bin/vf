@@ -1,0 +1,12 @@
+#!/bin/bash
+set -euo pipefail
+
+if [ $# -eq 0 ]; then
+  echo "usage: vf <git-grep-args>" >&2
+  exit 1
+fi
+
+tmpfile=$(mktemp)
+trap 'rm -f "$tmpfile"' EXIT
+git grep -n "$@" > "$tmpfile" || { echo "No matches found." >&2; exit 1; }
+nvim -q "$tmpfile" -c cwindow
