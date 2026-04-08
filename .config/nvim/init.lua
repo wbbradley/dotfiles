@@ -17,6 +17,12 @@ end
 vim.opt.jumpoptions = "stack,clean"
 vim.opt.rtp:prepend(lazypath)
 
+-- Disable unused providers
+vim.g.loaded_perl_provider = 0
+vim.g.loaded_ruby_provider = 0
+vim.g.loaded_node_provider = 0
+vim.g.loaded_python3_provider = 0
+
 -- Load global variables from lua/config/globals.lua
 local globals = require('config.globals')
 
@@ -33,7 +39,7 @@ local lazy_plugins = {
       -- Your setup opts here
     }
   },
-  { "wbbradley/nvim-procman", ft = "pman" },
+  { "wbbradley/nvim-procman" },
   "folke/trouble.nvim",
   "lewis6991/gitsigns.nvim",
   "folke/which-key.nvim",
@@ -1009,7 +1015,7 @@ vim.api.nvim_create_autocmd({ "BufRead" }, {
   callback = function(_)
     if vim.fn.executable("pickls") ~= 0 then
       -- We found an executable for pickls.
-      vim.lsp.set_log_level(vim.log.levels.INFO)
+      vim.lsp.set_log_level(vim.log.levels.WARN)
       vim.lsp.start({
         name = "pickls",
         cmd = { "pickls", vim.api.nvim_buf_get_name(0) },
@@ -1034,7 +1040,7 @@ vim.api.nvim_create_autocmd("LspAttach", {
           async = false,
           id = args.data.client_id,
           filter = function(client)
-            return client.supports_method("textDocument/formatting")
+            return client:supports_method("textDocument/formatting")
           end
         }
       end
