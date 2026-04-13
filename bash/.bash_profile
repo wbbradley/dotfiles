@@ -21,3 +21,8 @@ export BOOGIE_EXE="$HOME/.dotnet/tools/boogie"
 [[ -f "$HOME/.cargo/env" ]] && . "$HOME/.cargo/env"
 
 printf ''
+
+if [[ -d "$HOME"/.bun ]]; then
+  export BUN_INSTALL="$HOME/.bun"
+  export PATH="$PATH:$BUN_INSTALL/bin"
+fi
