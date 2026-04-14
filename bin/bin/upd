@@ -1,5 +1,5 @@
 #!/bin/bash
-set -xeuo pipefail
+set -euo pipefail
 
 dirs=(
   "$HOME"/src/dotfiles
@@ -9,15 +9,18 @@ dirs=(
 )
 
 for dir in "${dirs[@]}"; do
+  echo "upd: pulling and pushing $dir..."
   git -C "$dir" pull
   git -C "$dir" push
 done
 
+echo "upd: installing shellsafety..."
 ( 
   cd "$HOME"/src/shellsafety
   cabal install --overwrite-policy=always
 )
 
+echo "upd: installing statusline..."
 ( 
   cd "$HOME"/src/statusline
   cargo install --path .
