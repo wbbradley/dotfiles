@@ -10,6 +10,12 @@ dirs=(
 
 for dir in "${dirs[@]}"; do
   echo "upd: pulling and pushing $dir..."
+  # Check for modified files
+  if [[ -n $(git -C "$dir" status --porcelain) ]]; then
+    echo "upd: warning: Uncommitted changes in $dir. Please commit or stash them before pushing."
+    git -C "$dir" status
+    continue
+  fi
   git -C "$dir" pull
   git -C "$dir" push
 done
