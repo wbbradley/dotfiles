@@ -1,0 +1,25 @@
+#!/bin/bash
+set -xeuo pipefail
+
+dirs=(
+  "$HOME"/src/dotfiles
+  "$HOME"/.claude
+  "$HOME"/src/shellsafety
+  "$HOME"/src/statusline
+)
+
+for dir in "${dirs[@]}"; do
+  git -C "$dir" pull
+  git -C "$dir" push
+done
+
+( 
+  cd "$HOME"/src/shellsafety
+  cabal install --overwrite-policy=always
+)
+
+( 
+  cd "$HOME"/src/statusline
+  cargo install --path .
+)
+
