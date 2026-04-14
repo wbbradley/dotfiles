@@ -1,5 +1,31 @@
 #!/bin/bash
-set -euo pipefail
+set -uo pipefail
+
+BOLD=$'\033[1m'
+RED=$'\033[1;31m'
+GREEN=$'\033[1;32m'
+YELLOW=$'\033[1;33m'
+CYAN=$'\033[1;36m'
+DIM=$'\033[2m'
+RESET=$'\033[0m'
+
+dry_run=0
+filter=""
+for arg in "$@"; do
+  case "$arg" in
+    -n|--dry-run) dry_run=1 ;;
+    -h|--help)
+      cat <<EOF
+usage: upd [--dry-run] [FILTER]
+  FILTER    substring; only repos whose path contains it are processed
+  -n        show what would happen without pulling/pushing/installing
+EOF
+      exit 0
+      ;;
+    -*) echo "upd: unknown flag: $arg" >&2; exit 2 ;;
+    *)  filter="$arg" ;;
+  esac
+done
 
 dirs=(
   "$HOME"/src/dotfiles
@@ -8,27 +34,198 @@ dirs=(
   "$HOME"/src/statusline
 )
 
+# Parallel arrays (bash 3.2 has no associative arrays).
+status_keys=()
+status_vals=()
+head_keys=()
+head_vals=()
+
+set_status() {
+  status_keys[${#status_keys[@]}]="$1"
+  status_vals[${#status_vals[@]}]="$2"
+}
+
+set_head() {
+  head_keys[${#head_keys[@]}]="$1"
+  head_vals[${#head_vals[@]}]="$2"
+}
+
+get_head() {
+  local want="$1" i=0
+  while (( i < ${#head_keys[@]} )); do
+    if [[ "${head_keys[$i]}" == "$want" ]]; then
+      echo "${head_vals[$i]}"
+      return
+    fi
+    i=$(( i + 1 ))
+  done
+}
+
+run() {
+  if (( dry_run )); then
+    echo "${DIM}dry-run:${RESET} $*"
+  else
+    "$@"
+  fi
+}
+
+process_repo() {
+  local dir="$1"
+  local name
+  name="$(basename "$dir")"
+  printf '\n%s==> %s%s %s(%s)%s\n' "$CYAN" "$name" "$RESET" "$DIM" "$dir" "$RESET"
+
+  if ! git -C "$dir" rev-parse --git-dir >/dev/null 2>&1; then
+    printf '%sFAIL%s not a git repo\n' "$RED" "$RESET"
+    set_status "$dir" "FAIL (not a repo)"
+    return
+  fi
+
+  local before
+  before="$(git -C "$dir" rev-parse HEAD 2>/dev/null || echo '')"
+  set_head "$dir" "$before"
+
+  if ! git -C "$dir" fetch --quiet; then
+    printf '%sFAIL%s fetch failed\n' "$RED" "$RESET"
+    set_status "$dir" "FAIL (fetch)"
+    return
+  fi
+
+  local upstream
+  upstream="$(git -C "$dir" rev-parse --abbrev-ref --symbolic-full-name '@{u}' 2>/dev/null || echo '')"
+  if [[ -z $upstream ]]; then
+    printf '%sWARN%s no upstream branch; skipping pull/push\n' "$YELLOW" "$RESET"
+    set_status "$dir" "SKIP (no upstream)"
+    return
+  fi
+
+  local behind ahead
+  behind="$(git -C "$dir" rev-list --count 'HEAD..@{u}' 2>/dev/null || echo 0)"
+  ahead="$(git -C "$dir" rev-list --count '@{u}..HEAD' 2>/dev/null || echo 0)"
+  printf '    upstream=%s  behind=%s  ahead=%s\n' "$upstream" "$behind" "$ahead"
+
+  if (( behind > 0 )); then
+    if ! run git -C "$dir" pull --ff-only --autostash --quiet; then
+      printf '%sFAIL%s pull (not fast-forward?); leaving dir alone\n' "$RED" "$RESET"
+      set_status "$dir" "FAIL (pull)"
+      return
+    fi
+  fi
+
+  if [[ -n "$(git -C "$dir" status --porcelain)" ]]; then
+    printf '%sDIRTY%s uncommitted changes; skipping push\n' "$YELLOW" "$RESET"
+    git -C "$dir" status --short | sed 's/^/    /'
+    set_status "$dir" "DIRTY (skipped push)"
+    return
+  fi
+
+  if (( ahead > 0 )); then
+    if ! run git -C "$dir" push --quiet; then
+      printf '%sFAIL%s push failed\n' "$RED" "$RESET"
+      set_status "$dir" "FAIL (push)"
+      return
+    fi
+  fi
+
+  printf '%sOK%s\n' "$GREEN" "$RESET"
+  set_status "$dir" "OK"
+}
+
+GITHUB_USER="wbbradley"
+
+clone_missing() {
+  local dir="$1"
+  local name url parent
+  name="$(basename "$dir")"
+  parent="$(dirname "$dir")"
+  url="git@github.com:${GITHUB_USER}/${name}.git"
+  printf '    %scloning%s %s → %s\n' "$CYAN" "$RESET" "$url" "$dir"
+  if (( dry_run )); then
+    printf '    %sdry-run:%s git clone %s %s\n' "$DIM" "$RESET" "$url" "$dir"
+    return 0
+  fi
+  mkdir -p "$parent" || return 1
+  git clone --quiet "$url" "$dir"
+}
+
 for dir in "${dirs[@]}"; do
-  echo "upd: pulling and pushing $dir..."
-  # Check for modified files
-  if [[ -n $(git -C "$dir" status --porcelain) ]]; then
-    echo "upd: warning: Uncommitted changes in $dir. Please commit or stash them before pushing."
-    git -C "$dir" status
+  if [[ -n $filter && $dir != *"$filter"* ]]; then
     continue
   fi
-  git -C "$dir" pull
-  git -C "$dir" push
+  if [[ ! -d $dir ]]; then
+    printf '\n%s==> %s%s %s(%s)%s\n' "$CYAN" "$(basename "$dir")" "$RESET" "$DIM" "$dir" "$RESET"
+    printf '%sMISSING%s not on disk; cloning from GitHub\n' "$YELLOW" "$RESET"
+    if ! clone_missing "$dir"; then
+      printf '%sFAIL%s clone failed\n' "$RED" "$RESET"
+      set_status "$dir" "FAIL (clone)"
+      continue
+    fi
+    if (( dry_run )); then
+      set_status "$dir" "CLONE (dry-run)"
+      continue
+    fi
+    printf '%sCLONED%s\n' "$GREEN" "$RESET"
+  fi
+  process_repo "$dir"
 done
 
-echo "upd: installing shellsafety..."
-( 
-  cd "$HOME"/src/shellsafety
+changed() {
+  local dir="$1"
+  local before
+  before="$(get_head "$dir")"
+  [[ -z $before ]] && return 1  # not processed this run → treat as unchanged
+  local after
+  after="$(git -C "$dir" rev-parse HEAD 2>/dev/null || echo '')"
+  [[ $before != "$after" ]]
+}
+
+install_step() {
+  local name="$1" dir="$2"
+  shift 2
+  printf '\n%s==> install %s%s %s(%s)%s\n' "$CYAN" "$name" "$RESET" "$DIM" "$dir" "$RESET"
+  if [[ ! -d $dir ]]; then
+    printf '%sSKIP%s dir missing\n' "$YELLOW" "$RESET"
+    return
+  fi
+  if ! changed "$dir" && [[ -z ${UPD_FORCE_INSTALL:-} ]]; then
+    printf '%sskip%s HEAD unchanged (set UPD_FORCE_INSTALL=1 to override)\n' "$DIM" "$RESET"
+    return
+  fi
+  if (( dry_run )); then
+    printf '%sdry-run:%s (cd %s && %s)\n' "$DIM" "$RESET" "$dir" "$*"
+    return
+  fi
+  if ( cd "$dir" && "$@" ); then
+    printf '%sOK%s installed %s\n' "$GREEN" "$RESET" "$name"
+  else
+    printf '%sFAIL%s install %s\n' "$RED" "$RESET" "$name"
+    set_status "install:$name" "FAIL (install)"
+  fi
+}
+
+install_step shellsafety "$HOME/src/shellsafety" \
   cabal install --overwrite-policy=always
-)
-
-echo "upd: installing statusline..."
-( 
-  cd "$HOME"/src/statusline
+install_step statusline "$HOME/src/statusline" \
   cargo install --path .
-)
 
+printf '\n%sSummary%s\n' "$BOLD" "$RESET"
+had_failure=0
+summary_lines=()
+i=0
+while (( i < ${#status_keys[@]} )); do
+  key="${status_keys[$i]}"
+  val="${status_vals[$i]}"
+  case "$val" in
+    OK)                  color="$GREEN" ;;
+    DIRTY*|SKIP*|CLONE*) color="$YELLOW" ;;
+    FAIL*)               color="$RED"; had_failure=1 ;;
+    *)                   color="$RESET" ;;
+  esac
+  summary_lines[${#summary_lines[@]}]="$(printf '  %s%-24s%s %s' "$color" "$val" "$RESET" "$key")"
+  i=$(( i + 1 ))
+done
+if (( ${#summary_lines[@]} > 0 )); then
+  printf '%s\n' "${summary_lines[@]}" | sort
+fi
+
+exit "$had_failure"
