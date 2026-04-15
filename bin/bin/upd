@@ -51,6 +51,7 @@ dirs=(
 installs=(
   "shellsafety|$HOME/src/shellsafety|cabal install --overwrite-policy=always"
   "statusline|$HOME/src/statusline|cargo install --path ."
+  "procman|$HOME/src/procman|cargo install --path ."
 )
 
 tmpdir="$(mktemp -d -t upd 2>/dev/null || mktemp -d)"
