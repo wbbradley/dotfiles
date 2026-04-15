@@ -46,12 +46,16 @@ dirs=(
   "$HOME"/src/statusline
   "$HOME"/src/pickls
   "$HOME"/src/procman
+  "$HOME"/src/rollup
+  "$HOME"/src/tmux-claude
 )
 
 installs=(
   "shellsafety|$HOME/src/shellsafety|cabal install --overwrite-policy=always"
   "statusline|$HOME/src/statusline|cargo install --path ."
   "procman|$HOME/src/procman|cargo install --path ."
+  "rollup|$HOME/src/rollup|cargo install --path ."
+  "tmux-claude|$HOME/src/tmux-claude|~/src/tmux-claude/bin/tmux-claude-setup"
 )
 
 tmpdir="$(mktemp -d -t upd 2>/dev/null || mktemp -d)"
