@@ -9,6 +9,18 @@ CYAN=$'\033[1;36m'
 DIM=$'\033[2m'
 RESET=$'\033[0m'
 
+# Palette for per-job prefix colors (non-bold, to let status colors pop).
+PREFIX_COLORS=(
+  $'\033[36m'   # cyan
+  $'\033[32m'   # green
+  $'\033[33m'   # yellow
+  $'\033[35m'   # magenta
+  $'\033[34m'   # blue
+  $'\033[31m'   # red
+  $'\033[96m'   # bright cyan
+  $'\033[92m'   # bright green
+)
+
 dry_run=0
 filter=""
 for arg in "$@"; do
@@ -32,38 +44,46 @@ dirs=(
   "$HOME"/.claude
   "$HOME"/src/shellsafety
   "$HOME"/src/statusline
+  "$HOME"/src/pickls
+  "$HOME"/src/procman
 )
 
-# Parallel arrays (bash 3.2 has no associative arrays).
-status_keys=()
-status_vals=()
-head_keys=()
-head_vals=()
+installs=(
+  "shellsafety|$HOME/src/shellsafety|cabal install --overwrite-policy=always"
+  "statusline|$HOME/src/statusline|cargo install --path ."
+)
 
-set_status() {
-  status_keys[${#status_keys[@]}]="$1"
-  status_vals[${#status_vals[@]}]="$2"
-}
+tmpdir="$(mktemp -d -t upd 2>/dev/null || mktemp -d)"
+trap 'rm -rf "$tmpdir"' EXIT INT TERM
+mkdir -p "$tmpdir/status" "$tmpdir/head"
 
-set_head() {
-  head_keys[${#head_keys[@]}]="$1"
-  head_vals[${#head_vals[@]}]="$2"
-}
+# Compute the widest job label so prefixes line up nicely.
+prefix_width=0
+for dir in "${dirs[@]}"; do
+  name="$(basename "$dir")"
+  (( ${#name} > prefix_width )) && prefix_width=${#name}
+done
+for entry in "${installs[@]}"; do
+  label="install:${entry%%|*}"
+  (( ${#label} > prefix_width )) && prefix_width=${#label}
+done
 
-get_head() {
-  local want="$1" i=0
-  while (( i < ${#head_keys[@]} )); do
-    if [[ "${head_keys[$i]}" == "$want" ]]; then
-      echo "${head_vals[$i]}"
-      return
-    fi
-    i=$(( i + 1 ))
+prefix_output() {
+  local name="$1" color="$2"
+  while IFS= read -r line; do
+    printf '%s%-*s%s | %s\n' "$color" "$prefix_width" "$name" "$RESET" "$line"
   done
+}
+
+set_status() { printf '%s\n' "$2" > "$tmpdir/status/$1"; }
+set_head()   { printf '%s\n' "$2" > "$tmpdir/head/$1"; }
+get_head() {
+  [[ -f "$tmpdir/head/$1" ]] && cat "$tmpdir/head/$1"
 }
 
 run() {
   if (( dry_run )); then
-    echo "${DIM}dry-run:${RESET} $*"
+    printf '%sdry-run:%s %s\n' "$DIM" "$RESET" "$*"
   else
     "$@"
   fi
@@ -73,21 +93,21 @@ process_repo() {
   local dir="$1"
   local name
   name="$(basename "$dir")"
-  printf '\n%s==> %s%s %s(%s)%s\n' "$CYAN" "$name" "$RESET" "$DIM" "$dir" "$RESET"
+  printf '%s==>%s %s%s%s\n' "$CYAN" "$RESET" "$DIM" "$dir" "$RESET"
 
   if ! git -C "$dir" rev-parse --git-dir >/dev/null 2>&1; then
     printf '%sFAIL%s not a git repo\n' "$RED" "$RESET"
-    set_status "$dir" "FAIL (not a repo)"
+    set_status "$name" "FAIL (not a repo)"
     return
   fi
 
   local before
   before="$(git -C "$dir" rev-parse HEAD 2>/dev/null || echo '')"
-  set_head "$dir" "$before"
+  set_head "$name" "$before"
 
   if ! git -C "$dir" fetch --quiet; then
     printf '%sFAIL%s fetch failed\n' "$RED" "$RESET"
-    set_status "$dir" "FAIL (fetch)"
+    set_status "$name" "FAIL (fetch)"
     return
   fi
 
@@ -95,40 +115,40 @@ process_repo() {
   upstream="$(git -C "$dir" rev-parse --abbrev-ref --symbolic-full-name '@{u}' 2>/dev/null || echo '')"
   if [[ -z $upstream ]]; then
     printf '%sWARN%s no upstream branch; skipping pull/push\n' "$YELLOW" "$RESET"
-    set_status "$dir" "SKIP (no upstream)"
+    set_status "$name" "SKIP (no upstream)"
     return
   fi
 
   local behind ahead
   behind="$(git -C "$dir" rev-list --count 'HEAD..@{u}' 2>/dev/null || echo 0)"
   ahead="$(git -C "$dir" rev-list --count '@{u}..HEAD' 2>/dev/null || echo 0)"
-  printf '    upstream=%s  behind=%s  ahead=%s\n' "$upstream" "$behind" "$ahead"
+  printf 'upstream=%s  behind=%s  ahead=%s\n' "$upstream" "$behind" "$ahead"
 
   if (( behind > 0 )); then
     if ! run git -C "$dir" pull --ff-only --autostash --quiet; then
       printf '%sFAIL%s pull (not fast-forward?); leaving dir alone\n' "$RED" "$RESET"
-      set_status "$dir" "FAIL (pull)"
+      set_status "$name" "FAIL (pull)"
       return
     fi
   fi
 
   if [[ -n "$(git -C "$dir" status --porcelain)" ]]; then
     printf '%sDIRTY%s uncommitted changes; skipping push\n' "$YELLOW" "$RESET"
-    git -C "$dir" status --short | sed 's/^/    /'
-    set_status "$dir" "DIRTY (skipped push)"
+    git -C "$dir" status --short
+    set_status "$name" "DIRTY (skipped push)"
     return
   fi
 
   if (( ahead > 0 )); then
     if ! run git -C "$dir" push --quiet; then
       printf '%sFAIL%s push failed\n' "$RED" "$RESET"
-      set_status "$dir" "FAIL (push)"
+      set_status "$name" "FAIL (push)"
       return
     fi
   fi
 
   printf '%sOK%s\n' "$GREEN" "$RESET"
-  set_status "$dir" "OK"
+  set_status "$name" "OK"
 }
 
 GITHUB_USER="wbbradley"
@@ -139,55 +159,66 @@ clone_missing() {
   name="$(basename "$dir")"
   parent="$(dirname "$dir")"
   url="git@github.com:${GITHUB_USER}/${name}.git"
-  printf '    %scloning%s %s → %s\n' "$CYAN" "$RESET" "$url" "$dir"
+  printf '%scloning%s %s → %s\n' "$CYAN" "$RESET" "$url" "$dir"
   if (( dry_run )); then
-    printf '    %sdry-run:%s git clone %s %s\n' "$DIM" "$RESET" "$url" "$dir"
+    printf '%sdry-run:%s git clone %s %s\n' "$DIM" "$RESET" "$url" "$dir"
     return 0
   fi
   mkdir -p "$parent" || return 1
   git clone --quiet "$url" "$dir"
 }
 
-for dir in "${dirs[@]}"; do
-  if [[ -n $filter && $dir != *"$filter"* ]]; then
-    continue
-  fi
+repo_job() {
+  local dir="$1"
+  local name
+  name="$(basename "$dir")"
   if [[ ! -d $dir ]]; then
-    printf '\n%s==> %s%s %s(%s)%s\n' "$CYAN" "$(basename "$dir")" "$RESET" "$DIM" "$dir" "$RESET"
     printf '%sMISSING%s not on disk; cloning from GitHub\n' "$YELLOW" "$RESET"
     if ! clone_missing "$dir"; then
       printf '%sFAIL%s clone failed\n' "$RED" "$RESET"
-      set_status "$dir" "FAIL (clone)"
-      continue
+      set_status "$name" "FAIL (clone)"
+      return
     fi
     if (( dry_run )); then
-      set_status "$dir" "CLONE (dry-run)"
-      continue
+      set_status "$name" "CLONE (dry-run)"
+      return
     fi
     printf '%sCLONED%s\n' "$GREEN" "$RESET"
   fi
   process_repo "$dir"
+}
+
+# Launch all repo jobs in parallel.
+i=0
+for dir in "${dirs[@]}"; do
+  if [[ -n $filter && $dir != *"$filter"* ]]; then
+    continue
+  fi
+  name="$(basename "$dir")"
+  color="${PREFIX_COLORS[$(( i % ${#PREFIX_COLORS[@]} ))]}"
+  i=$(( i + 1 ))
+  ( repo_job "$dir" 2>&1 | prefix_output "$name" "$color" ) &
 done
+wait
 
 changed() {
-  local dir="$1"
+  local name="$1" dir="$2"
   local before
-  before="$(get_head "$dir")"
-  [[ -z $before ]] && return 1  # not processed this run → treat as unchanged
+  before="$(get_head "$name")"
+  [[ -z $before ]] && return 1
   local after
   after="$(git -C "$dir" rev-parse HEAD 2>/dev/null || echo '')"
   [[ $before != "$after" ]]
 }
 
-install_step() {
+install_job() {
   local name="$1" dir="$2"
   shift 2
-  printf '\n%s==> install %s%s %s(%s)%s\n' "$CYAN" "$name" "$RESET" "$DIM" "$dir" "$RESET"
   if [[ ! -d $dir ]]; then
     printf '%sSKIP%s dir missing\n' "$YELLOW" "$RESET"
     return
   fi
-  if ! changed "$dir" && [[ -z ${UPD_FORCE_INSTALL:-} ]]; then
+  if ! changed "$name" "$dir" && [[ -z ${UPD_FORCE_INSTALL:-} ]]; then
     printf '%sskip%s HEAD unchanged (set UPD_FORCE_INSTALL=1 to override)\n' "$DIM" "$RESET"
     return
   fi
@@ -203,18 +234,26 @@ install_step() {
   fi
 }
 
-install_step shellsafety "$HOME/src/shellsafety" \
-  cabal install --overwrite-policy=always
-install_step statusline "$HOME/src/statusline" \
-  cargo install --path .
+# Install steps in parallel.
+i=0
+for entry in "${installs[@]}"; do
+  IFS='|' read -r iname idir icmd <<< "$entry"
+  color="${PREFIX_COLORS[$(( i % ${#PREFIX_COLORS[@]} ))]}"
+  i=$(( i + 1 ))
+  label="install:$iname"
+  # shellcheck disable=SC2086
+  ( install_job "$iname" "$idir" $icmd 2>&1 | prefix_output "$label" "$color" ) &
+done
+wait
 
+# Summary
 printf '\n%sSummary%s\n' "$BOLD" "$RESET"
 had_failure=0
 summary_lines=()
-i=0
-while (( i < ${#status_keys[@]} )); do
-  key="${status_keys[$i]}"
-  val="${status_vals[$i]}"
+for f in "$tmpdir/status"/*; do
+  [[ -e $f ]] || continue
+  key="$(basename "$f")"
+  val="$(cat "$f")"
   case "$val" in
     OK)                  color="$GREEN" ;;
     DIRTY*|SKIP*|CLONE*) color="$YELLOW" ;;
@@ -222,7 +261,6 @@ while (( i < ${#status_keys[@]} )); do
     *)                   color="$RESET" ;;
   esac
   summary_lines[${#summary_lines[@]}]="$(printf '  %s%-24s%s %s' "$color" "$val" "$RESET" "$key")"
-  i=$(( i + 1 ))
 done
 if (( ${#summary_lines[@]} > 0 )); then
   printf '%s\n' "${summary_lines[@]}" | sort
