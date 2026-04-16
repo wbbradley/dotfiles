@@ -48,6 +48,7 @@ dirs=(
   "$HOME"/src/procman
   "$HOME"/src/rollup
   "$HOME"/src/tmux-claude
+  "$HOME"/src/git-stack
 )
 
 installs=(
@@ -55,6 +56,7 @@ installs=(
   "statusline|$HOME/src/statusline|cargo install --path ."
   "procman|$HOME/src/procman|cargo install --path ."
   "rollup|$HOME/src/rollup|cargo install --path ."
+  "git-stack|$HOME/src/git-stack|cargo install --path ."
   "tmux-claude|$HOME/src/tmux-claude|~/src/tmux-claude/bin/tmux-claude-setup"
 )
 
