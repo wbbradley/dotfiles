@@ -257,6 +257,7 @@ wait
 printf '\n%sSummary%s\n' "$BOLD" "$RESET"
 had_failure=0
 summary_lines=()
+shopt -s nullglob dotglob
 for f in "$tmpdir/status"/*; do
   [[ -e $f ]] || continue
   key="$(basename "$f")"
