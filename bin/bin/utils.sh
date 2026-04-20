@@ -108,9 +108,13 @@ append_path() {
 
 prepend_path_to () {
   var=$1
-  shift
-  new_value="$(insert_at_head "$var" :"$(eval "echo -n \"\$$var\"")" "$@")"
-  eval "export $var=\"$new_value\""
+  shift || return 1
+  dir=$1
+  shift || return 1
+  if [[ -d "$dir" ]]; then
+    new_value="$(insert_at_head "$var" :"$(eval "echo -n \"\$$var\"")" "$dir")"
+    eval "export $var=\"$new_value\""
+  fi
 }
 
 huh() {
@@ -123,9 +127,13 @@ huh() {
 
 append_path_to () {
   var=$1
-  shift
-  new_value="$(append_path "$var" :"$(eval "echo -n \"\$$var\"")" "$@")"
-  eval "export $var=\"$new_value\""
+  shift || return 1
+  dir=$1
+  shift || return 1
+  if [[ -d "$dir" ]]; then
+    new_value="$(append_path "$var" :"$(eval "echo -n \"\$$var\"")" "$dir")"
+    eval "export $var=\"$new_value\""
+  fi
 }
 
 wvi () {

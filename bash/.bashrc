@@ -87,15 +87,11 @@ new-main() {
 
 . "$HOME/bin/utils.sh"
 
-if [[ -d /opt/homebrew/bin ]]; then
-  prepend_path_to PATH /opt/homebrew/sbin
-  prepend_path_to PATH /opt/homebrew/bin
-fi
+prepend_path_to PATH /opt/homebrew/sbin
+prepend_path_to PATH /opt/homebrew/bin
 
 prepend_path_to PATH "$HOME"/bin
-if [[ -d "$HOME"/.local/bin ]]; then
-  prepend_path_to PATH "$HOME"/.local/bin
-fi
+prepend_path_to PATH "$HOME"/.local/bin
 append_path_to PATH "$HOME"/go/bin
 
 pane_id_of_pane1() {
@@ -499,15 +495,9 @@ export GPG_TTY
 
 [[ -f "$HOME/.ghcup/env" ]] && . "$HOME/.ghcup/env" # ghcup-env
 [[ -f "$HOME/.cargo/env" ]] && . "$HOME/.cargo/env"
-if [[ -d "$HOME/.ghcup/bin" ]]; then
-  export PATH="$PATH:$HOME/.ghcup/bin"
-fi
-
+append_path_to PATH "$HOME"/.ghcup/bin
+append_path_to PATH "$HOME"/.cabal/bin
 [[ -f ~/.fzf.bash ]] && source ~/.fzf.bash
-
-if [[ -f "$HOME/local.bashrc" ]]; then
-  . "$HOME/local.bashrc"
-fi
 
 declare -x RUST_SRC_PATH
 RUST_SRC_PATH="$(rustc --print sysroot)"/lib/rustlib/src/rust/library/
@@ -516,12 +506,11 @@ if command -v jj >/dev/null 2>&1; then
   source <(jj util completion bash)
 fi
 
+append_path_to PATH "$HOME"/Library/pnpm
+
+if [[ -f "$HOME/local.bashrc" ]]; then
+  . "$HOME/local.bashrc"
+fi
+
 printf ''
 
-# pnpm
-export PNPM_HOME="/Users/wbbradley/Library/pnpm"
-case ":$PATH:" in
-  *":$PNPM_HOME:"*) ;;
-  *) export PATH="$PNPM_HOME:$PATH" ;;
-esac
-# pnpm end

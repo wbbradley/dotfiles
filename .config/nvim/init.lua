@@ -196,7 +196,42 @@ local lazy_plugins = {
     end
   },
   "nvim-lua/plenary.nvim",
-  { "nvim-treesitter/nvim-treesitter", branch = "master" },
+  {
+    "nvim-treesitter/nvim-treesitter",
+    branch = "main",
+    lazy = false,
+    build = ":TSUpdate",
+    config = function()
+      local ts_parsers = {
+        "bash", "c", "clojure", "cpp", "css", "dockerfile", "fennel", "go",
+        "hcl", "html", "http", "java", "json", "kotlin", "lua", "markdown",
+        "markdown_inline", "nix", "python", "ruby", "rust", "scala",
+        "starlark", "sql", "terraform", "thrift", "toml", "tsx", "typescript",
+        "vim", "vimdoc", "xml", "yaml"
+      }
+
+      require("nvim-treesitter").install(ts_parsers)
+
+      local ts_filetypes = {}
+      for _, parser in ipairs(ts_parsers) do
+        for _, ft in ipairs(vim.treesitter.language.get_filetypes(parser)) do
+          table.insert(ts_filetypes, ft)
+        end
+      end
+
+      vim.api.nvim_create_autocmd("FileType", {
+        pattern = ts_filetypes,
+        callback = function(args)
+          local max_filesize = 100 * 1024
+          local ok, stats = pcall(vim.loop.fs_stat, vim.api.nvim_buf_get_name(args.buf))
+          if ok and stats and stats.size > max_filesize then
+            return
+          end
+          pcall(vim.treesitter.start, args.buf)
+        end
+      })
+    end
+  },
   "nvim-treesitter/nvim-treesitter-context",
   {
     "folke/lazydev.nvim",
@@ -385,55 +420,6 @@ vim.cmd([[
   hi TreesitterContextBottom gui=underline guisp=Grey
   hi TreesitterContextLineNumberBottom gui=underline guisp=Grey
 ]])
-require("nvim-treesitter.configs").setup({
-  ensure_installed = {
-    "bash",
-    "c",
-    "clojure",
-    "cpp",
-    "css",
-    "dockerfile",
-    "fennel",
-    "go",
-    "hcl",
-    "html",
-    "http",
-    "java",
-    "json",
-    "kotlin",
-    "lua",
-    "markdown",
-    "nix",
-    "python",
-    "ruby",
-    "rust",
-    "scala",
-    "starlark",
-    "sql",
-    "terraform",
-    "thrift",
-    "toml",
-    "tsx",
-    "typescript",
-    "vim",
-    "vimdoc",
-    "xml",
-    "yaml"
-  },
-  highlight = {
-    enable = true,
-
-    -- disable highlight for large files
-    disable = function(_lang, buf)
-      local max_filesize = 100 * 1024 -- 100 KB
-      local ok, stats = pcall(vim.loop.fs_stat, vim.api.nvim_buf_get_name(buf))
-      if ok and stats and stats.size > max_filesize then
-        return true
-      end
-    end
-  }
-})
-
 vim.g._ts_force_sync_parsing = true
 vim.g.laststatus = 2
 

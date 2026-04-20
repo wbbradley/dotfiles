@@ -56,6 +56,8 @@ dirs=(
   "$HOME"/src/rollup
   "$HOME"/src/tmux-claude
   "$HOME"/src/git-stack
+  "$HOME"/src/nvim-procman
+  "$HOME"/src/tree-sitter-procman
 )
 
 installs=(
@@ -77,6 +79,7 @@ for dir in "${dirs[@]}"; do
   name="$(basename "$dir")"
   (( ${#name} > prefix_width )) && prefix_width=${#name}
 done
+cargo install tree-sitter-cli
 for entry in "${installs[@]}"; do
   label="install:${entry%%|*}"
   (( ${#label} > prefix_width )) && prefix_width=${#label}
@@ -179,7 +182,7 @@ clone_missing() {
     return 0
   fi
   mkdir -p "$parent" || return 1
-  git clone --quiet "$url" "$dir"
+  git clone "$url" "$dir"
 }
 
 repo_job() {
