@@ -58,6 +58,7 @@ dirs=(
   "$HOME"/src/git-stack
   "$HOME"/src/nvim-procman
   "$HOME"/src/tree-sitter-procman
+  "$HOME"/src/jumplist.nvim
 )
 
 installs=(
