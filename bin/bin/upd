@@ -1,288 +1,503 @@
-#!/bin/bash
-set -uo pipefail
+#!/usr/bin/env python3
+"""upd: update local checkouts and rebuild installables.
 
-BOLD=$'\033[1m'
-RED=$'\033[1;31m'
-GREEN=$'\033[1;32m'
-YELLOW=$'\033[1;33m'
-CYAN=$'\033[1;36m'
-DIM=$'\033[2m'
-RESET=$'\033[0m'
+Phases:
+  1. Parallel per-repo: fetch, fast-forward pull, then push if clean & ahead.
+     Dirty repos defer their push to phase 2.
+  2. Serial dirty-handling: for each dirty repo, prompt to commit. On "y",
+     stage everything, generate a commit message via `claude -p`, and open
+     the git commit editor (git commit -e -F <msg>). If the editor exits
+     non-zero (e.g. `:cq` from vim), the commit is aborted and the repo
+     is left dirty. On a successful commit, the repo is pushed afterward.
+  3. Parallel install: re-run install commands whose repo HEAD changed
+     (or all of them with --force).
+"""
 
-# Palette for per-job prefix colors (non-bold, to let status colors pop).
-PREFIX_COLORS=(
-  $'\033[36m'   # cyan
-  $'\033[32m'   # green
-  $'\033[33m'   # yellow
-  $'\033[35m'   # magenta
-  $'\033[34m'   # blue
-  $'\033[31m'   # red
-  $'\033[96m'   # bright cyan
-  $'\033[92m'   # bright green
-)
+from __future__ import annotations
 
-dry_run=0
-force=0
-filter=""
-for arg in "$@"; do
-  case "$arg" in
-    -n|--dry-run) dry_run=1 ;;
-    -f|--force)   force=1 ;;
-    -h|--help)
-      cat <<EOF
-usage: upd [--dry-run] [--force] [FILTER]
-  FILTER    substring; only repos whose path contains it are processed
-  -n        show what would happen without pulling/pushing/installing
-  -f        force install on all projects regardless of HEAD changes
-EOF
-      exit 0
-      ;;
-    -*) echo "upd: unknown flag: $arg" >&2; exit 2 ;;
-    *)  filter="$arg" ;;
-  esac
-done
+import argparse
+import os
+import shutil
+import subprocess
+import sys
+import tempfile
+import threading
+from concurrent.futures import ThreadPoolExecutor, as_completed
+from pathlib import Path
+from typing import Optional
 
-if (( force )); then
-  export UPD_FORCE_INSTALL=1
-fi
+BOLD = "\033[1m"
+RED = "\033[1;31m"
+GREEN = "\033[1;32m"
+YELLOW = "\033[1;33m"
+CYAN = "\033[1;36m"
+DIM = "\033[2m"
+RESET = "\033[0m"
 
-dirs=(
-  "$HOME"/src/dotfiles
-  "$HOME"/.claude
-  "$HOME"/src/shellsafety
-  "$HOME"/src/statusline
-  "$HOME"/src/pickls
-  "$HOME"/src/procman
-  "$HOME"/src/rollup
-  "$HOME"/src/tmux-claude
-  "$HOME"/src/git-stack
-  "$HOME"/src/nvim-procman
-  "$HOME"/src/tree-sitter-procman
-  "$HOME"/src/jumplist.nvim
-)
+PREFIX_COLORS = [
+    "\033[36m",  # cyan
+    "\033[32m",  # green
+    "\033[33m",  # yellow
+    "\033[35m",  # magenta
+    "\033[34m",  # blue
+    "\033[31m",  # red
+    "\033[96m",  # bright cyan
+    "\033[92m",  # bright green
+]
 
-installs=(
-  "shellsafety|$HOME/src/shellsafety|cabal install --overwrite-policy=always"
-  "statusline|$HOME/src/statusline|cargo install --path ."
-  "procman|$HOME/src/procman|cargo install --path ."
-  "rollup|$HOME/src/rollup|cargo install --path ."
-  "git-stack|$HOME/src/git-stack|cargo install --path ."
-  "tmux-claude|$HOME/src/tmux-claude|~/src/tmux-claude/bin/tmux-claude-setup"
-)
+HOME = Path.home()
 
-tmpdir="$(mktemp -d -t upd 2>/dev/null || mktemp -d)"
-trap 'rm -rf "$tmpdir"' EXIT INT TERM
-mkdir -p "$tmpdir/status" "$tmpdir/head"
+DIRS: list[Path] = [
+    HOME / "src/dotfiles",
+    HOME / ".claude",
+    HOME / "src/shellsafety",
+    HOME / "src/statusline",
+    HOME / "src/pickls",
+    HOME / "src/procman",
+    HOME / "src/rollup",
+    HOME / "src/tmux-claude",
+    HOME / "src/git-stack",
+    HOME / "src/nvim-procman",
+    HOME / "src/tree-sitter-procman",
+    HOME / "src/jumplist.nvim",
+]
 
-# Compute the widest job label so prefixes line up nicely.
-prefix_width=0
-for dir in "${dirs[@]}"; do
-  name="$(basename "$dir")"
-  (( ${#name} > prefix_width )) && prefix_width=${#name}
-done
-cargo install tree-sitter-cli
-for entry in "${installs[@]}"; do
-  label="install:${entry%%|*}"
-  (( ${#label} > prefix_width )) && prefix_width=${#label}
-done
+INSTALLS: list[tuple[str, Path, list[str]]] = [
+    ("shellsafety", HOME / "src/shellsafety",
+     ["cabal", "install", "--overwrite-policy=always"]),
+    ("statusline", HOME / "src/statusline", ["cargo", "install", "--path", "."]),
+    ("procman", HOME / "src/procman", ["cargo", "install", "--path", "."]),
+    ("rollup", HOME / "src/rollup", ["cargo", "install", "--path", "."]),
+    ("git-stack", HOME / "src/git-stack", ["cargo", "install", "--path", "."]),
+    ("tmux-claude", HOME / "src/tmux-claude",
+     [str(HOME / "src/tmux-claude/bin/tmux-claude-setup")]),
+]
 
-prefix_output() {
-  local name="$1" color="$2"
-  while IFS= read -r line; do
-    printf '%s%-*s%s | %s\n' "$color" "$prefix_width" "$name" "$RESET" "$line"
-  done
-}
+GITHUB_USER = "wbbradley"
 
-set_status() { printf '%s\n' "$2" > "$tmpdir/status/$1"; }
-set_head()   { printf '%s\n' "$2" > "$tmpdir/head/$1"; }
-get_head() {
-  [[ -f "$tmpdir/head/$1" ]] && cat "$tmpdir/head/$1"
-}
+_print_lock = threading.Lock()
+_status: dict[str, str] = {}
+_status_lock = threading.Lock()
+_heads: dict[str, str] = {}
+_heads_lock = threading.Lock()
 
-run() {
-  if (( dry_run )); then
-    printf '%sdry-run:%s %s\n' "$DIM" "$RESET" "$*"
-  else
-    "$@"
-  fi
-}
 
-process_repo() {
-  local dir="$1"
-  local name
-  name="$(basename "$dir")"
-  printf '%s==>%s %s%s%s\n' "$CYAN" "$RESET" "$DIM" "$dir" "$RESET"
+def set_status(name: str, val: str) -> None:
+    with _status_lock:
+        _status[name] = val
 
-  if ! git -C "$dir" rev-parse --git-dir >/dev/null 2>&1; then
-    printf '%sFAIL%s not a git repo\n' "$RED" "$RESET"
-    set_status "$name" "FAIL (not a repo)"
-    return
-  fi
 
-  local before
-  before="$(git -C "$dir" rev-parse HEAD 2>/dev/null || echo '')"
-  set_head "$name" "$before"
+def set_head(name: str, val: str) -> None:
+    with _heads_lock:
+        _heads[name] = val
 
-  if ! git -C "$dir" fetch --quiet; then
-    printf '%sFAIL%s fetch failed\n' "$RED" "$RESET"
-    set_status "$name" "FAIL (fetch)"
-    return
-  fi
 
-  local upstream
-  upstream="$(git -C "$dir" rev-parse --abbrev-ref --symbolic-full-name '@{u}' 2>/dev/null || echo '')"
-  if [[ -z $upstream ]]; then
-    printf '%sWARN%s no upstream branch; skipping pull/push\n' "$YELLOW" "$RESET"
-    set_status "$name" "SKIP (no upstream)"
-    return
-  fi
+def get_head(name: str) -> Optional[str]:
+    with _heads_lock:
+        return _heads.get(name)
 
-  local behind ahead
-  behind="$(git -C "$dir" rev-list --count 'HEAD..@{u}' 2>/dev/null || echo 0)"
-  ahead="$(git -C "$dir" rev-list --count '@{u}..HEAD' 2>/dev/null || echo 0)"
-  printf 'upstream=%s  behind=%s  ahead=%s\n' "$upstream" "$behind" "$ahead"
 
-  if (( behind > 0 )); then
-    if ! run git -C "$dir" pull --ff-only --autostash --quiet; then
-      printf '%sFAIL%s pull (not fast-forward?); leaving dir alone\n' "$RED" "$RESET"
-      set_status "$name" "FAIL (pull)"
-      return
-    fi
-  fi
+def emit(name: str, color: str, width: int, text: str) -> None:
+    lines = text.splitlines() if text else [""]
+    if not lines:
+        lines = [""]
+    with _print_lock:
+        for line in lines:
+            sys.stdout.write(f"{color}{name:<{width}}{RESET} | {line}\n")
+        sys.stdout.flush()
 
-  if [[ -n "$(git -C "$dir" status --porcelain)" ]]; then
-    printf '%sDIRTY%s uncommitted changes; skipping push\n' "$YELLOW" "$RESET"
-    git -C "$dir" status --short
-    set_status "$name" "DIRTY (skipped push)"
-    return
-  fi
 
-  if (( ahead > 0 )); then
-    if ! run git -C "$dir" push --quiet; then
-      printf '%sFAIL%s push failed\n' "$RED" "$RESET"
-      set_status "$name" "FAIL (push)"
-      return
-    fi
-  fi
+def git(dir: Path, *args: str) -> tuple[int, str, str]:
+    r = subprocess.run(
+        ["git", "-C", str(dir), *args],
+        capture_output=True, text=True,
+    )
+    return r.returncode, r.stdout, r.stderr
 
-  printf '%sOK%s\n' "$GREEN" "$RESET"
-  set_status "$name" "OK"
-}
 
-GITHUB_USER="wbbradley"
+def git_q(dir: Path, *args: str) -> str:
+    rc, out, _ = git(dir, *args)
+    return out.strip() if rc == 0 else ""
 
-clone_missing() {
-  local dir="$1"
-  local name url parent
-  name="$(basename "$dir")"
-  parent="$(dirname "$dir")"
-  url="git@github.com:${GITHUB_USER}/${name}.git"
-  printf '%scloning%s %s → %s\n' "$CYAN" "$RESET" "$url" "$dir"
-  if (( dry_run )); then
-    printf '%sdry-run:%s git clone %s %s\n' "$DIM" "$RESET" "$url" "$dir"
-    return 0
-  fi
-  mkdir -p "$parent" || return 1
-  git clone "$url" "$dir"
-}
 
-repo_job() {
-  local dir="$1"
-  local name
-  name="$(basename "$dir")"
-  if [[ ! -d $dir ]]; then
-    printf '%sMISSING%s not on disk; cloning from GitHub\n' "$YELLOW" "$RESET"
-    if ! clone_missing "$dir"; then
-      printf '%sFAIL%s clone failed\n' "$RED" "$RESET"
-      set_status "$name" "FAIL (clone)"
-      return
-    fi
-    if (( dry_run )); then
-      set_status "$name" "CLONE (dry-run)"
-      return
-    fi
-    printf '%sCLONED%s\n' "$GREEN" "$RESET"
-  fi
-  process_repo "$dir"
-}
+def stream(name: str, color: str, width: int, cmd: list[str],
+           cwd: Optional[Path] = None) -> int:
+    proc = subprocess.Popen(
+        cmd, cwd=cwd, stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT, text=True,
+    )
+    assert proc.stdout is not None
+    for line in proc.stdout:
+        emit(name, color, width, line.rstrip("\n"))
+    return proc.wait()
 
-# Launch all repo jobs in parallel.
-i=0
-for dir in "${dirs[@]}"; do
-  if [[ -n $filter && $dir != *"$filter"* ]]; then
-    continue
-  fi
-  name="$(basename "$dir")"
-  color="${PREFIX_COLORS[$(( i % ${#PREFIX_COLORS[@]} ))]}"
-  i=$(( i + 1 ))
-  ( repo_job "$dir" 2>&1 | prefix_output "$name" "$color" ) &
-done
-wait
 
-changed() {
-  local name="$1" dir="$2"
-  local before
-  before="$(get_head "$name")"
-  [[ -z $before ]] && return 1
-  local after
-  after="$(git -C "$dir" rev-parse HEAD 2>/dev/null || echo '')"
-  [[ $before != "$after" ]]
-}
+def clone_missing(dir: Path, color: str, width: int, dry_run: bool) -> bool:
+    name = dir.name
+    url = f"git@github.com:{GITHUB_USER}/{name}.git"
+    emit(name, color, width, f"{CYAN}cloning{RESET} {url} -> {dir}")
+    if dry_run:
+        emit(name, color, width, f"{DIM}dry-run:{RESET} git clone {url} {dir}")
+        return True
+    dir.parent.mkdir(parents=True, exist_ok=True)
+    return stream(name, color, width, ["git", "clone", url, str(dir)]) == 0
 
-install_job() {
-  local name="$1" dir="$2"
-  shift 2
-  if [[ ! -d $dir ]]; then
-    printf '%sSKIP%s dir missing\n' "$YELLOW" "$RESET"
-    return
-  fi
-  if ! changed "$name" "$dir" && [[ -z ${UPD_FORCE_INSTALL:-} ]]; then
-    printf '%sskip%s HEAD unchanged (set UPD_FORCE_INSTALL=1 to override)\n' "$DIM" "$RESET"
-    return
-  fi
-  if (( dry_run )); then
-    printf '%sdry-run:%s (cd %s && %s)\n' "$DIM" "$RESET" "$dir" "$*"
-    return
-  fi
-  if ( cd "$dir" && "$@" ); then
-    printf '%sOK%s installed %s\n' "$GREEN" "$RESET" "$name"
-  else
-    printf '%sFAIL%s install %s\n' "$RED" "$RESET" "$name"
-    set_status "install:$name" "FAIL (install)"
-  fi
-}
 
-# Install steps in parallel.
-i=0
-for entry in "${installs[@]}"; do
-  IFS='|' read -r iname idir icmd <<< "$entry"
-  color="${PREFIX_COLORS[$(( i % ${#PREFIX_COLORS[@]} ))]}"
-  i=$(( i + 1 ))
-  label="install:$iname"
-  # shellcheck disable=SC2086
-  ( install_job "$iname" "$idir" $icmd 2>&1 | prefix_output "$label" "$color" ) &
-done
-wait
+def process_repo(dir: Path, color: str, width: int,
+                 dry_run: bool) -> Optional[Path]:
+    """Run fetch/pull and (when clean) push. Return dir if dirty, else None."""
+    name = dir.name
 
-# Summary
-printf '\n%sSummary%s\n' "$BOLD" "$RESET"
-had_failure=0
-summary_lines=()
-shopt -s nullglob dotglob
-for f in "$tmpdir/status"/*; do
-  [[ -e $f ]] || continue
-  key="$(basename "$f")"
-  val="$(cat "$f")"
-  case "$val" in
-    OK)                  color="$GREEN" ;;
-    DIRTY*|SKIP*|CLONE*) color="$YELLOW" ;;
-    FAIL*)               color="$RED"; had_failure=1 ;;
-    *)                   color="$RESET" ;;
-  esac
-  summary_lines[${#summary_lines[@]}]="$(printf '  %s%-24s%s %s' "$color" "$val" "$RESET" "$key")"
-done
-if (( ${#summary_lines[@]} > 0 )); then
-  printf '%s\n' "${summary_lines[@]}" | sort
-fi
+    def e(s: str) -> None:
+        emit(name, color, width, s)
 
-exit "$had_failure"
+    e(f"{CYAN}==>{RESET} {DIM}{dir}{RESET}")
+
+    rc, _, _ = git(dir, "rev-parse", "--git-dir")
+    if rc != 0:
+        e(f"{RED}FAIL{RESET} not a git repo")
+        set_status(name, "FAIL (not a repo)")
+        return None
+
+    set_head(name, git_q(dir, "rev-parse", "HEAD"))
+
+    rc, _, err = git(dir, "fetch", "--quiet")
+    if rc != 0:
+        e(f"{RED}FAIL{RESET} fetch failed")
+        if err.strip():
+            e(err.strip())
+        set_status(name, "FAIL (fetch)")
+        return None
+
+    upstream = git_q(dir, "rev-parse", "--abbrev-ref",
+                     "--symbolic-full-name", "@{u}")
+    if not upstream:
+        e(f"{YELLOW}WARN{RESET} no upstream branch; skipping pull/push")
+        set_status(name, "SKIP (no upstream)")
+        return None
+
+    behind = git_q(dir, "rev-list", "--count", "HEAD..@{u}") or "0"
+    ahead = git_q(dir, "rev-list", "--count", "@{u}..HEAD") or "0"
+    e(f"upstream={upstream}  behind={behind}  ahead={ahead}")
+
+    if int(behind) > 0:
+        if dry_run:
+            e(f"{DIM}dry-run:{RESET} git pull --ff-only --autostash --quiet")
+        else:
+            rc, _, err = git(dir, "pull", "--ff-only", "--autostash", "--quiet")
+            if rc != 0:
+                e(f"{RED}FAIL{RESET} pull (not fast-forward?); leaving dir alone")
+                if err.strip():
+                    e(err.strip())
+                set_status(name, "FAIL (pull)")
+                return None
+
+    porcelain = git_q(dir, "status", "--porcelain")
+    if porcelain:
+        e(f"{YELLOW}DIRTY{RESET} uncommitted changes; will prompt after parallel phase")
+        for line in porcelain.splitlines():
+            e(line)
+        set_status(name, "DIRTY (pending prompt)")
+        return dir  # defer push decision
+
+    if int(ahead) > 0:
+        if dry_run:
+            e(f"{DIM}dry-run:{RESET} git push --quiet")
+        else:
+            rc, _, err = git(dir, "push", "--quiet")
+            if rc != 0:
+                e(f"{RED}FAIL{RESET} push failed")
+                if err.strip():
+                    e(err.strip())
+                set_status(name, "FAIL (push)")
+                return None
+
+    e(f"{GREEN}OK{RESET}")
+    set_status(name, "OK")
+    return None
+
+
+def repo_job(dir: Path, color: str, width: int, dry_run: bool) -> Optional[Path]:
+    name = dir.name
+    if not dir.is_dir():
+        emit(name, color, width,
+             f"{YELLOW}MISSING{RESET} not on disk; cloning from GitHub")
+        if not clone_missing(dir, color, width, dry_run):
+            emit(name, color, width, f"{RED}FAIL{RESET} clone failed")
+            set_status(name, "FAIL (clone)")
+            return None
+        if dry_run:
+            set_status(name, "CLONE (dry-run)")
+            return None
+        emit(name, color, width, f"{GREEN}CLONED{RESET}")
+    return process_repo(dir, color, width, dry_run)
+
+
+def prompt_yn(prompt: str, default: bool = False) -> bool:
+    suffix = " [Y/n] " if default else " [y/N] "
+    while True:
+        try:
+            ans = input(prompt + suffix).strip().lower()
+        except EOFError:
+            return default
+        if not ans:
+            return default
+        if ans in ("y", "yes"):
+            return True
+        if ans in ("n", "no"):
+            return False
+
+
+def clean_commit_msg(msg: str) -> str:
+    msg = msg.strip()
+    if msg.startswith("```"):
+        lines = msg.splitlines()
+        lines = lines[1:]
+        if lines and lines[-1].startswith("```"):
+            lines = lines[:-1]
+        msg = "\n".join(lines).strip()
+    return msg
+
+
+def generate_commit_message(dir: Path) -> str:
+    if shutil.which("claude") is None:
+        return ""
+    diff_proc = subprocess.run(
+        ["git", "-C", str(dir), "diff", "--cached"],
+        capture_output=True, text=True,
+    )
+    diff = diff_proc.stdout
+    if not diff.strip():
+        return ""
+    prompt = (
+        "Generate a concise semantic git commit message for the diff piped on "
+        "stdin. Use conventional-commit style (e.g. 'feat: ...', 'fix: ...', "
+        "'chore: ...', 'refactor: ...'). Output the commit message text only: "
+        "no quotes, no markdown fences, no preamble, no attributions."
+    )
+    try:
+        proc = subprocess.run(
+            ["claude", "-p", prompt],
+            input=diff, capture_output=True, text=True, timeout=120,
+        )
+    except subprocess.TimeoutExpired:
+        return ""
+    return clean_commit_msg(proc.stdout)
+
+
+def handle_dirty_repos(dirty: list[Path], dry_run: bool) -> list[Path]:
+    """Prompt serially for each dirty repo. Return list of dirs that were
+    successfully committed (and thus need a push attempt)."""
+    committed: list[Path] = []
+    for dir in dirty:
+        name = dir.name
+        sys.stdout.write(f"\n{BOLD}=== {name} is dirty ==={RESET}\n")
+        _, status_out, _ = git(dir, "status", "--short")
+        sys.stdout.write(status_out)
+        sys.stdout.flush()
+
+        if not prompt_yn(f"Commit local changes in {name}?", default=False):
+            sys.stdout.write(f"{YELLOW}leaving {name} dirty{RESET}\n")
+            set_status(name, "DIRTY (skipped)")
+            continue
+
+        if dry_run:
+            sys.stdout.write(
+                f"{DIM}dry-run:{RESET} would stage, generate msg, open editor\n"
+            )
+            set_status(name, "DIRTY (dry-run)")
+            continue
+
+        rc, _, err = git(dir, "add", "-A")
+        if rc != 0:
+            sys.stdout.write(f"{RED}git add failed:{RESET} {err}\n")
+            set_status(name, "FAIL (git add)")
+            continue
+
+        sys.stdout.write(
+            f"{DIM}generating commit message via claude -p...{RESET}\n"
+        )
+        sys.stdout.flush()
+        msg = generate_commit_message(dir)
+
+        commit_cmd = ["git", "-C", str(dir), "commit", "-e"]
+        msgfile: Optional[str] = None
+        if msg:
+            with tempfile.NamedTemporaryFile(
+                "w", prefix="upd-msg-", suffix=".txt", delete=False,
+            ) as f:
+                f.write(msg + "\n")
+                msgfile = f.name
+            commit_cmd += ["-F", msgfile]
+
+        try:
+            rc = subprocess.call(commit_cmd)
+        finally:
+            if msgfile:
+                try:
+                    os.unlink(msgfile)
+                except OSError:
+                    pass
+
+        if rc == 0:
+            sys.stdout.write(f"{GREEN}committed{RESET} {name}\n")
+            set_status(name, "COMMITTED")
+            committed.append(dir)
+        else:
+            sys.stdout.write(
+                f"{YELLOW}commit aborted; leaving {name} dirty{RESET}\n"
+            )
+            set_status(name, "DIRTY (commit aborted)")
+    return committed
+
+
+def push_after_commit(dir: Path, color: str, width: int,
+                      dry_run: bool) -> None:
+    name = dir.name
+
+    def e(s: str) -> None:
+        emit(name, color, width, s)
+
+    ahead = git_q(dir, "rev-list", "--count", "@{u}..HEAD") or "0"
+    if int(ahead) <= 0:
+        e(f"{GREEN}OK{RESET} (nothing to push)")
+        set_status(name, "OK")
+        return
+    if dry_run:
+        e(f"{DIM}dry-run:{RESET} git push --quiet")
+        return
+    rc, _, err = git(dir, "push", "--quiet")
+    if rc != 0:
+        e(f"{RED}FAIL{RESET} push failed")
+        if err.strip():
+            e(err.strip())
+        set_status(name, "FAIL (push)")
+        return
+    e(f"{GREEN}OK{RESET}")
+    set_status(name, "OK")
+
+
+def changed(name: str, dir: Path) -> bool:
+    before = get_head(name)
+    if not before:
+        return False
+    after = git_q(dir, "rev-parse", "HEAD")
+    return before != after
+
+
+def install_job(name: str, dir: Path, cmd: list[str], color: str,
+                width: int, dry_run: bool, force: bool) -> None:
+    label = f"install:{name}"
+
+    def e(s: str) -> None:
+        emit(label, color, width, s)
+
+    if not dir.is_dir():
+        e(f"{YELLOW}SKIP{RESET} dir missing")
+        return
+    if not force and not changed(name, dir):
+        e(f"{DIM}skip{RESET} HEAD unchanged (use --force to override)")
+        return
+    if dry_run:
+        e(f"{DIM}dry-run:{RESET} (cd {dir} && {' '.join(cmd)})")
+        return
+    rc = stream(label, color, width, cmd, cwd=dir)
+    if rc == 0:
+        e(f"{GREEN}OK{RESET} installed {name}")
+    else:
+        e(f"{RED}FAIL{RESET} install {name}")
+        set_status(label, "FAIL (install)")
+
+
+def summary_color(val: str) -> tuple[str, bool]:
+    if val in ("OK", "COMMITTED"):
+        return GREEN, False
+    if val.startswith(("DIRTY", "SKIP", "CLONE")):
+        return YELLOW, False
+    if val.startswith("FAIL"):
+        return RED, True
+    return RESET, False
+
+
+def main() -> int:
+    p = argparse.ArgumentParser(
+        prog="upd",
+        description="Update local checkouts and rebuild installables.",
+    )
+    p.add_argument("-n", "--dry-run", action="store_true",
+                   help="show what would happen without pulling/pushing/installing")
+    p.add_argument("-f", "--force", action="store_true",
+                   help="force install on all projects regardless of HEAD changes")
+    p.add_argument("filter", nargs="?", default="",
+                   help="substring; only repos whose path contains it are processed")
+    args = p.parse_args()
+
+    selected_dirs = [d for d in DIRS if not args.filter or args.filter in str(d)]
+
+    # Prefix width over the full configured list (so it stays stable across runs).
+    width = 0
+    for d in DIRS:
+        width = max(width, len(d.name))
+    for name, _, _ in INSTALLS:
+        width = max(width, len(f"install:{name}"))
+
+    # Phase 1: parallel repo fetch/pull/(push if clean).
+    dirty: list[Path] = []
+    if selected_dirs:
+        with ThreadPoolExecutor(max_workers=len(selected_dirs)) as ex:
+            futures = {}
+            for i, d in enumerate(selected_dirs):
+                color = PREFIX_COLORS[i % len(PREFIX_COLORS)]
+                futures[ex.submit(repo_job, d, color, width, args.dry_run)] = d
+            for fut in as_completed(futures):
+                res = fut.result()
+                if res is not None:
+                    dirty.append(res)
+
+    # Phase 2: serial commit prompts for dirty repos, then parallel push for
+    # repos that got committed.
+    if dirty:
+        # Order by the configured DIRS order for deterministic prompt order.
+        order = {d: i for i, d in enumerate(selected_dirs)}
+        dirty.sort(key=lambda d: order.get(d, 0))
+        committed = handle_dirty_repos(dirty, args.dry_run)
+        if committed:
+            with ThreadPoolExecutor(max_workers=len(committed)) as ex:
+                for i, d in enumerate(committed):
+                    color = PREFIX_COLORS[i % len(PREFIX_COLORS)]
+                    ex.submit(push_after_commit, d, color, width, args.dry_run)
+
+    # Preserved from the original: keep tree-sitter-cli up to date.
+    if not args.dry_run:
+        subprocess.call(["cargo", "install", "tree-sitter-cli"])
+    else:
+        sys.stdout.write(f"{DIM}dry-run:{RESET} cargo install tree-sitter-cli\n")
+
+    # Phase 3: parallel install.
+    with ThreadPoolExecutor(max_workers=len(INSTALLS)) as ex:
+        for i, (name, idir, cmd) in enumerate(INSTALLS):
+            color = PREFIX_COLORS[i % len(PREFIX_COLORS)]
+            ex.submit(install_job, name, idir, cmd, color, width,
+                      args.dry_run, args.force)
+
+    # Summary.
+    sys.stdout.write(f"\n{BOLD}Summary{RESET}\n")
+    had_failure = 0
+    lines: list[str] = []
+    with _status_lock:
+        items = sorted(_status.items())
+    for key, val in items:
+        color, is_fail = summary_color(val)
+        if is_fail:
+            had_failure = 1
+        lines.append(f"  {color}{val:<24}{RESET} {key}")
+    if lines:
+        sys.stdout.write("\n".join(sorted(lines)) + "\n")
+    return had_failure
+
+
+if __name__ == "__main__":
+    try:
+        sys.exit(main())
+    except KeyboardInterrupt:
+        sys.exit(130)
