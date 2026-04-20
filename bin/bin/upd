@@ -75,6 +75,9 @@ INSTALLS: list[tuple[str, Path, list[str]]] = [
 
 GITHUB_USER = "wbbradley"
 
+DOTFILES_DIR = HOME / "src/dotfiles"
+SELF_REL_PATH = "bin/bin/upd"  # path to this script within DOTFILES_DIR
+
 _print_lock = threading.Lock()
 _status: dict[str, str] = {}
 _status_lock = threading.Lock()
@@ -286,8 +289,9 @@ def generate_commit_message(dir: Path) -> str:
 
 
 def handle_dirty_repos(dirty: list[Path], dry_run: bool) -> list[Path]:
-    """Prompt serially for each dirty repo. Return list of dirs that were
-    successfully committed (and thus need a push attempt)."""
+    """Run the commit editor serially for each dirty repo. Return the list of
+    dirs that were successfully committed (and thus need a push attempt).
+    Aborting the editor (:cq) leaves the repo dirty."""
     committed: list[Path] = []
     for dir in dirty:
         name = dir.name
@@ -295,11 +299,6 @@ def handle_dirty_repos(dirty: list[Path], dry_run: bool) -> list[Path]:
         _, status_out, _ = git(dir, "status", "--short")
         sys.stdout.write(status_out)
         sys.stdout.flush()
-
-        if not prompt_yn(f"Commit local changes in {name}?", default=False):
-            sys.stdout.write(f"{YELLOW}leaving {name} dirty{RESET}\n")
-            set_status(name, "DIRTY (skipped)")
-            continue
 
         if dry_run:
             sys.stdout.write(
@@ -409,6 +408,52 @@ def install_job(name: str, dir: Path, cmd: list[str], color: str,
         set_status(label, "FAIL (install)")
 
 
+def self_update_and_reexec(argv: list[str]) -> None:
+    """If dotfiles upstream has a newer version of this script, fast-forward
+    pull and re-exec. Returns without re-execing when no update is needed,
+    when dotfiles is dirty, or when any check fails."""
+    dir = DOTFILES_DIR
+    if not dir.is_dir():
+        return
+    if git(dir, "rev-parse", "--git-dir")[0] != 0:
+        return
+    if git(dir, "fetch", "--quiet")[0] != 0:
+        return
+    upstream = git_q(dir, "rev-parse", "--abbrev-ref",
+                     "--symbolic-full-name", "@{u}")
+    if not upstream:
+        return
+    behind = git_q(dir, "rev-list", "--count", "HEAD..@{u}") or "0"
+    if int(behind) <= 0:
+        return
+    rc, out, _ = git(dir, "diff", "--name-only", "HEAD..@{u}",
+                     "--", SELF_REL_PATH)
+    if rc != 0 or not out.strip():
+        return  # upd itself didn't change
+
+    sys.stdout.write(
+        f"{CYAN}upd: dotfiles upstream has a newer upd; pulling...{RESET}\n"
+    )
+    sys.stdout.flush()
+
+    if git_q(dir, "status", "--porcelain"):
+        sys.stdout.write(
+            f"{YELLOW}dotfiles is dirty; skipping self-update{RESET}\n"
+        )
+        return
+    rc, _, err = git(dir, "pull", "--ff-only", "--quiet")
+    if rc != 0:
+        sys.stdout.write(
+            f"{YELLOW}self-update pull failed: {err.strip()}{RESET}\n"
+        )
+        return
+
+    new_path = str(dir / SELF_REL_PATH)
+    sys.stdout.write(f"{CYAN}restarting: {new_path}{RESET}\n")
+    sys.stdout.flush()
+    os.execv(new_path, [new_path, "--skip-self-update", *argv])
+
+
 def summary_color(val: str) -> tuple[str, bool]:
     if val in ("OK", "COMMITTED"):
         return GREEN, False
@@ -428,9 +473,17 @@ def main() -> int:
                    help="show what would happen without pulling/pushing/installing")
     p.add_argument("-f", "--force", action="store_true",
                    help="force install on all projects regardless of HEAD changes")
+    p.add_argument("--skip-self-update", action="store_true",
+                   help=argparse.SUPPRESS)
     p.add_argument("filter", nargs="?", default="",
                    help="substring; only repos whose path contains it are processed")
     args = p.parse_args()
+
+    if not args.skip_self_update:
+        # Forward all args except --skip-self-update so the re-exec'd run
+        # behaves identically (filter, --dry-run, --force).
+        forward = [a for a in sys.argv[1:] if a != "--skip-self-update"]
+        self_update_and_reexec(forward)
 
     selected_dirs = [d for d in DIRS if not args.filter or args.filter in str(d)]
 
