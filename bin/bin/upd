@@ -22,15 +22,18 @@ PREFIX_COLORS=(
 )
 
 dry_run=0
+force=0
 filter=""
 for arg in "$@"; do
   case "$arg" in
     -n|--dry-run) dry_run=1 ;;
+    -f|--force)   force=1 ;;
     -h|--help)
       cat <<EOF
-usage: upd [--dry-run] [FILTER]
+usage: upd [--dry-run] [--force] [FILTER]
   FILTER    substring; only repos whose path contains it are processed
   -n        show what would happen without pulling/pushing/installing
+  -f        force install on all projects regardless of HEAD changes
 EOF
       exit 0
       ;;
@@ -38,6 +41,10 @@ EOF
     *)  filter="$arg" ;;
   esac
 done
+
+if (( force )); then
+  export UPD_FORCE_INSTALL=1
+fi
 
 dirs=(
   "$HOME"/src/dotfiles
