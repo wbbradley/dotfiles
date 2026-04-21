@@ -4,7 +4,7 @@
   signingkey = AE6C32FE234214518A99B63E0FF845E0416DA190
 [commit]
 	verbose = true
-  gpgsign = true
+  gpgsign = false
 [log]
   showSignature = false
 [color]
