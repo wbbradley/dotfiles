@@ -395,7 +395,7 @@ def install_job(name: str, dir: Path, cmd: list[str], color: str,
         e(f"{YELLOW}SKIP{RESET} dir missing")
         return
     if not force and not changed(name, dir):
-        e(f"{DIM}skip{RESET} HEAD unchanged (use --force to override)")
+        e(f"{GREEN}OK{RESET}")
         return
     if dry_run:
         e(f"{DIM}dry-run:{RESET} (cd {dir} && {' '.join(cmd)})")
