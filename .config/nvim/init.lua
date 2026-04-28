@@ -1001,7 +1001,7 @@ vim.api.nvim_create_autocmd({ "BufRead" }, {
   callback = function(_)
     if vim.fn.executable("pickls") ~= 0 then
       -- We found an executable for pickls.
-      vim.lsp.set_log_level(vim.log.levels.WARN)
+      vim.lsp.log.set_level(vim.log.levels.WARN)
       vim.lsp.start({
         name = "pickls",
         cmd = { "pickls", vim.api.nvim_buf_get_name(0) },
@@ -1040,7 +1040,7 @@ vim.api.nvim_create_autocmd("LspAttach", {
 --   callback = function(_)
 --     if vim.fn.executable("dmypyls") ~= 0 then
 --       -- We found an executable for dmypyls.
---       vim.lsp.set_log_level(vim.log.levels.INFO)
+--       vim.lsp.log.set_level(vim.log.levels.INFO)
 --       vim.lsp.start({
 --         name = "dmypyls",
 --         cmd = { "dmypyls", vim.api.nvim_buf_get_name(0) },
