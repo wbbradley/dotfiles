@@ -53,12 +53,6 @@ local lazy_plugins = {
     'nvim-lualine/lualine.nvim',
     dependencies = { 'nvim-tree/nvim-web-devicons' }
   },
-  {
-    "MysticalDevil/inlay-hints.nvim",
-    event = "LspAttach",
-    dependencies = { "neovim/nvim-lspconfig" },
-    config = function() require("inlay-hints").setup() end
-  },
   "jremmen/vim-ripgrep",
   {
     "ibhagwan/fzf-lua",
@@ -90,7 +84,7 @@ local lazy_plugins = {
   }, -- "nvimtools/none-ls.nvim",
   {
     "neovim/nvim-lspconfig",
-    dependencies = { { "j-hui/fidget.nvim", opts = {} } },
+    dependencies = { { "j-hui/fidget.nvim", enabled = true, opts = {} } },
     opts = { inlay_hints = { enabled = false } },
     config = function() end
   },
@@ -232,7 +226,7 @@ local lazy_plugins = {
       })
     end
   },
-  "nvim-treesitter/nvim-treesitter-context",
+  { "nvim-treesitter/nvim-treesitter-context", enabled = true },
   {
     "folke/lazydev.nvim",
     ft = "lua", -- only load on lua files
@@ -385,7 +379,6 @@ local function nmap(shortcut, command) keymap("n", shortcut, command) end
 nmap("M", ":FzfLua oldfiles<CR>")
 nmap("mm", "vipgq")
 nmap("<C-p>", ":FzfLua git_files<CR>")
-nmap("<leader>[", ":InlayHintsToggle<CR>")
 nmap("E", ':lua require("fzf-lua").live_grep()')
 nmap("vv", "viw")
 nmap(",", "<Plug>(easymotion-s)")
