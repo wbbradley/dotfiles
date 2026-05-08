@@ -42,7 +42,7 @@
 [mergetool]
   keepBackup = false
 [mergetool "nvim"]
-	cmd = /opt/homebrew/bin/nvim \"$MERGED\" '+/<<<<<\\|=====\\|>>>>>'
+	cmd = nvim \"$MERGED\" '+/<<<<<\\|=====\\|>>>>>'
 	trustExitCode = true
 [mergetool "sourcetree"]
 	cmd = /Applications/Sourcetree.app/Contents/Resources/opendiff-w.sh \"$LOCAL\" \"$REMOTE\" -ancestor \"$BASE\" -merge \"$MERGED\"
