@@ -60,6 +60,7 @@ DIRS: list[Path] = [
     HOME / "src/nvim-procman",
     HOME / "src/tree-sitter-procman",
     HOME / "src/jumplist.nvim",
+    HOME / "src/rtop",
 ]
 
 INSTALLS: list[tuple[str, Path, list[str]]] = [
@@ -69,6 +70,7 @@ INSTALLS: list[tuple[str, Path, list[str]]] = [
     ("procman", HOME / "src/procman", ["cargo", "install", "--path", "."]),
     ("rollup", HOME / "src/rollup", ["cargo", "install", "--path", "."]),
     ("git-stack", HOME / "src/git-stack", ["cargo", "install", "--path", "."]),
+    ("rtop", HOME / "src/rtop", ["cargo", "install", "--path", "."]),
     ("tmux-claude", HOME / "src/tmux-claude",
      [str(HOME / "src/tmux-claude/bin/tmux-claude-setup")]),
 ]
