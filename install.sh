@@ -122,6 +122,11 @@ run-install() (
 
 run-install >>"$HOME"/install.log 2>&1  || die "installation failed, see $HOME/install.log for details"
 
+if ! command -v cargo 2>/dev/null >/dev/null; then
+  echo "Installing Rust..."
+  curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+fi
+
 # Make sure needed tools are available
 git --version > /dev/null || die "git not installed"
 curl --version > /dev/null || die "curl not installed"
