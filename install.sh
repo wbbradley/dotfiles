@@ -163,6 +163,12 @@ if ! command -v flatc 2>/dev/null >/dev/null; then
   )
 fi
 
+# Install Haskell compiler 
+if ! command -v ghcup 2>/dev/null >/dev/null; then
+  echo "Installing ghcup..."
+  curl --proto '=https' --tlsv1.2 -sSf https://get-ghcup.haskell.org | sh
+fi
+
 # Make sure needed tools are available
 git --version || die "git not installed"
 curl --version || die "curl not installed"
@@ -170,6 +176,7 @@ nvim --version || die "vim not installed"
 cmake --version || die "cmake not installed"
 flatc --version || die "flatc not installed"
 cargo --version || die "cargo not installed"
+ghc --version || die "ghc not installed"
 
 
 dotfiles_dir="$HOME/src/dotfiles"
