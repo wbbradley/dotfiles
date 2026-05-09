@@ -69,6 +69,26 @@ setup-fzf() {
   cd "$fzf_dir" || exit
   ./install --all --no-zsh --no-fish || die "failed to install fzf"
 }
+apt_pkgs=(
+  build-essential
+  cmake
+  curl
+  eza
+  gettext
+  git
+  libffi-dev
+  libgmp-dev
+  libncurses-dev
+  libssl-dev
+  libtinfo5
+  ninja-build
+  openssl
+  pass
+  pkg-config
+  tmux
+  universal-ctags
+  unzip
+)
 
 run-install() (
   mkdir -p "$HOME"/.local/bin ||:
@@ -94,7 +114,7 @@ run-install() (
   elif on-linux; then
     if command -v apt 2>/dev/null; then
       sudo apt update -y
-      sudo apt install -y universal-ctags pass git tmux build-essential libssl-dev pkg-config ninja-build gettext cmake unzip curl eza
+      sudo apt install -y "${apt_pkgs[@]}"
       if ! command -v nvim 2>/dev/null >/dev/null; then
         mkdir -p "$HOME"/src
 
@@ -127,10 +147,29 @@ if ! command -v cargo 2>/dev/null >/dev/null; then
   curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 fi
 
+if ! command -v flatc 2>/dev/null >/dev/null; then
+  echo "Installing flatc..."
+  (
+    cd ~/src || die "failed to cd to src dir"
+    if ! [ -d flatbuffers ]; then
+      git clone --depth 1 https://github.com/google/flatbuffers || die "failed to clone flatbuffers repo"
+    fi
+    cd flatbuffers || die "failed to cd to flatbuffers dir" 
+    cmake -G "Unix Makefiles" || die "failed to run cmake for flatbuffers"
+    make -j || die "failed to make flatbuffers"
+    if on-linux; then
+      make install
+    fi
+  )
+fi
+
 # Make sure needed tools are available
-git --version > /dev/null || die "git not installed"
-curl --version > /dev/null || die "curl not installed"
-nvim --version > /dev/null || die "vim not installed"
+git --version || die "git not installed"
+curl --version || die "curl not installed"
+nvim --version || die "vim not installed"
+cmake --version || die "cmake not installed"
+flatc --version || die "flatc not installed"
+cargo --version || die "cargo not installed"
 
 
 dotfiles_dir="$HOME/src/dotfiles"
