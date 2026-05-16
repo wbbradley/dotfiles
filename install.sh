@@ -71,6 +71,7 @@ setup-fzf() {
 }
 apt_pkgs=(
   build-essential
+  clang
   cmake
   curl
   eza
@@ -80,7 +81,6 @@ apt_pkgs=(
   libgmp-dev
   libncurses-dev
   libssl-dev
-  libtinfo5
   ninja-build
   openssl
   pass
@@ -114,7 +114,7 @@ run-install() (
   elif on-linux; then
     if command -v apt 2>/dev/null; then
       sudo apt update -y
-      sudo apt install -y "${apt_pkgs[@]}"
+      sudo apt install -y "${apt_pkgs[@]}" || die "failed to install apt packages"
       if ! command -v nvim 2>/dev/null >/dev/null; then
         mkdir -p "$HOME"/src
 
@@ -142,9 +142,16 @@ run-install() (
 
 run-install >>"$HOME"/install.log 2>&1  || die "installation failed, see $HOME/install.log for details"
 
+[ -f "$HOME/.ghcup/env" ] && . "$HOME/.ghcup/env"
+[ -f "$HOME/.cargo/env" ] && . "$HOME/.cargo/env"
+
 if ! command -v cargo 2>/dev/null >/dev/null; then
   echo "Installing Rust..."
   curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+  if ! [ -f "$HOME"/.cargo/env ]; then
+    die "no cargo env found"
+  fi
+  . "$HOME"/.cargo/env
 fi
 
 if ! command -v flatc 2>/dev/null >/dev/null; then
@@ -158,7 +165,7 @@ if ! command -v flatc 2>/dev/null >/dev/null; then
     cmake -G "Unix Makefiles" || die "failed to run cmake for flatbuffers"
     make -j || die "failed to make flatbuffers"
     if on-linux; then
-      make install
+      sudo make install
     fi
   )
 fi
