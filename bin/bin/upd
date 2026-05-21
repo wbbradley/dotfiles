@@ -52,6 +52,7 @@ DIRS: list[Path] = [
     HOME / ".claude",
     HOME / "src/shellsafety",
     HOME / "src/statusline",
+    HOME / "src/autorize",
     HOME / "src/pickls",
     HOME / "src/procman",
     HOME / "src/rollup",
@@ -71,6 +72,7 @@ INSTALLS: list[tuple[str, Path, list[str]]] = [
     ("rollup", HOME / "src/rollup", ["cargo", "install", "--path", "."]),
     ("git-stack", HOME / "src/git-stack", ["cargo", "install", "--path", "."]),
     ("rtop", HOME / "src/rtop", ["cargo", "install", "--path", "."]),
+    ("autorize", HOME / "src/autorize", ["cargo", "install", "--path", "."]),
     ("tmux-claude", HOME / "src/tmux-claude",
      [str(HOME / "src/tmux-claude/bin/tmux-claude-setup")]),
 ]
