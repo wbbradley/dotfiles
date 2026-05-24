@@ -223,4 +223,13 @@ fi
 rm -rf "${HOME:?}/bin"
 ln -sf "$dotfiles_dir/bin/bin" "$HOME/bin" || die "failed to link bin dir"
 
+# Apply GNOME desktop settings (Caps Lock -> Ctrl, keybindings, etc.) when
+# running inside a GNOME/dconf session. Non-fatal: a headless/TTY install
+# (e.g. over SSH) has no session bus, so just skip it there.
+if on-linux && command -v dconf >/dev/null 2>&1 && [[ -n "$DBUS_SESSION_BUS_ADDRESS" ]]; then
+  echo "Applying GNOME settings via 'my-settings load'..."
+  "$dotfiles_dir/bin/bin/my-settings" load \
+    || echo "warning: 'my-settings load' failed; apply it manually from a GNOME session."
+fi
+
 echo "Dotfiles installation was successful, please logout of your shell, and log back in."

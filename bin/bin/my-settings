@@ -24,13 +24,34 @@ dump-settings() {
 }
 
 cmd-save() {
-  dconf dump /org/gnome/ \
-    | grep -v > "$DCONF_INI"
+  # Dump to a temp file first so a failed/empty dump can't truncate the
+  # checked-in dotfile.
+  local tmp
+  tmp="$(mktemp)" || die "failed to create temp file"
+  if dconf dump /org/gnome/ > "$tmp" && [[ -s "$tmp" ]]; then
+    mv "$tmp" "$DCONF_INI"
+  else
+    rm -f "$tmp"
+    die "failed to dump dconf settings (is this a GNOME/dconf session?)"
+  fi
 }
 
 cmd-load() {
   if ! [[ -f "$DCONF_INI" ]]; then
     die "could not find settings file [settings_file=$DCONF_INI]"
+  fi
+  # Back up current live settings before overwriting them. dconf keeps no
+  # history of its own, so without this a load is irreversible.
+  local backup_dir backup
+  backup_dir="${XDG_STATE_HOME:-$HOME/.local/state}/my-settings"
+  mkdir -p "$backup_dir" || die "failed to create backup dir [dir=$backup_dir]"
+  backup="$backup_dir/dconf-org-gnome-$(date +%Y%m%d-%H%M%S).ini"
+  if dconf dump /org/gnome/ > "$backup" && [[ -s "$backup" ]]; then
+    echo "backed up current settings to $backup"
+    echo "  (to revert this load: dconf load /org/gnome/ < '$backup')"
+  else
+    rm -f "$backup"
+    die "failed to back up current settings; aborting load"
   fi
   dconf load /org/gnome/ < "$DCONF_INI"
 }
