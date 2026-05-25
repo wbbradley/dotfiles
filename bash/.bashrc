@@ -93,6 +93,8 @@ prepend_path_to PATH /opt/homebrew/bin
 prepend_path_to PATH "$HOME"/bin
 prepend_path_to PATH "$HOME"/.local/bin
 append_path_to PATH "$HOME"/go/bin
+append_path_to PATH "$HOME"/src/tmux-claude/bin
+
 
 pane_id_of_pane1() {
   tmux list-panes -F '#{pane_index} #{pane_id}' | awk '$1 == "1" {print $2}'
