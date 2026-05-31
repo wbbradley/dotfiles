@@ -41,6 +41,7 @@ BREW_DEPS=(
   postgresql@14
   reattach-to-user-namespace
   ripgrep
+  rsync
   shellcheck
   stylua
   rlwrap
