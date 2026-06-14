@@ -944,6 +944,39 @@ require("lualine").setup({
   }
 })
 
+-- Make starting a macro recording loud and obvious. Pressing `q` in normal
+-- mode silently waits for a register key, and the tiny "recording @x" hint on
+-- the right of the statusline is easy to miss when `q` was an accident. Remap
+-- `q` so that it flashes a big prompt in the command line while it waits for
+-- the register key, then hands off to the real `q{reg}` to begin recording.
+vim.keymap.set("n", "q", function()
+  -- Already recording? A second `q` stops it -- pass it straight through.
+  if vim.fn.reg_recording() ~= "" then
+    vim.api.nvim_feedkeys("q", "n", false)
+    return
+  end
+
+  vim.api.nvim_echo({
+    { " ⏺ RECORD MACRO ", "ErrorMsg" },
+    { " press register key (Esc cancels)", "WarningMsg" },
+  }, false, {})
+  vim.cmd("redraw")
+
+  local ch = vim.fn.getcharstr()
+
+  -- Clear the prompt regardless of what happens next.
+  vim.api.nvim_echo({ { "" } }, false, {})
+
+  -- Esc (or an interrupted read) cancels without recording.
+  if ch == "" or ch == "\27" then
+    return
+  end
+
+  -- Begin recording into the chosen register. Mode "n" avoids re-triggering
+  -- this very mapping.
+  vim.api.nvim_feedkeys("q" .. ch, "n", false)
+end, { noremap = true, silent = true, desc = "Record macro (prominent prompt)" })
+
 local function is_home_directory(path)
   local home_dir = os.getenv("HOME")
   return path == home_dir
