@@ -23,9 +23,6 @@ vim.g.loaded_ruby_provider = 0
 vim.g.loaded_node_provider = 0
 vim.g.loaded_python3_provider = 0
 
--- Load global variables from lua/config/globals.lua
-local globals = require('config.globals')
-
 -- packages
 local lazy_plugins = {
   {
@@ -171,13 +168,6 @@ local lazy_plugins = {
           ["<C-j>"] = cmp.mapping.select_next_item(),
           ["<C-k>"] = cmp.mapping.select_prev_item(),
           ["<Tab>"] = cmp.mapping.confirm({ select = true })
-          --[[["<C-l>"] = cmp.mapping(function(fallback)
-            vim.api.nvim_feedkeys(
-              vim.fn["copilot#Accept"](vim.api.nvim_replace_termcodes("<Tab>", true, true, true)),
-              "n",
-              true
-            )
-          end),]]
         }),
         experimental = { ghost_text = false },
         sources = {
@@ -244,32 +234,6 @@ local lazy_plugins = {
   { "mrcjkb/rustaceanvim", ft = { "rust" } },
   "andersevenrud/nvim_context_vt"
 }
-
-if globals.allow_copilot then
-  lazy_plugins[#lazy_plugins + 1] = {
-    "zbirenbaum/copilot.lua",
-    cmd = "Copilot",
-    event = "InsertEnter",
-
-    config = function()
-      require("copilot").setup({
-        suggestion = {
-          auto_trigger = true,
-          hide_during_completion = false,
-          keymap = { accept = "<C-l>" }
-        },
-        -- panel = { enabled = true, auto_refresh = true },
-        filetypes = {
-          markdown = true,
-          text = false -- prevent copilot while password-store editing
-        }
-      })
-      vim.cmd([[
-        imap <expr> <Plug>(vimrc:copilot-dummy-map) copilot#Accept("\<Tab>")
-      ]])
-    end
-  }
-end
 
 vim.g.rustaceanvim = {
   server = {
@@ -917,8 +881,6 @@ if &diff
 endif
 ]])
 
-vim.api.nvim_set_var("copilot_status", "")
-
 require("lualine").setup({
   extensions = { "fzf", "lazy", "quickfix" },
   sections = {
@@ -927,19 +889,6 @@ require("lualine").setup({
       "encoding", -- "fileformat",
       "searchcount",
       "filetype",
-      function()
-        local copilot_status = vim.api.nvim_get_var("copilot_status")
-
-        if copilot_status == "Normal" then
-          return "Copilot(Normal)"
-        elseif copilot_status == "InProgress" then
-          return "Copilot(InProgress)"
-        elseif copilot_status == "Error" then
-          return "Copilot(Error)"
-        else
-          return ""
-        end
-      end
     }
   }
 })
@@ -1195,26 +1144,6 @@ _G.gather_and_send = function()
   vim.cmd("setlocal ft=markdown")
   local buf_contents = vim.api.nvim_buf_get_lines(0, 0, -1, false)
   _G.send_contents(buf_contents)
-end
-
-if globals.allow_copilot then
-  vim.api.nvim_create_autocmd("BufRead", {
-    group = vim.api.nvim_create_augroup("password-store-copilot-disable",
-                                        { clear = true }),
-    callback = function(_)
-      -- Check whether the current buffer's filename contains the string "pass"
-      -- and if so, disable copilot suggestions.
-      if string.find(vim.api.nvim_buf_get_name(0), "/pass.") then
-        vim.b.copilot_suggestion_auto_trigger = false
-      elseif string.find(vim.api.nvim_buf_get_name(0), ".ssh/") then
-        vim.b.copilot_suggestion_auto_trigger = false
-      elseif string.find(vim.api.nvim_buf_get_name(0), ".md") then
-        vim.b.copilot_suggestion_auto_trigger = false
-      elseif string.find(vim.api.nvim_buf_get_name(0), ".txt") then
-        vim.b.copilot_suggestion_auto_trigger = false
-      end
-    end
-  })
 end
 
 local function jump_to_rust_module()

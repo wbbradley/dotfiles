@@ -32,7 +32,6 @@ BREW_DEPS=(
   luajit
   luarocks
   neovim
-  node  # Needed for copilot
   pass
   pstree
   pkg-config
