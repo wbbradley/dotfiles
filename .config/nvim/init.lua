@@ -810,6 +810,11 @@ autocmd FileType markdown nnoremap <buffer> k gk
 autocmd FileType markdown nnoremap <buffer> ^ g^
 autocmd FileType markdown nnoremap <buffer> 0 g0
 autocmd FileType markdown nnoremap <buffer> $ g$
+autocmd FileType markdown xnoremap <buffer> j gj
+autocmd FileType markdown xnoremap <buffer> k gk
+autocmd FileType markdown xnoremap <buffer> ^ g^
+autocmd FileType markdown xnoremap <buffer> 0 g0
+autocmd FileType markdown xnoremap <buffer> $ g$
 autocmd BufRead,BufNewFile *.md setlocal textwidth=100 expandtab nocindent autoindent nosmartindent ts=2 sw=2 sts=2 cino=
 autocmd FileType conf setlocal expandtab sw=2 sts=2 smartindent
 autocmd FileType sh setlocal expandtab sw=2 sts=2 ts=2 expandtab smartindent
