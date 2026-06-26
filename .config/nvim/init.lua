@@ -235,24 +235,24 @@ local lazy_plugins = {
   "andersevenrud/nvim_context_vt"
 }
 
-vim.g.rustaceanvim = {
-  server = {
-    default_settings = {
-      ['rust-analyzer'] = {
-        diagnostics = { disabled = { "inactive-code", "unlinked-file" } },
-        rustfmt = {
-          overrideCommand = {
-            "rustfmt",
-            "--edition",
-            "2024",
-            "--config",
-            "group_imports=StdExternalCrate,imports_granularity=Crate,imports_layout=HorizontalVertical"
-          }
-        }
-      }
-    }
-  }
-}
+-- vim.g.rustaceanvim = {
+--   server = {
+--     default_settings = {
+--       ['rust-analyzer'] = {
+--         diagnostics = { disabled = { "inactive-code", "unlinked-file" } },
+--         rustfmt = {
+--           overrideCommand = {
+--             "rustfmt",
+--             "--edition",
+--             "2024",
+--             "--config",
+--             "group_imports=StdExternalCrate,imports_granularity=Crate,imports_layout=HorizontalVertical"
+--           }
+--         }
+--       }
+--     }
+--   }
+-- }
 
 local walrus_sites_prefix = os.getenv("HOME") .. "/src/walrus-sites"
 local walrus_prefix = os.getenv("HOME") .. "/src/walrus"
