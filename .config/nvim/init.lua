@@ -187,11 +187,39 @@ local lazy_plugins = {
     build = ":TSUpdate",
     config = function()
       local ts_parsers = {
-        "bash", "c", "clojure", "cpp", "css", "dockerfile", "fennel", "go",
-        "hcl", "html", "http", "java", "json", "kotlin", "lua", "markdown",
-        "markdown_inline", "nix", "python", "ruby", "rust", "scala",
-        "starlark", "sql", "terraform", "thrift", "toml", "tsx", "typescript",
-        "vim", "vimdoc", "xml", "yaml"
+        "bash",
+        "c",
+        "clojure",
+        "cpp",
+        "css",
+        "dockerfile",
+        "fennel",
+        "go",
+        "hcl",
+        "html",
+        "http",
+        "java",
+        "json",
+        "kotlin",
+        "lua",
+        "markdown",
+        "markdown_inline",
+        "nix",
+        "python",
+        "ruby",
+        "rust",
+        "scala",
+        "starlark",
+        "sql",
+        "terraform",
+        "thrift",
+        "toml",
+        "tsx",
+        "typescript",
+        "vim",
+        "vimdoc",
+        "xml",
+        "yaml"
       }
 
       require("nvim-treesitter").install(ts_parsers)
@@ -207,7 +235,8 @@ local lazy_plugins = {
         pattern = ts_filetypes,
         callback = function(args)
           local max_filesize = 100 * 1024
-          local ok, stats = pcall(vim.loop.fs_stat, vim.api.nvim_buf_get_name(args.buf))
+          local ok, stats = pcall(vim.loop.fs_stat,
+                                  vim.api.nvim_buf_get_name(args.buf))
           if ok and stats and stats.size > max_filesize then
             return
           end
@@ -804,7 +833,7 @@ autocmd FileType htmldjango setlocal sw=2 sts=2 ts=2 expandtab
 autocmd FileType html setlocal sw=2 sts=2 ts=2 expandtab
 autocmd FileType less setlocal sw=2 sts=2 ts=2 expandtab
 autocmd FileType css setlocal sw=2 sts=2 ts=2 expandtab
-autocmd FileType markdown setlocal textwidth=100 expandtab nocindent autoindent nosmartindent ts=2 sw=2 sts=2 cino= spell wrap linebreak nolist
+autocmd FileType markdown setlocal textwidth=100 expandtab nocindent autoindent nosmartindent ts=2 sw=2 sts=2 cino= spell wrap linebreak nolist nonumber
 autocmd FileType markdown nnoremap <buffer> j gj
 autocmd FileType markdown nnoremap <buffer> k gk
 autocmd FileType markdown nnoremap <buffer> ^ g^
@@ -898,7 +927,7 @@ require("lualine").setup({
     lualine_x = {
       "encoding", -- "fileformat",
       "searchcount",
-      "filetype",
+      "filetype"
     }
   }
 })
@@ -917,7 +946,7 @@ vim.keymap.set("n", "q", function()
 
   vim.api.nvim_echo({
     { " ⏺ RECORD MACRO ", "ErrorMsg" },
-    { " press register key (Esc cancels)", "WarningMsg" },
+    { " press register key (Esc cancels)", "WarningMsg" }
   }, false, {})
   vim.cmd("redraw")
 
