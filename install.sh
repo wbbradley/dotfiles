@@ -149,6 +149,8 @@ if ! command -v cargo 2>/dev/null >/dev/null; then
     die "no cargo env found"
   fi
   . "$HOME"/.cargo/env
+else
+  cargo install tree-sitter-cli || die "failed to install tree-sitter-cli"
 fi
 
 if ! command -v flatc 2>/dev/null >/dev/null; then
