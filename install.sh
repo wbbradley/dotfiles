@@ -53,9 +53,7 @@ BREW_DEPS=(
   ykman
 )
 
-BREW_CASK_DEPS=(
-  ghostty
-)
+BREW_CASK_DEPS=( )
 
 setup-fzf() {
   if command -v fzf 2>/dev/null; then
@@ -110,7 +108,6 @@ run-install() (
       luarocks install --server=https://luarocks.org/dev luaformatter || die "luaformatter install failed"
       echo "NB: make sure you manage brew services."
       brew services
-      ln -sf "$HOME"/src/dotfiles/.config/ghostty/config "$HOME"/Library/Application\ Support/com.mitchellh.ghostty/config || die "failed to link ghostty config"
   elif on-linux; then
     if command -v apt 2>/dev/null; then
       sudo apt update -y
