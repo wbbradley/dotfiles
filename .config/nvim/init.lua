@@ -222,7 +222,35 @@ local lazy_plugins = {
         "yaml"
       }
 
-      require("nvim-treesitter").install(ts_parsers)
+      -- nvim-treesitter `main` compiles parsers by shelling out to the external
+      -- `tree-sitter` CLI, so it must be on PATH. On Linux a fresh box often lacks it
+      -- (or ships a too-old distro build); warn loudly instead of failing per-parser.
+      if vim.fn.executable("tree-sitter") == 1 then
+        -- The CLI uses its per-user cache dir (Rust dirs::cache_dir()):
+        --   macOS -> ~/Library/Caches/tree-sitter
+        --   Linux -> ${XDG_CACHE_HOME:-~/.cache}/tree-sitter
+        -- `tree-sitter build`/`generate` ENOENTs if it does not exist, so ensure it.
+        local home = os.getenv("HOME")
+        local ts_cli_cache
+        if vim.fn.has("mac") == 1 then
+          ts_cli_cache = vim.fs.joinpath(home, "Library", "Caches", "tree-sitter")
+        else
+          local base = os.getenv("XDG_CACHE_HOME")
+          if base == nil or base == "" then
+            base = vim.fs.joinpath(home, ".cache")
+          end
+          ts_cli_cache = vim.fs.joinpath(base, "tree-sitter")
+        end
+        vim.fn.mkdir(ts_cli_cache, "p") -- idempotent; no-op if it already exists
+
+        require("nvim-treesitter").install(ts_parsers)
+      else
+        vim.notify(
+          "nvim-treesitter (main) needs the `tree-sitter` CLI on PATH "
+            .. "(>= 0.25 for --abi 15). Install with `cargo install tree-sitter-cli`.",
+          vim.log.levels.WARN
+        )
+      end
 
       local ts_filetypes = {}
       for _, parser in ipairs(ts_parsers) do
