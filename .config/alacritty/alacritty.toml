@@ -18,3 +18,8 @@ osc52 = "OnlyCopy"
 
 [mouse]
 hide_when_typing = false
+
+[[keyboard.bindings]]
+key = "Return"
+mods = "Shift"
+chars = "\u001B\r"
