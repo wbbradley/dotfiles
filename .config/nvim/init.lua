@@ -839,6 +839,7 @@ autocmd FileType markdown nnoremap <buffer> k gk
 autocmd FileType markdown nnoremap <buffer> ^ g^
 autocmd FileType markdown nnoremap <buffer> 0 g0
 autocmd FileType markdown nnoremap <buffer> $ g$
+autocmd FileType markdown nnoremap <buffer> D vg$x
 autocmd FileType markdown xnoremap <buffer> j gj
 autocmd FileType markdown xnoremap <buffer> k gk
 autocmd FileType markdown xnoremap <buffer> ^ g^
