@@ -1339,3 +1339,14 @@ vim.api.nvim_create_user_command("OpenNearestCargoToml", function()
   print("No Cargo.toml found.")
 end, {})
 
+vim.api.nvim_create_autocmd("BufWritePre", {
+    callback = function(ev)
+        local dir = vim.fn.fnamemodify(ev.file, ":h")
+        if vim.fn.isdirectory(dir) == 0 then
+            if vim.fn.confirm("Create directory: " .. dir .. "?", "&Yes\n&No") == 1 then
+                vim.fn.mkdir(dir, "p")
+            end
+        end
+    end,
+})
+
