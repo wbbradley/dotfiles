@@ -195,6 +195,10 @@ local lazy_plugins = {
         "dockerfile",
         "fennel",
         "go",
+        "gomod",
+        "gosum",
+        "gowork",
+        "gotmpl",
         "hcl",
         "html",
         "http",
@@ -363,6 +367,17 @@ require("gitsigns").setup({
 vim.cmd("Gitsigns toggle_current_line_blame")
 -- local _ = require("cmp")
 
+vim.lsp.config('gopls', {
+  settings = {
+    gopls = {
+      gofumpt = true,
+      staticcheck = true,
+      usePlaceholders = true,
+      analyses = { unusedparams = true, unusedwrite = true, nilness = true },
+      -- inlay hints are off by default; controlled via the global inlay_hints = { enabled = false }
+    }
+  }
+})
 vim.lsp.enable('gopls')
 vim.lsp.enable('taplo')
 -- vim.lsp.config.clangd.setup({})
@@ -503,9 +518,6 @@ set cursorline
 
 :autocmd VimResized * wincmd =
 
-augroup go
-  autocmd FileType go inoremap <C-n> <C-x><C-o>
-augroup END
 augroup sql
   autocmd FileType sql setlocal makeprg=pgsanity\ %
 augroup END
@@ -1062,14 +1074,36 @@ vim.api.nvim_create_autocmd({ "BufRead" }, {
 vim.api.nvim_create_autocmd("LspAttach", {
   group = vim.api.nvim_create_augroup("lsp", { clear = true }),
   callback = function(args)
+    local client = vim.lsp.get_client_by_id(args.data.client_id)
+
+    -- gopls: organize imports on save (runs before the format autocmd below,
+    -- because it is registered first within this LspAttach callback).
+    if client and client.name == "gopls" then
+      vim.api.nvim_create_autocmd("BufWritePre", {
+        buffer = args.buf,
+        callback = function()
+          local params = vim.lsp.util.make_range_params(0, client.offset_encoding)
+          params.context = { only = { "source.organizeImports" } }
+          local result = vim.lsp.buf_request_sync(0, "textDocument/codeAction", params, 1000)
+          for _, res in pairs(result or {}) do
+            for _, r in pairs(res.result or {}) do
+              if r.edit then
+                vim.lsp.util.apply_workspace_edit(r.edit, client.offset_encoding)
+              end
+            end
+          end
+        end
+      })
+    end
+
     vim.api.nvim_create_autocmd("BufWritePre", {
       buffer = args.buf,
       callback = function()
         vim.lsp.buf.format {
           async = false,
           id = args.data.client_id,
-          filter = function(client)
-            return client:supports_method("textDocument/formatting")
+          filter = function(c)
+            return c:supports_method("textDocument/formatting")
           end
         }
       end

@@ -153,6 +153,13 @@ else
   cargo install tree-sitter-cli || die "failed to install tree-sitter-cli"
 fi
 
+# Install gopls (Go language server). `go` is installed via Homebrew on macOS;
+# on Linux it may be absent, so guard on the toolchain. gopls lands in
+# $(go env GOPATH)/bin (~/go/bin), which .bashrc already adds to PATH.
+if command -v go >/dev/null 2>&1; then
+  command -v gopls >/dev/null 2>&1 || go install golang.org/x/tools/gopls@latest || die "failed to install gopls"
+fi
+
 if ! command -v flatc 2>/dev/null >/dev/null; then
   echo "Installing flatc..."
   (
