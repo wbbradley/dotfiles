@@ -48,3 +48,8 @@
 	trustExitCode = true
 [credential]
 	helper = store
+# Keep these includes at the end of the file so they win over [user] above.
+[includeIf "hasconfig:remote.*.url:https://github.com/wbbradley/**"]
+  path = ~/.gitconfig-wbbradley
+[includeIf "hasconfig:remote.*.url:git@github.com:wbbradley/**"]
+  path = ~/.gitconfig-wbbradley
