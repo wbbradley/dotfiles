@@ -57,7 +57,7 @@ local lazy_plugins = {
       -- calling `setup` is optional for customization
       local actions = require("fzf-lua.actions")
       require("fzf-lua").setup({
-        -- preview_opts = "hidden", -- NB: Toggle the preview with <F4>.
+        winopts = { preview = { hidden = true } }, -- NB: Toggle the preview with <F4>.
         fzf_opts = { ["--layout"] = "default" },
         previewers = { builtin = { scrollbar = false, syntax = true } },
         actions = {
