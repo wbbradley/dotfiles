@@ -781,8 +781,8 @@ nnoremap <leader>v <C-w>v<C-w>l<C-w>n<C-w>h
 nnoremap <leader>w :wa<CR>
 
 nnoremap <leader>90 :e ~/.config/nvim/init.lua<CR>
-nnoremap <leader>92 :e ~/.bashrc<CR>
-nnoremap <leader>93 :e ~/local.bashrc<CR>
+nnoremap <leader>91 :e ~/.bashrc<CR>
+nnoremap <leader>92 :e ~/local.bashrc<CR>
 nnoremap <leader>9a :e ~/.config/alacritty/alacritty.toml<CR>
 nnoremap <leader>9b :e ~/.bashrc<CR>
 nnoremap <leader>9d :e ~/.config/dmypyls/dmypyls.yaml<CR>
