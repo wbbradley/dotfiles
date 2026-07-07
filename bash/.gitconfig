@@ -1,5 +1,6 @@
 [user]
 	name = Will Bradley
+	email = 
 [commit]
 	verbose = true
   gpgsign = false
@@ -10,7 +11,7 @@
   ui = true
 [core]
   editor = nvim
-	excludesfile = ~/.gitignore
+	excludesfile = /Users/wbbradley/.gitignore
 [push]
   default = simple
 [pull]
