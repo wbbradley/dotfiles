@@ -948,8 +948,8 @@ augroup END
 let c_no_curly_error=1
 
 nnoremap - _
-nnoremap L m`:lua vim.diagnostic.goto_next()<CR>zz
-nnoremap H m`:lua vim.diagnostic.goto_prev()<CR>zz
+nnoremap L m`:lua vim.diagnostic.jump({ count = 1, float = true })<CR>zz
+nnoremap H m`:lua vim.diagnostic.jump({ count = -1, float = true })<CR>zz
 nnoremap <F9> m`:cprev<CR>zz
 nnoremap <F10> m`:cnext<CR>zz
 " Make sure % works normally.
