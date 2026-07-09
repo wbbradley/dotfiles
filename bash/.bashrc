@@ -339,6 +339,18 @@ venv() {
   fi
 }
 
+commit() {
+  git add .
+  echo "Creating commit message with Haiku..."
+  message=$(claude --model haiku -p 'Write a Conventional Commits commit message for the currently staged changes. Only include the commit message in your output, do not preface it or end it with any commentary. Assume your output will go directly into git commit -m')
+  rc=$?
+  if [[ $rc != 0 ]]; then
+    echo "claude error" >&2
+    return 1
+  fi
+  git commit -em "$message"
+}
+
 alias p='pstree -s'
 
 if on-macos; then

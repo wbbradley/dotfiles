@@ -9,6 +9,33 @@ main="$(git symbolic-ref refs/remotes/origin/HEAD | sed 's@^refs/remotes/origin/
 
 git fetch --tags -f --prune origin || die "failed to fetch from remote"
 git checkout -B "$main" "origin/$main" || die "failed to checkout $main"
-git branch --merged "$main" \
-  | grep -v "\* $main" \
-  | xargs -n 1 git branch -D
+
+# Drop metadata for worktrees whose directories are already gone.
+git worktree prune
+
+# Remove worktrees whose branch is already merged into main, so that the
+# branch delete pass below can clean up their branches too (a branch checked
+# out in a worktree can't be deleted).
+merged="$(git branch --merged "$main" --format='%(refname:short)')"
+while read -r key value; do
+  case "$key" in
+    worktree) wt_path="$value" ;;
+    branch) wt_branch="${value#refs/heads/}" ;;
+    "")
+      if [ -n "$wt_path" ] && [ -n "$wt_branch" ] && [ "$wt_branch" != "$main" ] \
+        && grep -qxF "$wt_branch" <<<"$merged"; then
+        if git worktree remove "$wt_path"; then
+          echo "removed merged worktree $wt_path ($wt_branch)"
+        else
+          echo "$(basename "$0"): warning: could not remove worktree $wt_path ($wt_branch)" >&2
+        fi
+      fi
+      wt_path=""
+      wt_branch=""
+      ;;
+  esac
+done < <(git worktree list --porcelain)
+
+git branch --merged "$main" --format='%(refname:short)' \
+  | grep -vx "$main" \
+  | xargs -r -n 1 git branch -D
