@@ -57,8 +57,7 @@ DIRS: list[Path] = [
     HOME / "src/pickls",
     HOME / "src/procman",
     HOME / "src/rollup",
-    HOME / "src/tmux-claude",
-    HOME / "src/tmux-codex",
+    HOME / "src/tmux-agent",
     HOME / "src/git-stack",
     HOME / "src/nvim-procman",
     HOME / "src/tree-sitter-procman",
@@ -80,10 +79,8 @@ INSTALLS: list[tuple[str, Path, list[str]]] = [
     ("rtop", HOME / "src/rtop", ["cargo", "install", "--path", "."]),
     ("dangle", HOME / "src/dangle", ["cargo", "install", "--path", "."]),
     ("autorize", HOME / "src/autorize", ["cargo", "install", "--path", "."]),
-    ("tmux-claude", HOME / "src/tmux-claude",
-     [str(HOME / "src/tmux-claude/bin/tmux-claude-setup")]),
-    ("tmux-codex", HOME / "src/tmux-codex",
-     [str(HOME / "src/tmux-codex/bin/tmux-codex-setup")]),
+    ("tmux-agent", HOME / "src/tmux-agent",
+     [str(HOME / "src/tmux-agent/bin/tmux-agent-setup")]),
 ]
 
 GITHUB_USER = "wbbradley"

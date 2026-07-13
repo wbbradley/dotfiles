@@ -94,7 +94,7 @@ prepend_path_to PATH /opt/homebrew/bin
 prepend_path_to PATH "$HOME"/bin
 prepend_path_to PATH "$HOME"/.local/bin
 append_path_to PATH "$HOME"/go/bin
-append_path_to PATH "$HOME"/src/tmux-claude/bin
+append_path_to PATH "$HOME"/src/tmux-agent/bin
 
 
 pane_id_of_pane1() {
