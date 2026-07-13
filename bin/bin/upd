@@ -49,7 +49,7 @@ HOME = Path.home()
 
 DIRS: list[Path] = [
     HOME / "src/dotfiles",
-    HOME / ".claude",
+    HOME / "src/agentic",
     HOME / "src/shellsafety",
     HOME / "src/scrapwatch",
     HOME / "src/statusline",
@@ -67,6 +67,8 @@ DIRS: list[Path] = [
 ]
 
 INSTALLS: list[tuple[str, Path, list[str]]] = [
+    ("agentic", HOME / "src/agentic",
+     [str(HOME / "src/agentic/install.sh")]),
     ("shellsafety", HOME / "src/shellsafety",
      ["cabal", "install", "--overwrite-policy=always"]),
     ("statusline", HOME / "src/statusline", ["cargo", "install", "--path", "."]),
@@ -230,7 +232,8 @@ def process_repo(dir: Path, color: str, width: int,
 
 def repo_job(dir: Path, color: str, width: int, dry_run: bool) -> Optional[Path]:
     name = dir.name
-    if not dir.is_dir():
+    was_missing = not dir.is_dir()
+    if was_missing:
         emit(name, color, width,
              f"{YELLOW}MISSING{RESET} not on disk; cloning from GitHub")
         if not clone_missing(dir, color, width, dry_run):
@@ -241,7 +244,11 @@ def repo_job(dir: Path, color: str, width: int, dry_run: bool) -> Optional[Path]
             set_status(name, "CLONE (dry-run)")
             return None
         emit(name, color, width, f"{GREEN}CLONED{RESET}")
-    return process_repo(dir, color, width, dry_run)
+    result = process_repo(dir, color, width, dry_run)
+    if was_missing:
+        # Ensure installable repositories are installed after their first clone.
+        set_head(name, "new clone")
+    return result
 
 
 def prompt_yn(prompt: str, default: bool = False) -> bool:

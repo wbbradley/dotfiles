@@ -3,6 +3,7 @@
 # shellcheck disable=SC1090,SC1091,SC2207
 [[ $- != *i* ]] && return
 
+export XDG_CONFIG_HOME="$HOME"/.config
 export BASH_SILENCE_DEPRECATION_WARNING=1
 export PATH=/opt/homebrew/opt/openjdk/bin:"$PATH"
 export RIPGREP_CONFIG_PATH="$HOME/.ripgreprc"
@@ -532,3 +533,7 @@ printf ''
 #THIS MUST BE AT THE END OF THE FILE FOR SDKMAN TO WORK!!!
 export SDKMAN_DIR="$HOME/.sdkman"
 [[ -s "$HOME/.sdkman/bin/sdkman-init.sh" ]] && source "$HOME/.sdkman/bin/sdkman-init.sh"
+
+export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || printf %s "${XDG_CONFIG_HOME}/nvm")"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
