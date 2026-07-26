@@ -340,9 +340,9 @@ venv() {
   fi
 }
 
-commit() {
+commit-claude() {
   git add .
-  echo "Creating commit message with Haiku..."
+  echo "Creating commit message..."
   message=$(claude --model haiku -p 'Write a Conventional Commits commit message for the currently staged changes. Only include the commit message in your output, do not preface it or end it with any commentary. Assume your output will go directly into git commit -m')
   rc=$?
   if [[ $rc != 0 ]]; then
@@ -350,6 +350,49 @@ commit() {
     return 1
   fi
   git commit -em "$message"
+}
+
+commit() {
+  git add -A
+
+  if git diff --cached --quiet; then
+    echo "Nothing staged to commit." >&2
+    return 1
+  fi
+
+  echo "Creating commit message..."
+
+  local output message rc
+  output="$(mktemp "${TMPDIR:-/tmp}/codex-commit.XXXXXX")" || return 1
+
+  codex exec \
+    --model gpt-5.6-luna \
+    --config 'model_reasoning_effort="low"' \
+    --sandbox read-only \
+    --ephemeral \
+    --output-last-message "$output" \
+    'Inspect the currently staged Git changes and write a Conventional Commits commit
+    message. Output only the commit message, with no Markdown, quotation marks, or
+    commentary. Keep the subject concise. Include a body only when it adds important
+    context.' \
+    >/dev/null
+
+  rc=$?
+  if [[ $rc != 0 ]]; then
+    echo "codex error" >&2
+    rm -f "$output"
+    return 1
+  fi
+
+  message="$(<"$output")"
+  rm -f "$output"
+
+  if [[ -z "$message" ]]; then
+    echo "codex returned an empty commit message" >&2
+    return 1
+  fi
+
+  git commit -e -m "$message"
 }
 
 alias p='pstree -s'
