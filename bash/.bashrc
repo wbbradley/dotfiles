@@ -548,6 +548,14 @@ notes() {
   nvim "$HOME"/notes.md "+norm G"
 }
 
+override-agents() {
+  for f in `find . -name AGENTS.md`; do
+    override="$(dirname "$f")"/AGENTS.override.md
+    echo "Creating $override..."
+    touch "$override"
+  done
+}
+
 GPG_TTY="$(tty)"
 export GPG_TTY
 
