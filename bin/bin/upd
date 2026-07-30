@@ -47,41 +47,29 @@ PREFIX_COLORS = [
 
 HOME = Path.home()
 
-DIRS: list[Path] = [
-    HOME / "src/dotfiles",
-    HOME / "src/agentic",
-    HOME / "src/shellsafety",
-    HOME / "src/scrapwatch",
-    HOME / "src/statusline",
-    HOME / "src/autorize",
-    HOME / "src/pickls",
-    HOME / "src/procman",
-    HOME / "src/rollup",
-    HOME / "src/tmux-agent",
-    HOME / "src/git-stack",
-    HOME / "src/nvim-procman",
-    HOME / "src/tree-sitter-procman",
-    HOME / "src/jumplist.nvim",
-    HOME / "src/rtop",
-    HOME / "src/dangle",
-]
+CARGO_INSTALL = ["cargo", "install", "--path", "."]
 
-INSTALLS: list[tuple[str, Path, list[str]]] = [
-    ("agentic", HOME / "src/agentic",
-     [str(HOME / "src/agentic/install.sh")]),
-    ("shellsafety", HOME / "src/shellsafety",
-     ["cabal", "install", "--overwrite-policy=always"]),
-    ("statusline", HOME / "src/statusline", ["cargo", "install", "--path", "."]),
-    ("scrapwatch", HOME / "src/scrapwatch", ["cargo", "install", "--path", "."]),
-    ("procman", HOME / "src/procman", ["cargo", "install", "--path", "."]),
-    ("rollup", HOME / "src/rollup", ["cargo", "install", "--path", "."]),
-    ("git-stack", HOME / "src/git-stack", ["cargo", "install", "--path", "."]),
-    ("rtop", HOME / "src/rtop", ["cargo", "install", "--path", "."]),
-    ("dangle", HOME / "src/dangle", ["cargo", "install", "--path", "."]),
-    ("autorize", HOME / "src/autorize", ["cargo", "install", "--path", "."]),
-    ("tmux-agent", HOME / "src/tmux-agent",
-     [str(HOME / "src/tmux-agent/bin/tmux-agent-setup")]),
-]
+# Every repo to keep up to date, mapped to its install command (None = no build
+# step; the repo is only fetched/pulled/pushed).
+REPOS: dict[Path, Optional[list[str]]] = {
+    HOME / "src/dotfiles": None,
+    HOME / "src/pickls": None,
+    HOME / "src/nvim-procman": None,
+    HOME / "src/tree-sitter-procman": None,
+    HOME / "src/jumplist.nvim": None,
+    HOME / "src/agentic": [str(HOME / "src/agentic/install.sh")],
+    HOME / "src/shellsafety": ["cabal", "install", "--overwrite-policy=always"],
+    HOME / "src/tmux-agent": [str(HOME / "src/tmux-agent/bin/tmux-agent-setup")],
+    HOME / "src/wt": CARGO_INSTALL,
+    HOME / "src/scrapwatch": CARGO_INSTALL,
+    HOME / "src/statusline": CARGO_INSTALL,
+    HOME / "src/autorize": CARGO_INSTALL,
+    HOME / "src/procman": CARGO_INSTALL,
+    HOME / "src/rollup": CARGO_INSTALL,
+    HOME / "src/git-stack": CARGO_INSTALL,
+    HOME / "src/rtop": CARGO_INSTALL,
+    HOME / "src/dangle": CARGO_INSTALL,
+}
 
 GITHUB_USER = "wbbradley"
 
@@ -100,14 +88,14 @@ def set_status(name: str, val: str) -> None:
         _status[name] = val
 
 
-def set_head(name: str, val: str) -> None:
+def set_head(dir: Path, val: str) -> None:
     with _heads_lock:
-        _heads[name] = val
+        _heads[str(dir)] = val
 
 
-def get_head(name: str) -> Optional[str]:
+def get_head(dir: Path) -> Optional[str]:
     with _heads_lock:
-        return _heads.get(name)
+        return _heads.get(str(dir))
 
 
 def emit(name: str, color: str, width: int, text: str) -> None:
@@ -172,7 +160,7 @@ def process_repo(dir: Path, color: str, width: int,
         set_status(name, "FAIL (not a repo)")
         return None
 
-    set_head(name, git_q(dir, "rev-parse", "HEAD"))
+    set_head(dir, git_q(dir, "rev-parse", "HEAD"))
 
     rc, _, err = git(dir, "fetch", "--quiet")
     if rc != 0:
@@ -247,7 +235,7 @@ def repo_job(dir: Path, color: str, width: int, dry_run: bool) -> Optional[Path]
     result = process_repo(dir, color, width, dry_run)
     if was_missing:
         # Ensure installable repositories are installed after their first clone.
-        set_head(name, "new clone")
+        set_head(dir, "new clone")
     return result
 
 
@@ -391,16 +379,17 @@ def push_after_commit(dir: Path, color: str, width: int,
     set_status(name, "OK")
 
 
-def changed(name: str, dir: Path) -> bool:
-    before = get_head(name)
+def changed(dir: Path) -> bool:
+    before = get_head(dir)
     if not before:
         return False
     after = git_q(dir, "rev-parse", "HEAD")
     return before != after
 
 
-def install_job(name: str, dir: Path, cmd: list[str], color: str,
+def install_job(dir: Path, cmd: list[str], color: str,
                 width: int, dry_run: bool, force: bool) -> None:
+    name = dir.name
     label = f"install:{name}"
 
     def e(s: str) -> None:
@@ -409,7 +398,7 @@ def install_job(name: str, dir: Path, cmd: list[str], color: str,
     if not dir.is_dir():
         e(f"{YELLOW}SKIP{RESET} dir missing")
         return
-    if not force and not changed(name, dir):
+    if not force and not changed(dir):
         e(f"{GREEN}OK{RESET}")
         return
     if dry_run:
@@ -491,7 +480,8 @@ def main() -> int:
     p.add_argument("--skip-self-update", action="store_true",
                    help=argparse.SUPPRESS)
     p.add_argument("filter", nargs="?", default="",
-                   help="substring; only repos whose path contains it are processed")
+                   help="substring; only repos whose path contains it are "
+                        "updated and installed")
     args = p.parse_args()
 
     if not args.skip_self_update:
@@ -500,14 +490,14 @@ def main() -> int:
         forward = [a for a in sys.argv[1:] if a != "--skip-self-update"]
         self_update_and_reexec(forward)
 
-    selected_dirs = [d for d in DIRS if not args.filter or args.filter in str(d)]
+    selected_dirs = [d for d in REPOS if not args.filter or args.filter in str(d)]
 
     # Prefix width over the full configured list (so it stays stable across runs).
     width = 0
-    for d in DIRS:
+    for d, cmd in REPOS.items():
         width = max(width, len(d.name))
-    for name, _, _ in INSTALLS:
-        width = max(width, len(f"install:{name}"))
+        if cmd:
+            width = max(width, len(f"install:{d.name}"))
 
     # Phase 1: parallel repo fetch/pull/(push if clean).
     dirty: list[Path] = []
@@ -525,7 +515,7 @@ def main() -> int:
     # Phase 2: serial commit prompts for dirty repos, then parallel push for
     # repos that got committed.
     if dirty:
-        # Order by the configured DIRS order for deterministic prompt order.
+        # Order by the configured REPOS order for deterministic prompt order.
         order = {d: i for i, d in enumerate(selected_dirs)}
         dirty.sort(key=lambda d: order.get(d, 0))
         committed = handle_dirty_repos(dirty, args.dry_run)
@@ -541,12 +531,14 @@ def main() -> int:
     else:
         sys.stdout.write(f"{DIM}dry-run:{RESET} cargo install tree-sitter-cli\n")
 
-    # Phase 3: parallel install.
-    with ThreadPoolExecutor(max_workers=len(INSTALLS)) as ex:
-        for i, (name, idir, cmd) in enumerate(INSTALLS):
-            color = PREFIX_COLORS[i % len(PREFIX_COLORS)]
-            ex.submit(install_job, name, idir, cmd, color, width,
-                      args.dry_run, args.force)
+    # Phase 3: parallel install, limited to the selected repos.
+    installs = [(d, cmd) for d in selected_dirs if (cmd := REPOS[d])]
+    if installs:
+        with ThreadPoolExecutor(max_workers=len(installs)) as ex:
+            for i, (idir, cmd) in enumerate(installs):
+                color = PREFIX_COLORS[i % len(PREFIX_COLORS)]
+                ex.submit(install_job, idir, cmd, color, width,
+                          args.dry_run, args.force)
 
     # Summary.
     sys.stdout.write(f"\n{BOLD}Summary{RESET}\n")
