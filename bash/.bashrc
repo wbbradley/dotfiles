@@ -558,6 +558,10 @@ override-agents() {
   done
 }
 
+inst() {
+  cargo install --path .
+}
+
 GPG_TTY="$(tty)"
 export GPG_TTY
 
