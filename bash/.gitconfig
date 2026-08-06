@@ -52,3 +52,9 @@
   path = ~/.gitconfig-wbbradley
 [includeIf "hasconfig:remote.*.url:git@github.com:wbbradley/**"]
   path = ~/.gitconfig-wbbradley
+[credential "https://github.com"]
+	helper = 
+	helper = !/opt/homebrew/bin/gh auth git-credential
+[credential "https://gist.github.com"]
+	helper = 
+	helper = !/opt/homebrew/bin/gh auth git-credential
