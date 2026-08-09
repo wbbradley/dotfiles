@@ -48,6 +48,7 @@ PREFIX_COLORS = [
 HOME = Path.home()
 
 CARGO_INSTALL = ["cargo", "install", "--path", "."]
+GO_INSTALL = ["go", "install"]
 
 # Every repo to keep up to date, mapped to its install command (None = no build
 # step; the repo is only fetched/pulled/pushed).
@@ -65,6 +66,7 @@ REPOS: dict[Path, Optional[list[str]]] = {
     HOME / "src/statusline": CARGO_INSTALL,
     HOME / "src/autorize": CARGO_INSTALL,
     HOME / "src/procman": CARGO_INSTALL,
+    HOME / "src/hq": GO_INSTALL + ["./cmd/hq"],
     HOME / "src/rollup": CARGO_INSTALL,
     HOME / "src/git-stack": CARGO_INSTALL,
     HOME / "src/rtop": CARGO_INSTALL,
