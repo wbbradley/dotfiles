@@ -9,7 +9,8 @@ Phases:
      the git commit editor (git commit -e -F <msg>). If the editor exits
      non-zero (e.g. `:cq` from vim), the commit is aborted and the repo
      is left dirty. On a successful commit, the repo is pushed afterward.
-  3. Parallel install: re-run install commands whose repo HEAD changed
+  3. Password store: fast-forward pull, then push local password changes.
+  4. Parallel install: re-run install commands whose repo HEAD changed
      (or all of them with --force).
 """
 
@@ -381,6 +382,39 @@ def push_after_commit(dir: Path, color: str, width: int,
     set_status(name, "OK")
 
 
+def sync_password_store(color: str, width: int, dry_run: bool) -> None:
+    name = "password-store"
+
+    def e(s: str) -> None:
+        emit(name, color, width, s)
+
+    if shutil.which("pass") is None:
+        e(f"{YELLOW}SKIP{RESET} pass is not installed")
+        set_status(name, "SKIP (pass missing)")
+        return
+
+    if dry_run:
+        e(f"{DIM}dry-run:{RESET} pass git pull --ff-only")
+        e(f"{DIM}dry-run:{RESET} pass git push")
+        set_status(name, "OK")
+        return
+
+    rc = stream(name, color, width, ["pass", "git", "pull", "--ff-only"])
+    if rc != 0:
+        e(f"{RED}FAIL{RESET} pull failed; skipping push")
+        set_status(name, "FAIL (pull)")
+        return
+
+    rc = stream(name, color, width, ["pass", "git", "push"])
+    if rc != 0:
+        e(f"{RED}FAIL{RESET} push failed")
+        set_status(name, "FAIL (push)")
+        return
+
+    e(f"{GREEN}OK{RESET}")
+    set_status(name, "OK")
+
+
 def changed(dir: Path) -> bool:
     before = get_head(dir)
     if not before:
@@ -527,13 +561,21 @@ def main() -> int:
                     color = PREFIX_COLORS[i % len(PREFIX_COLORS)]
                     ex.submit(push_after_commit, d, color, width, args.dry_run)
 
+    # Phase 3: publish local password-store changes after first pulling any
+    # remote changes that can be applied as a fast-forward.
+    sync_password_store(
+        PREFIX_COLORS[len(selected_dirs) % len(PREFIX_COLORS)],
+        width,
+        args.dry_run,
+    )
+
     # Preserved from the original: keep tree-sitter-cli up to date.
     if not args.dry_run:
         subprocess.call(["cargo", "install", "tree-sitter-cli"])
     else:
         sys.stdout.write(f"{DIM}dry-run:{RESET} cargo install tree-sitter-cli\n")
 
-    # Phase 3: parallel install, limited to the selected repos.
+    # Phase 4: parallel install, limited to the selected repos.
     installs = [(d, cmd) for d in selected_dirs if (cmd := REPOS[d])]
     if installs:
         with ThreadPoolExecutor(max_workers=len(installs)) as ex:
