@@ -559,7 +559,7 @@ override-agents() {
 }
 
 inst() {
-  cargo install --path .
+  cargo install --force --path .
 }
 
 GPG_TTY="$(tty)"
