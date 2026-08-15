@@ -393,22 +393,40 @@ def sync_password_store(color: str, width: int, dry_run: bool) -> None:
         set_status(name, "SKIP (pass missing)")
         return
 
+    store_dir = Path(
+        os.environ.get("PASSWORD_STORE_DIR", str(HOME / ".password-store"))
+    ).expanduser()
+    if not (store_dir / ".git").exists():
+        e(f"{YELLOW}SKIP{RESET} {store_dir} is not a git repo")
+        set_status(name, "SKIP (not a git repo)")
+        return
+
     if dry_run:
         e(f"{DIM}dry-run:{RESET} pass git pull --ff-only")
         e(f"{DIM}dry-run:{RESET} pass git push")
         set_status(name, "OK")
         return
 
-    rc = stream(name, color, width, ["pass", "git", "pull", "--ff-only"])
+    try:
+        rc = stream(name, color, width, ["pass", "git", "pull", "--ff-only"])
+    except OSError as err:
+        e(f"{YELLOW}WARN{RESET} could not run pull: {err}")
+        set_status(name, "WARN (pull)")
+        return
     if rc != 0:
-        e(f"{RED}FAIL{RESET} pull failed; skipping push")
-        set_status(name, "FAIL (pull)")
+        e(f"{YELLOW}WARN{RESET} pull failed; skipping push")
+        set_status(name, "WARN (pull)")
         return
 
-    rc = stream(name, color, width, ["pass", "git", "push"])
+    try:
+        rc = stream(name, color, width, ["pass", "git", "push"])
+    except OSError as err:
+        e(f"{YELLOW}WARN{RESET} could not run push: {err}")
+        set_status(name, "WARN (push)")
+        return
     if rc != 0:
-        e(f"{RED}FAIL{RESET} push failed")
-        set_status(name, "FAIL (push)")
+        e(f"{YELLOW}WARN{RESET} push failed")
+        set_status(name, "WARN (push)")
         return
 
     e(f"{GREEN}OK{RESET}")
@@ -497,7 +515,7 @@ def self_update_and_reexec(argv: list[str]) -> None:
 def summary_color(val: str) -> tuple[str, bool]:
     if val in ("OK", "COMMITTED"):
         return GREEN, False
-    if val.startswith(("DIRTY", "SKIP", "CLONE")):
+    if val.startswith(("DIRTY", "SKIP", "CLONE", "WARN")):
         return YELLOW, False
     if val.startswith("FAIL"):
         return RED, True
