@@ -6,6 +6,25 @@ local act = wezterm.action
 local config = wezterm.config_builder()
 
 config.enable_tab_bar = false
+config.window_padding = {
+  left = 0,
+  right = 0,
+  top = 0,
+  bottom = 0,
+}
+-- Preserve modifier keys for terminal applications (for example, Codex's
+-- Shift+Enter binding) via the Kitty keyboard protocol.
+config.enable_kitty_keyboard = true
+-- Kitty keyboard encoding can cause tmux to confuse forward Delete with
+-- Backspace. Keep Delete's conventional terminal sequence while retaining
+-- the protocol for modified keys such as Shift+Enter.
+config.keys = {
+  {
+    key = 'Delete',
+    mods = 'NONE',
+    action = act.SendString '\x1b[3~',
+  },
+}
 config.font_size = 14
 config.color_scheme = 'Gruvbox Dark (Gogh)'
 config.font = wezterm.font { family = 'FiraCode Nerd Font Mono', weight = 'Medium' }
