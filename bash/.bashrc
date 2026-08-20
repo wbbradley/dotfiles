@@ -559,7 +559,13 @@ override-agents() {
 }
 
 inst() {
-  cargo install --force --path .
+  if [[ -f Cargo.toml ]]; then
+    cargo install --force --path .
+  else
+    for f in `find . -name 'main.go' -maxdepth 3 | grep -E '\bcmd\b' | grep -Ev '\binternal\b'`; do
+      go install "$(dirname "$f")"
+    done
+  fi
 }
 
 GPG_TTY="$(tty)"
