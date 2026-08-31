@@ -5,9 +5,10 @@ Phases:
   1. Parallel per-repo: fetch, fast-forward pull, then push if clean & ahead.
      Dirty repos defer their push to phase 2.
   2. Serial dirty-handling: for each dirty repo, prompt to commit. On "y",
-     stage everything, generate a commit message via `claude -p`, and open
-     the git commit editor (git commit -e -F <msg>). If the editor exits
-     non-zero (e.g. `:cq` from vim), the commit is aborted and the repo
+     stage everything, generate a commit message via Claude (falling back to
+     Codex), and open the git commit editor (git commit -e -F <msg>). If both
+     generators fail, the editor opens with a blank message. If the editor
+     exits non-zero (e.g. `:cq` from vim), the commit is aborted and the repo
      is left dirty. On a successful commit, the repo is pushed afterward.
   3. Password store: fast-forward pull, then push local password changes.
   4. Parallel install: re-run install commands whose repo HEAD changed
@@ -18,6 +19,7 @@ from __future__ import annotations
 
 import argparse
 import os
+import re
 import shutil
 import subprocess
 import sys
@@ -50,6 +52,19 @@ HOME = Path.home()
 
 CARGO_INSTALL = ["cargo", "install", "--path", "."]
 GO_INSTALL = ["go", "install"]
+
+COMMIT_MESSAGE_PROMPT = (
+    "Inspect the staged Git diff and generate a concise Conventional Commits "
+    "message. Start the subject with one of build, chore, ci, docs, feat, fix, "
+    "perf, refactor, revert, style, or test, optionally followed by a scope. "
+    "Output the commit message text only: no quotes, no markdown fences, no "
+    "preamble, and no attributions. Include a body only when it adds important "
+    "context."
+)
+CONVENTIONAL_SUBJECT_RE = re.compile(
+    r"^(?:build|chore|ci|docs|feat|fix|perf|refactor|revert|style|test)"
+    r"(?:\([^\r\n()]+\))?!?: \S"
+)
 
 # Every repo to keep up to date, mapped to its install command (None = no build
 # step; the repo is only fetched/pulled/pushed).
@@ -268,30 +283,124 @@ def clean_commit_msg(msg: str) -> str:
     return msg
 
 
-def generate_commit_message(dir: Path) -> str:
-    if shutil.which("claude") is None:
+def generator_failed(provider: str, reason: str, detail: str = "") -> None:
+    sys.stderr.write(f"{YELLOW}{provider} {reason}{RESET}\n")
+    detail = detail.strip()
+    if detail:
+        sys.stderr.write(detail + "\n")
+    sys.stderr.flush()
+
+
+def validate_commit_message(provider: str, msg: str) -> str:
+    msg = clean_commit_msg(msg)
+    if not msg:
+        generator_failed(provider, "returned an empty commit message")
         return ""
+    if not CONVENTIONAL_SUBJECT_RE.match(msg.splitlines()[0]):
+        generator_failed(
+            provider,
+            "returned an invalid commit message; ignoring it",
+            msg,
+        )
+        return ""
+    return msg
+
+
+def generate_with_claude(diff: str) -> str:
+    if shutil.which("claude") is None:
+        generator_failed("claude", "is not installed")
+        return ""
+    sys.stdout.write(f"{DIM}trying claude -p...{RESET}\n")
+    sys.stdout.flush()
+    try:
+        proc = subprocess.run(
+            ["claude", "-p", COMMIT_MESSAGE_PROMPT],
+            input=diff, capture_output=True, text=True, timeout=120,
+        )
+    except subprocess.TimeoutExpired:
+        generator_failed("claude", "timed out")
+        return ""
+    except OSError as err:
+        generator_failed("claude", "could not be started", str(err))
+        return ""
+    if proc.returncode != 0:
+        generator_failed(
+            "claude",
+            f"failed with exit code {proc.returncode}",
+            proc.stderr or proc.stdout,
+        )
+        return ""
+    return validate_commit_message("claude", proc.stdout)
+
+
+def generate_with_codex(dir: Path) -> str:
+    if shutil.which("codex") is None:
+        generator_failed("codex", "is not installed")
+        return ""
+    sys.stdout.write(f"{DIM}trying codex exec...{RESET}\n")
+    sys.stdout.flush()
+    output_path = ""
+    try:
+        with tempfile.NamedTemporaryFile(
+            prefix="upd-codex-", suffix=".txt", delete=False,
+        ) as output_file:
+            output_path = output_file.name
+        proc = subprocess.run(
+            [
+                "codex", "exec",
+                "--model", "gpt-5.6-luna",
+                "--config", 'model_reasoning_effort="low"',
+                "--sandbox", "read-only",
+                "--ephemeral",
+                "--output-last-message", output_path,
+                COMMIT_MESSAGE_PROMPT,
+            ],
+            cwd=dir, capture_output=True, text=True, timeout=120,
+        )
+        if proc.returncode != 0:
+            generator_failed(
+                "codex",
+                f"failed with exit code {proc.returncode}",
+                proc.stderr or proc.stdout,
+            )
+            return ""
+        try:
+            msg = Path(output_path).read_text()
+        except OSError as err:
+            generator_failed("codex", "output could not be read", str(err))
+            return ""
+        return validate_commit_message("codex", msg)
+    except subprocess.TimeoutExpired:
+        generator_failed("codex", "timed out")
+        return ""
+    except OSError as err:
+        generator_failed("codex", "could not be started", str(err))
+        return ""
+    finally:
+        if output_path:
+            try:
+                os.unlink(output_path)
+            except OSError:
+                pass
+
+
+def generate_commit_message(dir: Path) -> str:
     diff_proc = subprocess.run(
         ["git", "-C", str(dir), "diff", "--cached"],
         capture_output=True, text=True,
     )
+    if diff_proc.returncode != 0:
+        generator_failed(
+            "git diff",
+            f"failed with exit code {diff_proc.returncode}",
+            diff_proc.stderr,
+        )
+        return ""
     diff = diff_proc.stdout
     if not diff.strip():
+        generator_failed("git diff", "returned no staged changes")
         return ""
-    prompt = (
-        "Generate a concise semantic git commit message for the diff piped on "
-        "stdin. Use conventional-commit style (e.g. 'feat: ...', 'fix: ...', "
-        "'chore: ...', 'refactor: ...'). Output the commit message text only: "
-        "no quotes, no markdown fences, no preamble, no attributions."
-    )
-    try:
-        proc = subprocess.run(
-            ["claude", "-p", prompt],
-            input=diff, capture_output=True, text=True, timeout=120,
-        )
-    except subprocess.TimeoutExpired:
-        return ""
-    return clean_commit_msg(proc.stdout)
+    return generate_with_claude(diff) or generate_with_codex(dir)
 
 
 def handle_dirty_repos(dirty: list[Path], dry_run: bool) -> list[Path]:
@@ -319,11 +428,15 @@ def handle_dirty_repos(dirty: list[Path], dry_run: bool) -> list[Path]:
             set_status(name, "FAIL (git add)")
             continue
 
-        sys.stdout.write(
-            f"{DIM}generating commit message via claude -p...{RESET}\n"
-        )
+        sys.stdout.write(f"{DIM}generating commit message...{RESET}\n")
         sys.stdout.flush()
         msg = generate_commit_message(dir)
+        if not msg:
+            sys.stderr.write(
+                f"{YELLOW}no generated message; opening the editor with a "
+                f"blank commit message{RESET}\n"
+            )
+            sys.stderr.flush()
 
         commit_cmd = ["git", "-C", str(dir), "commit", "-e"]
         msgfile: Optional[str] = None
