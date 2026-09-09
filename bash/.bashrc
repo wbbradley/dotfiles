@@ -30,12 +30,6 @@ if ! shopt -oq posix; then
       . "$f"
     done
   fi
-  if [ -d /opt/homebrew/share/bash-completion/completions ]; then
-    for f in /opt/homebrew/share/bash-completion/completions/*
-      do
-        . "$f"
-      done
-  fi
 fi
 
 _ssh() {
@@ -412,6 +406,7 @@ if on-macos; then
 	# alias mails='sudo python -m smtpd -n -c DebuggingServer localhost:25'
 	alias stopify='pkill -STOP Spotify\ Helper'
 	alias startify='pkill -CONT Spotify\ Helper'
+  [[ -r "/opt/homebrew/etc/profile.d/bash_completion.sh" ]] && . "/opt/homebrew/etc/profile.d/bash_completion.sh"
 elif on-linux; then
   alias pbcopy="xclip -selection clipboard -i"
 	alias ls='ls -latr --color'
