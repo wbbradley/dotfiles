@@ -69,6 +69,7 @@ CONVENTIONAL_SUBJECT_RE = re.compile(
 # Every repo to keep up to date, mapped to its install command (None = no build
 # step; the repo is only fetched/pulled/pushed).
 REPOS: dict[Path, Optional[list[str]]] = {
+    HOME / "wiki": None,
     HOME / "src/dotfiles": None,
     HOME / "src/pickls": None,
     HOME / "src/nvim-procman": None,
@@ -88,6 +89,9 @@ REPOS: dict[Path, Optional[list[str]]] = {
     HOME / "src/rtop": CARGO_INSTALL,
     HOME / "src/dangle": CARGO_INSTALL,
 }
+
+# These repos use their existing Git configuration and are never cloned.
+OPTIONAL_REPOS = {HOME / "wiki"}
 
 GITHUB_USER = "wbbradley"
 
@@ -238,6 +242,18 @@ def process_repo(dir: Path, color: str, width: int,
 
 def repo_job(dir: Path, color: str, width: int, dry_run: bool) -> Optional[Path]:
     name = dir.name
+    if dir in OPTIONAL_REPOS:
+        reason = ""
+        if not dir.is_dir():
+            reason = "dir missing"
+        elif not (dir / ".git").exists() or git(dir, "rev-parse", "--git-dir")[0] != 0:
+            reason = "not a git repo"
+        elif not git_q(dir, "remote"):
+            reason = "no remote"
+        if reason:
+            emit(name, color, width, f"{YELLOW}SKIP{RESET} {reason}")
+            set_status(name, f"SKIP ({reason})")
+            return None
     was_missing = not dir.is_dir()
     if was_missing:
         emit(name, color, width,
