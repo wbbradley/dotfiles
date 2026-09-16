@@ -611,7 +611,7 @@ nnoremap <C-o> <C-o>zz
 nnoremap <C-i> <C-i>zz
 nnoremap <leader>+ viwyo"""<Esc>pA."""<Esc>_wvU<Esc>V:s/_/ /<CR>:noh<CR>:match<CR>
 nnoremap <Leader>! :view ~/README.md<CR>
-nnoremap <Leader>1 :e ~/README.md<CR>Go<Esc>:r!date<CR>
+nnoremap <Leader>1 :e ~/README.md<CR>Go# <Esc>:r!date<CR>kJo<CR><Esc>
 nnoremap <Leader>2 :e ~/github.txt<CR>Go<Esc>:r!date<CR>
 nnoremap <Leader>c :%s/\<<C-r><C-w>\>/
 vnoremap <Leader>c "hy:%s/<C-r>h/
