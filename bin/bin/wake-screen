@@ -1,0 +1,15 @@
+#!/bin/sh
+# Wake this user's running GNOME display, including from an SSH session.
+# Does not unlock the session or change idle/power preferences.
+set -eu
+export DBUS_SESSION_BUS_ADDRESS="unix:path=/run/user/$(id -u)/bus"
+if [ ! -S "/run/user/$(id -u)/bus" ]; then
+    echo 'wake-screen: no running user session bus found' >&2
+    exit 1
+fi
+gdbus call --session \
+    --dest org.gnome.Mutter.DisplayConfig \
+    --object-path /org/gnome/Mutter/DisplayConfig \
+    --method org.freedesktop.DBus.Properties.Set \
+    org.gnome.Mutter.DisplayConfig PowerSaveMode '<int32 0>' >/dev/null
+printf '%s\n' 'GNOME display wake requested.'
