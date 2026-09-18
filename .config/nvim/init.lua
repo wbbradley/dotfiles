@@ -27,13 +27,20 @@ vim.g.loaded_python3_provider = 0
 local lazy_plugins = {
   {
     "hedyhli/outline.nvim",
+    dependencies = { "epheien/outline-treesitter-provider.nvim" },
+    config = function(_, opts)
+      require("outline_treesitter_ranges").setup()
+      require("outline").setup(opts)
+    end,
     lazy = true,
     cmd = { "Outline", "OutlineOpen" },
     keys = { -- Example mapping to toggle outline
       { "<leader>o", "<cmd>Outline<CR>", desc = "Toggle outline" }
     },
     opts = {
-      -- Your setup opts here
+      providers = {
+        priority = { "lsp", "coc", "markdown", "norg", "man", "treesitter" },
+      },
     }
   },
   { "wbbradley/nvim-procman" },
@@ -1383,4 +1390,3 @@ vim.api.nvim_create_autocmd("BufWritePre", {
         end
     end,
 })
-
