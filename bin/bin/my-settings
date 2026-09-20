@@ -46,7 +46,8 @@ cmd-load() {
   backup_dir="${XDG_STATE_HOME:-$HOME/.local/state}/my-settings"
   mkdir -p "$backup_dir" || die "failed to create backup dir [dir=$backup_dir]"
   backup="$backup_dir/dconf-org-gnome-$(date +%Y%m%d-%H%M%S).ini"
-  if dconf dump /org/gnome/ > "$backup" && [[ -s "$backup" ]]; then
+  # An empty dump is valid when all settings still use their defaults.
+  if dconf dump /org/gnome/ > "$backup"; then
     echo "backed up current settings to $backup"
     echo "  (to revert this load: dconf load /org/gnome/ < '$backup')"
   else
