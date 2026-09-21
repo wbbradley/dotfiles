@@ -18,7 +18,7 @@ org.gnome.desktop.interface gtk-enable-primary-paste true
 org.gnome.desktop.interface gtk-im-module 'gtk-im-context-simple'
 org.gnome.desktop.interface gtk-im-preedit-style 'callback'
 org.gnome.desktop.interface gtk-im-status-style 'callback'
-org.gnome.desktop.interface gtk-key-theme 'Default'
+org.gnome.desktop.interface gtk-key-theme 'Emacs'
 org.gnome.desktop.interface gtk-theme 'Yaru-dark'
 org.gnome.desktop.interface gtk-timeout-initial 200
 org.gnome.desktop.interface gtk-timeout-repeat 20
