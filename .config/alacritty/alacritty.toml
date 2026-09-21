@@ -33,3 +33,8 @@ chars = "\u001b[1;3A"
 key = "N"
 mods = "Control|Shift"
 action = "CreateNewWindow"
+
+# Match Neovim gruvbox Normal colors.
+[colors.primary]
+background = "#282828"
+foreground = "#ebdbb2"
