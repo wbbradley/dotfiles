@@ -1,0 +1,36 @@
+engine = "whisper"
+state_file = "auto"
+
+[hotkey]
+enabled = false
+
+[audio]
+device = "default"
+sample_rate = 16000
+max_duration_secs = 120
+
+[audio.feedback]
+enabled = false
+volume = 0.4
+
+[whisper]
+mode = "local"
+model = "medium"
+language = "en"
+translate = false
+on_demand_loading = false
+
+[output]
+mode = "type"
+fallback_to_clipboard = true
+type_delay_ms = 2
+pre_type_delay_ms = 200
+auto_submit = false
+
+[output.notification]
+on_recording_start = true
+on_recording_stop = true
+on_transcription = false
+
+[osd]
+enabled = false

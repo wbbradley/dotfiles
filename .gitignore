@@ -13,3 +13,8 @@ bin/bin/protonum
 bin/bin/wim
 bin/bin/wim-key
 .config/*
+
+# Track only the Voxtype settings, not runtime files.
+!.config/voxtype/
+.config/voxtype/*
+!.config/voxtype/config.toml

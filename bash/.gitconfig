@@ -58,3 +58,5 @@
 [credential "https://gist.github.com"]
 	helper = 
 	helper = !/opt/homebrew/bin/gh auth git-credential
+[includeIf "gitdir:~/nw/"]
+	path = ~/nw/.gitconfig
