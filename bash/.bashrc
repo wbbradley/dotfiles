@@ -90,7 +90,9 @@ prepend_path_to PATH "$HOME"/.local/bin
 append_path_to PATH "$HOME"/go/bin
 append_path_to PATH "$HOME"/src/tmux-agent/bin
 
-eval "$(wt shell-init bash)"
+if command -v wt >/dev/null 2>&1; then
+  eval "$(wt shell-init bash)"
+fi
 
 
 pane_id_of_pane1() {

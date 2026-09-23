@@ -24,6 +24,7 @@ BREW_DEPS=(
   eza
   fd
   ffmpeg
+  flatbuffers
   git
   go
   graphviz
