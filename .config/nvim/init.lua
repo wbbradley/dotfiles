@@ -2,6 +2,16 @@
 -- Lazy package manager
 -- luacheck: globals vim
 -- ]]
+local uv = vim.uv or vim.loop
+if not uv.cwd() then
+  -- A shell can retain a working directory that has since been deleted.
+  local home = assert(uv.os_homedir(), "Cannot resolve home directory")
+  vim.api.nvim_set_current_dir(home)
+  vim.schedule(function()
+    vim.notify("Working directory is unavailable; changed to your home directory.", vim.log.levels.WARN)
+  end)
+end
+
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 
 if not (vim.uv or vim.loop).fs_stat(lazypath) then
@@ -321,43 +331,6 @@ local lazy_plugins = {
 --     }
 --   }
 -- }
-
-local walrus_sites_prefix = os.getenv("HOME") .. "/src/walrus-sites"
-local walrus_prefix = os.getenv("HOME") .. "/src/walrus"
-
-if string.sub(vim.loop.cwd(), 1, #walrus_sites_prefix) == walrus_sites_prefix then
-  vim.print("Walrus Sites detected")
-elseif string.sub(vim.loop.cwd(), 1, #walrus_prefix) == walrus_prefix then
-  vim.print("Walrus detected")
-  local capabilities = vim.lsp.protocol.make_client_capabilities()
-  vim.tbl_deep_extend("force", capabilities, {
-    workspace = { didChangeWatchedFiles = { dynamicRegistration = true } }
-  })
-  vim.g.rustaceanvim = {
-    server = {
-      default_settings = {
-        ['rust-analyzer'] = {
-          diagnostics = { disabled = { "inactive-code", "unlinked-file" } },
-          rustfmt = {
-            overrideCommand = {
-              "rustfmt",
-              "--edition",
-              "2024",
-              "--config",
-              "group_imports=StdExternalCrate,imports_granularity=Crate,imports_layout=HorizontalVertical"
-            }
-          },
-          cargo = { cfgs = { "test-utils", "msim", "backup" } }
-        }
-      }
-    }
-  }
-  vim.cmd([[
-    augroup MoveLint
-      autocmd FileType move setlocal makeprg=move-lint
-    augroup END
-  ]])
-end
 
 vim.opt.runtimepath:prepend(vim.fn.expand("~/src/jumplist.nvim"))
 require("jumplist").setup({})
@@ -920,7 +893,6 @@ augroup RustCore
   autocmd FileType rust nmap <F21> :wa<CR>:!cargo fmt -- %<CR><CR>
   " autocmd FileType rust nmap <F9> :wa<CR>:pclose<CR>:compiler cargo<CR>:setlocal makeprg=cargo\ simtest\ simtest\ build\ --profile\ simtest<CR>:make<CR><CR>
   autocmd FileType rust setlocal colorcolumn=100,101,102,103
-  " autocmd FileType rust nnoremap <leader>d Owalrus_utils::crumb!();<Esc>_
   autocmd FileType rust setlocal formatoptions-=o
 augroup END
 
