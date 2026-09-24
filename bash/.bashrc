@@ -517,48 +517,83 @@ graphical-mode() {
   fi
 }
 
-# New Linux shells can find the agent started by agent().
-if [[ "$(uname)" == "Linux" && -z "$SSH_AUTH_SOCK" ]]; then
-  export SSH_AUTH_SOCK="$HOME/.ssh/agent.sock"
-fi
+# Every shell uses the same address, including shells opened before agent starts.
+# ssh itself also uses this address via IdentityAgent (installed by agent).
+export SSH_AUTH_SOCK="$HOME/.ssh/dotfiles-agent/agent.sock"
+unset SSH_AGENT_PID
+
+_agent-setup() (
+  # A subshell keeps lock cleanup and umask changes out of the calling shell.
+  umask 077
+  local agent_dir="$HOME/.ssh/dotfiles-agent"
+  local agent_status attempt config_tmp=""
+  if [[ -L "$agent_dir" ]]; then
+    echo "agent: refusing symlinked agent directory: $agent_dir" >&2
+    return 1
+  fi
+  mkdir -p "$agent_dir" || return
+  if [[ ! -O "$agent_dir" ]]; then
+    echo "agent: agent directory is not owned by this user: $agent_dir" >&2
+    return 1
+  fi
+  chmod 700 "$agent_dir" || return
+
+  for ((attempt = 0; attempt < 100; attempt++)); do
+    if mkdir "$agent_dir/lock" 2>/dev/null; then
+      break
+    fi
+    sleep 0.1
+  done
+  if ((attempt == 100)); then
+    echo "agent: startup lock is busy: $agent_dir/lock" >&2
+    echo "If no other agent command is running, remove that directory and retry." >&2
+    return 1
+  fi
+  trap '[[ -z "$config_tmp" ]] || rm -f -- "$config_tmp"; rmdir "$agent_dir/lock"' EXIT
+  trap 'exit 1' HUP INT TERM
+
+  # Respect an existing IdentityAgent directive wherever it appears.
+  # Otherwise put the shared default before any Host/Match blocks.
+  local agent_setting='IdentityAgent ~/.ssh/dotfiles-agent/agent.sock'
+  if ! grep -q '^IdentityAgent' "$HOME/.ssh/config" 2>/dev/null; then
+    # Preserve a user's symlink rather than silently replacing it.
+    if [[ -L "$HOME/.ssh/config" ]]; then
+      echo "agent: add '$agent_setting' at the top of the symlinked ~/.ssh/config" >&2
+      return 1
+    fi
+    config_tmp="$(mktemp "$HOME/.ssh/config.agent.XXXXXX")" || return
+    printf '%s\n' "$agent_setting" >"$config_tmp" || return
+    if [[ -e "$HOME/.ssh/config" ]]; then
+      cat "$HOME/.ssh/config" >>"$config_tmp" || return
+    fi
+    mv -f -- "$config_tmp" "$HOME/.ssh/config" || return
+    config_tmp=""
+  fi
+
+  # Exit 1 means the agent is reachable but has no keys; only 2 is unreachable.
+  agent_status=0
+  ssh-add -l >/dev/null 2>&1 || agent_status=$?
+  case "$agent_status" in
+    0|1) return 0 ;;
+    2) ;;
+    *) echo "agent: unexpected ssh-add status: $agent_status" >&2; return 1 ;;
+  esac
+  # Never delete an unexpected regular file at the socket address.
+  if [[ -S "$SSH_AUTH_SOCK" || -L "$SSH_AUTH_SOCK" ]]; then
+    rm -f -- "$SSH_AUTH_SOCK" || return
+  fi
+  ssh-agent -a "$SSH_AUTH_SOCK" >/dev/null
+)
 
 agent() {
-  local agent_sock agent_status
-  case "$(uname)" in
-    Darwin)
-      # Use the same macOS agent inherited by new terminal windows.
-      agent_sock="$(launchctl getenv SSH_AUTH_SOCK)" || return
-      if [[ -z "$agent_sock" || ! -S "$agent_sock" ]]; then
-        echo "Cannot find the macOS SSH agent socket" >&2
-        return 1
-      fi
-      export SSH_AUTH_SOCK="$agent_sock"
-      unset SSH_AGENT_PID
-      ;;
-    Linux)
-      # An empty but reachable agent returns 1; an unreachable agent returns 2.
-      agent_status=0
-      ssh-add -l >/dev/null 2>&1 || agent_status=$?
-      if [[ "$agent_status" -eq 2 ]]; then
-        export SSH_AUTH_SOCK="$HOME/.ssh/agent.sock"
-        unset SSH_AGENT_PID
-        agent_status=0
-        ssh-add -l >/dev/null 2>&1 || agent_status=$?
-        if [[ "$agent_status" -eq 2 ]]; then
-          mkdir -p -m 700 "$HOME/.ssh" || return
-          if [[ -S "$SSH_AUTH_SOCK" ]]; then
-            rm -- "$SSH_AUTH_SOCK" || return
-          fi
-          ssh-agent -a "$SSH_AUTH_SOCK" >/dev/null || return
-        fi
-      fi
-      ;;
-    *)
-      echo "agent supports macOS and Linux" >&2
-      return 1
-      ;;
-  esac
-  ssh-add ~/.ssh/id_ed25519
+  export SSH_AUTH_SOCK="$HOME/.ssh/dotfiles-agent/agent.sock"
+  unset SSH_AGENT_PID
+  _agent-setup || return
+  if (($#)); then
+    ssh-add "$@"
+  else
+    ssh-add "$HOME/.ssh/id_ed25519"
+  fi
 }
 
 agent-with-keys() {
