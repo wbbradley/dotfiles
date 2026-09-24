@@ -517,6 +517,50 @@ graphical-mode() {
   fi
 }
 
+# New Linux shells can find the agent started by agent().
+if [[ "$(uname)" == "Linux" && -z "$SSH_AUTH_SOCK" ]]; then
+  export SSH_AUTH_SOCK="$HOME/.ssh/agent.sock"
+fi
+
+agent() {
+  local agent_sock agent_status
+  case "$(uname)" in
+    Darwin)
+      # Use the same macOS agent inherited by new terminal windows.
+      agent_sock="$(launchctl getenv SSH_AUTH_SOCK)" || return
+      if [[ -z "$agent_sock" || ! -S "$agent_sock" ]]; then
+        echo "Cannot find the macOS SSH agent socket" >&2
+        return 1
+      fi
+      export SSH_AUTH_SOCK="$agent_sock"
+      unset SSH_AGENT_PID
+      ;;
+    Linux)
+      # An empty but reachable agent returns 1; an unreachable agent returns 2.
+      agent_status=0
+      ssh-add -l >/dev/null 2>&1 || agent_status=$?
+      if [[ "$agent_status" -eq 2 ]]; then
+        export SSH_AUTH_SOCK="$HOME/.ssh/agent.sock"
+        unset SSH_AGENT_PID
+        agent_status=0
+        ssh-add -l >/dev/null 2>&1 || agent_status=$?
+        if [[ "$agent_status" -eq 2 ]]; then
+          mkdir -p -m 700 "$HOME/.ssh" || return
+          if [[ -S "$SSH_AUTH_SOCK" ]]; then
+            rm -- "$SSH_AUTH_SOCK" || return
+          fi
+          ssh-agent -a "$SSH_AUTH_SOCK" >/dev/null || return
+        fi
+      fi
+      ;;
+    *)
+      echo "agent supports macOS and Linux" >&2
+      return 1
+      ;;
+  esac
+  ssh-add ~/.ssh/id_ed25519
+}
+
 agent-with-keys() {
   keys=( "$@" )
   if [[ -z "$SSH_AGENT_PID" ]]; then
