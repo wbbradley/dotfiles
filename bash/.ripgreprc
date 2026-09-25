@@ -5,6 +5,7 @@
 --glob=!.mypy_cache/
 --glob=!node_modules/
 --glob=!tags
+--glob=!.venv
 -uuu
 # --glob=!.git/**/*
 # --glob=.github/**/*

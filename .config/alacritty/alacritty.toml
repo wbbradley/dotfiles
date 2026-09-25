@@ -34,6 +34,11 @@ key = "N"
 mods = "Control|Shift"
 action = "CreateNewWindow"
 
+[[keyboard.bindings]]
+key = "/"
+mods = "Control"
+chars = "\u001f"
+
 # Match Neovim gruvbox Normal colors.
 [colors.primary]
 background = "#282828"
