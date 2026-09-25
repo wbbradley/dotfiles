@@ -14,6 +14,11 @@ bin/bin/wim
 bin/bin/wim-key
 .config/*
 
+# Shared tmux theme.
+!.config/tmux/
+.config/tmux/*
+!.config/tmux/gruvbox.conf
+
 # Track only the Voxtype settings, not runtime files.
 !.config/voxtype/
 .config/voxtype/*

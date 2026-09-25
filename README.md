@@ -11,6 +11,15 @@ Considering bringing more of
 https://raw.githubusercontent.com/tamdogood/builder-essential-skills/refs/heads/main/skills/orwell-writing/SKILL.md
 in.
 
+## tmux colors
+
+The Linux and Darwin tmux configs both source `.config/tmux/gruvbox.conf`
+through `~/.config`, which the installer links to this repository. Edit that
+shared file to change the Gruvbox status bar, pane borders, copy-mode colors,
+or pane flashes. Pane foreground and background inherit the terminal colors.
+
+Reload an existing session with `tmux source-file ~/.tmux.conf`.
+
 ## Voxtype (GNOME Wayland)
 
 `.config/voxtype/config.toml` configures local Whisper medium, English
