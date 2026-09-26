@@ -5,7 +5,6 @@ import importlib.util
 import io
 import os
 from pathlib import Path
-import subprocess
 import sys
 import tempfile
 import unittest
@@ -133,16 +132,6 @@ class ProgressTest(unittest.TestCase):
         self.assertEqual(upd._logs["job"][0], "line 20")
         self.assertEqual(upd._logs["job"][-1], "line 99")
 
-    def test_demo_never_runs_commands(self):
-        upd = self.upd
-        with patch.object(sys, "argv", [str(SCRIPT), "--demo", "--plain"]), \
-                patch.object(upd.time, "sleep"), contextlib.redirect_stdout(io.StringIO()) as output, \
-                patch.object(upd.subprocess, "run", side_effect=AssertionError("ran a command")), \
-                patch.object(upd.subprocess, "Popen", side_effect=AssertionError("ran a command")):
-            self.assertEqual(upd.main(), 0)
-        self.assertIn("demo compiler failure", output.getvalue())
-        self.assertNotIn("\033", output.getvalue())
-
     def test_tree_sitter_failure_affects_exit_status(self):
         upd = self.upd
         with patch.object(sys, "argv", [str(SCRIPT), "--skip-self-update"]), \
@@ -152,13 +141,8 @@ class ProgressTest(unittest.TestCase):
                 contextlib.redirect_stdout(io.StringIO()) as output:
             self.assertEqual(upd.main(), 1)
         self.assertIn("install:tree-sitter-cli: FAIL (exit 23)", output.getvalue())
+        self.assertNotIn("\033", output.getvalue())
 
-    def test_redirected_demo_has_no_terminal_escapes(self):
-        result = subprocess.run([sys.executable, str(SCRIPT), "--demo"],
-                                text=True, capture_output=True, check=True)
-        self.assertNotIn("\033", result.stdout)
-        self.assertEqual(result.stderr, "")
-        self.assertIn("4 jobs", result.stdout)
 
 
 if __name__ == "__main__":

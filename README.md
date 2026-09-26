@@ -27,9 +27,7 @@ jobs and password-store warnings get separate sections at the end containing
 their last 80 lines of output. Failed jobs produce a nonzero exit status;
 password-store warnings remain nonfatal.
 
-Try `upd --demo` for a safe animated preview, including a simulated build
-failure. It runs no update or installation commands. Use `upd --plain` for
-static output; redirected output automatically uses this style. `NO_COLOR=1`
+Use `upd --plain` for static output; redirected output automatically uses this style. `NO_COLOR=1`
 disables colors while keeping animation in a terminal. Small terminals show
 active jobs first and print every job when the phase finishes. Progress pauses
 while the interactive commit editor is open.
