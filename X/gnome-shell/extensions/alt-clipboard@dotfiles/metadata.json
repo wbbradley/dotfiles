@@ -1,0 +1,8 @@
+{
+  "uuid": "alt-clipboard@dotfiles",
+  "name": "Alt Clipboard",
+  "description": "Alt+A selects all; Alt+C copies; Alt+V pastes, with terminal-aware clipboard shortcuts.",
+  "shell-version": ["50"],
+  "settings-schema": "org.gnome.shell.extensions.alt-clipboard",
+  "version": 1
+}

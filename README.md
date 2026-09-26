@@ -1,5 +1,4 @@
 dotfiles
-========
 
 # Installation
 
@@ -19,6 +18,34 @@ shared file to change the Gruvbox status bar, pane borders, copy-mode colors,
 or pane flashes. Pane foreground and background inherit the terminal colors.
 
 Reload an existing session with `tmux source-file ~/.tmux.conf`.
+
+## Alt select all, copy and paste (GNOME 50)
+
+Run `~/bin/setup-alt-clipboard`, then log out and back in. The installer also
+runs this setup. The local GNOME extension in `X/gnome-shell/extensions/`
+maps Alt+C to Ctrl+C in GUI apps and Ctrl+Shift+C in Alacritty and common
+terminals. Alt+V sends Ctrl+Shift+V everywhere (often paste without formatting
+in GUI apps). Alacritty also has native Alt+C/Alt+V clipboard bindings for use
+without the extension. Alt+A sends Ctrl+A to select all in the focused text field
+(including Chrome and Slack). Outside text fields, it performs the focused app's
+Ctrl+A action; in terminals this commonly moves to the start of the command line.
+Regular Ctrl shortcuts remain available.
+
+Release Alt to perform the action. Pending actions are cancelled if focus
+changes or Alt remains held for five seconds. The extension handles windows
+and the overview, but is inactive on the lock screen. It takes precedence over
+app shortcuts such as Alt+A/Alt+C/Alt+V menu accelerators. GNOME Terminal's stored
+copy/paste shortcuts are restored to Ctrl+Shift+C/V for forwarding.
+
+To use ordinary Ctrl+V paste in GUI apps (terminals still use Ctrl+Shift+V):
+
+```sh
+gsettings --schemadir ~/.local/share/gnome-shell/extensions/alt-clipboard@dotfiles/schemas \
+  set org.gnome.shell.extensions.alt-clipboard paste-with-shift false
+```
+
+To disable the desktop mappings, run `gnome-extensions disable alt-clipboard@dotfiles`.
+After editing the extension, rerun setup and log out and back in.
 
 ## Voxtype (GNOME Wayland)
 

@@ -1,0 +1,37 @@
+#!/bin/bash
+set -euo pipefail
+
+if [[ "$(gnome-shell --version)" != 'GNOME Shell 50.'* ]]; then
+  echo 'Alt Clipboard currently supports GNOME Shell 50.' >&2
+  exit 1
+fi
+
+dotfiles_dir="$(cd -- "$(dirname -- "$(readlink -f -- "$0")")/../.." && pwd)"
+uuid=alt-clipboard@dotfiles
+source_dir="$dotfiles_dir/X/gnome-shell/extensions/$uuid"
+target_dir="${XDG_DATA_HOME:-$HOME/.local/share}/gnome-shell/extensions/$uuid"
+mkdir -p "$target_dir/schemas"
+cp "$source_dir/metadata.json" "$source_dir/extension.js" "$target_dir/"
+cp "$source_dir/schemas/"*.xml "$target_dir/schemas/"
+glib-compile-schemas --strict "$target_dir/schemas"
+
+# Preserve existing enabled extensions, including ones absent from dconf.ini.
+/usr/bin/python3 - "$uuid" <<'PY'
+import sys
+from gi.repository import Gio
+settings = Gio.Settings.new('org.gnome.shell')
+enabled = settings.get_strv('enabled-extensions')
+if sys.argv[1] not in enabled:
+    settings.set_strv('enabled-extensions', enabled + [sys.argv[1]])
+Gio.Settings.sync()
+PY
+
+# GNOME Terminal previously used Alt directly; the extension now forwards
+# Ctrl+Shift to terminals. Only change these two settings, not the whole desktop.
+dconf write /org/gnome/terminal/legacy/keybindings/copy "'<Control><Shift>c'"
+dconf write /org/gnome/terminal/legacy/keybindings/paste "'<Control><Shift>v'"
+
+if gnome-extensions info "$uuid" >/dev/null 2>&1; then
+    gnome-extensions enable "$uuid"
+fi
+echo 'Alt Clipboard installed. Log out and back in to load new or updated extension code.'

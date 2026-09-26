@@ -69,6 +69,7 @@ setup-fzf() {
   ./install --all --no-zsh --no-fish || die "failed to install fzf"
 }
 apt_pkgs=(
+  age
   build-essential
   clang
   cmake
@@ -159,6 +160,9 @@ fi
 # $(go env GOPATH)/bin (~/go/bin), which .bashrc already adds to PATH.
 if command -v go >/dev/null 2>&1; then
   command -v gopls >/dev/null 2>&1 || go install golang.org/x/tools/gopls@latest || die "failed to install gopls"
+  if ! command -v sops >/dev/null 2>&1; then
+    go install github.com/getsops/sops/v3/cmd/sops@latest
+  fi
 fi
 
 if ! command -v flatc 2>/dev/null >/dev/null; then
@@ -237,6 +241,10 @@ if on-linux && command -v dconf >/dev/null 2>&1 && [[ -n "$DBUS_SESSION_BUS_ADDR
   echo "Applying GNOME settings via 'my-settings load'..."
   "$dotfiles_dir/bin/bin/my-settings" load \
     || echo "warning: 'my-settings load' failed; apply it manually from a GNOME session."
+  if command -v gnome-shell >/dev/null 2>&1; then
+    "$dotfiles_dir/bin/bin/setup-alt-clipboard" \
+      || echo "warning: Alt Clipboard setup failed; run setup-alt-clipboard manually."
+  fi
 fi
 
 echo "Dotfiles installation was successful, please logout of your shell, and log back in."

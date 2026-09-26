@@ -1,0 +1,20 @@
+<schemalist>
+  <schema id="org.gnome.shell.extensions.alt-clipboard" path="/org/gnome/shell/extensions/alt-clipboard/">
+    <key name="alt-copy" type="as">
+      <default>['&lt;Alt&gt;c']</default>
+      <summary>Copy shortcut</summary>
+    </key>
+    <key name="alt-paste" type="as">
+      <default>['&lt;Alt&gt;v']</default>
+      <summary>Paste shortcut</summary>
+    </key>
+    <key name="alt-select-all" type="as">
+      <default>['&lt;Alt&gt;a']</default>
+      <summary>Select all shortcut</summary>
+    </key>
+    <key name="paste-with-shift" type="b">
+      <default>true</default>
+      <summary>Send Ctrl+Shift+V in GUI apps instead of Ctrl+V</summary>
+    </key>
+  </schema>
+</schemalist>
