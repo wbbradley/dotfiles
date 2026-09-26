@@ -25,6 +25,9 @@ import subprocess
 import sys
 import tempfile
 import threading
+import time
+import unicodedata
+from collections import defaultdict, deque
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 from typing import Optional
@@ -105,6 +108,200 @@ _heads: dict[str, str] = {}
 _heads_lock = threading.Lock()
 
 
+# Child output is retained for diagnostics, never written over the live display.
+ANSI_RE = re.compile(r"\x1b(?:\][^\x07\x1b]*(?:\x07|\x1b\\)|\[[0-?]*[ -/]*[@-~])")
+_logs: dict[str, deque[str]] = defaultdict(lambda: deque(maxlen=80))
+_display: Optional["Progress"] = None
+_plain = False
+
+
+def plain_text(text: str) -> str:
+    text = ANSI_RE.sub("", text)
+    return "".join(c for c in text if c.isprintable() or c == "\t").expandtabs(4)
+
+
+def clip(text: str, columns: int) -> str:
+    """Clip by terminal cells, including wide Unicode characters."""
+    used = 0
+    result = ""
+    for char in text:
+        size = 0 if unicodedata.combining(char) else (2 if unicodedata.east_asian_width(char) in "WF" else 1)
+        if used + size > columns:
+            return result[:-1] + "…" if result else ""
+        result += char
+        used += size
+    return result
+
+
+class Progress:
+    """One terminal row per job, with bounded output retained for failures."""
+
+    def __init__(self, title: str, names: list[str]):
+        self.title = title
+        self.rows = {name: {"state": "queued", "detail": "waiting", "start": 0.0, "end": 0.0}
+                     for name in names}
+        self.live = sys.stdout.isatty() and os.environ.get("TERM") != "dumb" and not _plain
+        self.lock = threading.RLock()
+        self.stop = threading.Event()
+        self.thread: Optional[threading.Thread] = None
+        self.drawn = 0
+        self.tick = 0
+        self.frame: list[str] = []
+        self.size: Optional[os.terminal_size] = None
+
+    def __enter__(self):
+        global _display
+        _display = self
+        sys.stdout.write(f"\n{BOLD}{self.title}{RESET}\n")
+        if self.live:
+            sys.stdout.write("\033[?25l")
+            self.render()
+            self.thread = threading.Thread(target=self.animate, daemon=True)
+            self.thread.start()
+        sys.stdout.flush()
+        return self
+
+    def __exit__(self, *_):
+        global _display
+        self.stop.set()
+        if self.thread:
+            self.thread.join()
+        try:
+            if self.live:
+                self.render(final=True)
+        finally:
+            _display = None
+            if self.live:
+                sys.stdout.write("\033[?25h")
+                sys.stdout.flush()
+
+    def animate(self):
+        while not self.stop.wait(0.1):
+            self.render()
+
+    def start(self, name: str):
+        with self.lock:
+            self.rows[name].update(state="running", detail="starting", start=time.monotonic())
+
+    def update(self, name: str, detail: str):
+        with self.lock:
+            if name in self.rows:
+                self.rows[name]["detail"] = detail
+
+    def finish(self, name: str):
+        with self.lock:
+            status = _status.get(name, "OK")
+            self.rows[name].update(state=status, end=time.monotonic())
+            if not self.live:
+                sys.stdout.write(self.line(name, self.rows[name]) + "\n")
+                sys.stdout.flush()
+
+    def line(self, name: str, row: dict) -> str:
+        state = row["state"]
+        if state == "running":
+            icon, color = "⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏"[self.tick % 10], CYAN
+            detail = row["detail"]
+        elif state == "queued":
+            icon, color, detail = "·", DIM, "waiting"
+        else:
+            color, failed = summary_color(state)
+            icon = "✗" if failed else ("✓" if state in ("OK", "COMMITTED") else "–")
+            detail = state
+            if row["detail"] and row["detail"] != state:
+                detail += " · " + row["detail"]
+        elapsed = (row["end"] or time.monotonic()) - row["start"] if row["start"] else 0
+        width = min(26, max(map(len, self.rows)))
+        label = clip(name, width)
+        text = f" {icon} {label:<{width}}  {elapsed:5.1f}s  {detail}"
+        if self.live:
+            text = clip(text, max(1, shutil.get_terminal_size().columns - 1))
+        return f"{color}{text}{RESET}"
+
+    def render(self, final: bool = False):
+        with self.lock:
+            size = shutil.get_terminal_size()
+            # Keep the live area shorter than the screen so cursor-up never
+            # targets rows that have already scrolled into terminal history.
+            limit = max(1, size.lines - 4)
+            items = list(self.rows.items())
+            overflow = len(items) > limit and not final
+            if overflow:
+                items.sort(key=lambda item: item[1]["state"] != "running")
+                items = items[:max(0, limit - 1)]
+            frame = [self.line(name, row) for name, row in items]
+            if overflow:
+                frame.append(clip(f" … {len(self.rows) - len(items)} more jobs", size.columns - 1))
+            output = ""
+            if self.drawn:
+                output += f"\033[{min(self.drawn, max(1, size.lines - 1))}A\r"
+            if len(frame) == len(self.frame) and size == self.size:
+                # Completed rows stay untouched while each active row advances.
+                for previous, current in zip(self.frame, frame):
+                    output += "\033[1B\r" if current == previous else f"\033[2K{current}\r\n"
+            else:
+                output += "\033[J" + "".join(line + "\n" for line in frame)
+            sys.stdout.write(output)
+            self.frame, self.size = frame, size
+            self.drawn = len(frame)
+            self.tick += 1
+            sys.stdout.flush()
+
+
+def run_job(name: str, fn, *args):
+    """Surface worker exceptions as job failures and keep unrelated jobs going."""
+    if _display:
+        _display.start(name)
+    try:
+        return fn(*args)
+    except Exception as err:
+        emit(name, RED, 0, f"{type(err).__name__}: {err}")
+        set_status(name, "FAIL (exception)")
+        return None
+    finally:
+        if _display:
+            _display.finish(name)
+
+
+def failure_summary() -> int:
+    failures = [(name, status) for name, status in _status.items()
+                if status.startswith(("FAIL", "WARN"))]
+    sys.stdout.write(f"\n{BOLD}Finished{RESET} · {len(_status)} jobs · {len(failures)} issues\n")
+    for name, status in failures:
+        color, _ = summary_color(status)
+        sys.stdout.write(f"\n{color}── {name}: {status} ──{RESET}\n")
+        sys.stdout.write(f"{DIM}Recent output (up to 80 lines):{RESET}\n")
+        for line in _logs[name]:
+            sys.stdout.write(f"  {line}\n")
+    sys.stdout.flush()
+    return int(any(status.startswith("FAIL") for _, status in failures))
+
+
+def demo() -> int:
+    """Exercise the real renderer without running any external commands."""
+    names = ["dotfiles", "wiki", "install:procman", "install:tree-sitter-cli"]
+
+    def job(name, steps, result):
+        for step in steps:
+            emit(name, CYAN, 0, step)
+            time.sleep(0.65)
+        set_status(name, result)
+
+    with Progress("upd · demo (no commands are run)", names):
+        with ThreadPoolExecutor(max_workers=4) as ex:
+            work = [
+                (["fetching origin", "already up to date"], "OK"),
+                (["fetching origin", "pulling 3 commits", "up to date"], "OK"),
+                (["checking HEAD", "compiling procman", "linking", "installed"], "OK"),
+                (["updating registry", "compiling tree-sitter-cli", "error: demo compiler failure", "build exited with code 1"], "FAIL (install)"),
+            ]
+            futures = [ex.submit(run_job, name, job, name, steps, result)
+                       for name, (steps, result) in zip(names, work)]
+            for future in futures:
+                future.result()
+    failure_summary()
+    return 0  # the simulated failure is intentional
+
+
 def set_status(name: str, val: str) -> None:
     with _status_lock:
         _status[name] = val
@@ -121,13 +318,15 @@ def get_head(dir: Path) -> Optional[str]:
 
 
 def emit(name: str, color: str, width: int, text: str) -> None:
-    lines = text.splitlines() if text else [""]
-    if not lines:
-        lines = [""]
+    lines = [plain_text(line) for line in text.splitlines()] or [""]
     with _print_lock:
-        for line in lines:
-            sys.stdout.write(f"{color}{name:<{width}}{RESET} | {line}\n")
-        sys.stdout.flush()
+        _logs[name].extend(lines)
+        if _display:
+            _display.update(name, lines[-1])
+        else:
+            for line in lines:
+                sys.stdout.write(f"{color}{name:<{width}}{RESET} | {line}\n")
+            sys.stdout.flush()
 
 
 def git(dir: Path, *args: str) -> tuple[int, str, str]:
@@ -145,14 +344,14 @@ def git_q(dir: Path, *args: str) -> str:
 
 def stream(name: str, color: str, width: int, cmd: list[str],
            cwd: Optional[Path] = None) -> int:
-    proc = subprocess.Popen(
+    with subprocess.Popen(
         cmd, cwd=cwd, stdout=subprocess.PIPE,
-        stderr=subprocess.STDOUT, text=True,
-    )
-    assert proc.stdout is not None
-    for line in proc.stdout:
-        emit(name, color, width, line.rstrip("\n"))
-    return proc.wait()
+        stderr=subprocess.STDOUT, text=True, errors="replace",
+    ) as proc:
+        assert proc.stdout is not None
+        for line in proc.stdout:
+            emit(name, color, width, line.rstrip("\n"))
+        return proc.wait()
 
 
 def clone_missing(dir: Path, color: str, width: int, dry_run: bool) -> bool:
@@ -184,6 +383,7 @@ def process_repo(dir: Path, color: str, width: int,
 
     set_head(dir, git_q(dir, "rev-parse", "HEAD"))
 
+    e("fetching origin")
     rc, _, err = git(dir, "fetch", "--quiet")
     if rc != 0:
         e(f"{RED}FAIL{RESET} fetch failed")
@@ -207,6 +407,7 @@ def process_repo(dir: Path, color: str, width: int,
         if dry_run:
             e(f"{DIM}dry-run:{RESET} git pull --ff-only --autostash --quiet")
         else:
+            e("pulling updates")
             rc, _, err = git(dir, "pull", "--ff-only", "--autostash", "--quiet")
             if rc != 0:
                 e(f"{RED}FAIL{RESET} pull (not fast-forward?); leaving dir alone")
@@ -227,6 +428,7 @@ def process_repo(dir: Path, color: str, width: int,
         if dry_run:
             e(f"{DIM}dry-run:{RESET} git push --quiet")
         else:
+            e("pushing local commits")
             rc, _, err = git(dir, "push", "--quiet")
             if rc != 0:
                 e(f"{RED}FAIL{RESET} push failed")
@@ -440,7 +642,7 @@ def handle_dirty_repos(dirty: list[Path], dry_run: bool) -> list[Path]:
 
         rc, _, err = git(dir, "add", "-A")
         if rc != 0:
-            sys.stdout.write(f"{RED}git add failed:{RESET} {err}\n")
+            emit(name, RED, 0, f"git add failed: {err}")
             set_status(name, "FAIL (git add)")
             continue
 
@@ -500,6 +702,7 @@ def push_after_commit(dir: Path, color: str, width: int,
     if dry_run:
         e(f"{DIM}dry-run:{RESET} git push --quiet")
         return
+    e("pushing local commits")
     rc, _, err = git(dir, "push", "--quiet")
     if rc != 0:
         e(f"{RED}FAIL{RESET} push failed")
@@ -579,20 +782,25 @@ def install_job(dir: Path, cmd: list[str], color: str,
         emit(label, color, width, s)
 
     if not dir.is_dir():
-        e(f"{YELLOW}SKIP{RESET} dir missing")
+        e("directory missing")
+        set_status(label, "SKIP (dir missing)")
         return
     if not force and not changed(dir):
-        e(f"{GREEN}OK{RESET}")
+        e("HEAD unchanged")
+        set_status(label, "SKIP (unchanged)")
         return
     if dry_run:
         e(f"{DIM}dry-run:{RESET} (cd {dir} && {' '.join(cmd)})")
+        set_status(label, "SKIP (dry-run)")
         return
+    e("running " + " ".join(cmd))
     rc = stream(label, color, width, cmd, cwd=dir)
     if rc == 0:
-        e(f"{GREEN}OK{RESET} installed {name}")
+        e(f"installed {name}")
+        set_status(label, "OK")
     else:
         e(f"{RED}FAIL{RESET} install {name}")
-        set_status(label, "FAIL (install)")
+        set_status(label, f"FAIL (install, exit {rc})")
 
 
 def self_update_and_reexec(argv: list[str]) -> None:
@@ -660,12 +868,23 @@ def main() -> int:
                    help="show what would happen without pulling/pushing/installing")
     p.add_argument("-f", "--force", action="store_true",
                    help="force install on all projects regardless of HEAD changes")
+    p.add_argument("--plain", action="store_true",
+                   help="disable animated progress (automatic when output is redirected)")
+    p.add_argument("--demo", action="store_true",
+                   help="preview progress and a simulated failure without running commands")
     p.add_argument("--skip-self-update", action="store_true",
                    help=argparse.SUPPRESS)
     p.add_argument("filter", nargs="?", default="",
                    help="substring; only repos whose path contains it are "
                         "updated and installed")
     args = p.parse_args()
+    global _plain, BOLD, RED, GREEN, YELLOW, CYAN, DIM, RESET, PREFIX_COLORS
+    _plain = args.plain
+    if not sys.stdout.isatty() or os.environ.get("TERM") == "dumb" or "NO_COLOR" in os.environ or _plain:
+        BOLD = RED = GREEN = YELLOW = CYAN = DIM = RESET = ""
+        PREFIX_COLORS = [""]
+    if args.demo:
+        return demo()
 
     if not args.skip_self_update:
         # Forward all args except --skip-self-update so the re-exec'd run
@@ -682,69 +901,58 @@ def main() -> int:
         if cmd:
             width = max(width, len(f"install:{d.name}"))
 
-    # Phase 1: parallel repo fetch/pull/(push if clean).
+    # Interactive editors run between live displays with the cursor restored.
     dirty: list[Path] = []
     if selected_dirs:
-        with ThreadPoolExecutor(max_workers=len(selected_dirs)) as ex:
-            futures = {}
-            for i, d in enumerate(selected_dirs):
-                color = PREFIX_COLORS[i % len(PREFIX_COLORS)]
-                futures[ex.submit(repo_job, d, color, width, args.dry_run)] = d
-            for fut in as_completed(futures):
-                res = fut.result()
-                if res is not None:
-                    dirty.append(res)
+        with Progress("Repositories", [d.name for d in selected_dirs]):
+            with ThreadPoolExecutor(max_workers=len(selected_dirs)) as ex:
+                futures = [ex.submit(run_job, d.name, repo_job, d,
+                                     PREFIX_COLORS[i % len(PREFIX_COLORS)], width, args.dry_run)
+                           for i, d in enumerate(selected_dirs)]
+                for fut in as_completed(futures):
+                    res = fut.result()
+                    if res is not None:
+                        dirty.append(res)
 
-    # Phase 2: serial commit prompts for dirty repos, then parallel push for
-    # repos that got committed.
     if dirty:
-        # Order by the configured REPOS order for deterministic prompt order.
         order = {d: i for i, d in enumerate(selected_dirs)}
-        dirty.sort(key=lambda d: order.get(d, 0))
+        dirty.sort(key=lambda d: order[d])
         committed = handle_dirty_repos(dirty, args.dry_run)
         if committed:
-            with ThreadPoolExecutor(max_workers=len(committed)) as ex:
-                for i, d in enumerate(committed):
-                    color = PREFIX_COLORS[i % len(PREFIX_COLORS)]
-                    ex.submit(push_after_commit, d, color, width, args.dry_run)
+            with Progress("Publishing commits", [d.name for d in committed]):
+                with ThreadPoolExecutor(max_workers=len(committed)) as ex:
+                    futures = [ex.submit(run_job, d.name, push_after_commit, d,
+                                         CYAN, width, args.dry_run) for d in committed]
+                    for fut in as_completed(futures):
+                        fut.result()
 
-    # Phase 3: publish local password-store changes after first pulling any
-    # remote changes that can be applied as a fast-forward.
-    sync_password_store(
-        PREFIX_COLORS[len(selected_dirs) % len(PREFIX_COLORS)],
-        width,
-        args.dry_run,
-    )
+    with Progress("Password store", ["password-store"]):
+        run_job("password-store", sync_password_store, CYAN, width, args.dry_run)
 
-    # Preserved from the original: keep tree-sitter-cli up to date.
-    if not args.dry_run:
-        subprocess.call(["cargo", "install", "tree-sitter-cli"])
-    else:
-        sys.stdout.write(f"{DIM}dry-run:{RESET} cargo install tree-sitter-cli\n")
+    def tree_sitter_job():
+        name = "install:tree-sitter-cli"
+        emit(name, CYAN, width, "cargo install tree-sitter-cli")
+        if args.dry_run:
+            set_status(name, "SKIP (dry-run)")
+        else:
+            rc = stream(name, CYAN, width, ["cargo", "install", "tree-sitter-cli"])
+            set_status(name, "OK" if rc == 0 else f"FAIL (exit {rc})")
 
-    # Phase 4: parallel install, limited to the selected repos.
+    # Preserve the existing ordering of tree-sitter before project installs.
+    with Progress("Tree-sitter CLI", ["install:tree-sitter-cli"]):
+        run_job("install:tree-sitter-cli", tree_sitter_job)
+
     installs = [(d, cmd) for d in selected_dirs if (cmd := REPOS[d])]
     if installs:
-        with ThreadPoolExecutor(max_workers=len(installs)) as ex:
-            for i, (idir, cmd) in enumerate(installs):
-                color = PREFIX_COLORS[i % len(PREFIX_COLORS)]
-                ex.submit(install_job, idir, cmd, color, width,
-                          args.dry_run, args.force)
+        with Progress("Installations", [f"install:{d.name}" for d, _ in installs]):
+            with ThreadPoolExecutor(max_workers=len(installs)) as ex:
+                futures = [ex.submit(run_job, f"install:{d.name}", install_job,
+                                     d, cmd, CYAN, width, args.dry_run, args.force)
+                           for d, cmd in installs]
+                for fut in as_completed(futures):
+                    fut.result()
 
-    # Summary.
-    sys.stdout.write(f"\n{BOLD}Summary{RESET}\n")
-    had_failure = 0
-    lines: list[str] = []
-    with _status_lock:
-        items = sorted(_status.items())
-    for key, val in items:
-        color, is_fail = summary_color(val)
-        if is_fail:
-            had_failure = 1
-        lines.append(f"  {color}{val:<24}{RESET} {key}")
-    if lines:
-        sys.stdout.write("\n".join(sorted(lines)) + "\n")
-    return had_failure
+    return failure_summary()
 
 
 if __name__ == "__main__":
