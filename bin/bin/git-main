@@ -17,21 +17,35 @@ if (( $# > 1 )); then
   exit 2
 fi
 
+main="$(git symbolic-ref --short refs/remotes/origin/HEAD)" || exit 1
+main="${main#origin/}"
+target="${1:-$main}"
+
+# NUL-delimited porcelain preserves spaces, newlines, and backslashes in paths.
+while IFS= read -r -d '' field; do
+  case "$field" in
+    'worktree '*) worktree="${field#worktree }" ;;
+    "branch refs/heads/$target")
+      if [[ "$(git symbolic-ref -q HEAD)" != "refs/heads/$target" ]]; then
+        printf 'git-main: %s is already checked out in %s; updating it there.\n' "$target" "$worktree" >&2
+        printf 'git-main: to enter that worktree, run: cd -- %q\n' "$worktree" >&2
+      fi
+      cd -- "$worktree" || exit 1
+      break
+      ;;
+  esac
+done < <(git worktree list --porcelain -z)
+
 if ! git fetch; then
-  echo "$0: git fetch failed" >&2
+  echo "git-main: git fetch failed" >&2
   exit 1
 fi
 
-main="$(git symbolic-ref refs/remotes/origin/HEAD | sed 's@^refs/remotes/origin/@@')"
 if ! $force &&
   [[ "$(git rev-parse "origin/$main")" != "$(git rev-parse HEAD)" ]] &&
   git merge-base --is-ancestor "origin/$main" HEAD; then
-  echo "$0: warning: HEAD contains commits that have not been pushed to origin/$main; use -f to discard them" >&2
+  echo "git-main: warning: HEAD contains commits that have not been pushed to origin/$main; use -f to discard them" >&2
   exit 1
 fi
 
-if [[ -n "$1" ]] && [[ -n "$main" ]]; then
-  git checkout -B "$1" "origin/$main"
-else
-  git checkout -B "$main" "origin/$main"
-fi
+git checkout -B "$target" "origin/$main"
