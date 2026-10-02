@@ -622,8 +622,7 @@ agent-with-keys() {
 }
 
 notes() {
-  touch "$HOME"/notes.md
-  nvim "$HOME"/notes.md "+norm G"
+  nvim -c "lua require('notes').open()"
 }
 
 override-agents() {
