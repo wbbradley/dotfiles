@@ -5,6 +5,9 @@ option_as_alt = "OnlyRight"
 [scrolling]
 history = 100000
 
+[selection]
+save_to_clipboard = true
+
 [font]
 normal = { family = "FiraCode Nerd Font Mono", style = "Regular" }
 bold = { family = "FiraCode Nerd Font Mono", style = "Medium" }
