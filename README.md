@@ -10,6 +10,17 @@ Considering bringing more of
 https://raw.githubusercontent.com/tamdogood/builder-essential-skills/refs/heads/main/skills/orwell-writing/SKILL.md
 in.
 
+## Neovim notes
+
+Neovim configuration and local Lua modules are tracked in `.config/nvim/`,
+which the installer exposes through the `~/.config` symlink. They do not
+live in `vim/`. Updating this repository makes them available to new Neovim
+sessions; the generated `lazy-lock.json` remains ignored.
+
+Run `notes` in Bash or press `<Leader>1` in Neovim to open `~/README.md`,
+append a dated heading, and start a new note. Save the buffer to keep it.
+The shared implementation is `.config/nvim/lua/notes.lua`.
+
 ## tmux colors
 
 The Linux and Darwin tmux configs both source `.config/tmux/gruvbox.conf`
