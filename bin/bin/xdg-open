@@ -1,0 +1,11 @@
+#!/bin/sh
+# Web URLs try obsidian in a detached worker. Files, other schemes, and options
+# retain the local system opener's behavior.
+opener_dir=$(dirname "$(readlink -f "$0")")
+if [ "$#" -eq 1 ]; then
+    case "$1" in
+        [hH][tT][tT][pP]://*|[hH][tT][tT][pP][sS]://*)
+            exec "$opener_dir/open-on-mac" "$1" ;;
+    esac
+fi
+exec "$opener_dir/xdg-open-local" "$@"

@@ -234,6 +234,12 @@ fi
 rm -rf "${HOME:?}/bin"
 ln -sf "$dotfiles_dir/bin/bin" "$HOME/bin" || die "failed to link bin dir"
 
+if on-linux; then
+  mkdir -p "$HOME/.local/bin"
+  ln -sf "$dotfiles_dir/bin/bin/xdg-open" "$HOME/.local/bin/xdg-open" \
+    || die "failed to link Linux URL opener"
+fi
+
 # Apply GNOME desktop settings (Caps Lock -> Ctrl, keybindings, etc.) when
 # running inside a GNOME/dconf session. Non-fatal: a headless/TTY install
 # (e.g. over SSH) has no session bus, so just skip it there.

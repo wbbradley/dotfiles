@@ -1,0 +1,77 @@
+#!/usr/bin/env python3
+"""Try a Mac's default browser asynchronously, then fall back to Linux locally."""
+
+import argparse
+import os
+from pathlib import Path
+import shlex
+import signal
+import subprocess
+import time
+
+
+def run_bounded(command):
+    deadline = time.monotonic() + 1
+    try:
+        process = subprocess.Popen(
+            command,
+            stdin=subprocess.DEVNULL,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+            start_new_session=True,
+        )
+    except OSError:
+        return False
+    try:
+        return process.wait(timeout=max(0, deadline - time.monotonic())) == 0
+    except subprocess.TimeoutExpired:
+        try:
+            os.killpg(process.pid, signal.SIGKILL)
+        except ProcessLookupError:
+            pass
+        process.wait()
+        return False
+
+
+def open_url(url, host):
+    if url.lower().startswith(("http://", "https://")):
+        # SSH joins command arguments into a remote shell command. Quote the URL
+        # here rather than relying on local argv to preserve it remotely.
+        command = [
+            "ssh", "-T",
+            "-o", "BatchMode=yes",
+            "-o", "StrictHostKeyChecking=yes",
+            "-o", "ConnectTimeout=1",
+            "-o", "ConnectionAttempts=1",
+            "-o", "ControlPath=none",
+            "-o", "ClearAllForwardings=yes",
+            host, "/usr/bin/open -u " + shlex.quote(url),
+        ]
+        if run_bounded(command):
+            return
+    run_bounded([str(Path(__file__).resolve().with_name("xdg-open-local")), url])
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--host", default="obsidian")
+    parser.add_argument("url")
+    args = parser.parse_args()
+    # The caller only waits for dispatch. Neither SSH nor a local launcher can
+    # retain the calling shell's/TUI's input, output, or controlling terminal.
+    if os.fork():
+        return
+    os.setsid()
+    if os.fork():
+        os._exit(0)
+    with open(os.devnull, "r+b", buffering=0) as null:
+        for descriptor in (0, 1, 2):
+            os.dup2(null.fileno(), descriptor)
+    try:
+        open_url(args.url, args.host)
+    finally:
+        os._exit(0)
+
+
+if __name__ == "__main__":
+    main()

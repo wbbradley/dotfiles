@@ -38,6 +38,27 @@ total deadline. Failed attempts are silent, and stalled subprocess groups are
 killed. SSH requires working key authentication and an already trusted host
 key. Change the destination in Linux's `copy-command` setting if needed.
 
+## Opening links on obsidian
+
+On Linux, `open` and `xdg-open` send HTTP/HTTPS links to the default browser on
+`obsidian` using `~/bin/open-on-mac`. The helper returns immediately and runs a
+detached worker; SSH has a one-second total deadline, requires a trusted host
+key and noninteractive authentication, and falls back to the existing local
+GTK/browser launcher if the remote attempt fails. The local fallback also has
+a one-second deadline. URLs are quoted for the remote shell and never evaluated
+as commands. Files, non-web schemes, and opener options remain local.
+
+The installer links `~/.local/bin/xdg-open` to the tracked wrapper so it takes
+precedence on this machine. The `open` wrapper preserves native behavior on
+macOS. To select a different Mac explicitly, run
+`open-on-mac --host other-mac https://example.org`.
+
+Use the same helper in wt with:
+
+```sh
+wt config set open-command "$HOME/bin/open-on-mac" --host obsidian
+```
+
 ## Updating with `upd`
 
 `upd` shows each repository, installation, and maintenance task on its own

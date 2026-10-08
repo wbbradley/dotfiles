@@ -1,0 +1,19 @@
+#!/bin/sh
+# Use GTK's launch context so existing local browser windows get focus.
+# This fallback bypasses our remote wrapper to avoid recursion.
+if [ "$#" -eq 1 ]; then
+    case "$1" in
+        [hH][tT][tT][pP]://*) scheme=http ;;
+        [hH][tT][tT][pP][sS]://*) scheme=https ;;
+        *) exec /usr/bin/xdg-open "$@" ;;
+    esac
+
+    if command -v gtk-launch >/dev/null 2>&1; then
+        desktop=$(xdg-mime query default "x-scheme-handler/$scheme" 2>/dev/null)
+        if [ -n "$desktop" ]; then
+            exec gtk-launch "$desktop" "$1"
+        fi
+    fi
+fi
+
+exec /usr/bin/xdg-open "$@"
