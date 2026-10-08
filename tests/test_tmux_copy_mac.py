@@ -11,7 +11,7 @@ import unittest
 
 
 HELPER = Path(__file__).resolve().parents[1] / "bin/bin/tmux-copy-mac"
-FAKE_COPY = '''#!/usr/bin/env python3
+FAKE_COPY = """#!/usr/bin/env python3
 import json
 import os
 from pathlib import Path
@@ -31,7 +31,7 @@ if mode == "hang":
     (root / (name + ".child")).write_text(str(child.pid))
     time.sleep(30)
 (root / (name + ".bytes")).write_bytes(sys.stdin.buffer.read())
-'''
+"""
 
 
 class TmuxCopyMacTest(unittest.TestCase):
@@ -60,8 +60,11 @@ class TmuxCopyMacTest(unittest.TestCase):
     def copy(self, contents, *args):
         start = time.monotonic()
         result = subprocess.run(
-            [str(HELPER), *args], input=contents, capture_output=True,
-            env=self.env, timeout=3,
+            [str(HELPER), *args],
+            input=contents,
+            capture_output=True,
+            env=self.env,
+            timeout=3,
         )
         self.assertEqual(result.returncode, 0)
         self.assertEqual(result.stdout, b"")
@@ -78,13 +81,18 @@ class TmuxCopyMacTest(unittest.TestCase):
 
     def test_exact_bytes_and_destination(self):
         contents = "Unicode: λ 🍂\n".encode() + b"NUL: \0\n\n"
-        self.copy(contents)
+        self.copy(contents, "mac.example.test")
         for name in ("ssh", "xclip"):
             self.assertEqual((self.root / (name + ".bytes")).read_bytes(), contents)
         args = json.loads((self.root / "ssh.args").read_text())
-        self.assertEqual(args[-2:], ["obsidian", "/usr/bin/pbcopy"])
+        self.assertEqual(args[-2:], ["mac.example.test", "/usr/bin/pbcopy"])
         self.assertIn("BatchMode=yes", args)
         self.assertIn("StrictHostKeyChecking=yes", args)
+
+    def test_no_host_copies_locally_without_attempting_ssh(self):
+        self.copy(b"local only")
+        self.assertEqual((self.root / "xclip.bytes").read_bytes(), b"local only")
+        self.assertFalse((self.root / "ssh.args").exists())
 
     def test_host_override(self):
         self.copy(b"selection", "other-mac")
@@ -95,30 +103,33 @@ class TmuxCopyMacTest(unittest.TestCase):
         self.env["COPY_TEST_SSH"] = "hang"
         # Exceed pipe capacity to also exercise timeout while writing to SSH.
         contents = b"selected text\n" * 20000
-        self.copy(contents)
+        self.copy(contents, "mac.example.test")
         self.assertEqual((self.root / "xclip.bytes").read_bytes(), contents)
         self.assert_stopped("ssh")
 
     def test_failed_ssh_preserves_local_copy(self):
         self.env["COPY_TEST_SSH"] = "fail"
-        self.copy(b"local copy")
+        self.copy(b"local copy", "mac.example.test")
         self.assertEqual((self.root / "xclip.bytes").read_bytes(), b"local copy")
 
     def test_failed_local_copy_preserves_remote_copy(self):
         self.env["COPY_TEST_XCLIP"] = "fail"
-        self.copy(b"remote copy")
+        self.copy(b"remote copy", "mac.example.test")
         self.assertEqual((self.root / "ssh.bytes").read_bytes(), b"remote copy")
 
     def test_stalled_local_copy_preserves_remote_copy(self):
         self.env["COPY_TEST_XCLIP"] = "hang"
-        self.copy(b"remote copy")
+        self.copy(b"remote copy", "mac.example.test")
         self.assertEqual((self.root / "ssh.bytes").read_bytes(), b"remote copy")
         self.assert_stopped("xclip")
 
     def test_stalled_input_stops_before_launching_commands(self):
         process = subprocess.Popen(
-            [str(HELPER)], stdin=subprocess.PIPE, stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE, env=self.env,
+            [str(HELPER)],
+            stdin=subprocess.PIPE,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            env=self.env,
         )
         try:
             process.wait(timeout=2)

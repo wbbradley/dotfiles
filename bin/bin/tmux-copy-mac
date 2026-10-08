@@ -59,21 +59,30 @@ def main():
         args=(["xclip", "-selection", "clipboard", "-i"], contents, deadline),
     )
     local.start()
-    host = sys.argv[1] if len(sys.argv) > 1 else "obsidian"
-    copy_to(
-        [
-            "ssh", "-T",
-            "-o", "BatchMode=yes",
-            "-o", "StrictHostKeyChecking=yes",
-            "-o", "ConnectTimeout=1",
-            "-o", "ConnectionAttempts=1",
-            "-o", "ControlPath=none",
-            "-o", "ClearAllForwardings=yes",
-            host, "/usr/bin/pbcopy",
-        ],
-        contents,
-        deadline,
-    )
+    host = sys.argv[1] if len(sys.argv) > 1 else None
+    if host:
+        copy_to(
+            [
+                "ssh",
+                "-T",
+                "-o",
+                "BatchMode=yes",
+                "-o",
+                "StrictHostKeyChecking=yes",
+                "-o",
+                "ConnectTimeout=1",
+                "-o",
+                "ConnectionAttempts=1",
+                "-o",
+                "ControlPath=none",
+                "-o",
+                "ClearAllForwardings=yes",
+                host,
+                "/usr/bin/pbcopy",
+            ],
+            contents,
+            deadline,
+        )
     local.join()
 
 

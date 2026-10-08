@@ -1,11 +1,18 @@
 #!/bin/sh
-# Web URLs try obsidian in a detached worker. Files, other schemes, and options
+# Web URLs try a configured Mac in a detached worker. Files, other schemes, and options
 # retain the local system opener's behavior.
 opener_dir=$(dirname "$(readlink -f "$0")")
 if [ "$#" -eq 1 ]; then
     case "$1" in
         [hH][tT][tT][pP]://*|[hH][tT][tT][pP][sS]://*)
-            exec "$opener_dir/open-on-mac" "$1" ;;
+            host_file="${XDG_CONFIG_HOME:-$HOME/.config}/remote-mac-host"
+            if [ -r "$host_file" ]; then
+                remote_host=
+                IFS= read -r remote_host < "$host_file" || :
+                if [ -n "$remote_host" ]; then
+                    exec "$opener_dir/open-on-mac" --host "$remote_host" "$1"
+                fi
+            fi ;;
     esac
 fi
 exec "$opener_dir/xdg-open-local" "$@"

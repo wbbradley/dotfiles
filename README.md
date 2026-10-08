@@ -30,33 +30,44 @@ or pane flashes. Pane foreground and background inherit the terminal colors.
 
 Reload an existing session with `tmux source-file ~/.tmux.conf`.
 
-Linux tmux yanks (`y`, Enter, and mouse selections) also send the copied text
-to `/usr/bin/pbcopy` through SSH to `obsidian`, while preserving the
-tmux buffer and Linux's `xclip` clipboard. `~/bin/tmux-copy-mac` runs in tmux's
-separate copy process, with parallel clipboard destinations and a one-second
-total deadline. Failed attempts are silent, and stalled subprocess groups are
-killed. SSH requires working key authentication and an already trusted host
-key. Change the destination in Linux's `copy-command` setting if needed.
+Linux tmux yanks (`y`, Enter, and mouse selections) preserve the tmux buffer
+and Linux's `xclip` clipboard. `~/bin/tmux-copy-mac` can also send the copied
+text to `/usr/bin/pbcopy` over SSH when given an explicit destination. It runs
+in tmux's separate copy process, with parallel clipboard destinations and a
+one-second total deadline. Failed attempts are silent, and stalled subprocess
+groups are killed. SSH requires working key authentication and a trusted host
+key. Without a destination, it only copies locally.
 
-## Opening links on obsidian
+To enable remote copying, add this setting to `~/.config/tmux/local.conf`,
+which is ignored by Git and loaded after the shared tmux settings:
 
-On Linux, `open` and `xdg-open` send HTTP/HTTPS links to the default browser on
-`obsidian` using `~/bin/open-on-mac`. The helper returns immediately and runs a
-detached worker; SSH has a one-second total deadline, requires a trusted host
-key and noninteractive authentication, and falls back to the existing local
-GTK/browser launcher if the remote attempt fails. The local fallback also has
-a one-second deadline. URLs are quoted for the remote shell and never evaluated
-as commands. Files, non-web schemes, and opener options remain local.
+```tmux
+set-option -s copy-command '~/bin/tmux-copy-mac my-mac'
+```
 
-The installer links `~/.local/bin/xdg-open` to the tracked wrapper so it takes
-precedence on this machine. The `open` wrapper preserves native behavior on
-macOS. To select a different Mac explicitly, run
-`open-on-mac --host other-mac https://example.org`.
+## Opening links on a Mac
 
-Use the same helper in wt with:
+On Linux, `open` and `xdg-open` can send HTTP/HTTPS links to a configured Mac's
+default browser using `~/bin/open-on-mac`. Store your SSH destination as a single
+line in `~/.config/remote-mac-host` (or `$XDG_CONFIG_HOME/remote-mac-host`). This
+machine-specific file is ignored by Git. With no host configured, URLs open
+locally. The helper itself requires an explicit `--host` argument.
+
+The helper returns immediately and runs a detached worker; SSH has a one-second
+total deadline, requires a trusted host key and noninteractive authentication,
+and falls back to the existing local GTK/browser launcher on failure. The local
+fallback also has a one-second deadline. URLs are quoted for the remote shell
+and never evaluated as commands. Files, non-web schemes, and options stay local.
+
+The installer links `~/.local/bin/xdg-open` to the tracked wrapper. The `open`
+wrapper preserves native behavior on macOS. For an explicit destination, run
+`open-on-mac --host my-mac https://example.org`.
+
+Use the helpers in wt with machine-local configuration:
 
 ```sh
-wt config set open-command "$HOME/bin/open-on-mac" --host obsidian
+wt config set copy-command "$HOME/bin/tmux-copy-mac" my-mac
+wt config set open-command "$HOME/bin/open-on-mac" --host my-mac
 ```
 
 ## Updating with `upd`

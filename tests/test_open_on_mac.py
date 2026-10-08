@@ -12,7 +12,7 @@ import unittest
 
 
 BIN = Path(__file__).resolve().parents[1] / "bin/bin"
-FAKE_OPENER = '''#!/usr/bin/env python3
+FAKE_OPENER = """#!/usr/bin/env python3
 import json
 import os
 from pathlib import Path
@@ -30,7 +30,7 @@ if mode == "hang":
     time.sleep(30)
 if mode == "fail":
     sys.exit(1)
-'''
+"""
 
 
 class OpenOnMacTest(unittest.TestCase):
@@ -43,8 +43,15 @@ class OpenOnMacTest(unittest.TestCase):
             shutil.copy2(BIN / name, self.bin / name)
         for name in ("ssh", "xdg-open-local"):
             self.fake(name)
-        self.env = dict(os.environ, OPEN_TEST_DIR=str(self.root),
-                        PATH=str(self.bin) + os.pathsep + os.environ["PATH"])
+        config = self.root / "config"
+        config.mkdir()
+        (config / "remote-mac-host").write_text("mac.example.test\n")
+        self.env = dict(
+            os.environ,
+            OPEN_TEST_DIR=str(self.root),
+            XDG_CONFIG_HOME=str(config),
+            PATH=str(self.bin) + os.pathsep + os.environ["PATH"],
+        )
 
     def fake(self, name):
         command = self.bin / name
@@ -61,8 +68,9 @@ class OpenOnMacTest(unittest.TestCase):
 
     def dispatch(self, command, *args):
         started = time.monotonic()
-        result = subprocess.run([str(command), *args], env=self.env,
-                                capture_output=True, timeout=2)
+        result = subprocess.run(
+            [str(command), *args], env=self.env, capture_output=True, timeout=2
+        )
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertEqual(result.stdout, b"")
         self.assertEqual(result.stderr, b"")
@@ -77,12 +85,40 @@ class OpenOnMacTest(unittest.TestCase):
                 time.sleep(0.01)
         self.fail(name + " did not run")
 
+    def test_helper_requires_an_explicit_host(self):
+        result = subprocess.run(
+            [str(self.bin / "open-on-mac"), "https://example.org/"],
+            env=self.env,
+            capture_output=True,
+            timeout=2,
+        )
+        self.assertEqual(result.returncode, 2)
+        self.assertIn(b"--host", result.stderr)
+        self.assertFalse((self.root / "ssh.args").exists())
+
+    def test_unconfigured_wrapper_opens_locally(self):
+        (self.root / "config/remote-mac-host").unlink()
+        self.fake("open-on-mac")
+        self.dispatch(self.bin / "xdg-open", "https://example.org/")
+        self.assertEqual(self.arguments("xdg-open-local"), ["https://example.org/"])
+        self.assertFalse((self.root / "open-on-mac.args").exists())
+
+    def test_host_file_does_not_require_a_trailing_newline(self):
+        (self.root / "config/remote-mac-host").write_text("mac.example.test")
+        self.fake("open-on-mac")
+        self.dispatch(self.bin / "xdg-open", "https://example.org/")
+        self.assertEqual(
+            self.arguments("open-on-mac"),
+            ["--host", "mac.example.test", "https://example.org/"],
+        )
+
     def test_remote_success_and_shell_quoting(self):
         import shlex
-        url = "https://example.org/a'b?x=$(touch BAD)&quoted=\"two words\""
-        self.dispatch(self.bin / "open-on-mac", "--host", "obsidian", url)
+
+        url = 'https://example.org/a\'b?x=$(touch BAD)&quoted="two words"'
+        self.dispatch(self.bin / "open-on-mac", "--host", "mac.example.test", url)
         args = self.arguments("ssh")
-        self.assertEqual(args[-2], "obsidian")
+        self.assertEqual(args[-2], "mac.example.test")
         self.assertEqual(shlex.split(args[-1]), ["/usr/bin/open", "-u", url])
         self.assertIn("BatchMode=yes", args)
         self.assertIn("StrictHostKeyChecking=yes", args)
@@ -92,14 +128,14 @@ class OpenOnMacTest(unittest.TestCase):
     def test_failure_uses_local_fallback(self):
         self.env["OPEN_TEST_SSH"] = "fail"
         url = "https://example.org/?a=1&b=two words"
-        self.dispatch(self.bin / "open-on-mac", url)
+        self.dispatch(self.bin / "open-on-mac", "--host", "mac.example.test", url)
         self.assertEqual(self.arguments("xdg-open-local"), [url])
 
     def test_remote_timeout_kills_descendants_and_falls_back(self):
         self.env["OPEN_TEST_SSH"] = "hang"
         url = "https://example.org/timeout"
         started = time.monotonic()
-        self.dispatch(self.bin / "open-on-mac", url)
+        self.dispatch(self.bin / "open-on-mac", "--host", "mac.example.test", url)
         self.assertEqual(self.arguments("xdg-open-local"), [url])
         self.assertLess(time.monotonic() - started, 1.5)
         self.assert_stopped("ssh")
@@ -114,14 +150,26 @@ class OpenOnMacTest(unittest.TestCase):
     def test_local_timeout_is_bounded(self):
         self.env["OPEN_TEST_SSH"] = "fail"
         self.env["OPEN_TEST_XDG_OPEN_LOCAL"] = "hang"
-        self.dispatch(self.bin / "open-on-mac", "https://example.org/")
+        self.dispatch(
+            self.bin / "open-on-mac",
+            "--host",
+            "mac.example.test",
+            "https://example.org/",
+        )
         self.arguments("xdg-open-local")
         time.sleep(1.1)
         self.assert_stopped("xdg-open-local")
 
     def test_files_and_other_schemes_stay_local(self):
-        self.dispatch(self.bin / "open-on-mac", "mailto:person@example.org")
-        self.assertEqual(self.arguments("xdg-open-local"), ["mailto:person@example.org"])
+        self.dispatch(
+            self.bin / "open-on-mac",
+            "--host",
+            "mac.example.test",
+            "mailto:person@example.org",
+        )
+        self.assertEqual(
+            self.arguments("xdg-open-local"), ["mailto:person@example.org"]
+        )
         self.assertFalse((self.root / "ssh.args").exists())
 
     def test_xdg_open_symlink_and_open_command_use_remote_helper(self):
@@ -130,7 +178,10 @@ class OpenOnMacTest(unittest.TestCase):
         link.symlink_to(self.bin / "xdg-open")
         for command in (link, self.bin / "open"):
             self.dispatch(command, "HTTPS://example.org/")
-            self.assertEqual(self.arguments("open-on-mac"), ["HTTPS://example.org/"])
+            self.assertEqual(
+                self.arguments("open-on-mac"),
+                ["--host", "mac.example.test", "HTTPS://example.org/"],
+            )
             (self.root / "open-on-mac.args").unlink()
 
     def test_xdg_open_passes_files_options_and_multiple_arguments_locally(self):
