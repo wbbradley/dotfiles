@@ -30,6 +30,14 @@ or pane flashes. Pane foreground and background inherit the terminal colors.
 
 Reload an existing session with `tmux source-file ~/.tmux.conf`.
 
+Linux tmux yanks (`y`, Enter, and mouse selections) also send the copied text
+to `/usr/bin/pbcopy` through SSH to `obsidian`, while preserving the
+tmux buffer and Linux's `xclip` clipboard. `~/bin/tmux-copy-mac` runs in tmux's
+separate copy process, with parallel clipboard destinations and a one-second
+total deadline. Failed attempts are silent, and stalled subprocess groups are
+killed. SSH requires working key authentication and an already trusted host
+key. Change the destination in Linux's `copy-command` setting if needed.
+
 ## Updating with `upd`
 
 `upd` shows each repository, installation, and maintenance task on its own

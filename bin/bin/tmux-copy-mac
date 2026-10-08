@@ -1,0 +1,81 @@
+#!/usr/bin/env python3
+"""Copy tmux stdin to X11 and a Mac, with a one-second total deadline."""
+
+import os
+import select
+import signal
+import subprocess
+import sys
+import threading
+import time
+
+
+def read_clipboard(deadline):
+    chunks = []
+    while True:
+        remaining = deadline - time.monotonic()
+        if remaining <= 0 or not select.select([sys.stdin], [], [], remaining)[0]:
+            return None
+        chunk = os.read(sys.stdin.fileno(), 65536)
+        if not chunk:
+            return b"".join(chunks)
+        chunks.append(chunk)
+
+
+def copy_to(command, contents, deadline):
+    if time.monotonic() >= deadline:
+        return
+    try:
+        process = subprocess.Popen(
+            command,
+            stdin=subprocess.PIPE,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+            start_new_session=True,
+        )
+    except OSError:
+        return
+    try:
+        process.communicate(contents, timeout=max(0, deadline - time.monotonic()))
+    except subprocess.TimeoutExpired:
+        try:
+            os.killpg(process.pid, signal.SIGKILL)
+        except ProcessLookupError:
+            pass
+        process.communicate()
+
+
+def main():
+    deadline = time.monotonic() + 1
+    try:
+        contents = read_clipboard(deadline)
+    except OSError:
+        return
+    if contents is None:
+        return
+
+    local = threading.Thread(
+        target=copy_to,
+        args=(["xclip", "-selection", "clipboard", "-i"], contents, deadline),
+    )
+    local.start()
+    host = sys.argv[1] if len(sys.argv) > 1 else "obsidian"
+    copy_to(
+        [
+            "ssh", "-T",
+            "-o", "BatchMode=yes",
+            "-o", "StrictHostKeyChecking=yes",
+            "-o", "ConnectTimeout=1",
+            "-o", "ConnectionAttempts=1",
+            "-o", "ControlPath=none",
+            "-o", "ClearAllForwardings=yes",
+            host, "/usr/bin/pbcopy",
+        ],
+        contents,
+        deadline,
+    )
+    local.join()
+
+
+if __name__ == "__main__":
+    main()
