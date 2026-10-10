@@ -91,6 +91,7 @@ REPOS: dict[Path, Optional[list[str]]] = {
     HOME / "src/git-stack": CARGO_INSTALL,
     HOME / "src/rtop": CARGO_INSTALL,
     HOME / "src/dangle": CARGO_INSTALL,
+    HOME / "src/bbs": ["sh", "-c", "cargo install --path . && bbs init && ./scripts/setup.py"],
 }
 
 # These repos use their existing Git configuration and are never cloned.
