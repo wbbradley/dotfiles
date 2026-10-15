@@ -1,0 +1,6 @@
+{"total_count": 4, "check_runs": [
+  {"id": 1, "name": "build", "status": "completed", "conclusion": "success", "started_at": "2026-10-13T21:11:40Z", "app": {"id": 15368, "slug": "github-actions"}, "head_sha": "aaaaaaa0000000000000000000000000000000aa"},
+  {"id": 115541961128, "name": "changelog note", "status": "completed", "conclusion": "failure", "started_at": "2026-10-13T21:11:44Z", "app": {"id": 15368, "slug": "github-actions"}, "head_sha": "aaaaaaa0000000000000000000000000000000aa"},
+  {"id": 115541971447, "name": "changelog note", "status": "completed", "conclusion": "skipped", "started_at": "2026-10-13T21:11:44Z", "app": {"id": 15368, "slug": "github-actions"}, "head_sha": "aaaaaaa0000000000000000000000000000000aa"},
+  {"id": 115542240333, "name": "changelog note", "status": "completed", "conclusion": "skipped", "started_at": "2026-10-13T21:12:21Z", "app": {"id": 15368, "slug": "github-actions"}, "head_sha": "aaaaaaa0000000000000000000000000000000aa"}
+]}
