@@ -95,22 +95,8 @@ if command -v wt >/dev/null 2>&1; then
 fi
 
 
-pane_id_of_pane1() {
-  tmux list-panes -F '#{pane_index} #{pane_id}' | awk '$1 == "1" {print $2}'
-}
-
-update_tmux_title() {
-  if [[ "$TMUX_PANE" = "$(pane_id_of_pane1 2>/dev/null)" ]]; then
-    tmux rename-window " ${PWD/"$HOME"/\~} " 2>/dev/null
-  fi
-  return 0
-}
-
-export -f update_tmux_title
-export -f pane_id_of_pane1
-
 # shellcheck disable=SC2155
-export PS1="\$(if (( \$? )); then printf 'ERROR '; fi; update_tmux_title)\[\e[48;5;155;38;5;0m\]\
+export PS1="\$(if (( \$? )); then printf 'ERROR '; fi)\[\e[48;5;155;38;5;0m\]\
 \$(if [ -n \"\$SSH_TTY\" ]; then printf ' %s ' \$(hostname); fi)\[\e[0m\]\
 \[\e[48;2;0;46;106;38;2;255;255;255m\]\$(parse_git_branch)\[\e[0m\]\
 \[\e[38;2;108;117;132m\] \$(date) \[\e[0m\] \n\
